@@ -1,0 +1,12 @@
+{
+  "name": "prodonus-app",
+  "description": "Prodonus is a warranty and social network platform for products",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node prodonus-app.js"
+  },
+  "dependencies": {
+    "express": "3.x"
+  }
+}
