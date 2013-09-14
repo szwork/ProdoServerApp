@@ -13,10 +13,13 @@ var express = require('express')
      , fs = require('fs')
      , path = require('path');
 
-/*All the routes are stored in the app/routes directory
+/*All the routes files are described and stored in the routes directory
+* All the routes for prodonus are initialized in the code below. The init function
+* is called on all the routes.
 */
 var RouteDir = 'routes',
     files = fs.readdirSync(RouteDir);
+
 files.forEach(function (file) {
     var filePath = path.resolve('./', RouteDir, file),
         route = require(filePath);
@@ -30,8 +33,10 @@ mongoose.connect('mongodb://localhost/contacts_database');
 // defines app settings with default values for Prodonus
 app.set('log level', process.env.PRODONUS_LOG_LEVEL || Log.DEBUG);
 app.set('session secret', process.env.PRODONUS_SESSION_SECRET || 'secret');
-app.set('session age', process.env.PRODONUS_SESSION_AGE || 3500);
-app.set('port', process.env.PRODONUS for middleware and requests
+app.set('session age', process.env.PRODONUS_SESSION_AGE || 3600);
+app.set('port', process.env.PRODONUS_PORT || 9000);
+
+// configures default logger available for middleware and requests
 app.use(function (req, res, next) {
     req.log = new Log(app.get('log level'));
     next();
@@ -45,19 +50,15 @@ if (app.get('log level') >= Log.INFO) {
     app.use(express.logger(format));
 }
 
-// all environments
-// app.set('port', process.env.PORT || 3000);
-// app.set('views', __dirname + '/app');
-// app.set('view engine', 'jade');
-
-// config
 app.use(express.favicon());
-// app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(app.router);
-// app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+
+//////////////
+// enables compression for all requests
+app.use(express.compress());
 
 //Set the Prodonus Server
 http.createServer(app).listen(app.get('port'), function(){
