@@ -1,12 +1,13 @@
 /**
  * Prodonus App
  * A warranty and social network platform for products. It enables conversation between
- * the manufacturers
- *
+ * the manufacturers and consumers, both individuals and companies
+ *  
  */
 
 var express = require('express')
 	 , routes = require('./routes')
+	 , Log = require('log')
      , api = require('./routes/api')
      , envir = require('./config/environment')
      , mongoose = require('mongoose')
@@ -27,6 +28,7 @@ files.forEach(function (file) {
 });
 
 var app = express();
+var log = new Log();
 
 mongoose.connect('mongodb://localhost/contacts_database');
 
@@ -56,7 +58,6 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 
-//////////////
 // enables compression for all requests
 app.use(express.compress());
 
