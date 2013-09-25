@@ -6,15 +6,15 @@ var app= angular.module("ProdonusApp",['app.directives'], function() {} );
 
 app.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
   $routeProvider.
-      when('/company', {templateUrl: 'registration/views/company.tpl.html'}).
-      when('/contact', {templateUrl: 'registration/views/contact.tpl.html'}).
-      when('/address', {templateUrl: 'registration/views/address.tpl.html'}).
-      when('/service', {templateUrl: 'registration/views/service.tpl.html'}).
-      when('/terms&conditions', {templateUrl: 'registration/views/terms&conditions.tpl.html'}).
-      when('/payment', {templateUrl: 'registration/views/payment.tpl.html'}).
-      when('/groupusers', {templateUrl: 'registration/views/groupusers.tpl.html'}).
-      when('/signin', {templateUrl: 'registration/views/signin.tpl.html'}).
-      when('/signup', {templateUrl: 'registration/views/signup.tpl.html'}).
+      when('/company', {templateUrl: 'org/registration/views/company.tpl.html'}).
+      when('/contact', {templateUrl: 'org/registration/views/contact.tpl.html'}).
+      when('/address', {templateUrl: 'org/registration/views/address.tpl.html'}).
+      when('/service', {templateUrl: 'org/registration/views/service.tpl.html'}).
+      when('/terms&conditions', {templateUrl: 'org/registration/views/terms&conditions.tpl.html'}).
+      when('/payment', {templateUrl: 'org/registration/views/payment.tpl.html'}).
+      when('/groupusers', {templateUrl: 'org/registration/views/groupusers.tpl.html'}).
+      when('/signin', {templateUrl: 'org/registration/views/signin.tpl.html'}).
+      when('/signup', {templateUrl: 'org/registration/views/signup.tpl.html'}).
       otherwise({redirectTo: '/company'});
     }]);
   
