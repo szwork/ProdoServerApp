@@ -1,0 +1,32 @@
+<div class="container">
+  
+  <form name="signinForm" class="css-form" novalidate ng-submit="signin()">
+    <center>
+      <h3 class="form-register-heading">Please Sign In</h3>
+      <div class="control-group" ng-class="{error: signinForm.username.$invalid &&          signinForm.username.$dirty && showValidationMessage}">
+            <div class="controls">
+              <input name="username" class="form-control" type="text" placeholder="Username" required ng-model="signin.username" />  
+                <span class="help-inline" ng-show="showValidationMessage && signinForm.username.$error.required">Required</span>
+            </div>
+        </div>
+        <div class="control-group"
+            ng-class="{error: signinForm.password.$invalid && signinForm.password.$dirty && showValidationMessage}">
+            <div class="controls">
+                <input name="password" class="form-control" type="password" placeholder="Password" required 
+                       ng-model="signin.password" />
+                <span class="help-inline"
+                      ng-show="signinForm.password.$error.required && showValidationMessage">Required</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls controls-row">
+                <button type="submit" class="btn btn-md btn-primary btn-signin" value="SignIn">Sign In</button><br>
+                <a href="#">Forgot Password?</a>
+            </div>
+        </div>
+    </center>
+  </form>
+        
+
+</div>   
+ 

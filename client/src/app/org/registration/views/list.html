@@ -1,0 +1,28 @@
+<div class="container">
+ 
+<table class="table table-striped table-condensed table-hover">
+ 		<thead class="tbl-header">
+ 			<th>Company Name</th>
+ 			<th>Contract Id</th>
+ 			<th>Address 1</th>
+ 			<th>Address 2</th>
+ 			<th>Address 3</th>
+ 			<th>City</th>
+ 			<th>State</th>
+ 			<th>Zip Code</th>
+ 		</thead>
+		<tbody>
+			<tr ng-repeat="manufacturer in manufacturers">
+				<td>{{manufacturer.companyname}}</td>
+				<td>{{manufacturer.contractid}}</td>
+				<td>{{manufacturer.address1}}</td>
+				<td>{{manufacturer.address2}}</td>
+				<td>{{manufacturer.address3}}</td>
+				<td>{{manufacturer.city}}</td>
+				<td>{{manufacturer.state}}</td>
+				<td>{{manufacturer.zipcode}}</td>
+			</tr>			
+		</tbody> 		
+ 	</table>	
+ 	 
+</div>

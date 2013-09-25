@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html ng-app="ProdonusApp" lang="en">
+<head>
+	<meta charset="utf-8">
+	<script src="../vendor/angularjs-1.0.5/angular.min.js"></script>
+	<script src="../vendor/angularjs-1.0.5/angular-resource.js"></script>
+	<script src="registration/js/manufacturerRegistration.js"></script>
+	<script src="../common/js/directives/passwordCheck.js"></script>
+	 
+	<link rel=" stylesheet" href="../vendor/bootstrap-3.0.0/dist/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="../assets/css/prodonus.css">
+ 
+</head>
+<!-- To create a Manufacturer's Registration Page for a manufacturing company to get registered with Prodonus & create an account and capture details.   -->
+<body>
+
+	<div class="container">
+	  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	  	<a class="navbar-brand" href="#"><h4><strong>Prodonus</strong></h4></a>
+	  	<p class="navbar-text pull-right"><a href="#/signin" class="navbar-link"><strong>Sign In</strong></a></p>
+      </nav>
+		  
+		<div class="row">
+  			<div class="col-md-2">First Coloumn</div>
+ 			<center><div class="col-md-8"><strong>Welcome To Prodonus</strong></div></center>
+  			<div class="col-md-2">Third Coloumn</div>
+		</div>
+		 
+		<div class="col-md-8 col-md-offset-2"  ng-controller="ManufacturerRegistrationCtrl">
+			<ul class="nav nav-tabs">
+     		 	<li ng-class="tabClass(tab)" ng-repeat="tab in tabs" tab="tab"><a href="{{tab.link}}" ng-click="setSelectedTab(tab)"><strong>{{tab.label}}</strong></a></li>
+
+    		</ul>
+    		<div class="container">
+   		    <div ng-view></div>
+   		    </div>
+				 
+		</div>
+		 
+
+	  	<div class="container">
+	  		<div class="footer">
+       		 	<p>&copy; Company 2013</p>
+      		</div>
+	  	</div>
+	  	
+		 
+	</div>
+	 
+	
+		
+	<script src="../vendor/bootstrap-3.0.0/assets/js/jquery.js"></script>
+	<script src="../vendor/bootstrap-3.0.0/dist/js/bootstrap.js"></script>
+</body>
+</html>
+	
