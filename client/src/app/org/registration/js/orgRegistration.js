@@ -1,10 +1,11 @@
  
 
-var app= angular.module("ProdonusApp",['app.directives'], function() {} );
+var app= angular.module("ProdonusApp",['app.directives', 'ui.router'], function() {} );
 
 // app.controller('WidgetsController', function($scope) {});
 
 app.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+  $locationProvider.hashPrefix('!');
   $routeProvider.
       when('/company', {templateUrl: 'org/registration/views/company.tpl.html'}).
       when('/contact', {templateUrl: 'org/registration/views/contact.tpl.html'}).
@@ -15,7 +16,7 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
       when('/groupusers', {templateUrl: 'org/registration/views/groupusers.tpl.html'}).
       when('/signin', {templateUrl: 'org/registration/views/signin.tpl.html'}).
       when('/signup', {templateUrl: 'org/registration/views/signup.tpl.html'}).
-      otherwise({redirectTo: '/company'});
+      otherwise({redirectTo: '/signup'});
     }]);
   
   
@@ -38,9 +39,9 @@ app.controller("OrgRegistrationCtrl", function($scope, $http) {
 	 
 
 	 $scope.tabs = [
-      { link : '#/company', label : 'Company' },
-      { link : '#/groupusers', label : 'Group Users' },
-      { link : '#/payment', label : 'Payments' }
+      { link : '#!/company', label : 'Company' },
+      { link : '#!/groupusers', label : 'Group Users' },
+      { link : '#!/payment', label : 'Payments' }
       
     ]; 
     
@@ -162,27 +163,3 @@ $scope.orgs = [
 
 
 });
- 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
