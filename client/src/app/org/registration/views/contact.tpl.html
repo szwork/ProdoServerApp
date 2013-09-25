@@ -1,21 +1,24 @@
 <div class="container">
-
-     				<form name=" formManufacturerRegisterContact" class="css-form" novalidate>
-        				
-        				<center>
-        					<h3 class="form-register-heading">Contact Details</h3>
-        					<p class="para1">All fields are mandatory.</p>
-        					<input name="textinput" type="text" class="form-control" placeholder="Customer HelpLine No." ng-model="cust.helpline" autofocus required/>
-                  <input name="textinput" type="url" class="form-control" placeholder="Company Site URL" ng-model="site.url" required/>
-        				
-
-        				</center>
-        				 
-          				<center>
-          					<button class="btn btn-md btn-primary" type="submit">Proceed</button>
-       						<button class="btn btn-md" type="submit">Reset</button>
-          				</center> 
-       					
-      				</form>
-
-				</div>
+  <a class="link" href="#">Company</a>
+  <a class="link" href="#/contact">Contact</a>
+  <a class="link" href="#/address">Location</a>
+  <form name=" formOrgRegisterContact" class="css-form" novalidate>
+    <center>
+      <div class="control-group">
+      <label class="label-control">Contact</label>
+        <a href="" ng-click="addContact()"><span class="glyphicon glyphicon-plus"></span></a> 
+      <div ng-repeat="contact in contacts">
+      <input name="contact" type="text" class="form-control" placeholder="Customer HelpLine" ng-model="contact.value"  autofocus required/>
+        <a href="" ng-click="removeContact(contact)"><span class="glyphicon glyphicon-remove"></span></a>
+        <div class="input-help">
+          <h4>Field Required!</h4>
+        </div> 
+      </div>
+      </div>
+    </center>
+    <center>
+      <button class="btn btn-md btn-primary" type="submit" ng-click="save()">Save</button>
+    </center>
+    </div>
+  </form>
+</div>

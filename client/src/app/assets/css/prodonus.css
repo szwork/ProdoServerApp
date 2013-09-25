@@ -1,5 +1,5 @@
 .container{
-    max-width: 1200px;
+    max-width: 1170px;
 }
 .container1{
   margin-bottom: -70px;
@@ -7,24 +7,20 @@
 }
 
 .row{
-	background-color: #b8b8b8;
+	background-color: #ffffff;
 	margin-top: 55px;
 } 
-.row1{
-  background-color: #ffffff;
-   
-} 
- 
- .footer{
- 	margin-top: 575px;
- 	background-color: #b8c8d8;
- }
- 
-  .form-control{
-  	 margin-top: 10px;
-  	width: 350px;
-  }
 
+
+  .form-control{
+  	margin-top: 10px;
+  	width: 350px;
+    display: inline-block;
+  }
+  .control-group{
+    margin-top: 40px;
+  }
+ 
   .btn-md{
   	margin-top: 30px;
   	margin-bottom: 30px;
@@ -41,11 +37,18 @@
 	border: 1px solid #ddd;
 }
 
- .glyphicon-remove-sign{
-  color: red;
+ .glyphicon-remove{
+  margin-left: 5px;
+
  }
- .glyphicon-ok-sign{
-  color: green;
+ .glyphicon-plus{
+  
+  margin-left: 300px;
+ }
+
+ .glyphicon-plus-email{
+  
+  margin-left: 8px;
  }
 
  .error{
@@ -72,13 +75,18 @@
 .navbar-text{
 
   margin-right: 25px;
+  padding-bottom: 10px;
 }
 .navbar-brand{
-  margin-left: 10px;
+  padding-bottom: 10px;
+  font-style: italic;
+
 
 }
 .navbar{
-  max-height: 20px;
+  min-height: 1px;
+  max-height: 40px; 
+ 
 }
 
 .control-group.error .help-inline, 
@@ -125,6 +133,10 @@
 
 /* Always hide the input help when it's pristine */
 input.ng-pristine + .input-help {
+  display: none;
+}
+
+textarea.ng-pristine + .input-help {
   display: none;
 }
 
@@ -206,7 +218,46 @@ input:focus {
   background-position: 2px 6px;
 }
 
- 
+.link{ 
+  margin-right: 20px;
 
+}
+
+html,body{
+    height: 100%
+}
+
+#holder{
+    min-height: 100%;
+    position:relative;
+}
+
+#body{
+      padding: 0;  /* height of footer */
+}
+
+#footer{
+    height: 20px; 
+    padding-top: 3px;
+    background-color: #f1eee9;
+    position: relative;
+    /*bottom: 50px; */
+    font-size: 10px;
+
+}
+  
  
- 
+ .link-footer{
+  margin-left: 100px;
+ }
+ .jumbotron{
+  margin-top: 50px;
+
+ }
+
+.footer-margin-up{
+  height: 110px;
+}
+ .footer-margin-down{
+  
+ }

@@ -1,20 +1,15 @@
 <div class="container">
+  <form class="css-form" name="formOrgRegisterPayment" novalidate>
+    <center>
+      <div class="control-group">
+     	  <input type="text" class="form-control" placeholder="Card Holder Name" ng-model="card.holder"autofocus required/>
 
-     				<form class="css-form" name="formManufacturerRegisterPayment" novalidate>
-        				
-        				<center>
-        					<h3 class="form-register-heading">Payment Details</h3>
-        					<p class="para1">All fields are mandatory.</p>
-        					
-        					<input type="text" class="form-control" placeholder="Card Holder Name" ng-model="card.holder"autofocus required/>
-        					<input type="text" class="form-control" placeholder="Card Type" ng-model="card.type" required/>
-        				  </center>
+			  <input type="text" class="form-control" placeholder="Card Type" ng-model="card.type" required/>
+      </div>
+    </center>
         				 
-          				<center>
-          					<button class="btn btn-md btn-primary" type="submit">Proceed</button>
-       						  <button class="btn btn-md" type="submit">Reset</button>
-          				</center> 
-       					
-      				</form>
-
-				</div>
+    <center>
+      <button class="btn btn-md btn-primary" type="submit" ng-click="save()">Save</button>
+    </center>
+  </form>
+</div>

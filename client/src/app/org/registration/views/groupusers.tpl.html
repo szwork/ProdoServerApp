@@ -1,48 +1,23 @@
 <div class="container">
-
-  
-  
-     				<form name="formManufacturerRegisterGroupUser" class="css-form" novalidate>
-        				
-        				<center>
-                  <h3 class="form-register-heading">Company Group Users</h3>
-                  <p class="para1">All fields are mandatory.</p>
-                  
-                   
-                  <select type="text" class="form-control" ng-model="role" ng-options="r.name for r in roles" autofocus required></select> 
-
-                  <input type="text" class="form-control" placeholder="Username" ng-model="username" required/>
-                  <div class="input-help">
-                    <h4>Field Required!</h4>
-                  </div>
-
-                  <input type="email" name="email" class="form-control" placeholder="Email Id" ng-model="emailid" required/>
-                  <div class="input-help">
-                    <h4>Enter valid email:abc@example.com</h4>
-                  </div>
-                  
-                  <input type="password" class="immediate-help form-control" id="password1" name="password1" placeholder="Password" ng-model="password1" prodonus-password-validate required>
-                      <div class="input-help">
-                        <h4>Password must have:</h4>
-                          <ul>
-                           <li ng-class="pwdHasAlphabet">At least <strong>1 Alphabet</strong></li>
-                           <li ng-class="pwdHasNumber">At least <strong>1 Number</strong></li>
-                           <li ng-class="pwdHasSymbol">At least <strong>1 Special Symbol</strong></li>
-                           <li ng-class="pwdValidLength">At least <strong>8 characters long</strong></li>
-                          </ul>
-                      </div>
-
-                    <input type="password" class="immediate-help form-control" id="confirmpassword" name="confirmpassword" placeholder="Confirm Password" ng-model="confirmpassword1" prodonus-password-check="password1"/> 
-                     <div class="input-help">
-                      <h4>Password must be same as above!</h4>
-                     </div>
-              	    </center>
-        				 
-          				<center>
-          					<button class="btn btn-md btn-primary" type="submit" ng-click="submitted=true">Add</button>
-       						  <button class="btn btn-md" type="submit">Reset</button>
-          				</center> 
-       					
-      				</form>
-
-				</div>
+  <form name="formOrgGroupUser" class="css-form" novalidate>
+    <center>
+      <div class="control-group">
+        <input type="text" name="groupname" class="form-control" placeholder="Group Name" ng-model="groupname"  autofocus required/><a href="" ng-click="addEmail()"><span class="glyphicon glyphicon-plus glyphicon-plus-email"></span></a>
+          <div class="input-help">
+            <h4>Field Required!</h4>
+          </div>
+        
+        <div ng-repeat="email in emails">
+        <input name="email" type="email" class="form-control" placeholder="Enter EmailId" ng-model="email.value" required/>
+          <a href="" ng-click="removeEmail(email)"><span class="glyphicon glyphicon-remove"></span></a>
+          <div class="input-help">
+            <h4>Enter valid email:abc@example.com</h4>
+          </div>
+        </div>
+      </div> 
+    </center>
+    <center>
+		  <button class="btn btn-md btn-primary" type="submit" ng-click="s">Save</button> 
+		</center> 
+  </form>
+</div>
