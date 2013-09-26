@@ -3,6 +3,7 @@
 */
 'use strict';
 
+var orgModule = angular.module('prd.subscribe', []);
 var subscribeModule = angular.module('prd.subscribe', []);
 var surveyModule = angular.module('prd.survey', []);
 var adminModule = angular.module('prd.admin', []);
