@@ -2,14 +2,14 @@
   <form name="formOrgGroupUser" class="css-form" ng-submit="" novalidate>
     <center>
       <div class="control-group">
-        <input type="text" name="groupname" class="form-control" placeholder="Group Name" ng-model="groupname"  autofocus required/><a href="" ng-click="addEmail()"><span class="glyphicon glyphicon-plus glyphicon-plus-email"></span></a>
+      <label class="label-control">Group Users</label><br>
+        <input type="text" name="groupname" class="form-control" placeholder="Group Name" ng-model="grpuser.name"  autofocus required/>
           <div class="input-help">
             <h4>Field Required!</h4>
           </div>
-        
-        <div ng-repeat="email in emails">
-        <input name="email" type="email" class="form-control" placeholder="Enter EmailId" ng-model="email.value" required/>
-          <a href="" ng-click="removeEmail(email)"><span class="glyphicon glyphicon-remove"></span></a>
+         <input name="email" type="email" class="form-control" placeholder=" Your emailid" ng-model="grpuser.email" required/>
+         <input name="email" type="email" class="form-control" placeholder="Send invites" ng-model="grpuser.invites" required/>
+           
           <div class="input-help">
             <h4>Enter valid email:abc@example.com</h4>
           </div>
@@ -17,7 +17,8 @@
       </div> 
     </center>
     <center>
-		  <button class="btn btn-md btn-primary" type="submit" ui-sref="home.terms&conditions">Proceed</button> 
-		</center> 
+      <button class="btn btn-md btn-primary" type="submit" ui-sref="home.contact">Previous</button>
+    <button class="btn btn-md btn-primary" type="submit" ui-sref="home.terms">Next</button>
+    </center>
   </form>
 </div>

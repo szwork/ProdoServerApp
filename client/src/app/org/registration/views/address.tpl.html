@@ -1,8 +1,5 @@
 <div class="container">
-	<a class="link" href="#!/company">Company</a>
-  <a class="link" href="#!/contact">Contact</a>
-  <a class="link" href="#!/address">Location</a>
-  <form name=" formOrgRegisterAddress" class="css-form" novalidate>
+  <form name=" formOrgRegisterAddress" class="css-form" ng-submit="" novalidate>
   	<center>
   		<div class="control-group">
 	      <label class="label-control">Location</label><br>    
@@ -30,8 +27,9 @@
           </div>
 			</div>
   	</center>
-		<center>
-    	<button class="btn btn-md btn-primary" type="submit" ng-click="save()">Save</button>
+	  <center>
+      <button class="btn btn-md btn-primary" type="submit" ui-sref="home.company">Previous</button>
+    <button class="btn btn-md btn-primary" type="submit" ui-sref="home.contact">Next</button>
     </center>
    </form>
 </div>   
