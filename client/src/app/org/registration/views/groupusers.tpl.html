@@ -1,5 +1,5 @@
 <div class="container">
-  <form name="formOrgGroupUser" class="css-form" novalidate>
+  <form name="formOrgGroupUser" class="css-form" ng-submit="" novalidate>
     <center>
       <div class="control-group">
         <input type="text" name="groupname" class="form-control" placeholder="Group Name" ng-model="groupname"  autofocus required/><a href="" ng-click="addEmail()"><span class="glyphicon glyphicon-plus glyphicon-plus-email"></span></a>
@@ -17,7 +17,7 @@
       </div> 
     </center>
     <center>
-		  <button class="btn btn-md btn-primary" type="submit" ng-click="s">Save</button> 
+		  <button class="btn btn-md btn-primary" type="submit" ui-sref="home.terms&conditions">Proceed</button> 
 		</center> 
   </form>
 </div>

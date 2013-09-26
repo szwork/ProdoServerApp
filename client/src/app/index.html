@@ -14,54 +14,33 @@
   <script src="../vendor/angularjs/angular-resource.js"></script>
   <script src="org/registration/js/orgRegistration.js"></script>
   <script src="common/js/directives/passwordCheck.js"></script>
+  <script src="../vendor/angularjs/angular-ui-router.js"></script>
   <link rel=" stylesheet" href="../vendor/bootstrap/dist/css/bootstrap.css">
   <link rel="stylesheet" type="text/css" href="assets/css/prodonus.css">
 </head>
 <!-- To create a Manufacturer's Registration Page for a manufacturing company to get registered with Prodonus & create an account and capture details.   -->
 <body>
   <div id="holder">
-  <div id="body" class="container">
-    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-      <a class="navbar-brand" href="#">Prodonus</a>
-      <p class="navbar-text pull-right"><a href="#/signin" class="navbar-link">Sign In</a></p>
-      </nav>
-      <div class="container">
-      <div class="row">
-      <div class="col-md-6 jumbotron">
-       <h3>Welcome To Prodonus!</h3>
-      <p>Warranty & Social Networking Platform For Products</p>
-          <button type="button" class="btn btn-primary btn-lg">Learn More</button>
-        <button type="button" class="btn btn-info btn-lg glyphicon glyphicon-play">Play Video</button> 
+    <div id="body" class="container">
+      <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <a class="navbar-brand" href="#/prodonus">Prodonus</a>
+        <p class="navbar-text pull-right"><a href="#/signin" class="navbar-link">Sign In</a></p>
+        </nav>
+        <div class="container" ng-controller="OrgRegistrationCtrl">
+          <div ui-view></div>
+        </div>
+      <div class="container footer-margin-up"></div>
+      <div id="footer" class="container">
+        <a class="link link-footer" href="">About</a>
+        <a class="link" href="">Connect With Us</a>
+        <a class="link" href="">Terms</a>
+        <a class="link" href="">Privacy</a>
+        <a class="link" href="">Contact</a>
+           &copy; Prodonus 2013 | made in pune, india
       </div>
-        <div class="col-md-5 col-md-offset-1"  ng-controller="OrgRegistrationCtrl">
-      <ul class="nav nav-tabs">
-          <li ng-class="tabClass(tab)" ng-repeat="tab in tabs" tab="tab"><a href="{{tab.link}}" ng-click="setSelectedTab(tab)"><strong>{{tab.label}}</strong></a></li>
-      </ul>
-         
-          <div ng-view></div>
-             
+        <div class="container footer-margin-down"></div>   <!--container -->
     </div>
-    </div>
-      
-    
-   </div>
-   <div class="container footer-margin-up">
-        
-      </div>
-   <div id="footer" class="container">
-    <a class="link link-footer" href="">About</a>
-    <a class="link" href="">Connect With Us</a>
-    <a class="link" href="">Terms</a>
-    <a class="link" href="">Privacy</a>
-    <a class="link" href="">Contact</a>
-         &copy; Prodonus 2013 | made in pune, india
-      </div>
-      <div class="container footer-margin-down">
-        
-      </div>
-   </div> <!--container -->
-   </div>
-  
+  </div>
     
   <script src="../vendor/bootstrap/assets/js/jquery.js"></script>
   <script src="../vendor/bootstrap/dist/js/bootstrap.js"></script>

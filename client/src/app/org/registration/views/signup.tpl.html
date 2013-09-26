@@ -1,20 +1,20 @@
 <div class="container">
-  <form name="signupForm" class="css-form" novalidate ng-submit="signup()">
+  <form name="signupForm" class="css-form" novalidate ng-submit="">
     
       <center>
         <div class="control-group">
           <lable><h6>Sign Up</h6></lable>
-          <input name="fullname" class="form-control" type="text" placeholder="Enter FullName" required ng-model="signun.fullname" />
+          <input name="fullname" class="form-control" type="text" placeholder="FullName" required ng-model="user.fullname" />
             <div class="input-help">
               <h4>Field Required</h4>
             </div>
 
-          <input name="email" class="form-control" type="email" placeholder="Enter Email" required ng-model="signup.email" />  
+          <input name="email" class="form-control" type="email" placeholder="Email" required ng-model="user.email" />  
             <div class="input-help">
               <h4>Enter valid email:abc@example.com</h4>
             </div>
       
-          <input type="password" class="immediate-help form-control" id="password1" name="password1" placeholder="Password" ng-model="password1" prodonus-password-validate required>
+          <input type="password" class="immediate-help form-control" id="password1" name="password1" placeholder="Password" ng-model="user.password1" prodonus-password-validate required>
             <div class="input-help">
               <h4>Password must have:</h4>
                 <ul>
@@ -25,7 +25,7 @@
                 </ul>
             </div>
 
-          <input type="password" class="immediate-help form-control" id="confirmpassword" name="confirmpassword" placeholder="Confirm Password" ng-model="confirmpassword1" prodonus-password-check="password1"/> 
+          <input type="password" class="immediate-help form-control" id="confirmpassword" name="confirmpassword" placeholder="Confirm Password" ng-model="user.confirmpassword1" prodonus-password-check="password1"/> 
             <div class="input-help">
                 <h4>Password must be same as above!</h4>
             </div>
@@ -33,8 +33,8 @@
         </div>  
       </center>
       <center>
-        <button class="btn btn-md btn-primary" type="submit">Sign Up</button>
-        <a href="#/signin">Already Registered?</a>
+        <button class="btn btn-md btn-primary" value="Next" ui-sref="home.company">Sign Up</button>
+        <a ui-sref="home.signin">Already Registered?</a>
       </center>
   </form>
 </div>   

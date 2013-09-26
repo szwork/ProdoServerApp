@@ -1,5 +1,5 @@
 <div class="container">
-  <form name="signinForm" class="css-form" novalidate ng-submit="signin()">
+  <form name="signinForm" class="css-form" novalidate ng-submit="">
     
       <center>
         <div class="control-group">
@@ -17,9 +17,9 @@
         </div>  
       </center>
       <center>
-        <button class="btn btn-md btn-primary" type="submit">Sign In</button>
+        <button class="btn btn-md btn-primary" type="submit" ui-sref="prodonus">Sign In</button>
         <a href="#">Forgot Password?</a>
-        <p>New User? Please <a href="#/signup">Sign Up</a></p>
+        <p>New User? Please <a ui-sref="home.signup">Sign Up</a></p>
       </center>
   </form>
 </div>   
