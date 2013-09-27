@@ -48,13 +48,24 @@
   }
    
  .btn-lg{
-  margin-top: 50px;
-  margin-bottom: 10px;
-  width: 130px;
-  height: 35px;
-  font-size: 15px;
-  padding-bottom: 30px;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  max-width: 180px;
+  height: 40px;
+  font-size: 14px;
+  font-style: oblique;
+  
  }
+ .btn-layout-text{
+  margin-top: 25px;
+  margin-right: 5px;
+  width: 130px;
+  height: 40px;
+  font-size: 18px;
+  font-style: normal;
+}
+
  .glyphicon-thumbs-up{
   margin-right: 3px;
  }
@@ -299,11 +310,9 @@ html,body{
   height: 450px;
   padding-top: 130px;
   text-align: left;
-
-
- }
-
- .prd-text{
+  margin-left: 40px;
+}
+  .prd-text{
   font-size: 30px;
   font-style: italic;
   color: #000000;
