@@ -1,6 +1,6 @@
  
  
-var app= angular.module("ProdonusApp", ['ui.router'], function() {} );
+var app= angular.module("ProdonusApp", ['ui.router', 'app.directives'], function() {} );
 
   
       app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
