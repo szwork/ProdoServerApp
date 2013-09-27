@@ -1,10 +1,11 @@
 .container{
     max-width: 1170px;
-}
+
+  }
  
 
 .row{
-	background-color: #ffffff;
+	 
 	margin-top: 25px;
 } 
 
@@ -39,6 +40,7 @@
   .main-container-div{
     height: 570px;
 
+
   }
   .para1{
   	text-align: center;
@@ -63,6 +65,7 @@
   -moz-border-radius: 20px;
   border-radius: 20px; 
   width: 450px;
+  background-color: #ffffff;
 }
 
  .glyphicon-remove{
@@ -262,7 +265,9 @@ html,body{
 }
 
 #body{
-      padding: 0;  /* height of footer */
+      padding: 0;
+      background-image: url(../images/prodonus.jpg);  
+      background-size:1200px 700px;
 }
 
 #footer{
@@ -272,7 +277,6 @@ html,body{
     position: relative;
     /*bottom: 50px; */
     font-size: 10px;
-
 }
   
  .link-footer{
@@ -294,8 +298,15 @@ html,body{
  .layout-text{
   height: 450px;
   padding-top: 130px;
-  text-align: center;
+  text-align: left;
 
+
+ }
+
+ .prd-text{
+  font-size: 30px;
+  font-style: italic;
+  color: #000000;
  }
  .div-grid-control {
   min-height: 450px;
