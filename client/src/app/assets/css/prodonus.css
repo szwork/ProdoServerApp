@@ -9,6 +9,17 @@
 	margin-top: 25px;
 } 
 
+.modal{
+  position: relative;
+  top: 150px;
+  display: inline;
+
+  
+}
+.fade{
+  opacity: 0.9;
+   
+}
 
   .form-control{
   	margin-top: 10px;
