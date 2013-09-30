@@ -57,7 +57,18 @@ app.controller("OrgRegistrationCtrl", ['$scope', '$state',  function($scope, $ht
     $scope.password1 = "";
     $scope.user = {};
  
+function validateEmail(field) {
+    var regex=/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i;
+    return (regex.test(field)) ? true : false;
+}
 
+function validateMultipleEmailsCommaSeparated(value) {
+    var result = value.split(",");
+    for(var i = 0;i < result.length;i++)
+    if(!validateEmail(result[i])) 
+            return false;       
+    return true;
+}
  
 //--------------------------------code snippet for Organization Types---------------------------------------------
 //-------------------- to be changed and options to be retrieved from database................

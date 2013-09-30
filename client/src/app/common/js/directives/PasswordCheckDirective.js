@@ -45,3 +45,24 @@ var app1 = angular.module("app.directives", [], function() {});
         }
     };
 });
+
+  app1.directive('prodonusMultiEmailValidate', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            ctrl.$parsers.unshift(function(viewValue) {
+
+                 
+                scope.emailHas = (viewValue && /(([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)(\s*,\s*|\s*$))+/.test(viewValue)) ? 'valid' : undefined;
+                if(scope.emailHas) {
+                    ctrl.$setValidity('email', true);
+                    return viewValue;
+                } else {
+                    ctrl.$setValidity('email', false);                    
+                    return undefined;
+                }
+
+            });
+        }
+    };
+});
