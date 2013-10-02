@@ -4,17 +4,17 @@
       <center>
         <div class="control-group">
           <label><h4>Sign Up</h4></label><br>
-          <input name="fullname" class="immediate-help form-control" type="text" placeholder="FullName" required ng-model="user.fullname" />
+          <input name="fullname" class="immediate-help form-control" type="text" placeholder="FullName" required ng-model="fullname" />
             <div class="input-help">
               <h4>Field Required</h4>
             </div>
 
-          <input name="email" class="immediate-help form-control" type="email" placeholder="Email" required ng-model="user.email" />  
+          <input name="email" class="immediate-help form-control" type="email" placeholder="Email" required ng-model="email" />  
             <div class="input-help">
               <h4>Enter valid email:abc@example.com</h4>
             </div>
       
-          <input type="password" class="immediate-help form-control" id="password1" name="password1" placeholder="Password" ng-model="user.password1" prodonus-password-validate required>
+          <input type="password" class="immediate-help form-control" id="password1" name="password1" placeholder="Password" ng-model="password" prodonus-password-validate required>
             <div class="input-help">
               <h4>Password must have:</h4>
                 <ul>
@@ -34,7 +34,7 @@
        
         <center>
  
-        <button class="btn btn-lg btn-primary" ui-sref="prodonus"><span class=" glyphicon glyphicon-thumbs-up" ></span> Sign Up as Individual</button>
+        <button class="btn btn-lg btn-primary" ui-sref="prodonus" ng-click="save()"><span class=" glyphicon glyphicon-thumbs-up" ></span> Sign Up as Individual</button>
         <br/>
         <button class="btn btn-lg btn-primary" ui-sref="home.company"><span class=" glyphicon glyphicon-thumbs-up" ></span> Sign Up as Company</button>
         <br>

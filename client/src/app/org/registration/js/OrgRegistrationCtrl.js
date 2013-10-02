@@ -2,7 +2,29 @@
  
 var app= angular.module("ProdonusApp", ['ui.router', 'app.directives'], function() {} );
 
-  
+      app.factory('Org', function(){
+
+          return {
+            companyname:"",
+            description:"", 
+            name:"",
+            contractid:"",
+            address1:"",
+            address2:"",
+            address3:"",
+            country:"",
+            city:"",
+            state:"",
+            zipcode:"",
+            value:"",
+            groupname:"",
+            domain:"",
+            invites:"",
+            planid:"",
+            plantype:"",  
+          }
+
+      })
       app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
     
     $urlRouterProvider.otherwise('/home/signup');
@@ -51,15 +73,63 @@ var app= angular.module("ProdonusApp", ['ui.router', 'app.directives'], function
     .state('forgotEmail', {
         url: '/forgotEmail',
         templateUrl: 'user/views/forgot.email.tpl.html'
-      })
+      }) 
+    .state('home.display', {
+        url: '/display',
+        templateUrl: 'org/registration/views/display.tpl.html'
+      }) 
        
   }]); 
   //...................... controller........................
-app.controller("OrgRegistrationCtrl", ['$scope', '$state',  function($scope, $http, $state) {
+app.controller("OrgRegistrationCtrl", ['$scope', '$state',  function($scope, $http, $state, Org) {
 
- 
-    $scope.password1 = "";
+    $scope.org=Org;
+    $scope.password = "";
     $scope.user = {};
+//...................................................................................
+      
+        
+//................................code for post method...............................
+var method = 'POST';
+    var inserturl = 'http://192.168.1.3:4000/signup'; // URL where the Node.js server is running
+    $scope.codeStatus = "";
+    $scope.save = function() {
+    // Preparing the Json Data from the Angular Model to send in the Server. 
+    var formData = {
+      'fullname' : this.fullname,
+      'email' : this.email,
+    'password' : this.password
+    };
+
+  this.fullname = '';
+  this.email = '';
+  this.password = '';
+
+  var jdata = 'mydata='+JSON.stringify(formData); // The data is to be string.
+
+  $http({ // Accessing the Angular $http Service to send data via REST Communication to Node Server.
+            method: method,
+            url: inserturl,
+            data:  jdata ,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+       
+        }).
+        success(function(response) {
+                console.log("success"); // Getting Success Response in Callback
+                $scope.codeStatus = response.data;
+                console.log($scope.codeStatus);
+             
+
+        }).
+        error(function(response) {
+    console.log("error"); // Getting Error Response in Callback
+                $scope.codeStatus = response || "Request failed";
+    console.log($scope.codeStatus);
+        });
+         
+  };  
+
+
  
 //--------------------------------code snippet for Organization Types---------------------------------------------
 //-------------------- to be changed and options to be retrieved from database................
@@ -71,7 +141,7 @@ $scope.orgs = [
                 {name: 'Retailers'},
                 {name: 'Service Centers'},
               ];
-                $scope.org = $scope.orgs[0];
+                $scope.org=[ {name:''} ];
 
 //------------------------------Add multiple contacts---------------------------------------
  $scope.contacts=[ {value:''} ];
