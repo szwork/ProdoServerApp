@@ -3,13 +3,13 @@
     
       <center>
         <div class="control-group">
-          <lable><h6>Sign Up</h6></lable>
-          <input name="fullname" class="form-control" type="text" placeholder="FullName" required ng-model="user.fullname" />
+          <label><h4>Sign Up</h4></label><br>
+          <input name="fullname" class="immediate-help form-control" type="text" placeholder="FullName" required ng-model="user.fullname" />
             <div class="input-help">
               <h4>Field Required</h4>
             </div>
 
-          <input name="email" class="form-control" type="email" placeholder="Email" required ng-model="user.email" />  
+          <input name="email" class="immediate-help form-control" type="email" placeholder="Email" required ng-model="user.email" />  
             <div class="input-help">
               <h4>Enter valid email:abc@example.com</h4>
             </div>
@@ -24,18 +24,21 @@
                   <li ng-class="pwdValidLength">At least <strong>8 characters long</strong></li>
                 </ul>
             </div>
-
-          <input type="password" class="immediate-help form-control" id="confirmpassword" name="confirmpassword" placeholder="Confirm Password" ng-model="user.confirmpassword1" prodonus-password-check="password1"/> 
-            <div class="input-help">
-                <h4>Password must be same as above!</h4>
-            </div>
-            <br>
-        </div>  
+  
+            </div>  
       </center>
-      <center>
+        
+          
+        
+          
+       
+        <center>
  
-        <button class="btn btn-md btn-primary" value="Next" ui-sref="home.company">Sign Up</button>
-        <a ui-sref="home.signin">Already Registered?</a>
+        <button class="btn btn-lg btn-primary" ui-sref="prodonus"><span class=" glyphicon glyphicon-thumbs-up" ></span> Sign Up as Individual</button>
+        <br/>
+        <button class="btn btn-lg btn-primary" ui-sref="home.company"><span class=" glyphicon glyphicon-thumbs-up" ></span> Sign Up as Company</button>
+        <br>
+        <a class="link" ui-sref="home.signin">Already Registered?</a>
  
       </center>
   </form>

@@ -1,24 +1,20 @@
 <div class="container">
-  <a class="link" href="#!/company">Company</a>
-  <a class="link" href="#!/contact">Contact</a>
-  <a class="link" href="#!/address">Location</a>
-  <form name=" formOrgRegisterContact" class="css-form" novalidate>
+  <form name=" formOrgRegisterContact" class="css-form" ng-submit="" novalidate>
     <center>
       <div class="control-group">
-      <label class="label-control">Contact</label>
-        <a href="" ng-click="addContact()"><span class="glyphicon glyphicon-plus"></span></a> 
-      <div ng-repeat="contact in contacts">
-      <input name="contact" type="text" class="form-control" placeholder="Customer HelpLine" ng-model="contact.value"  autofocus required/>
-        <a href="" ng-click="removeContact(contact)"><span class="glyphicon glyphicon-remove"></span></a>
-        <div class="input-help">
-          <h4>Field Required!</h4>
-        </div> 
-      </div>
+        <label class="label-control">Contact</label><a href="" ng-click="addContact()" class="glyphicon glyphicon-plus-sign"></a><br> 
+        <div ng-repeat="contact in contacts">
+          <input name="contact" type="text" class="form-control" placeholder="Customer HelpLine" ng-model="contact.value" autofocus required/>
+          <a href="" ng-click="removeContact(contact)" class="glyphicon glyphicon-remove"></a>
+            <div class="input-help">
+              <h4>Field Required!</h4>
+            </div> 
+        </div>
       </div>
     </center>
     <center>
-      <button class="btn btn-md btn-primary" type="submit" ng-click="save()">Save</button>
+      <button class="btn btn-md btn-primary" type="submit" ui-sref="home.address">Previous</button>
+      <button class="btn btn-md btn-primary" type="submit" ui-sref="home.groupuser">Next</button>
     </center>
-    </div>
   </form>
 </div>

@@ -1,46 +1,103 @@
 .container{
     max-width: 1170px;
-}
+
+  }
  
 
 .row{
-	background-color: #ffffff;
-	margin-top: 55px;
+	 
+	margin-top: 25px;
 } 
 
+.modal{
+  position: relative;
+  top: 150px;
+  display: inline;
+
+  
+}
+.fade{
+  opacity: 0.9;
+   
+}
 
   .form-control{
   	margin-top: 10px;
-  	width: 350px;
+  	width: 230px;
     display: inline-block;
+    position: relative;
+    margin-right: 25px;
+    font-size: 15px;
   }
   .control-group{
     margin-top: 40px;
   }
- 
+  .label-control{
+    text-align: center;
+   
+    font-style: italic;
+    font-size: 20px;
+  }
   .btn-md{
   	margin-top: 30px;
-  	margin-bottom: 30px;
+    margin-bottom: 5px;
+    position: relative;
+    width: 90px;
+    height: 25px;
+    text-align: center;
+    font-size: 15px;
+    padding-bottom: 25px;
+  }
+  .main-container-div{
+    height: 570px;
+
+
   }
   .para1{
   	text-align: center;
   	color: red;
   }
-  .btn1{
-    margin-left: 250px;
-  }
+   
+ .btn-lg{
+  margin-top: 20px;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  max-width: 180px;
+  height: 40px;
+  font-size: 14px;
+  font-style: oblique;
+  
+ }
+ .btn-layout-text{
+  margin-top: 25px;
+  margin-right: 5px;
+  width: 130px;
+  height: 40px;
+  font-size: 18px;
+  font-style: normal;
+}
+
+ .glyphicon-thumbs-up{
+  margin-right: 3px;
+ }
  
-[class*="col-"]{
-	border: 1px solid #ddd;
+.nested-view1 {
+  border: 1px solid #ddd;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px; 
+  width: 450px;
+  background-color: #E9E5Df;
 }
 
  .glyphicon-remove{
-  margin-left: 5px;
+  margin-left: -17px;
 
  }
- .glyphicon-plus{
+ .glyphicon-plus-sign{
   
-  margin-left: 300px;
+  margin-left: 10px;
+  
  }
 
  .glyphicon-plus-email{
@@ -165,7 +222,7 @@ input:focus {
 
 /* Show the help box once it has focus */
 .immediate-help:focus + .input-help {
-  display: block;
+  display: inline-block;
 }
 
 /* Immediate help should be red when pristine */
@@ -187,7 +244,7 @@ input:focus {
 
 /* Help should show and be red when invalid */
 .ng-invalid + .input-help {
-  display: block;
+  display: inline-block;
   border-color: #ec3f41;
   position: relative;
 }
@@ -215,9 +272,9 @@ input:focus {
   background-position: 2px 6px;
 }
 
-.link{ 
-  margin-right: 20px;
-
+.link{
+  margin-left: 20px;
+  text-align: center;
 }
 
 html,body{
@@ -230,7 +287,9 @@ html,body{
 }
 
 #body{
-      padding: 0;  /* height of footer */
+      padding: 0;
+      background-image: url(../images/prodonus.jpg);  
+      background-size:1200px 700px;
 }
 
 #footer{
@@ -240,21 +299,37 @@ html,body{
     position: relative;
     /*bottom: 50px; */
     font-size: 10px;
-
 }
   
- 
  .link-footer{
   margin-left: 100px;
  }
+
  .jumbotron{
   margin-top: 50px;
-
  }
 
 .footer-margin-up{
-  height: 110px;
+  height: 19px;
 }
  .footer-margin-down{
+  height: 5px;
   
+ }
+
+ .layout-text{
+  height: 450px;
+  padding-top: 130px;
+  text-align: left;
+  margin-left: 40px;
+}
+  .prd-text{
+  font-size: 30px;
+  font-style: italic;
+  color: #000000;
+ }
+ .div-grid-control {
+  min-height: 450px;
+  max-height: 540px;
+
  }
