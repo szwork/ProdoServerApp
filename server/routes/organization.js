@@ -11,15 +11,19 @@
 * 
 */
 
-//Prodonus Routes
-var api = require("./app/api/api.js");
+//Prodonus Routesar
 
-// REST api for invites
+var auth = require('../app/common/js/security');
+var api = require("../app/api/api.js");
+
+// Organization - REST api
 function init(app) {
-  app.post('/organization', api.organizationapi.addOrganization);
-  app.put('/organization/:orgid',organizationapi.updateOrganization);
-  app.delete('/organization/:orgid',organizationapi.deleteOrganization);
-  //Access to ONLY prodonus Admin 
-  app.get('/organization',organizationapi.getAllOrganization); 
-  app.get('/organization/:orgid',organizationapi.getorganizationbyid);
+  app.post('/organization', api.orgapi.addOrganization);
+  app.put('/organization/:orgid', auth, api.orgapi.updateOrganization);
+  app.delete('/organization/:orgid', auth, api.orgapi.deleteOrganization);
+
+  //Access to ONLY prodonus Admin //set up admin  role
+  app.get('/organization', auth, api.orgapi.getAllOrganization); 
+  app.get('/organization/:orgid', auth, api.orgapi.getOrganizationById);
+  app.post('/invites/:orgid', auth, api.orgapi.invites);
 }
