@@ -2,29 +2,7 @@
  
 var app= angular.module("ProdonusApp", ['ui.router', 'app.directives'], function() {} );
 
-      app.factory('Org', function(){
-
-          return {
-            companyname:"",
-            description:"", 
-            name:"",
-            contractid:"",
-            address1:"",
-            address2:"",
-            address3:"",
-            country:"",
-            city:"",
-            state:"",
-            zipcode:"",
-            value:"",
-            groupname:"",
-            domain:"",
-            invites:"",
-            planid:"",
-            plantype:"",  
-          }
-
-      })
+      
       app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
     
     $urlRouterProvider.otherwise('/home/signup');
@@ -81,9 +59,9 @@ var app= angular.module("ProdonusApp", ['ui.router', 'app.directives'], function
        
   }]); 
   //...................... controller........................
-app.controller("OrgRegistrationCtrl", ['$scope', '$state',  function($scope, $http, $state, Org) {
+app.controller("OrgRegistrationCtrl", ['$scope', '$state',  function($scope, $http, $state, OrgModel) {
 
-    $scope.org=Org;
+    $scope.org=OrgModel;
     $scope.password = "";
     $scope.user = {};
 //...................................................................................
