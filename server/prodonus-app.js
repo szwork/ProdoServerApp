@@ -13,15 +13,15 @@
 * 
 */
 
-var express = require('express')
-	 , routes = require('./routes')
-	 , Log = require('log')
-     , api = require('./routes/api')
-     , envir = require('./config/environment')
-     , mongoose = require('mongoose')
-     , fs = require('fs')
-     , passport=require('passport')
-     , path = require('path');
+var express = require('express');
+var	routes = require('./routes');
+var Log = require('log');
+var api = require('./routes/api');
+var envir = require('./config/environment');
+var mongoose = require('mongoose');
+var fs = require('fs');
+var passport=require('passport');
+var path = require('path');
 
 /*All the routes files are described and stored in the routes directory
 * All the routes for prodonus are initialized in the code below. The init function
@@ -39,7 +39,7 @@ files.forEach(function (file) {
 var app = express();
 var log = new Log();
 
-mongoose.connect('mongodb://localhost/prodonus');
+// mongoose.connect('mongodb://localhost/prodonus');
 
 // defines app settings with default values for Prodonus
 app.set('log level', process.env.PRODONUS_LOG_LEVEL || Log.DEBUG);

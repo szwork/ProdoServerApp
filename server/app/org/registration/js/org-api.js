@@ -239,8 +239,8 @@ sendInviteMailToGroupMembers = function(usergrp,orgid,host,callback) {
 }//end of send invite method
     
 
-exports.getOrganization = function(req,res) {
-  orgModel.find(function(err,organization)
+exports.getAllOrganization = function(req,res) {
+  orgModel.find(function(err, organization)
   {
     if(err) {
       console.log(err+"errrro in retriving all organiztion details");
