@@ -44,7 +44,7 @@ var app= angular.module("ProdonusApp", ['ui.router', 'app.directives'], function
         url: '/terms',
         templateUrl: 'user/views/prodonus.terms.tpl.html'
       })
-    .state('home.subscription', {
+    .state('subscription', {
         url: '/subscription',
         templateUrl: 'org/registration/views/subscription.tpl.html'
       })
