@@ -13,6 +13,6 @@
 
 auth = function (req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
+  res.send("please login to continue this operation");
 }
-export.module = auth;
+module.exports= auth;

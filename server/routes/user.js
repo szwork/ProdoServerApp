@@ -13,10 +13,15 @@
 
 //Prodonus Routes
 var api = require("../app/api/api.js");
-
+var auth=require('../app/common/js/security');
 // User - REST apis
 exports.init = function (app) {
-  app.get('/verify/:token', api.userapi.verifyUser);
+  app.get('/verify/:token', auth,api.userapi.verifyUser);
   app.post('/login', api.userapi.loginSession);
   app.post('/signup', api.userapi.signup);
+  app.post('/forgotpassword',api.userapi.forgotpassword);
+  app.get("/forgotpassword/:token",api.userapi.forgotpasswordurlaction);
+  app.post("/resetpassword", auth,api.userapi.resetpassword);
+
+
 }

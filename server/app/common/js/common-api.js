@@ -1,6 +1,20 @@
+/*
+* Overview: common method used 
+* Dated:
+* Author: Sunil More
+* Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
+* Change History:
+* ----------------------------------------------------------------------
+* date | author | description 
+* ----------------------------------------------------------------------
+* 27-3-2013 | xyx | Add a new property
+* 03-10-2013|sunil|add get brcryptstring method
+*/
 
 var nodemailer = require("nodemailer");
 //authentication  about send email
+var bcrypt = require('bcrypt');
+var SALT_WORK_FACTOR = 10;
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.gmail.com", // hostname
     secureConnection: true, // use SSL
@@ -10,7 +24,22 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
         pass: "anil_sharad90"
       }
 });
-
+//get bcrypt string
+exports.getbcrypstring=function(data,callback)
+{
+  bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+    if(err) {
+      return next(err);
+    }
+    bcrypt.hash(data, salt, function(err, hash) {
+      if(err) {
+        return next(err);
+      }
+      console.log("hash data"+hash);
+     callback(hash)
+      });
+  });
+}
 //send an email
 exports.sendMail = function(message,callback){
   smtpTransport.sendMail(message, 

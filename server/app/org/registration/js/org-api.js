@@ -221,7 +221,7 @@ sendInviteMailToGroupMembers = function(usergrp,orgid,host,callback) {
           console.log("new emails data"+emaildata[i]);
           var user = new User({email:emaildata[i],orgid:new BSON.ObjectID(orgid+"")});
         //creating new user with invite emails
-          userapi.adduser(user,host,function(result) {
+          userapi.addUser(user,host,function(result) {
             console.log("result"+result);
             if(result == "success") {
               console.log("successfully added new user and verfication mail sent to your email id");
