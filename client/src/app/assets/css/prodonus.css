@@ -34,7 +34,7 @@
   }
   .label-control{
     text-align: center;
-   
+    margin-bottom: 10px;
     font-style: italic;
     font-size: 20px;
   }
@@ -50,9 +50,12 @@
   }
   .main-container-div{
     height: 570px;
-
-
-  }
+ }
+ .table-container{
+  height: 500px;
+  overflow-y: scroll;
+  margin-top: 20px;
+ }
   .para1{
   	text-align: center;
   	color: red;
@@ -331,5 +334,6 @@ html,body{
  .div-grid-control {
   min-height: 450px;
   max-height: 540px;
+
 
  }

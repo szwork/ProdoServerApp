@@ -1,0 +1,90 @@
+<div class="table-container">
+	<center><label class="label-control">Organization Data Summary</label><br></center>
+	 
+		<table class="table table-condensed table-hover">
+	 		<thead class="tbl-header">
+	 			<th>Company Details</th></thead>
+	 			<tbody>
+	 			<tr>
+	 				<td>Company Name</td>
+	 				<td>{{org.companyname}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>Company Description</td>
+	 				<td>{{org.description}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>Organization Type</td>
+	 				<td>{{org.name}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>Contract Id</td>
+	 				<td>{{org.contractid}}</td>
+	 			</tr>
+	 			</tbody>
+	 			<table class="table table-hover">
+	 		<thead class="tbl-header">
+	 			<th>Address Details</th></thead>
+	 			<tbody>
+	 			<tr>
+	 				<td>Address</td>
+	 				<td>{{org.address1}}{{org.address2}}{{org.address3}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>Country</td>
+	 				<td>{{org.country}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>City</td>
+	 				<td>{{org.city}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>State</td>
+	 				<td>{{org.state}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>Zipcode</td>
+	 				<td>{{org.zipcode}}</td>
+	 			</tr></tbody>
+	 			<table class="table table-hover">
+	 		<thead class="tbl-header">
+	 			<th>Contact Details</th></thead>
+	 			<tbody>
+	 			<tr>
+	 				<td>Contact No.</td>
+	 				<td>{{org.value}}</td>
+	 			</tr></tbody>
+	 			<tr>
+	 			<table class="table table-hover">
+	 		<thead class="tbl-header">
+	 			<th>Group User Details</th></thead>
+	 			<tbody>
+	 				<td>Group Name</td>
+	 				<td>{{org.groupname}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>Domain Name</td>
+	 				<td>{{org.domain}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>Group Invites</td>
+	 				<td>{{org.invites}}</td>
+	 			</tr></tbody>
+	 			<table class="table table-hover">
+	 		<thead class="tbl-header">
+	 			<th>Subscription Details</th></thead>
+	 			<tbody>
+	 			<tr>
+	 				<td>Plan Id</td>
+	 				<td>{{org.planid}}</td>
+	 			</tr>
+	 			<tr>
+	 				<td>Plan Type</td>
+	 				<td>{{org.plantype}}</td>
+	 			</tr></tbody>
+		</table>
+  <center>
+    <button class="btn btn-md btn-primary" type="submit" ui-sref="home.company">Edit</button>
+    <button class="btn btn-md btn-primary" type="submit" ui-sref="prodonus">Submit</button>
+  </center> 
+</div>
