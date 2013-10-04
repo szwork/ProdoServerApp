@@ -12,7 +12,7 @@
 * 
 */
 
-var mongoose = require('../common/db');
+var mongoose = require('../../../common/js/db');
 var ObjectId = mongoose.Schema.ObjectId;
 var organizationHistorySchema = mongoose.Schema({
 	orgid:{ type:ObjectId,required: true, ref: 'Organization' },

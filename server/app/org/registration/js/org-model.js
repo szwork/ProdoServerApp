@@ -11,7 +11,7 @@
 * 
 */
 
-var mongoose = require('../common/db');
+var mongoose = require('../../../common/js/db');
 var ObjectId = mongoose.Schema.ObjectId;
 
 var UserGroupSchema = mongoose.Schema({     

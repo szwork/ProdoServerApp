@@ -13,13 +13,13 @@
 
 var orgModel = require('./org-model');
 var orgHistoryModel = require('./org-history-model'); 
-var userModel = require('../../user/registration/js/user-model');
+var userModel = require('../../../user/registration/js/user-model');
 var mongodb = require("mongodb");
 
 var BSON = mongodb.BSONPure;
-var verificationTokenModel = require('../../common/js/verification-token-model');
-var commonapi = require('../../common/js/common-api');
-var userapi = require('../../user/registration/js/user-api');
+var verificationTokenModel = require('../../../common/js/verification-token-model');
+var commonapi = require('../../../common/js/common-api');
+var userapi = require('../../../user/registration/js/user-api');
 
 exports.addOrganization = function(req,res){
   var name = req.body.name;
@@ -38,9 +38,9 @@ exports.addOrganization = function(req,res){
   };
 
   var user = {
-    fullname: req.body.fullname;
-    email: req.body.email;
-    password: req.body.password;
+    fullname: req.body.fullname,
+    email: req.body.email,
+    password: req.body.password
   }
 
   var usergrp = {
