@@ -77,14 +77,16 @@ passport.deserializeUser(function(id, done) {
 
 exports.verifyUser = function (req, res, next) {
   var token = req.params.token;
-  verify(token, function(err) {
+  verify(token, function (err,user) {
     if (err) { 
+      console.log("error in verify token "+err);
       return res.redirect("verification-failure");
       /*here we call req.logIn passport for under session 
         res.send("/");
         */
       } else {
-       var message = 
+        var html="Welocme "+user.fullname+" in Prodonus";
+           var message = 
              {
                 from: "Prodonus <sunil@giantleapsystems.com>", // sender address
                 to: user.email, // list of receivers
@@ -92,23 +94,22 @@ exports.verifyUser = function (req, res, next) {
                 html: html
  
              }
-        commonapi.sendMail(message, function (result)
+           commonapi.sendMail(message, function (result)
             {
                 if (result=="failure")
                  {
                     // not much point in attempting to send again, so we give up
                     // will need to give the user a mechanism to resend verification
                     console.error("Unable to send via postmark: " + error.message);
-                    res.send("unable to send forget password verification link");
+                    res.send("unable to send welocme email to user");
                  }
                  else
                  {
                     console.log("success send forget password verification email");
-                  res.send("success send forget password verification email");  
+                  res.send("succesfully verified user and welocme email sent to your emailid");  
                  }
 
             });
-        res.send("successfully verfied the user");
       }
   });
 };
@@ -123,9 +124,13 @@ verify = function(token, done) {
         return done(err);
       }
       user["verified"] = true;
-      user.save(function(err) {
-        done(err);
+      user.save(function(err,user) {
+             
       });
+     // done(user);
+      done(null,user);
+      
+     // done(user);
     });
   });
 };
