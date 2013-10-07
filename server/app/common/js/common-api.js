@@ -16,12 +16,12 @@ var nodemailer = require("nodemailer");
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var smtpTransport = nodemailer.createTransport("SMTP", {
-    host: "smtp.gmail.com", // hostname
+    host: "smtp.giantleapsystems.com", // hostname
     secureConnection: true, // use SSL
     port: 465, // port for secure SMTP
     auth: {
-        user: "sunilmore690",
-        pass: "anil_sharad90"
+        user: "sunil@giantleapsystems.com",
+        pass: "Sunil12345"
       }
 });
 //get bcrypt string

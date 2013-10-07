@@ -15,7 +15,7 @@ var orgModel = require('./org-model');
 var orgHistoryModel = require('./org-history-model'); 
 var userModel = require('../../../user/registration/js/user-model');
 var mongodb = require("mongodb");
-
+var S=require('string');
 var BSON = mongodb.BSONPure;
 var verificationTokenModel = require('../../../common/js/verification-token-model');
 var commonapi = require('../../../common/js/common-api');
@@ -43,66 +43,280 @@ exports.signupOrganization = function(req,res){
     password: req.body.password
   }
 
-  var usergrp = {
+  var usergrp = [{
     grpname:req.body.grpname,
     //curently invites manuallly set
-    invites:[{email:"sunil@giantleapsystems.com"},{email:"neha@giantleapsystems.com"}]  
-  };
+    invites:"sunil@giantleapsystems.com,neha@giantleapsystems.com"  
+  }];
     
-  var organization = {
+  var organization = new orgModel({
      name: name,
      description: description,
      orgtype: orgtype,
      contact: contacts,
      location: [{ address:address }],
-     usergrp: [ usergrp ]
+     usergrp: usergrp
    } 
-  //calling to addOrganization method
-  addOrganization( organization ,function( err,orgid )
-  {
-    if(err)
-    {
-      console.log("error in saving new organization");
-    }
-    //call addusergroup
-   addUsergroup(usergrp,orgid,function(err,result)
-   {
-
-   })
-   
-
-  })
+  );
+  
   //to save an organization
   //1.to save an new organization
   //2.to add amdin user
   //3 to add invite user
   //4/to send email to invites user
-  organization.save(function(err,organization) {
-    if(err){
-      console.log(err+"error in saving new organization")
-    }
-    if(organization){
-      console.log("organization data"+organization);
-      var orgid = organization._id;
-      var usergrp = organization.usergrp;
-      console.log("usergroup data"+usergrp);
-      console.log("orgid"+orgid);
-      //call function send invite to grop members
-       sendInviteMailToGroupMembers(usergrp,orgid,req.get('host') ,function(result) {
-        if(result=="success") {
-          console.log("successfully send emails");
-          res.send("successfully added new organization");
-        }
-        else {
-          res.send("problem in adding new organization");
-        }
-      });
-    }
-    //console.log("organization group data"+organization.usergrp)
-    //res.send(organization);
+  //5 to add new group admin in organization
+  //add an organiazation
+  addOrganization(organization,function(err,orgid)
+  {
+    //add an admin user of organization
+    if(err)
+    {
+      console.log("error in adding organization");
+    };
+    console.log("organization successfully saved");
+    var userdata=new userModel({fullname:req.body.fullname,email:req.body.email,password:req.body.password,orgid:orgid});
+    //to add an admin user
+    userapi.addUser(userdata,req.get('host'),function(result)
+    {
+      if(result=="failure")
+      {
+        console.log("add an admin user unsuccessfull");
+        res.send("errror in saving organization user");
+      }
+      else
+      {
+          //to add an invites user
+          console.log("admin user successfully saved for organization");
+          addInvitesUserAndSendMail(usergrp,orgid,req.get('host'),function(result)
+          {
+            if(result=="failure")
+            {
+              console.log("error in adding invites user in database");
+            }
+            else
+            {
+              console.log("invites user and send verification email")
+              //send verification mail to invites user
+              console.log("adding invites user into database");
+              //add user id into grpmembers
+              addGroupMembers( usergrp ,orgid ,function( result )
+              {
+                if( result == "failure")
+                {
+                  console.log("error in adding grpmembers");
+                }
+                else
+                {
+                  console.log("group members added successfully");
+                  res.send("organization successfully saved");
+                }
+              });
+              addAdminGroup( req.body.email,orgid,function(result)
+                   {
+                      if(result=="failure")
+                      {
+                        console.log("error in adding admingroup in organization");
+                      }
+                      else
+                      {
+                        console.log("adming group added in organization");
+                      }
+
+                   });
+              //add an admingroup
+            //  console.log("calling to addadmin group"+req.body.email);
+              
+              
+            }
+          });
+      }
+
+    })
+
   });
 }
+addOrganization=function(organization,done)
+{ 
+    organization.save(function(err,organization)
+    {
+      if(err){
+      console.log(err+"error in saving new organization");
+      done(err);
+    }
+    if(organization)
+    {
+      console.log("organization data"+organization);
+      var orgid = organization._id;
+      done(null,orgid);
 
+    }
+    else
+    {
+      console.log("organization saved blank");
+      done(err);
+    }
+  })
+};
+addInvitesUserAndSendMail=function(usergrp,orgid,host,callback)
+{
+  console.log("usergroup data"+usergrp);
+  console.log("orgid"+orgid);
+  var usergrplength=usergrp.length;
+  var invites;
+  var emails=[];
+  var j=0;
+  console.log("usergroup data"+usergrp.invites);
+  console.log("usergrp length"+usergrp.length);
+  for(var i=0;i<usergrplength;i++)
+  {
+    invites=usergrp[i].invites;
+    invites=S(invites);
+    console.log("while loop");
+    while(invites.length>0)
+    {   
+      if(invites.contains(','))
+      {
+        var pos=invites.indexOf(',');
+        emails[j]=invites.substring(0,pos);
+        invites=invites.substring(pos+1);
+
+        console.log("remaining invites"+invites);
+        j++;
+      }
+      else
+      {
+          emails[j]=invites;
+          invites=[];
+          j++;
+      }
+    };
+    console.log("email[ "+i+" ]"+emails);
+  };
+      console.log("email[]"+emails); 
+      //to add an invite user
+      var user;
+      for(var i=0;i<emails.length;i++)
+      {
+          user=new userModel({email:emails[i],orgid:new BSON.ObjectID(orgid+"")});
+          console.log("user["+i+"]"+user);
+          userapi.addUser(user,host,function(result)
+          {
+            if(result=="failure")
+            {
+              console.log("error in invite user saving");
+            }
+            else
+            {
+              console.log("invtes user saved")
+              
+                callback(result);
+              
+              //callback(result);
+            }
+          })
+      };
+           
+    
+    //console.log("organization group data"+organization.usergrp)
+    //res.send(organization);
+};
+addGroupMembers=function(usergrp,orgid,callback)
+{
+  console.log("usergroup data"+usergrp);
+  console.log("orgid"+orgid);
+  var usergrplength=usergrp.length;
+  var invites;
+  var grpname;
+  var emails=[];
+  var j=0;
+  for(var i=0;i<usergrplength;i++)
+  {
+    invites=usergrp[i].invites;
+    invites=S(invites);
+    grpname=usergrp[i].grpname;
+   // var emaildata="[";
+    while(invites.length>0)
+    {   
+      if(invites.contains(','))
+      {
+        var pos=invites.indexOf(',');
+        emails[j]=invites.substring(0,pos);
+        invites=invites.substring(pos+1);
+
+        console.log("remaining invites"+invites);
+        j++;
+      }
+      else
+      {
+          emails[j]=invites;
+          invites=[];
+          j++;
+      }
+    };
+  //  emaildata+="]";
+    /*to get all userid according to groupname */
+    userModel.find({ email:{ $in :emails }},{_id:1},function(err,user)
+    {
+      if( err )
+      {
+        console.log("error in finding userid according invites");
+      }
+      if( user )
+      { //add the userid into respective group
+        console.log("userid by email"+user);
+        var newuser=[];
+        for(var i=0;i<user.length;i++)
+        {
+          newuser[i]=user[i]._id;
+
+        }
+        orgModel.update({ _id : new BSON.ObjectID(orgid+""),"usergrp.grpname":grpname},{$push:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status)
+        {
+          if( err )
+          {
+            callback("failure");
+            console.log("error in adding grpmembers in usergrp");
+          }
+          if( status==1 )
+          {
+            callback("success");
+            console.log("successfully added grpmembers into usergrp");
+          }
+        })
+      }
+
+    })
+    console.log("email[ "+i+" ]"+emails);
+  };
+      
+
+}
+addAdminGroup=function(email,orgid,callback)
+{
+  console.log("admin email"+email);
+  userModel.find({email:email},{_id:1},function(err,user)
+  {
+    if(err)
+    {
+      console.log("error in finding admin email for organization");
+    }
+    else
+    {
+      console.log()
+      orgModel.update({ _id:new BSON.ObjectID(orgid+"")},{$push:{usergrp:{grpname:"amdin",grpmembers:user._id}}},function(err,status)
+      {
+        if(err)
+        {
+          console.log("error in adding admin group into existing organization");
+        }
+        else
+        {
+          console.log("successfully added admin group into existing organization");
+        }
+      })
+    }
+  })
+}
  //to update an existing organization
  exports.updateOrganization = function(req,res) {
   //value taking from body
@@ -167,95 +381,18 @@ exports.invites = function(req,res) {
   var usergrp = [
                  {
                   grpname:"Service Engineers",
-                  invites:["neha@giantleapsystems.com"]
+                  invites:"neha@giantleapsystems.com"
                  },
                 {
                   grpname:"Production Engineers",
-                  invites:["sunil@giantleapsystems.com","sunilmore6490@gmail.com"]
+                  invites:"sunil@giantleapsystems.com,sunilmore6490@gmail.com"
                 }
               ];
-  if(usergrp != undefined) {
-    //pass a list of email to send invitation
-    sendInviteMailToGroupMembers(usergrp,orgid,req.get('host'), function(result) {
-      if(result == "success"){
-        console.log("successfully send emails");
-        //we have to push into grpmembers
-        res.send("organization data updated successfully");
-      }
-    });//end of sendInviteMail          
-  }
+
 };//end of invites method
 
 
 //send an invite email to usergroup members
-sendInviteMailToGroupMembers = function(usergrp,orgid,host,callback) {
-  var k = 0;//to calculate how many emails in usergroup
-  var emails = [];
-  var lengthofdata = usergrp.length;
-  console.log("length of user" + lengthofdata);
-  
-  //for loop start
-  for(var i = 0; i < lengthofdata; i++) {
-    var invities = usergrp[i].invites;
-    console.log("grpmembersdata"+invities);
-    if(invities != undefined)
-    {
-      var grpmemberslength = invities.length;
-      for(var j = 0;j < grpmemberslength; j++) {  
-        if(invities[j]!=undefined) { 
-          emails[k+1]=invities[j];
-          console.log(invities[j]);
-          k++;
-        }
-      }//end of for loop for grpmemberslength
-    }//end of if loop for invities
-  }//for loop end for lengthdata
-  console.log(emails);
-  var emaildata = [];
-  var j = 0;
-  for(i = 0; i < emails.length; i++)
-  {
-    if(emails[i] != undefined) { 
-      emaildata[j] = emails[i];
-      j++;
-      //console.log(ema)
-    }
-  }
-  console.log("emaildata"+emaildata);
-  for(var i=0;i<emaildata.length;i++) { 
-    console.log("email"+emaildata[i]);
-    if(emaildata[i]!=undefined)  {
-      console.log("email["+i+"]"+emaildata[i]);
-      userModel.find({email:emaildata[i]},function(err,userdata) {
-        if(err) {
-          console.log("error in check email aleready exists orn not");
-
-        }
-     //   console.log("userdata"+userdata);
-          console.log("length of userdata"+userdata.length);
-          if(userdata.length <=0 ) {
-          console.log("userdata"+userdata);
-        //  console.log("email "+invities[i].e);
-          console.log("new emails data"+emaildata[i]);
-          var user = new userModel({email:emaildata[i],orgid:new BSON.ObjectID(orgid+"")});
-        //creating new user with invite emails
-          userapi.addUser(user,host,function(result) {
-            console.log("result"+result);
-            if(result == "success") {
-              console.log("successfully added new user and verfication mail sent to your email id");
-              //res.send("successfully added new user and verfication mail sent to your email id");          
-            }
-            else {
-            console.log("problem in adding new user and ");
-            //res.send("problem in adding new user and ");               
-            }
-          });
-        }//end of if(!userdata) 
-      })//end of User.find function
-    } //end of emails[i]!=undefined
-  }//end of for loop emails.length
-}//end of send invite method
-    
 
 exports.getAllOrganization = function(req,res) {
   orgModel.find(function(err, organization)

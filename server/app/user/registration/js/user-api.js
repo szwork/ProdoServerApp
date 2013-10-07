@@ -137,7 +137,7 @@ verify = function(token, done) {
 exports.addUser=function(user,host,callback)
 {
 
-  adduser(user, req.get('host'),function(result) {
+  adduser(user, host,function(result) {
       if(result == "success") {
         console.log("success: U100, V001"); 
         callback(result);

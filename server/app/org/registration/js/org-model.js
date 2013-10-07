@@ -47,6 +47,15 @@ var LocationSchema = mongoose.Schema({
 
 var ContactSchema = mongoose.Schema({ customerhelpline: {type:String}
 });
+var subscription=mongoose.Schema(
+{
+
+        planid:{type:ObjectId,ref:"Subscription"} ,
+        planstartdate:Date , 
+        planexpirydate:Date
+        
+}
+  )
 
 var OrganizationSchema = mongoose.Schema({
     parentorgid: { type: String, default:0 },
@@ -61,7 +70,8 @@ var OrganizationSchema = mongoose.Schema({
     location:[LocationSchema],
     usergrp:[UserGroupSchema],
     status: { type:String,default:"active"},/*wheather organization is active(1) or deactive(0)*/
-    contractid:{type:String}  
+    contractid:{type:String},
+    subscription:[subscription]
 });
 
 var Organization = mongoose.model('organization', OrganizationSchema);
