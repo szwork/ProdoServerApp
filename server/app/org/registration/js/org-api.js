@@ -21,7 +21,7 @@ var verificationTokenModel = require('../../../common/js/verification-token-mode
 var commonapi = require('../../../common/js/common-api');
 var userapi = require('../../../user/registration/js/user-api');
 
-exports.addOrganization = function(req,res){
+exports.signupOrganization = function(req,res){
   var name = req.body.name;
   var description = req.body.description;
   var orgtype = req.body.orgtype;
@@ -49,7 +49,7 @@ exports.addOrganization = function(req,res){
     invites:[{email:"sunil@giantleapsystems.com"},{email:"neha@giantleapsystems.com"}]  
   };
     
-  var organization = new orgModel({
+  var organization = {
      name: name,
      description: description,
      orgtype: orgtype,
@@ -57,8 +57,21 @@ exports.addOrganization = function(req,res){
      location: [{ address:address }],
      usergrp: [ usergrp ]
    } 
-  );
-  
+  //calling to addOrganization method
+  addOrganization( organization ,function( err,orgid )
+  {
+    if(err)
+    {
+      console.log("error in saving new organization");
+    }
+    //call addusergroup
+   addUsergroup(usergrp,orgid,function(err,result)
+   {
+
+   })
+   
+
+  })
   //to save an organization
   organization.save(function(err,organization) {
     if(err){
@@ -150,11 +163,11 @@ exports.invites = function(req,res) {
   var usergrp = [
                  {
                   grpname:"Service Engineers",
-                  invites:"neha@giantleapsystems.com"
+                  invites:["neha@giantleapsystems.com"]
                  },
                 {
                   grpname:"Production Engineers",
-                  invites:"sunil@giantleapsystems.com,sunilmore6490@gmail.com"
+                  invites:["sunil@giantleapsystems.com","sunilmore6490@gmail.com"]
                 }
               ];
   if(usergrp != undefined) {
@@ -185,9 +198,9 @@ sendInviteMailToGroupMembers = function(usergrp,orgid,host,callback) {
     {
       var grpmemberslength = invities.length;
       for(var j = 0;j < grpmemberslength; j++) {  
-        if(invities[j].email!=undefined) { 
-          emails[k+1]=invities[j].email;
-          console.log(invities[j].email);
+        if(invities[j]!=undefined) { 
+          emails[k+1]=invities[j];
+          console.log(invities[j]);
           k++;
         }
       }//end of for loop for grpmemberslength
@@ -209,17 +222,18 @@ sendInviteMailToGroupMembers = function(usergrp,orgid,host,callback) {
     console.log("email"+emaildata[i]);
     if(emaildata[i]!=undefined)  {
       console.log("email["+i+"]"+emaildata[i]);
-      User.find({email:emaildata[i]},function(err,userdata) {
+      userModel.find({email:emaildata[i]},function(err,userdata) {
         if(err) {
-          console.log("error in check email aleready exists orn not")
+          console.log("error in check email aleready exists orn not");
+
         }
      //   console.log("userdata"+userdata);
-        console.log("length of userdata"+userdata.length);
-        if(userdata.length <=0 ) {
+          console.log("length of userdata"+userdata.length);
+          if(userdata.length <=0 ) {
           console.log("userdata"+userdata);
         //  console.log("email "+invities[i].e);
           console.log("new emails data"+emaildata[i]);
-          var user = new User({email:emaildata[i],orgid:new BSON.ObjectID(orgid+"")});
+          var user = new userModel({email:emaildata[i],orgid:new BSON.ObjectID(orgid+"")});
         //creating new user with invite emails
           userapi.addUser(user,host,function(result) {
             console.log("result"+result);

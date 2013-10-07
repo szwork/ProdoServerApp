@@ -1,3 +1,15 @@
+/*
+* Overview: Forgot password db Database connections
+* Dated:
+* Author: Sunil More
+* Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
+* Change History:
+* ----------------------------------------------------------------------
+* date | author | description 
+* ----------------------------------------------------------------------
+* 27-3-2013 | xyx | Add a new property
+* 03-10-2013| Sunil|creat forgot password token model 
+*/
 var uuid = require('node-uuid');
 var mongoose=require('./db');
 //var mongoose = require('mongoose')
@@ -20,5 +32,5 @@ forgotPasswordTokenSchema.methods.createforgotPasswordToken = function (done) {
         console.log("Verification token", forgetPasswordToken);
     });
 };
-var ForgotPasswordTokenModel = mongoose.model('ForgetPasswordToken', forgotPasswordTokenSchema);
+var ForgotPasswordTokenModel = mongoose.model('forgetpasswordtoken', forgotPasswordTokenSchema);
 module.exports = ForgotPasswordTokenModel;
