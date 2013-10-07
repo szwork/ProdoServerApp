@@ -83,7 +83,7 @@ exports.verifyUser = function (req, res, next) {
         res.send("/");
         */
       } else {
-        res.send("successfully verfied the user");
+        res.redirect('#/home/signin');
       }
   });
 };
