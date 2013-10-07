@@ -11,7 +11,7 @@
 * 
 */
 
-var mongoose = require('../../common/js/db');
+var mongoose = require('../../../common/js/db');
 
 var orgTypeSchema = mongoose.Schema({	
 	orgtypename:{ type:String,required:true }//orgtype namemeans

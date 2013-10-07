@@ -13,17 +13,17 @@
 
 //Prodonus Routesar
 
-var auth = require('../app/common/js/security');
+// var auth = require('../app/common/js/security');
 var api = require("../app/api/api.js");
 
 // Organization - REST api
-function init(app) {
+exports.init = function (app) {
   app.post('/organization', api.orgapi.addOrganization);
-  app.put('/organization/:orgid', auth, api.orgapi.updateOrganization);
-  app.delete('/organization/:orgid', auth, api.orgapi.deleteOrganization);
+  app.put('/organization/:orgid', api.orgapi.updateOrganization);
+  app.delete('/organization/:orgid', api.orgapi.deleteOrganization);
 
   //Access to ONLY prodonus Admin //set up admin  role
-  app.get('/organization', auth, api.orgapi.getAllOrganization); 
-  app.get('/organization/:orgid', auth, api.orgapi.getOrganizationById);
-  app.post('/invites/:orgid', auth, api.orgapi.invites);
+  app.get('/organization', api.orgapi.getAllOrganization); 
+  app.get('/organization/:orgid', api.orgapi.getOrganizationById);
+  app.post('/invites/:orgid', api.orgapi.invites);
 }

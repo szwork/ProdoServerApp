@@ -15,8 +15,8 @@
 var api = require("../app/api/api.js");
 
 // User - REST apis
-function init(app) {
-  app.get('/verify/:token', api.userapi.verifyuser);
+exports.init = function (app) {
+  app.get('/verify/:token', api.userapi.verifyUser);
   app.post('/login', api.userapi.loginSession);
   app.post('/signup', api.userapi.signup);
 }

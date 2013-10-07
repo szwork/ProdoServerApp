@@ -11,11 +11,11 @@
 * 
 */
 
-var verificationTokenModel = require('../../common/js/verification-token-model');
+var verificationTokenModel = require('../../../common/js/verification-token-model');
 var userModel = require('./user-model');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var commonapi = require('../../common/js/common-api');
+var commonapi = require('../../../common/js/common-api');
 
 //Create login session
 exports.loginSession = function(req, res, next) {
@@ -105,7 +105,7 @@ verify = function(token, done) {
   });
 };
 
-exports.addUser = function(user, host, callback, req, res) {
+addUser = function (user, host, callback) {
     console.log("calling to adduser function");
     user.save(function(err,user){
       if(err) {

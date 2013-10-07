@@ -11,7 +11,7 @@
 * 
 */
 
-var orgType = require('../models/org-type-model');
+var orgType = require('./org-type-model');
 
 exports.addOrgType = function(req,res){
   var orgtypename = req.body.orgtypename;
