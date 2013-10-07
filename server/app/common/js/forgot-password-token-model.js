@@ -1,5 +1,5 @@
 /*
-* Overview: verfiy password db Database connections
+* Overview: Forgot password db Database connections
 * Dated:
 * Author: Sunil More
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
@@ -10,29 +10,32 @@
 * 27-3-2013 | xyx | Add a new property
 * 
 */
+
 var uuid = require('node-uuid');
 var mongoose = require('./db');
 
 // Verification token model
 var ObjectId = mongoose.Schema.ObjectId;
-var verificationTokenSchema = new mongoose.Schema({
+
+var forgotPasswordTokenSchema = new mongoose.Schema({
     _userId: { type:ObjectId,required: true, ref: 'User' },
     token: { type: String, required: true },
-    createddate: { type: Date, required: true, default: Date.now, expires: '4h' }
+    createdAt: { type: Date, required: true, default: Date.now, expires: '4h' },
+    status: { type:String,default:"active" }
 });
 
-verificationTokenSchema.methods.createVerificationToken = function (done) {
-    var verificationToken = this;
+forgotPasswordTokenSchema.methods.createForgotPasswordToken = function (done) {
+    var forgotPasswordToken = this;
     var token = uuid.v4();
-    verificationToken.set('token', token);
-    verificationToken.save( function (err) {
+    forgotPasswordToken.set('token', token);
+    forgotPasswordToken.save( function (err) {
       if (err){
-          return done(err);
+        return done(err);
       }
       return done(null, token);
-      console.log("Verification token", verificationToken);
+      console.log("Verification token", forgotPasswordToken);
     });
 };
 
-var VerificationTokenModel = mongoose.model('verificationtoken', verificationTokenSchema);
-module.exports = VerificationTokenModel;
+var ForgotPasswordTokenModel = mongoose.model('ForgotPasswordToken', forgotPasswordTokenSchema);
+module.exports = ForgotPasswordTokenModel;
