@@ -21,40 +21,48 @@ var app= angular.module("ProdonusApp", ['ui.router', 'app.directives'], function
         url: '/prodonus',
         templateUrl: 'common/layouts/prodonus.layout.tpl.html'
       })
+    .state('subscription', {
+        url: '/subscription',
+        templateUrl: 'common/layouts/subscription.layout.tpl.html'
+      })
     .state('home.signup', {
         url: '/signup',
         templateUrl:  'user/views/signup.tpl.html'
       })
-    .state('home.company', {
+    .state('subscription.company', {
         url: '/company',
         templateUrl: 'org/registration/views/company.tpl.html'
       })
-    .state('home.contact', {
+    .state('subscription.contact', {
         url: '/contact',
         templateUrl: 'org/registration/views/contact.tpl.html'
       })
-    .state('home.address', {
+    .state('subscription.address', {
         url: '/address',
         templateUrl: 'org/registration/views/address.tpl.html'
       })
-    .state('home.groupuser', {
+    .state('subscription.groupuser', {
         url: '/groupuser',
         templateUrl: 'org/registration/views/groupusers.tpl.html'})
-    .state('home.terms', {
+    .state('subscription.terms', {
         url: '/terms',
         templateUrl: 'user/views/prodonus.terms.tpl.html'
       })
-    .state('subscription', {
-        url: '/subscription',
-        templateUrl: 'org/registration/views/subscription.tpl.html'
+    .state('subscription.subscribe', {
+        url: '/subscribe',
+        templateUrl: 'user/views/subscribe.tpl.html'
       })
     .state('forgotEmail', {
         url: '/forgotEmail',
         templateUrl: 'user/views/forgot.email.tpl.html'
       }) 
-    .state('home.display', {
+    .state('subscription.display', {
         url: '/display',
         templateUrl: 'org/registration/views/display.tpl.html'
+      })
+    .state('subscription.payment', {
+        url: '/payment',
+        templateUrl: 'org/registration/views/payment.tpl.html'
       }) 
        
   }]); 

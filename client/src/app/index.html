@@ -19,27 +19,26 @@
 </head>
 <!-- To create a Manufacturer's Registration Page for a manufacturing company to get registered with Prodonus & create an account and capture details.   -->
 <body>
-  <div id="holder">
-    <div id="body" class="container">
+ 
+    <!-- <div id="body" class="container"> -->
+    <div class="container-prd">
       <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
         <a class="navbar-brand" href="#/prodonus">Prodonus</a>
         <p class="navbar-text pull-right"><a ui-sref="home.signin" class="navbar-link">Sign In</a></p>
         </nav>
-        <div class="container main-container-div" ng-controller="OrgRegistrationCtrl">
-          <div ui-view></div>
-        </div>
-      <div class="container footer-margin-up"></div>
-      <div id="footer" class="container">
+        <div class="container-main" ui-view ng-controller="OrgRegistrationCtrl"></div>
+    </div>
+    <!-- <div class="container footer-margin-up"></div> -->
+    <div id="footer" class="container-footer">
         <a class="link link-footer" href="">About</a>
         <a class="link" href="">Connect With Us</a>
         <a class="link" href="">Terms</a>
         <a class="link" href="">Privacy</a>
         <a class="link" href="">Contact</a>
            &copy; Prodonus 2013 | made in pune, india
-      </div>
-        <div class="container footer-margin-down"></div>   <!--container -->
     </div>
-  </div>
+        <!-- <div class="container footer-margin-down"></div>  -->
+ 
     
   <script src="../vendor/bootstrap/assets/js/jquery.js"></script>
   <script src="../vendor/bootstrap/dist/js/bootstrap.js"></script>

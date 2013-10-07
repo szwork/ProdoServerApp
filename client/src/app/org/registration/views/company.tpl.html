@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container-org">
   <form name="formOrgRegisterCompany" class="css-form form-org-register" ng-submit=""  novalidate>
     <center>
       <div class="control-group">
@@ -7,17 +7,17 @@
         <div class="input-help">
           <h4>Field Required!</h4>
         </div>
-
+ 
       <textarea name="description" type="textarea" class="form-control" ng-model="org.description" placeholder="Company Description" required/></textarea>
         <div class="input-help">
           <h4>Field Required!</h4>
         </div>  
-
+ 
       <select type="text" class="form-control" ng-model="org" ng-options="org.name for org in orgs" required></select>
         <div class="input-help">
           <h4>Field Required!</h4>
         </div>
-
+ 
       <input name="contractid" type="text" class="form-control" ng-model="org.contractid" placeholder="Contract Id" required/>
         <div class="input-help">
           <h4>Field Required!</h4>
@@ -26,7 +26,7 @@
     </center>
 
     <center>
-    	<button class="btn btn-md btn-primary" ui-sref="home.address" ng-click="saveUser()">Next</button>
+    	<button class="btn btn-md btn-primary" ui-sref="subscription.address" ng-click="saveUser()">Next</button>
     </center>
 
 	</form>

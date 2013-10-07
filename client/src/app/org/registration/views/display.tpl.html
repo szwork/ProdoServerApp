@@ -1,6 +1,7 @@
-<div class="table-container">
-	<center><label class="label-control">Organization Data Summary</label><br></center>
-	 
+<div class="container-org">
+ 
+	<label class="label-control">Organization Data Summary</label><br>
+	 <div class="container-display">
 		<table class="table table-condensed table-hover">
 	 		<thead class="tbl-header">
 	 			<th>Company Details</th></thead>
@@ -22,14 +23,13 @@
 	 				<td>{{org.contractid}}</td>
 	 			</tr>
 	 			</tbody>
-	 			<table class="table table-hover">
-	 		<thead class="tbl-header">
-	 			<th>Address Details</th></thead>
-	 			<tbody>
-	 			<tr>
-	 				<td>Address</td>
-	 				<td>{{org.address1}}{{org.address2}}{{org.address3}}</td>
-	 			</tr>
+	 				<thead class="tbl-header">
+	 					<th>Address Details</th></thead>
+	 						<tbody>
+	 							<tr>
+	 								<td>Address</td>
+	 								<td>{{org.address1}}{{org.address2}}{{org.address3}}</td>
+	 							</tr>
 	 			<tr>
 	 				<td>Country</td>
 	 				<td>{{org.country}}</td>
@@ -46,7 +46,6 @@
 	 				<td>Zipcode</td>
 	 				<td>{{org.zipcode}}</td>
 	 			</tr></tbody>
-	 			<table class="table table-hover">
 	 		<thead class="tbl-header">
 	 			<th>Contact Details</th></thead>
 	 			<tbody>
@@ -54,11 +53,12 @@
 	 				<td>Contact No.</td>
 	 				<td>{{org.value}}</td>
 	 			</tr></tbody>
-	 			<tr>
-	 			<table class="table table-hover">
+	 			
+	 			 
 	 		<thead class="tbl-header">
 	 			<th>Group User Details</th></thead>
 	 			<tbody>
+	 			<tr>
 	 				<td>Group Name</td>
 	 				<td>{{org.groupname}}</td>
 	 			</tr>
@@ -69,8 +69,9 @@
 	 			<tr>
 	 				<td>Group Invites</td>
 	 				<td>{{org.invites}}</td>
-	 			</tr></tbody>
-	 			<table class="table table-hover">
+	 			</tr>
+	 			</tbody>
+	 			 
 	 		<thead class="tbl-header">
 	 			<th>Subscription Details</th></thead>
 	 			<tbody>
@@ -84,7 +85,8 @@
 	 			</tr></tbody>
 		</table>
   <center>
-    <button class="btn btn-md btn-primary" type="submit" ui-sref="home.company">Edit</button>
+    <button class="btn btn-md btn-primary" type="submit" ui-sref="subscription.company">Edit</button>
     <button class="btn btn-md btn-primary" type="submit" ui-sref="prodonus">Submit</button>
-  </center> 
+  </center>
+  </div> 
 </div>

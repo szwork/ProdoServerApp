@@ -1,29 +1,255 @@
-.container{
-    max-width: 1170px;
+/*.........................Layouts for prodonus..................................*/
 
-  }
  
-
+ 
+/*#body{
+      padding: 0;
+      background: url(../images/prodonus.jpg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover; 
+    height: 660px;
+    }*/
+.container-prd{
+  height: 660px;
+}
+.container-main{
+  padding: 0;
+  margin: 0;
+}
+.signup-view {
+  border: 1px solid #ddd;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px; 
+  background-color: #E9E5Df;
+  width: 500px;
+  height: 400px;
+  margin-top: 60px;
+  padding-bottom: 20px;
+}
+.container-welcome-text{
+  height: 450px;
+  padding-top: 130px;
+  text-align: left;
+  margin-left: 150px;
+}
+.prd-text{
+  font-size: 30px;
+  font-style: italic;
+  color: #000000;
+ }
 .row{
-	 
-	margin-top: 25px;
-} 
+  margin: 0;
+  height: 620px;
+}
+#footer{
+    height: 20px; 
+    padding-top: 3px;
+    background-color: #f1eee9;
+    position: relative;
+    /*bottom: 50px; */
+    font-size: 10px;
+}
+.link{
+  margin-left: 20px;
+  text-align: center;
+}
+.link-footer{
+  margin-left: 100px;
+ }
+ .navbar-text{
 
+  margin-right: 25px;
+  padding-bottom: 10px;
+}
+.navbar-brand{
+  padding-bottom: 10px;
+  font-style: italic;
+}
+.navbar{
+  min-height: 1px;
+  max-height: 40px; 
+}
 .modal{
   position: relative;
   top: 150px;
   display: inline;
-
-  
 }
 .fade{
   opacity: 0.9;
    
 }
 
-  .form-control{
-  	margin-top: 10px;
-  	width: 230px;
+/*...............................end......................................................*/
+/*...............................Layout for subscription......................................................*/
+.container-subscription{
+  height: 620px;
+  background-color: #ffffff;
+}
+.col-md-2{
+ background-color: #f9f9f9;
+ height: 620px;
+}
+.col-md-8{
+ height: 620px;
+}
+ 
+.subscription{
+  margin-top: 25px;
+  padding-left: 95px;
+ }
+ .page-header{
+  text-align: center;
+  margin: 0px;
+}
+.jumbotron-subscribe{
+  width: 210px;
+  float: left;
+  height: 400px;
+  margin-left: 2px;
+  margin-bottom: 30px;
+  padding: 0;
+  background-color: #F9F4F2;
+  position: relative;
+  border-radius: 10px;
+ }
+ 
+ .subscription-heading{
+  width: 210px;
+  height:50px;
+  background-color: #5E9489;
+  color: #ffffff;
+  text-align: center;
+  border-radius: 10px;
+  border-bottom-style: inset;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px; 
+  text-transform: capitalize;
+  padding: 10px;
+  font:bold 20px/30px Georgia,serif;
+}
+.subscribe-text{
+  text-align: center;
+  color: #929C93;
+}
+
+section:hover{
+   transform: scale(1.05);
+-webkit-transform: scale(1.05); /* Safari and Chrome */  
+  tranform-style:preserve-3d;
+  background-color: #F8F0C8 ;
+  position:relative;
+  left:0px;
+  top:0px;
+  z-index:1;
+}
+ 
+section:hover #heading{
+    
+  background-color: #3E8960 ;
+}
+
+ 
+ hr{
+  width: 150px;
+  border-top: 1px solid #D8D0D0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+ }
+.subscribe-feature-list{
+  font-size: 12px;
+  color: #404541; 
+}
+.btn-subscribe{
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+p.price{
+  padding: 10px;
+  text-align: center;
+  color: #A5A9AD;
+  font:italic bold 20px/30px Georgia,serif;
+}
+.usd{
+  color: #2366AD;
+  font-size: 25px;
+}
+
+/*...............................end......................................................*/
+/*...............................css for all buttons......................................................*/
+
+.btn-layout-text{
+  margin-top: 25px;
+  margin-right: 5px;
+  width: 130px;
+  height: 40px;
+  font-size: 18px;
+  font-style: normal;
+}
+.btn-md{
+    margin-top: 30px;
+    margin-bottom: 5px;
+    position: relative;
+    width: 90px;
+    height: 25px;
+    text-align: center;
+    font-size: 15px;
+    padding-bottom: 25px;
+  }
+  .btn-lg {
+  margin-top: 20px;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  max-width: 180px;
+  height: 40px;
+  font-size: 14px;
+  font-style: oblique;
+  
+ }
+ .btn-signin{
+  margin-top: 50px;
+}
+ .glyphicon-thumbs-up {
+  margin-right: 3px;
+ }
+ .glyphicon-remove {
+  margin-left: -17px;
+}
+ .glyphicon-plus-sign {  
+  margin-left: 10px;  
+ }
+.glyphicon-plus-email {
+  
+  margin-left: 8px;
+ }
+/*...............................end......................................................*/
+/*...............................css for tamplate views inside subscription layout......................................................*/
+ 
+.container-org{
+  width:600px; 
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+ }
+ .container-terms{
+  text-align: left;
+
+ }
+ .container-display{
+  text-align: left;
+  height: 500px;
+  overflow-y: scroll;
+  font-size: 12px;
+ }
+ .tbl-header{
+  font-size: 15px;
+ }
+ .form-control{
+    margin-top: 10px;
+    width: 350px;
     display: inline-block;
     position: relative;
     margin-right: 25px;
@@ -38,76 +264,16 @@
     font-style: italic;
     font-size: 20px;
   }
-  .btn-md{
-  	margin-top: 30px;
-    margin-bottom: 5px;
-    position: relative;
-    width: 90px;
-    height: 25px;
-    text-align: center;
-    font-size: 15px;
-    padding-bottom: 25px;
-  }
-  .main-container-div{
-    height: 570px;
- }
- .table-container{
-  height: 500px;
-  overflow-y: scroll;
-  margin-top: 20px;
- }
+ .section
   .para1{
-  	text-align: center;
-  	color: red;
+    text-align: center;
+    color: red;
   }
+ /*...............................end......................................................*/
+/*...............................css for all templates and forms......................................................*/
    
- .btn-lg{
-  margin-top: 20px;
-  margin-bottom: 5px;
-  margin-right: 5px;
-  max-width: 180px;
-  height: 40px;
-  font-size: 14px;
-  font-style: oblique;
-  
- }
- .btn-layout-text{
-  margin-top: 25px;
-  margin-right: 5px;
-  width: 130px;
-  height: 40px;
-  font-size: 18px;
-  font-style: normal;
-}
-
- .glyphicon-thumbs-up{
-  margin-right: 3px;
- }
- 
-.nested-view1 {
-  border: 1px solid #ddd;
-  -webkit-border-radius: 20px;
-  -moz-border-radius: 20px;
-  border-radius: 20px; 
-  width: 450px;
-  background-color: #E9E5Df;
-}
-
- .glyphicon-remove{
-  margin-left: -17px;
-
- }
- .glyphicon-plus-sign{
-  
-  margin-left: 10px;
-  
- }
-
- .glyphicon-plus-email{
-  
-  margin-left: 8px;
- }
-
+ /*...............................end......................................................*/
+/*...........................................css for input help.............................*/
  .error{
   color: red;
   display: block;
@@ -129,22 +295,7 @@
         background-color: #A2F08F;
       }
 
-.navbar-text{
 
-  margin-right: 25px;
-  padding-bottom: 10px;
-}
-.navbar-brand{
-  padding-bottom: 10px;
-  font-style: italic;
-
-
-}
-.navbar{
-  min-height: 1px;
-  max-height: 40px; 
- 
-}
 
 .control-group.error .help-inline, 
 .control-group.error input {
@@ -152,17 +303,10 @@
   color: #B94A48;
 }
 
-.btn-signin{
-  margin-top: 50px;
-}
-
  .input-help {
   display: none;
   position:absolute;
   z-index: 100;
-  top: -35px;
-  left: 290px;
-  width:200px;
   padding:10px;
   background:#fefefe;
   font-size:.875em;
@@ -275,65 +419,8 @@ input:focus {
   background-position: 2px 6px;
 }
 
-.link{
-  margin-left: 20px;
-  text-align: center;
-}
 
-html,body{
-    height: 100%
-}
-
-#holder{
-    min-height: 100%;
-    position:relative;
-}
-
-#body{
-      padding: 0;
-      background-image: url(../images/prodonus.jpg);  
-      background-size:1200px 700px;
-}
-
-#footer{
-    height: 20px; 
-    padding-top: 3px;
-    background-color: #f1eee9;
-    position: relative;
-    /*bottom: 50px; */
-    font-size: 10px;
-}
   
- .link-footer{
-  margin-left: 100px;
- }
 
- .jumbotron{
-  margin-top: 50px;
- }
-
-.footer-margin-up{
-  height: 19px;
-}
- .footer-margin-down{
-  height: 5px;
-  
- }
-
- .layout-text{
-  height: 450px;
-  padding-top: 130px;
-  text-align: left;
-  margin-left: 40px;
-}
-  .prd-text{
-  font-size: 30px;
-  font-style: italic;
-  color: #000000;
- }
- .div-grid-control {
-  min-height: 450px;
-  max-height: 540px;
-
-
- }
+ 
+ 
