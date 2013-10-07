@@ -60,6 +60,10 @@ exports.addOrganization = function(req,res){
   );
   
   //to save an organization
+  //1.to save an new organization
+  //2.to add amdin user
+  //3 to add invite user
+  //4/to send email to invites user
   organization.save(function(err,organization) {
     if(err){
       console.log(err+"error in saving new organization")
