@@ -21,7 +21,7 @@ var UserGroupSchema = mongoose.Schema({
       grpmembers:
       [
        {
-       		userid:{type:ObjectId, ref: 'User'}
+       		type:String
        } 
 	   ]   
 	}

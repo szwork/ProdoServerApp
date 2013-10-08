@@ -78,14 +78,18 @@ passport.deserializeUser(function(id, done) {
 
 exports.verifyUser = function (req, res, next) {
   var token = req.params.token;
-  verify(token, function (err,user) {
-    if (err) { 
+  verify(token, function (err,user)
+   {
+    if (err)
+     { 
       console.log("error in verify token "+err);
       return res.redirect("verification-failure");
       /*here we call req.logIn passport for under session 
         res.send("/");
         */
-      } else {
+     } 
+     else 
+     {
         //var url = "http://"+ host+"/verify/"+token;
           EmailTemplateModel.find({"templatetype":"welcome"},function(err,emailtemplate)
           {
@@ -113,7 +117,7 @@ exports.verifyUser = function (req, res, next) {
                  // will need to give the user a mechanism to resend verification
                  // callback(result);
                  res.send({"message":"unverified","info":"error in verifying user"});
-                 }
+                }
                 else 
                 {
                   res.send({"message":"verified","info":"Successfully verified user"});
@@ -123,7 +127,10 @@ exports.verifyUser = function (req, res, next) {
       }
   });
 };
-
+/*
+This function call from verfiyuser
+it pass token as parameter and get user as callback
+*/ 
 verify = function(token, done) {
   verificationTokenModel.findOne({token: token}, function (err, doc){
     if (err) {
@@ -144,6 +151,7 @@ verify = function(token, done) {
     });
   });
 };
+//add an individual user
 exports.addUser=function(user,host,callback)
 {
 
@@ -245,6 +253,12 @@ exports.resetpassword=function(req,res)
   })
 
 };
+/*
+forgepassswordurlaction
+this function call when user click forgot password link from their respective email account
+-it will check token if it is valid then
+it will show resetpassword page 
+*/
 exports.forgotpasswordurlaction=function (req, res) {
     var token = req.params.token;
     verifyPasswordToken(token, function(err,user)
@@ -259,7 +273,7 @@ exports.forgotpasswordurlaction=function (req, res) {
                {
                  if (err)
                   { 
-                    res.send("error in creating session for user");s
+                    res.send("error in creating session for user");
                      console.log(err+"errro in creating session for particular userid");
                   }
                   else{

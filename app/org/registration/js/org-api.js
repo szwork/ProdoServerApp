@@ -23,6 +23,61 @@ var userapi = require('../../../user/registration/js/user-api');
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
 //adding new organization
+var EmailTemplateModel=require('../../../common/js/email-template-model');
+
+
+var emailtemplatedata=[ {
+templatetype: "password",
+subject: "Password reset request for Prodonus",
+description: "Please click or copy this link into new browser to change your password on Prodonus:<br><br><url><br><br>Regards,<br>Prodonus"
+},
+{
+templatetype: "verify",
+subject: "Prodonus Verification Link",
+description: "Hey, we want to verify that you are indeed <email> If t that/s the case, please follow the link below:<br><br><url><br><br> If you're not <email> didn't request verification you can ignore this email."
+},
+{
+templatetype: "welcome",
+subject: "Welocme to Prodonus",
+description: "Welocme <fullname> to Prodonus"
+}]
+var emailtemplate=new EmailTemplateModel({templatetype:"test"});
+emailtemplate.save(function(err,docs)
+{
+  if(err)
+  {
+    
+  }
+  else
+  {
+    console.log("default email")
+  }
+
+})
+
+EmailTemplateModel.find({templatetype:"welcome"},function(err,emailtemplate)
+{
+   if(err)
+   {
+    console.log("error in finding emailtemplate at adding manually ")
+   }
+   if(emailtemplate.length==0)
+   {
+    EmailTemplateModel.create(emailtemplatedata,function(err,docs)
+    {
+      if(err)
+      {
+        console.log("error in addiin emailtemplate")
+      }
+      else
+      {
+        console.log("emailtemplate saved"+docs);
+      }
+    })
+
+   }
+
+})
 exports.signupOrganization = function(req,res)
 {
   var name = req.body.name;
@@ -98,9 +153,9 @@ exports.signupOrganization = function(req,res)
           //to add an invites user
           console.log("admin user successfully saved for organization");
           console.log("---------------------------");
-              console.log("calling to  addInvitesUserAndSendMail");
+          console.log("calling to  addInvitesUserAndSendMail");
               
-              console.log("---------------------------");
+          console.log("---------------------------");
           addInvitesUserAndSendMail(usergrp,orgid,req.get('host'),function(result)
           {
             if(result=="failure")
@@ -128,11 +183,10 @@ exports.signupOrganization = function(req,res)
                 {
                   console.log("group members added successfully");
                   console.log("---------------------------");
-              console.log("calling to addadmin group");
-              
-              console.log("---------------------------");
-                    addAdminGroup( req.body.email,orgid,function(result)
-                   {
+                  console.log("calling to addadmin group");
+                  console.log("---------------------------");
+                  addAdminGroup( req.body.email,orgid,function(result)
+                  {
                       if(result=="failure")
                       {
                         console.log("error in adding admingroup in organization");
@@ -148,18 +202,19 @@ exports.signupOrganization = function(req,res)
                 }
               });
             
-              //add an admingroup
-            //  console.log("calling to addadmin group"+req.body.email);
-              
-              
             }
           });
-      }
+        }
 
-    })
+      })
 
   });
 }
+//addorganization method declaration
+/*
+It save organization and 
+callback orgid
+*/
 addOrganization=function(organization,done)
 { 
     organization.save(function(err,organization)
@@ -182,6 +237,10 @@ addOrganization=function(organization,done)
     }
   })
 };
+/*
+save all user according invite email and send verification email
+
+*/
 addInvitesUserAndSendMail=function(usergrp,orgid,host,callback)
 {
   console.log("usergroup data"+usergrp);
@@ -244,10 +303,11 @@ addInvitesUserAndSendMail=function(usergrp,orgid,host,callback)
           })
       };
            
-    
-    //console.log("organization group data"+organization.usergrp)
-    //res.send(organization);
 };
+/*
+it adds userid according to group into groupmembers
+so we can identify what is the role to user
+*/
 addGroupMembers=function(usergrp,orgid,callback)
 {
   console.log("usergroup data"+usergrp);
@@ -294,6 +354,7 @@ addGroupMembers=function(usergrp,orgid,callback)
     var i=0;
   //var usergrpdatalength=usergrp.length;
   //addgrpmember defination
+  //here we open an event
   eventEmitter.on('addgrpmember',function(i)
   {
     console.log("groupname:"+grpname[i]+" emails"+emaildata[i]);
@@ -341,6 +402,10 @@ addGroupMembers=function(usergrp,orgid,callback)
   });
   eventEmitter.emit("addgrpmember",i);
 }
+/*
+crate an new group adming into usergroup
+and only add one userid which is admin of the organization
+*/
 addAdminGroup=function(email,orgid,callback)
 {
   console.log("admin email"+email);
@@ -353,7 +418,7 @@ addAdminGroup=function(email,orgid,callback)
     else
     {
       console.log()
-      orgModel.update({ _id:new BSON.ObjectID(orgid+"")},{$push:{usergrp:{grpname:"admin",grpmembers:user._id}}},function(err,status)
+      orgModel.update({ _id:new BSON.ObjectID(orgid+"")},{$push:{usergrp:{grpname:"admin",grpmembers:user[0]._id}}},function(err,status)
       {
         if(err)
         {

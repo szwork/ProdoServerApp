@@ -13,6 +13,8 @@
 
 var orgapi = require("../org/registration/js/org-api");
 var userapi = require("../user/registration/js/user-api");
+var commonapi = require("../common/js/email-template-api");
 
 exports.orgapi = orgapi;
 exports.userapi = userapi;
+exports.commonapi=commonapi;
