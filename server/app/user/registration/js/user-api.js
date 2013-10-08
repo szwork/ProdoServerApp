@@ -17,7 +17,8 @@ var userModel = require('./user-model');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var commonapi = require('../../../common/js/common-api');
-
+var EmailTemplateModel=require('../../../common/js/email-template-model');
+var S=require('string');
 //Create login session
 exports.loginSession = function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
@@ -85,31 +86,40 @@ exports.verifyUser = function (req, res, next) {
         res.send("/");
         */
       } else {
-        var html="Welocme "+user.fullname+" in Prodonus";
-           var message = 
-             {
-                from: "Prodonus <sunil@giantleapsystems.com>", // sender address
+        //var url = "http://"+ host+"/verify/"+token;
+          EmailTemplateModel.find({"templatetype":"welcome"},function(err,emailtemplate)
+          {
+              console.log("emailtemplate"+emailtemplate);
+              var html=emailtemplate[0].description;
+              html=S(html);
+              html=html.replaceAll("<fullname>",user.fullname);
+             // html=html.replaceAll("<url>",url);
+              var message = 
+              {
+                from: "Prodonus  <noreply@prodonus.com>", // sender address
                 to: user.email, // list of receivers
-                subject:"Welocme To Prodonus", // Subject line
-                html: html
- 
-             }
-           commonapi.sendMail(message, function (result)
-            {
-                if (result=="failure")
-                 {
-                    // not much point in attempting to send again, so we give up
-                    // will need to give the user a mechanism to resend verification
-                    console.error("Unable to send via postmark: " + error.message);
-                    res.send("unable to send welocme email to user");
+                subject:emailtemplate[0].subject, // Subject line
+                html: html+"" // html body
+              };
+              console.log("email"+user.email)
+             // console.log("message data"+message+" token data"+token);
+             // console.log("requestd host"+ host);
+              //calling to sendmail method
+              commonapi.sendMail(message, function (result)
+              {
+                if (result == "failure") 
+                {
+                 // not much point in attempting to send again, so we give up
+                 // will need to give the user a mechanism to resend verification
+                 // callback(result);
+                 res.send({"message":"unverified","info":"error in verifying user"});
                  }
-                 else
-                 {
-                    console.log("success send forget password verification email");
-                  res.send("succesfully verified user and welocme email sent to your emailid");  
-                 }
-
-            });
+                else 
+                {
+                  res.send({"message":"verified","info":"Successfully verified user"});
+                }
+              });
+          })
       }
   });
 };
@@ -169,34 +179,41 @@ exports.forgotpassword=function(req,res)
         {
             if (err) return console.log("Couldn't create verification token for forget password", err);
             var url="http://"+ req.get('host')+"/forgotpassword/"+token;
-            var html="Please click this link to change your password on Prodonus:<br>"+url+"<br>Regards,<br>Prodonus"
-            var message = 
-             {
-                from: "Prodonus <sunil@giantleapsystems.com>", // sender address
+            //var url = "http://"+ host+"/verify/"+token;
+          EmailTemplateModel.find({"templatetype":"password"},function(err,emailtemplate)
+          {
+              console.log("emailtemplate"+emailtemplate);
+              var html=emailtemplate[0].description;
+              html=S(html);
+             // html=html.replaceAll("<email>",user.email);
+              html=html.replaceAll("<url>",url);
+              var message = 
+              {
+                from: "Prodonus  <noreply@prodonus.com>", // sender address
                 to: user.email, // list of receivers
-                subject:"Password reset reque​st for Prodonus", // Subject line
-                html: html
- 
-             }
-            console.log("email"+user.email)
-            console.log("message data"+message+" token data"+token);
-            console.log("requestd host"+ req.get('host'));
-            commonapi.sendMail(message, function (result)
-            {
-                if (result=="failure")
-                 {
-                    // not much point in attempting to send again, so we give up
-                    // will need to give the user a mechanism to resend verification
-                    console.error("Unable to send via postmark: " + error.message);
-                    res.send("unable to send forget password verification link");
-                 }
-                 else
-                 {
-                    console.log("success send forget password verification email");
-                  res.send("success send forget password verification email");  
-                 }
-
-            });
+                subject:emailtemplate[0].subject, // Subject line
+                html: html+"" // html body
+              };
+             // console.log("email"+user.email)
+              console.log("message data"+message+" token data"+token);
+              //console.log("requestd host"+ host);
+              //calling to sendmail method
+              commonapi.sendMail(message, function (result)
+              {
+                if (result == "failure") 
+                {
+                 // not much point in attempting to send again, so we give up
+                 // will need to give the user a mechanism to resend verification
+                 // callback(result);
+                 res.send({"message":"forget password","info":"Problem in sending password setting"});
+                }
+                else 
+                {
+                  res.send({"message":"forget password","info":"password settings sent to your mail"})
+                  //callback(result);
+                }
+              });
+          })
         });
     }
     else
@@ -270,7 +287,7 @@ verifyPasswordToken = function(token, done) {
                 if(docs)
                 {
                     console.log("forget passwordtoken model  change status");
-                     done(user);
+                     done(null,user);
                 }
             });
                
@@ -278,48 +295,83 @@ verifyPasswordToken = function(token, done) {
         })
     })
 }
+//adding email template
+/*var description="Hey, we want to verify that you are indeed <email> If that/s the case, please follow the link below:";
+    description+= "<br><url><br><br> If you're not <email> didn't request verification you can ignore this email."
+var template=
+{ 
+  templatetype:"verfiy",
+  subject:"Prodonus verifcation Link",
+  description:description
+            
+}
+var emailtemplate=new EmailTemplateModel(template);
+emailtemplate.save(function(err,template)
+{
+  if(err)
+  {
+    console.log("error in saving template");
+  }
+  console.log(template);
+})
 
-adduser = function (user, host, callback) {
+*/
+adduser = function (user, host, callback) 
+{
     console.log("calling to adduser function");
-    user.save(function(err,user){
-      if(err) {
+    user.save(function(err,user)
+    {
+      if(err) 
+      {
         console.log(err);
       } 
-      else {
+      else 
+      {
         /* calling to create verfication token*/
         //User.find({username:})
         var verificationToken = new verificationTokenModel({_userId: user._id});
-        verificationToken.createVerificationToken(function (err, token) {
-        if (err) { 
-          return console.log("Couldn't create verification token", err);
-        }
-        var url = "http://"+ host+"/verify/"+token;
-        var html="Hey, we want to verify that you are indeed “"+user.email+". If that's the case, please follow the link below:<br><br>"+url+"<br><br>";
-            html+="If you're not "+user.email+"or didn't request verification you can ignore this email."
-        var message = {
-          from: "Prodonus  <sunilmore690@gmail.com>", // sender address
-          to: user.email, // list of receivers
-          subject:"Prodonus verification link", // Subject line
-          text: "http://localhost:3000/verify/"+token, // plaintext body
-          html: html // html body
-        };
-        console.log("email"+user.email)
-        console.log("message data"+message+" token data"+token);
-        console.log("requestd host"+ host);
-
-        commonapi.sendMail(message, function (result){
-          if (result == "failure") {
-            // not much point in attempting to send again, so we give up
-            // will need to give the user a mechanism to resend verification
-            callback(result);
+        verificationToken.createVerificationToken(function (err, token) 
+        {
+          if (err)
+          { 
+            return console.log("Couldn't create verification token", err);
           }
-          else {
-            callback(result);
-          }
+          var url = "http://"+ host+"/verify/"+token;
+          EmailTemplateModel.find({"templatetype":"verify"},function(err,emailtemplate)
+          {
+              console.log("emailtemplate"+emailtemplate);
+              var html=emailtemplate[0].description;
+              html=S(html);
+              html=html.replaceAll("<email>",user.email);
+              html=html.replaceAll("<url>",url);
+              var message = 
+              {
+                from: "Prodonus  <noreply@prodonus.com>", // sender address
+                to: user.email, // list of receivers
+                subject:emailtemplate[0].subject, // Subject line
+                html: html+"" // html body
+              };
+              console.log("email"+user.email)
+              console.log("message data"+message+" token data"+token);
+              console.log("requestd host"+ host);
+              //calling to sendmail method
+              commonapi.sendMail(message, function (result)
+              {
+                if (result == "failure") 
+                {
+                 // not much point in attempting to send again, so we give up
+                 // will need to give the user a mechanism to resend verification
+                  callback(result);
+                }
+                else 
+                {
+                  callback(result);
+                }
+              });
+          })
         });
-      });
-    }
-  })
+      }
+    })
 };
 
 exports.signup = function(req,res) {

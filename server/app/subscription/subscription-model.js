@@ -27,11 +27,11 @@ var mongoose = require('../../../common/js/db');
 var subscriptionSchema = mongoose.Schema({
   plantype: { type: String },
   planpaymentcommitments:
-  	{
+  	[{
   	 type:String,
   	 amount:String,
   	 currency:String
-  	},
+  	}],
   status:{type:String,default:"active"},
   location:{
   	region:String,
@@ -41,6 +41,6 @@ var subscriptionSchema = mongoose.Schema({
    }
 });
 
-var Subscription = mongoose.model('Subscription', subscriptionSchema);
+var SubscriptionModel = mongoose.model('Subscription', subscriptionSchema);
 
-module.exports = Subscription;
+module.exports = SubscriptionModel;
