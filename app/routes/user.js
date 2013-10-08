@@ -12,8 +12,8 @@
 */
 
 //Prodonus Routes
-var api = require("../app/api/api.js");
-var auth=require('../app/common/js/security');
+var api = require("../api/api.js");
+var auth=require('../common/js/security');
 // User - REST apis
 exports.init = function (app) {
   app.get('/verify/:token',api.userapi.verifyUser);

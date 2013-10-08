@@ -46,7 +46,7 @@ app.use(express.compress());
 * All the routes for prodonus are initialized in the code below. The init function
 * is called on all the routes.
 */
-var RouteDir = 'routes',
+var RouteDir = './app/routes',
     files = fs.readdirSync(RouteDir);
 
 files.forEach(function (file) {

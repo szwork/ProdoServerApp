@@ -14,8 +14,8 @@
 //Prodonus Routesar
 
 // var auth = require('../app/common/js/security');
-var api = require("../app/api/api.js");
-var auth=require('../app/common/js/security');
+var api = require("../api/api.js");
+var auth=require('../common/js/security');
 // Organization - REST api
 exports.init = function (app) {
   app.post('/organization', api.orgapi.signupOrganization);
