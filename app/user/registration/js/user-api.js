@@ -80,18 +80,26 @@ emailtemplate
 */
 exports.verifyUser = function (req, res, next) {
   var token = req.params.token;
-  verify(token, function (err,user)
-   {
-    if (err)
-     { 
+  verify(token, function (dberr,err,user)
+  {
+    if (dberr)
+    { 
       console.log("error in verify token "+err);
-      return res.redirect("verification-failure");
+      //return res.redirect("verification-failure");
+      res.send({"error":"error in userverification token model"});
       /*here we call req.logIn passport for under session 
         res.send("/");
         */
-     } 
-     else 
-     {
+    } 
+    if(err)
+    {
+      console.log("token is expired or invalid token");
+      //return res.redirect("verification-failure");
+      res.send({"exception":"token is expired or invalid token"});
+      
+    }
+    else 
+    {
         //var url = "http://"+ host+"/verify/"+token;
           EmailTemplateModel.find({"templatetype":"welcome"},function(err,emailtemplate)
           {
@@ -135,22 +143,34 @@ it pass token as parameter and get user as callback
 */ 
 verify = function(token, done) {
   verificationTokenModel.findOne({token: token}, function (err, doc){
-    if (err) {
+    if (err)
+    {
      return done(err);
+     console.log("error in verification token");
     }
-    userModel.findOne({_id: doc._userId}, function (err, user) {
-      if (err) {
-        return done(err);
-      }
-      user["verified"] = true;
-      user.save(function(err,user) {
-             
+    console.log("verification token data"+doc);
+    if(doc!=null)
+    {  
+        userModel.findOne({_id: doc._userId}, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        user["verified"] = true;
+        user.save(function(err,user) {
+               
+        });
+       // done(user);
+        done(null,null,user);
+        
+       // done(user);
       });
-     // done(user);
-      done(null,user);
-      
-     // done(user);
-    });
+    }
+    else
+    {
+      console.log("token is expird or invalid token");
+     // res.send({"error":"token is expired or invalid token"});
+      done(null,"error");
+    } 
   });
 };
 //add an individual user
@@ -263,52 +283,75 @@ it will show resetpassword page
 */
 exports.forgotpasswordurlaction=function (req, res) {
     var token = req.params.token;
-    verifyPasswordToken(token, function(err,user)
+    /*
+      err -for db error
+      err1-for geting null or undefined value
+
+    */
+    verifyPasswordToken(token, function(dberr,err,user)
      {
-        if (err) 
+        if (dberr) 
         {
-          res.send("verification-failure");
+          res.send({"dberror":"erro in forgetpasswordtoken collection"});
+        }
+        if(err)
+        {
+          console.log("tokne is expired or invalid token");
+          res.send({"exception":"token is expired or invalid token"});
         }
         else
-          {
+        {
               req.logIn(user, function(err)
                {
                  if (err)
                   { 
-                    res.send("error in creating session for user");
-                     console.log(err+"errro in creating session for particular userid");
+                    res.send({"error":"error in creating session for user"});
+                    console.log(err+"errro in creating session for particular userid");
                   }
                   else{
-                    res.send('create session and send it to resetpassword page');
+                    res.send({"success":"create session and send it to resetpassword page"});
                   }
                 
                });
-          }
+        }
     });
 };
-verifyPasswordToken = function(token, done) {
-    ForgotPasswordTokenModel.findOne({token: token,status:"active"}, function (err, forgetpasswordtoken){
-        if (err) return done(err);
-        userModel.findOne({_id: forgetpasswordtoken._userId}, function (err, user) {
-            if (err) return done(err);
-            console.log("user data"+user);
-            forgetpasswordtoken["status"] = "deactive";
-            forgetpasswordtoken.save(function(err,docs) {
+verifyPasswordToken = function(token, done)
+ {
+    ForgotPasswordTokenModel.findOne({token: token,status:"active"}, function (err, forgetpasswordtoken)
+    {
+        if ( err )
+        { 
+          return done(err);
+        }
+        if(forgetpasswordtoken!=null)
+        {
+          userModel.findOne({_id: forgetpasswordtoken._userId}, function (err, user) 
+          {
+              if (err) return done(err);
+              console.log("user data"+user);
+              forgetpasswordtoken["status"] = "deactive";
+              forgetpasswordtoken.save(function(err,docs)
+              {
                 if(err)
                 { 
                     console.error(err);
-                  done(err);
+                    done(err);
                 }
 
                 if(docs)
                 {
                     console.log("forget passwordtoken model  change status");
-                     done(null,user);
+                     done(null,null,user);
                 }
-            });
-               
-              
-        })
+              });
+                 
+          })
+        }
+        else
+        {
+          done(null,"err1");
+        }
     })
 }
 //adding email template

@@ -32,7 +32,7 @@ var eventEmitter = new events.EventEmitter();
 //adding new organization
 exports.signupOrganization = function(req,res)
 {
-  var name = req.body.name;
+  /*var name = req.body.name;
   var description = req.body.description;
   var orgtype = req.body.orgtype;
   var contacts = req.body.contacts;
@@ -63,18 +63,13 @@ exports.signupOrganization = function(req,res)
     grpname:"Marketing",
     //curently invites manuallly set
     invites:"sunilmore6490@gmail.com"  
-  }];*/req.body.usergrp;
-    
-  var organization = new orgModel(
-  {
-     name: name,
-     description: description,
-     orgtype: orgtype,
-     contact: contacts,
-     location: [{ address:address }],
-     usergrp: usergrp
-   } 
-  );
+  }];
+  req.body.usergrp;*/
+
+  var organizationdata=req.body.organiztion;
+  var userdata=req.body.user;
+  var usergrp=req.body.organization.usergrp;   
+  var organization = new orgModel(organizationdata);
   
   //to save an organization
   //1.to save an new organization
@@ -92,9 +87,9 @@ exports.signupOrganization = function(req,res)
       console.log("error in adding organization");
     };
     console.log("organization successfully saved");
-    var userdata=new userModel({fullname:req.body.fullname,email:req.body.email,password:req.body.password,orgid:orgid});
+    var user=new userModel(userdata);
     //to add an admin user
-    userapi.addUser(userdata,req.get('host'),function(result)
+    userapi.addUser(user,req.get('host'),function(result)
     {
       if(result=="failure")
       {
@@ -424,13 +419,18 @@ addAdminGroup=function(email,orgid,callback)
     var organizationHistory = new orgHistoryModel({orgid:new BSON.ObjectID(orgid),updatedby:"sunil current session user"});
   /*----currently manulay updated by-------*/
   //to save data into organization history
-    organizationHistory.save(function(err, orgHistory) {
-      if(err) {
-        console.log(err+"error in saving orghistory");
-      }
-      if(orgHistory) {
+    organizationHistory.save(function(err, orgHistory) 
+    {
+      if(err)
+       {
+         console.log(err+"error in saving orghistory");
+         res.send({"error":"error in saving orgHistory"});
+       }
+      if(orgHistory)
+       {
         console.log("organization history updated for organization id"+orgid+" by");
-      }
+     //   res.send({"success":"organization history updated");
+       }
     });//end of organization save
            //to update an organization
     orgModel.update(
@@ -444,12 +444,16 @@ addAdminGroup=function(email,orgid,callback)
             location:[{address:address}]
           }
       },
-      function(err, updatestaus) {
-        if(err) {
+      function(err, updatestaus) 
+      {
+        if(err)
+        {
           console.log(err + "error in saving new organization")
+          res.send({"error":"error in updating neow organization"})
         }
-        if(updatestaus == 1) { //send invite mean create  user,create token and send mail
-          res.send("organization data updated successfully");
+        if(updatestaus == 1)
+        { //send invite mean create  user,create token and send mail
+          res.send({"success":"organization data updated successfully"});
         }
       }
     )//end of organization update
