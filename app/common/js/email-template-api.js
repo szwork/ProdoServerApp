@@ -40,18 +40,7 @@ EmailTemplateModel.find(function(err,emailtemplate)
    }
    if(emailtemplate.length<0)
    {
-    EmailTemplateModel.create(emailtemplatedata,function(err,docs)
-    {
-    	if(err)
-    	{
-    		console.log("error in addiin emailtemplate")
-    	}
-    	else
-    	{
-    		console.log("emailtemplate saved"+docs);
-    	}
-    })
-
+    
    }
 
 })
