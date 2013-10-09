@@ -75,7 +75,9 @@ passport.deserializeUser(function(id, done) {
   });
 });
 //end of passport method
-
+/*
+emailtemplate 
+*/
 exports.verifyUser = function (req, res, next) {
   var token = req.params.token;
   verify(token, function (err,user)
