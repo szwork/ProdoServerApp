@@ -22,6 +22,8 @@ exports.init = function (app) {
   app.post('/forgotpassword',api.userapi.forgotpassword);
   app.get("/forgotpassword/:token",api.userapi.forgotpasswordurlaction);
   app.post("/resetpassword", auth,api.userapi.resetpassword);
-  app.get('/emailtemplate',api.commonapi.getAllEmailTemplate);
-
+  app.get('/emailtemplate',api.emailtemplateapi.getAllEmailTemplate);
+  app.get('/loadsubcription',api.subscriptionapi.loadsubscriptiondata);
+  app.get('/subscriptionplan',api.subscriptionapi.getAllSubscriptionPlan);
+  app.get('/loademailtemplate',api.emailtemplateapi.loadEmailTemplate);
 }

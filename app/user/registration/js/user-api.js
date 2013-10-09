@@ -11,68 +11,22 @@
 * 03-10-2013|sunil|add forgot password method
 */
 
+//require schema model
 var verificationTokenModel = require('../../../common/js/verification-token-model');
-var ForgotPasswordTokenModel=require('../../../common/js/forget-password-token-model')
+var ForgotPasswordTokenModel=require('../../../common/js/forgot-password-token-model')
 var userModel = require('./user-model');
+var EmailTemplateModel=require('../../../common/js/email-template-model');
+
+//require cusome api
+var commonapi = require('../../../common/js/common-api');
+
+//require libraary
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var commonapi = require('../../../common/js/common-api');
-var EmailTemplateModel=require('../../../common/js/email-template-model');
 var S=require('string');
 
+//default emiltemplate record saved
 
-var emailtemplatedata=[ {
-templatetype: "password",
-subject: "Password reset request for Prodonus",
-description: "Please click or copy this link into new browser to change your password on Prodonus:<br><br><url><br><br>Regards,<br>Prodonus"
-},
-{
-templatetype: "verify",
-subject: "Prodonus Verification Link",
-description: "Hey, we want to verify that you are indeed <email> If t that/s the case, please follow the link below:<br><br><url><br><br> If you're not <email> didn't request verification you can ignore this email."
-},
-{
-templatetype: "welcome",
-subject: "Welocme to Prodonus",
-description: "Welocme <fullname> to Prodonus"
-}]
-var emailtemplate1=new EmailTemplateModel({templatetype:"test"});
-emailtemplate1.save(function(err,docs)
-{
-  if(err)
-  {
-    console.log("error in inserting test emailtemplate saved");
-  }
-  else
-  {
-    console.log("templatetype test saved");
-  }
-})
-EmailTemplateModel.find({templatetype:{$ne:"test"}},function(err,emailtemplate)
-{
-   if(err)
-   {
-    console.log("error in finding emailtemplate at adding manually ")
-   }
-   console.log("emailtemplate data"+emailtemplate);
-   if(emailtemplate.length==0)
-   {
-    
-      EmailTemplateModel.create(emailtemplatedata,function(err,docs)
-      {
-        if(err)
-        {
-          console.log("error in inserting defaulte emailtemplate");
-        }
-        else
-        {
-          console.log("default emailtemplate saved");
-          //res.send({"success"})
-        }
-      })
-   }
-
-})
 //Create login session
 exports.loginSession = function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
@@ -96,27 +50,35 @@ exports.loginSession = function(req, res, next) {
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
     console.log("email" + email +" password"+password);
-    userModel.findOne({ email: email}, function(err, user) {
-    if (err) { 
-      return done(err); 
-    }
-    if (!user) {
-      console.log("unkown user");
-      return done(null, false, { message: 'Unknown user ' + email }); 
-    }
+    userModel.findOne({ email: email}, function(err, user) 
+    {
+      if (err)
+      { 
+        return done(err); 
+      }
+      if (!user) 
+      {
+        console.log("unkown user");
+        return done(null, false, { message: 'Unknown user ' + email }); 
+      }
     
-    user.comparePassword(password, function(err, isMatch) {
-      if (err){
-        return done(err);
-      }
-      if(isMatch) {
-        return done(null, user);
-      } else {
-        console.log("unknown password");
-        return done(null, false, { message: 'Invalid password' });
-      }
+      user.comparePassword(password, function(err, isMatch)
+      {
+          if ( err )
+          {
+              return done(err);
+          }
+          if( isMatch ) 
+          {
+            return done(null, user);
+          }
+          else
+          {
+            console.log("unknown password");
+            return done(null, false, { message: 'Invalid password' });
+          }
+      });
     });
-  });
 }));
 
 passport.serializeUser(function(user, done) {

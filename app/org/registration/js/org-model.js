@@ -50,12 +50,11 @@ var ContactSchema = mongoose.Schema({ customerhelpline: {type:String}
 var subscription=mongoose.Schema(
 {
 
-        planid:{type:ObjectId,ref:"Subscription"} ,
-        planstartdate:Date , 
+        planid:{type:ObjectId,ref:"Subscription"} ,//individdual
+        planstartdate:{type:Date,default:Date.now()}, 
         planexpirydate:Date
         
-}
-  )
+});
 
 var OrganizationSchema = mongoose.Schema({
     parentorgid: { type: String, default:0 },

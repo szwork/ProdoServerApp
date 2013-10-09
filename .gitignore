@@ -2,4 +2,5 @@
 bin
 build
 node_modules
+model
 client/src/vendor

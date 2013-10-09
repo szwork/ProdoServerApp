@@ -1,1 +1,113 @@
-var SubscriptionModel=require('./subscription-model');
+var SubscriptionModel=require('./subscription-model'); 
+
+exports.loadsubscriptiondata=function(req,res)
+{
+var subscriptionarray=
+[
+	{
+		plantype:"individual",
+		planpaymentcommitment:
+		[{
+			committype:"monthly",
+			amount:5,
+			currency:"dollar"
+		}]
+	},
+	{
+		plantype:"individual",
+	    planpaymentcommitment:
+		[{
+			committype:"quarterly",
+			amount:10,
+			currency:"dollar"
+		}]
+	},
+	{
+		plantype:"individual",
+	    planpaymentcommitment:
+		[{
+			committype:"yearly",
+			amount:50,
+			currency:"dollar"
+		}]
+	},
+	{
+		plantype:"company",
+		planpaymentcommitment:
+		[{
+			committype:"monthly",
+			amount:10,
+			currency:"dollar"
+		}]
+	},
+	{
+		plantype:"company",
+	    planpaymentcommitment:
+		[{
+			committype:"quarterly",
+			amount:25,
+			currency:"dollar"
+		}]
+	},
+	{
+		plantype:"company",
+	    planpaymentcommitment:
+		[{
+			committype:"yearly",
+			amount:100,
+			currency:"dollar"
+		}]
+	},
+	{
+		plantype:"manufacturer",
+		planpaymentcommitment:
+		[{
+			committype:"monthly",
+			amount:20,
+			currency:"dollar"
+		}]
+	},
+	{
+		plantype:"manufacturer",
+	    planpaymentcommitment:
+		[{
+			committype:"quarterly",
+			amount:50,
+			currency:"dollar"
+		}]
+	},
+	{
+		plantype:"manufacturer",
+	    planpaymentcommitment:
+		[{
+			committype:"yearly",
+			amount:180,
+			currency:"dollar"
+		}]
+	}];
+SubscriptionModel.create(subscriptionarray,function(err,docs)
+{
+	if(err)
+	{
+		console.log("error in creating default subscription model");
+	}
+	else
+	{
+		res.send({"success":"subscription default records insertd"});	
+	}
+})
+};
+exports.getAllSubscriptionPlan=function(req,res)
+{
+	SubscriptionModel.find(function(err,subscription)
+	{
+		if(err)
+		{
+			console.log("error in getting subscription plan in databse");
+		}
+		else
+		{
+			res.send(subscription);
+		}
+	})
+}

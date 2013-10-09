@@ -15,13 +15,21 @@ var mongoose = require('../../../common/js/db');
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var ObjectId = mongoose.Schema.ObjectId;
+var subscription=mongoose.Schema(
+{
 
+        planid:{type:ObjectId,ref:"Subscription"} ,//individdual
+        planstartdate:Date , 
+        planexpirydate:Date
+        
+});
 var userSchema = mongoose.Schema({
-	fullname: { type: String },
+  fullname: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String},
   verified: { type:Boolean, default:false },
-  orgid: { type:ObjectId, ref: 'Organization' }
+  orgid: { type:ObjectId, ref: 'Organization' },
+  subscription:[subscription]
 });
 
 //Encrypt the password when you save.
