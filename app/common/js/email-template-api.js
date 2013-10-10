@@ -30,6 +30,11 @@ exports.loadEmailTemplate=function(req,res)
 		templatetype: "welcome",
 		subject: "Welocme to Prodonus",
 		description: "Welocme <fullname> to Prodonus"
+		},
+		{
+		templatetype: "invite",
+		subject: "Invite from <companyname> for <grpname>",
+		description: "Invite has sent by <companyname> to join Prodonus ,please click this link to add your details :<br> <url><br><br>Prodonus"
 		}]
 
 

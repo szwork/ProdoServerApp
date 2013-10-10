@@ -202,23 +202,7 @@ verify = function(token, done) {
   });
 };
 //add an individual user
-exports.addUser=function(user,host,callback)
-{
 
-  adduser(user, host,function(result) {
-      if(result == "success") {
-        console.log("success: U100, V001"); 
-        callback(result);
-        //access the code from dictionary/basecamp
-        //res.send("success: U100, V001");          
-      } 
-      else {
-        console.log("error: C101");
-        //res.send("error: C101");
-        callback(result);               
-      }
-    });
-};
 exports.forgotpassword=function(req,res)
 {
   var email=req.body.email;
@@ -403,80 +387,164 @@ emailtemplate.save(function(err,template)
 })
 
 */
-adduser = function (user, host, callback) 
+exports.addInviteUser=function(user,host,callback)
 {
-    console.log("calling to adduser function");
-    user.save(function(err,user)
+  console.log("user email"+user["email"]);
+  userModel.find({email:user["email"]},function(err,userdata)
+  {
+    if(err)
     {
-      if(err) 
-      {
-        console.log(err);
-      } 
-      else 
-      {
-        /* calling to create verfication token*/
-        //User.find({username:})
-        var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"user"});
-        verificationToken.createVerificationToken(function (err, token) 
-        {
-          if (err)
-          { 
-            return console.log("Couldn't create verification token", err);
-          }
-          var url = "http://"+ host+"/verify/"+token;
-          EmailTemplateModel.find({"templatetype":"verify"},function(err,emailtemplate)
-          {
-              console.log("emailtemplate"+emailtemplate);
-              var html=emailtemplate[0].description;
-              html=S(html);
-              html=html.replaceAll("<email>",user.email);
-              html=html.replaceAll("<url>",url);
-              var message = 
-              {
-                from: "Prodonus  <noreply@prodonus.com>", // sender address
-                to: user.email, // list of receivers
-                subject:emailtemplate[0].subject, // Subject line
-                html: html+"" // html body
-              };
-              console.log("email"+user.email)
-              console.log("message data"+message+" token data"+token);
-              console.log("requestd host"+ host);
-              //calling to sendmail method
-              commonapi.sendMail(message, function (result)
-              {
-                if (result == "failure") 
-                {
-                 // not much point in attempting to send again, so we give up
-                 // will need to give the user a mechanism to resend verification
-                  callback(result);
-                }
-                else 
-                {
-                  callback(result);
-                }
-              });
-          })
-        });
-      }
-    })
-};
-
-exports.signup = function(req,res) {
-   // var username=req.body.username;
-    var fullname = req.body.fullname;
-    var email = req.body.email;
-    var password = req.body.password;
-    var user = new userModel({ fullname: fullname, email: email, password: password});
-
-    //calling to adduser function
-    adduser(user, req.get('host'),function(result) {
+      console.log("error in checking in databae email alerady exist or not for invites");
+    }
+    console.log("userdata.length"+userdata.length);
+    if(userdata.length!=0)
+    {
+       callback("ignore");
+       console.log("calling to callback ignore");  
+    }
+    else
+    {
+      adduser(user, host,function(result) {
       if(result == "success") {
-        console.log("success: U100, V001"); //access the code from dictionary/basecamp
-        res.send("success: U100, V001");          
+        console.log("success: U100, V001"); 
+        callback(result);
+        //access the code from dictionary/basecamp
+        //res.send("success: U100, V001");          
       } 
       else {
         console.log("error: C101");
-        res.send("error: C101");               
+        //res.send("error: C101");
+        callback(result);               
       }
     });
-};
+    }
+  })
+}
+
+exports.addUser=function(user,host,callback)
+{
+   console.log("calling to addUser for admin organization");
+      adduser(user, host,function(result) {
+      if(result == "success") {
+        console.log("success: U100, V001"); 
+        callback(result);
+        //access the code from dictionary/basecamp
+        //res.send("success: U100, V001");          
+      } 
+      else {
+        console.log("error: C101");
+        //res.send("error: C101");
+        callback(result);               
+      }
+    });
+   
+}
+adduser = function (user, host, callback) 
+{
+    console.log("calling to adduser function");
+    console.log("email"+user["email"])
+   
+        user.save(function(err,user)
+        {
+          if(err) 
+          {
+            console.log(err);
+          }  
+          else 
+          {
+        /* calling to create verfication token*/
+        //User.find({username:})
+            var templatetype;
+            if(user["orgid"] && !user["password"])
+            {
+                templatetype="invite";
+            }
+            else
+            {
+              templatetype="verify"
+            }
+            var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"user"});
+            verificationToken.createVerificationToken(function (err, token) 
+            {
+              if (err)
+              {  
+                return console.log("Couldn't create verification token", err);
+              }
+              var url = "http://"+ host+"/verify/"+token;
+              EmailTemplateModel.find({"templatetype":templatetype},function(err,emailtemplate)
+              {
+                console.log("emailtemplate"+emailtemplate);
+                var html=emailtemplate[0].description;
+                html=S(html);
+                html=html.replaceAll("<email>",user.email);
+                html=html.replaceAll("<url>",url);
+                var message = 
+                  {
+                    from: "Prodonus  <noreply@prodonus.com>", // sender address
+                    to: user.email, // list of receivers
+                    subject:emailtemplate[0].subject, // Subject line
+                    html: html+"" // html body
+                  };
+                console.log("email"+user.email)
+                console.log("message data"+message+" token data"+token);
+                console.log("requestd host"+ host);
+                //calling to sendmail method
+                commonapi.sendMail(message, function (result)
+                {
+                  if (result == "failure") 
+                  {
+                 // not much point in attempting to send again, so we give up
+                 // will need to give the user a mechanism to resend verification
+                  callback(result);
+                  }
+                  else 
+                  {
+                    callback(result);
+                  }
+                });
+              })
+           });
+          }
+       })
+}
+      
+
+
+exports.signup = function(req,res) {
+   // var username=req.body.username;
+    //var fullname = req.body.fullname;
+    //var email = req.body.email;
+    //var password = req.body.password;
+    var  userdata=req.body.user;
+    var user = new userModel(userdata);
+     console.log("userdata"+userdata)
+    //calling to adduser function
+    userModel.find({email:user["email"]},function(err,userdata)
+    {
+      if(err)
+      {
+        console.log("error in checking in databae email alerady exist for individual user");
+      }
+      console.log("userdata"+userdata);
+      if(userdata.length==0)
+      {
+        adduser(user, req.get('host'),function(result) {
+        if(result == "success") {
+        console.log("success: U100, V001"); //access the code from dictionary/basecamp
+        res.send("success: U100, V001");          
+        } 
+      else {
+        console.log("error: C101");
+        res.send("error: C101");               
+           }
+       });
+     }
+     else
+     {
+      console.log("email already exists");
+      res.send({"exception":"email aleready exists"});
+     }
+      
+    })
+  }
+    
