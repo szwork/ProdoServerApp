@@ -1,21 +1,16 @@
 var EmailTemplateModel=require('./email-template-model');
 
-exports.getAllEmailTemplate=function(req,res)
-{
-	EmailTemplateModel.find({},{_id:0,__v:0},function(err,emailtemplate)
-	{
-		if(err)
-		{
+exports.getAllEmailTemplate=function(req,res){
+	EmailTemplateModel.find({},{_id:0,__v:0},function(err,emailtemplate){
+		if(err){
 			console.log("error in gettin email templates");
 		}
-		else
-		{
+		else{
 			res.send(emailtemplate);
 		}
 	})
 };
-exports.loadEmailTemplate=function(req,res)
-{
+exports.loadEmailTemplate=function(req,res){
 	var emailtemplatedata=[ {
 		templatetype: "password",
 		subject: "Password reset request for Prodonus",
@@ -38,14 +33,11 @@ exports.loadEmailTemplate=function(req,res)
 		}]
 
 
-      EmailTemplateModel.create(emailtemplatedata,function(err,docs)
-      {
-        if(err)
-        {
+      EmailTemplateModel.create(emailtemplatedata,function(err,docs){
+        if(err){
           console.log("error in inserting defaulte emailtemplate");
         }
-        else
-        {
+        else{
           console.log("default emailtemplate saved");
           res.send({"success":"default emailtemplate saved"});
           //res.send({"success"})

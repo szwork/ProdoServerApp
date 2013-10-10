@@ -25,8 +25,7 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
       }
 });
 //get bcrypt string
-exports.getbcrypstring=function(data,callback)
-{
+exports.getbcrypstring=function(data,callback){
   bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
     if(err) {
       return next(err);
@@ -36,7 +35,7 @@ exports.getbcrypstring=function(data,callback)
         return next(err);
       }
       console.log("hash data"+hash);
-     callback(hash)
+      callback(hash)
       });
   });
 }

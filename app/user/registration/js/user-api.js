@@ -49,37 +49,27 @@ exports.loginSession = function(req, res, next) {
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
     console.log("email" + email +" password"+password);
-    userModel.findOne({ email: email}, function(err, user) 
-    {
-      if (err)
-      { 
+    userModel.findOne({ email: email}, function(err, user) {
+      if (err){ 
         return done(err); 
       }
-
-      if (!user) 
-      {
+      if (!user) {
         console.log("unkown user");
         return done(null, false, { message: 'Unknown user ' + email }); 
       };
       console.log("user data in login action"+user.verified);
-      if(user.verified==false)
-      {
+      if(user.verified==false){
         console.log("verfication is not done please verify");
         return done(null,false,{message:"please verfiy or resend verfication email"});
       }
-    
-      user.comparePassword(password, function(err, isMatch)
-      {
-          if ( err )
-          {
+      user.comparePassword(password, function(err, isMatch){
+          if ( err ){
               return done(err);
           }
-          if( isMatch ) 
-          {
+          if( isMatch ) {
             return done(null, user);
           }
-          else
-          {
+          else{
             console.log("unknown password");
             return done(null, false, { message: 'Invalid password' });
           }
@@ -102,10 +92,8 @@ emailtemplate
 */
 exports.verifyUser = function (req, res, next) {
   var token = req.params.token;
-  verify(token, function (dberr,err,user)
-  {
-    if (dberr)
-    { 
+  verify(token, function (dberr,err,user){
+    if (dberr){ 
       console.log("error in verify token "+err);
       //return res.redirect("verification-failure");
       res.send({"error":"error in userverification token model"});
@@ -113,25 +101,20 @@ exports.verifyUser = function (req, res, next) {
         res.send("/");
         */
     } 
-    if(err)
-    {
+    if(err){
       console.log("token is expired or invalid token");
       //return res.redirect("verification-failure");
       res.send({"exception":"token is expired or invalid token"});
       
-    }
-    else 
-    {
+    } else {
         //var url = "http://"+ host+"/verify/"+token;
-          EmailTemplateModel.find({"templatetype":"welcome"},function(err,emailtemplate)
-          {
+          EmailTemplateModel.find({"templatetype":"welcome"},function(err,emailtemplate){
               console.log("emailtemplate"+emailtemplate);
               var html=emailtemplate[0].description;
               html=S(html);
               html=html.replaceAll("<fullname>",user.fullname);
              // html=html.replaceAll("<url>",url);
-              var message = 
-              {
+              var message = {
                 from: "Prodonus  <noreply@prodonus.com>", // sender address
                 to: user.email, // list of receivers
                 subject:emailtemplate[0].subject, // Subject line
@@ -141,17 +124,13 @@ exports.verifyUser = function (req, res, next) {
              // console.log("message data"+message+" token data"+token);
              // console.log("requestd host"+ host);
               //calling to sendmail method
-              commonapi.sendMail(message, function (result)
-              {
-                if (result == "failure") 
-                {
+              commonapi.sendMail(message, function (result){
+                if (result == "failure") {
                  // not much point in attempting to send again, so we give up
                  // will need to give the user a mechanism to resend verification
                  // callback(result);
                  res.send({"message":"unverified","info":"error in verifying user"});
-                }
-                else 
-                {
+                } else {
                   res.send({"message":"verified","info":"Successfully verified user"});
                 }
               });
@@ -165,14 +144,12 @@ it pass token as parameter and get user as callback
 */ 
 verify = function(token, done) {
   VerificationTokenModel.findOne({token: token,status:"active",tokentype:"user"}, function (err, userverificationtoken){
-    if (err)
-    {
+    if (err){
      return done(err);
      console.log("error in verification token");
     }
     console.log("verification token data"+userverificationtoken);
-    if(userverificationtoken!=null)
-    {  
+    if(userverificationtoken!=null){  
         userModel.findOne({_id: userverificationtoken._userId}, function (err, user) {
         if (err) {
           return done(err);
@@ -182,8 +159,7 @@ verify = function(token, done) {
                
         });
         userverificationtoken["status"]="deactive";
-        userverificationtoken.save(function(err,user)
-        {
+        userverificationtoken.save(function(err,user){
           console.log("userverificationtoken token set deactive");
         });
        // done(user);
@@ -192,9 +168,7 @@ verify = function(token, done) {
         
        // done(user);
       });
-    }
-    else
-    {
+    } else{
       console.log("token is expird or invalid token");
      // res.send({"error":"token is expired or invalid token"});
       done(null,"error");
@@ -203,34 +177,27 @@ verify = function(token, done) {
 };
 //add an individual user
 
-exports.forgotpassword=function(req,res)
-{
+exports.forgotpassword=function(req,res){
   var email=req.body.email;
-  userModel.findOne({email:email},function(err,user)
-  {
-    if(err)
-    {
+  userModel.findOne({email:email},function(err,user){
+    if(err){
       console.log(err);
     }
-    if(user)
-    {
+    if(user){
       //send forget password token to mail
       //User.find({username:})
         var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"password"});
-        verificationToken.createVerificationToken(function (err, token) 
-        {
+        verificationToken.createVerificationToken(function (err, token) {
             if (err) return console.log("Couldn't create verification token for forget password", err);
             var url="http://"+ req.get('host')+"/forgotpassword/"+token;
             //var url = "http://"+ host+"/verify/"+token;
-          EmailTemplateModel.find({"templatetype":"password"},function(err,emailtemplate)
-          {
+          EmailTemplateModel.find({"templatetype":"password"},function(err,emailtemplate){
               console.log("emailtemplate"+emailtemplate);
               var html=emailtemplate[0].description;
               html=S(html);
              // html=html.replaceAll("<email>",user.email);
               html=html.replaceAll("<url>",url);
-              var message = 
-              {
+              var message = {
                 from: "Prodonus  <noreply@prodonus.com>", // sender address
                 to: user.email, // list of receivers
                 subject:emailtemplate[0].subject, // Subject line
@@ -240,47 +207,37 @@ exports.forgotpassword=function(req,res)
               console.log("message data"+message+" token data"+token);
               //console.log("requestd host"+ host);
               //calling to sendmail method
-              commonapi.sendMail(message, function (result)
-              {
-                if (result == "failure") 
-                {
+              commonapi.sendMail(message, function (result){
+                if (result == "failure") {
                  // not much point in attempting to send again, so we give up
                  // will need to give the user a mechanism to resend verification
                  // callback(result);
                  res.send({"message":"forget password","info":"Problem in sending password setting"});
-                }
-                else 
-                {
+                } else {
                   res.send({"message":"forget password","info":"password settings sent to your mail"})
                   //callback(result);
                 }
               });
           })
         });
-    }
-    else
-    {
+    } else{
         res.send("email is not registered with prodonus");
     }
   })
 };
-exports.resetpassword=function(req,res)
-{
+exports.resetpassword=function(req,res){
   var newpassword=req.body.newpassword;
   console.log("requested user"+req.user);
   console.log("email"+req.user.email);
-  commonapi.getbcrypstring(newpassword,function(hash)
-  {
+  //calling to getbrcyrpt string
+  commonapi.getbcrypstring(newpassword,function(hash){
     console.log("hash data"+hash);
-          userModel.update({email:req.user.email},{$set:{password:hash}},function(err,status)
-          {
+          userModel.update({email:req.user.email},{$set:{password:hash}},function(err,status){
 
-            if(err)
-            {
+            if(err){
               res.send("error in reseting password");
             }
-            if(status==1)
-            {
+            if(status==1){
               res.send("password successfully updated");
             }
           })
@@ -300,110 +257,64 @@ exports.forgotpasswordurlaction=function (req, res) {
       err1-for geting null or undefined value
 
     */
-    verifyPasswordToken(token, function(dberr,err,user)
-     {
-        if (dberr) 
-        {
+    verifyPasswordToken(token, function(dberr,err,user){
+        if (dberr) {
           res.send({"dberror":"erro in forgetpasswordtoken collection"});
         }
-        if(err)
-        {
+        if(err){
           console.log("tokne is expired or invalid token");
           res.send({"exception":"token is expired or invalid token"});
-        }
-        else
-        {
-              req.logIn(user, function(err)
-               {
-                 if (err)
-                  { 
+        } else{
+              req.logIn(user, function(err){
+                 if (err){ 
                     res.send({"error":"error in creating session for user"});
                     console.log(err+"errro in creating session for particular userid");
-                  }
-                  else{
+                  } else{
                     res.send({"success":"create session and send it to resetpassword page"});
                   }
                 
-               });
-        }
-    });
+                });
+              }
+      });
 };
-verifyPasswordToken = function(token, done)
- {
-    VerificationTokenModel.findOne({token: token,status:"active",tokentype:"password"}, function (err, forgetpasswordtoken)
-    {
-        if ( err )
-        { 
+verifyPasswordToken = function(token, done) {
+    VerificationTokenModel.findOne({token: token,status:"active",tokentype:"password"}, function (err, forgetpasswordtoken){
+        if ( err ){ 
           return done(err);
         }
-        if(forgetpasswordtoken!=null)
-        {
-          userModel.findOne({_id: forgetpasswordtoken._userId}, function (err, user) 
-          {
+        if(forgetpasswordtoken!=null){
+          userModel.findOne({_id: forgetpasswordtoken._userId}, function (err, user) {
               if (err) return done(err);
               console.log("user data"+user);
               forgetpasswordtoken["status"] = "deactive";
-              forgetpasswordtoken.save(function(err,docs)
-              {
-                if(err)
-                { 
+              forgetpasswordtoken.save(function(err,docs){
+                if(err){ 
                     console.error(err);
                     done(err);
                 }
-
-                if(docs)
-                {
+                if(docs){
                     console.log("forget passwordtoken model  change status");
-                     done(null,null,user);
+                    done(null,null,user);
                 }
               });
                  
           })
-        }
-        else
-        {
+        } else{
           done(null,"err1");
         }
     })
 }
-//adding email template
-/*var description="Hey, we want to verify that you are indeed <email> If that/s the case, please follow the link below:";
-    description+= "<br><url><br><br> If you're not <email> didn't request verification you can ignore this email."
-var template=
-{ 
-  templatetype:"verfiy",
-  subject:"Prodonus verifcation Link",
-  description:description
-            
-}
-var emailtemplate=new EmailTemplateModel(template);
-emailtemplate.save(function(err,template)
-{
-  if(err)
-  {
-    console.log("error in saving template");
-  }
-  console.log(template);
-})
-
-*/
-exports.addInviteUser=function(user,host,callback)
-{
+exports.addInviteUser=function(user,host,callback){
   console.log("user email"+user["email"]);
-  userModel.find({email:user["email"]},function(err,userdata)
-  {
-    if(err)
-    {
+  userModel.find({email:user["email"]},function(err,userdata){
+    if(err){
       console.log("error in checking in databae email alerady exist or not for invites");
     }
     console.log("userdata.length"+userdata.length);
-    if(userdata.length!=0)
-    {
+    if(userdata.length!=0){
        callback("ignore");
        console.log("calling to callback ignore");  
-    }
-    else
-    {
+    } else{
       adduser(user, host,function(result) {
       if(result == "success") {
         console.log("success: U100, V001"); 
@@ -421,8 +332,7 @@ exports.addInviteUser=function(user,host,callback)
   })
 }
 
-exports.addUser=function(user,host,callback)
-{
+exports.addUser=function(user,host,callback){
    console.log("calling to addUser for admin organization");
       adduser(user, host,function(result) {
       if(result == "success") {
@@ -444,42 +354,32 @@ adduser = function (user, host, callback)
     console.log("calling to adduser function");
     console.log("email"+user["email"])
    
-        user.save(function(err,user)
-        {
-          if(err) 
-          {
+        user.save(function(err,user){
+          if(err) {
             console.log(err);
-          }  
-          else 
-          {
+          } else {
         /* calling to create verfication token*/
         //User.find({username:})
             var templatetype;
-            if(user["orgid"] && !user["password"])
-            {
+            if(user["orgid"] && !user["password"]){
                 templatetype="invite";
-            }
-            else
-            {
+            } else{
               templatetype="verify"
             }
             var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"user"});
-            verificationToken.createVerificationToken(function (err, token) 
-            {
-              if (err)
-              {  
+            verificationToken.createVerificationToken(function (err, token) {
+              if (err){  
                 return console.log("Couldn't create verification token", err);
               }
               var url = "http://"+ host+"/verify/"+token;
-              EmailTemplateModel.find({"templatetype":templatetype},function(err,emailtemplate)
-              {
+              EmailTemplateModel.find({"templatetype":templatetype},function(err,emailtemplate){
+                
                 console.log("emailtemplate"+emailtemplate);
                 var html=emailtemplate[0].description;
                 html=S(html);
                 html=html.replaceAll("<email>",user.email);
                 html=html.replaceAll("<url>",url);
-                var message = 
-                  {
+                var message = {
                     from: "Prodonus  <noreply@prodonus.com>", // sender address
                     to: user.email, // list of receivers
                     subject:emailtemplate[0].subject, // Subject line
@@ -489,16 +389,12 @@ adduser = function (user, host, callback)
                 console.log("message data"+message+" token data"+token);
                 console.log("requestd host"+ host);
                 //calling to sendmail method
-                commonapi.sendMail(message, function (result)
-                {
-                  if (result == "failure") 
-                  {
+                commonapi.sendMail(message, function (result){
+                  if (result == "failure") {
                  // not much point in attempting to send again, so we give up
                  // will need to give the user a mechanism to resend verification
                   callback(result);
-                  }
-                  else 
-                  {
+                  } else {
                     callback(result);
                   }
                 });
@@ -519,32 +415,25 @@ exports.signup = function(req,res) {
     var user = new userModel(userdata);
      console.log("userdata"+userdata)
     //calling to adduser function
-    userModel.find({email:user["email"]},function(err,userdata)
-    {
-      if(err)
-      {
+    userModel.find({email:user["email"]},function(err,userdata){
+      if(err){
         console.log("error in checking in databae email alerady exist for individual user");
       }
       console.log("userdata"+userdata);
-      if(userdata.length==0)
-      {
+      if(userdata.length==0){
         adduser(user, req.get('host'),function(result) {
         if(result == "success") {
         console.log("success: U100, V001"); //access the code from dictionary/basecamp
         res.send("success: U100, V001");          
-        } 
-      else {
+        }   else {
         console.log("error: C101");
         res.send("error: C101");               
-           }
-       });
-     }
-     else
-     {
+      }
+    });
+  } else {
       console.log("email already exists");
       res.send({"exception":"email aleready exists"});
-     }
-      
-    })
-  }
+    }
+  })
+}
     

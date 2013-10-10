@@ -30,49 +30,14 @@ var eventEmitter = new events.EventEmitter();
 
 
 //adding new organization
-exports.signupOrganization = function(req,res)
-{
-  /*var name = req.body.name;
-  var description = req.body.description;
-  var orgtype = req.body.orgtype;
-  var contacts = req.body.contacts;
-  var contractid = req.body.contractid;
-  var region = req.body.region;
-  var address = {
-    add1: req.body.address1,
-    add2: req.body.address2,
-    add3: req.body.address3,
-    country: req.body.country,
-    state: req.body.state,
-    city: req.body.city
-  };
-
-  var user = {
-    fullname: req.body.fullname,
-    email: req.body.email,
-    password: req.body.password
-  }
-
-  var usergrp = /*[
-  {
-    grpname:req.body.grpname,
-    //curently invites manuallly set
-    invites:"sunil@giantleapsystems.com,sunilmore690@facebook.com"  
-  },
-  {
-    grpname:"Marketing",
-    //curently invites manuallly set
-    invites:"sunilmore6490@gmail.com"  
-  }];
-  req.body.usergrp;*/
-
+exports.signupOrganization = function(req,res){
+ 
   var organizationdata=req.body.organization;
   console.log("organization data"+organizationdata);
   var userdata=req.body.user;
   console.log("userdata"+userdata);
   var usergrp=req.body.organization.usergrp;
   console.log("user group data"+usergrp);   
-  var organization = new orgModel(organizationdata);
   
   //to save an organization
   //1.to save an new organization
@@ -82,54 +47,45 @@ exports.signupOrganization = function(req,res)
   //4/to send email to invites user
   //5 
   //add an organiazation
-  userModel.find({email:userdata.email},function(err,users)
-  {
-      if(err)
-      {
+  userModel.find({ email : userdata.email },function( err , users ){
+      if( err ){
+
         console.log("error in database checking email id already exists or not");
         res.send({"error":"error in database checking email id already exists or not"});
       }
-      if(users.length!=0)
-      {
+      if(users.length!=0){
+        
         console.log("email id already exists for organization save");
         res.send({"exception":"email aleready exists for organization"});
-      }
-      else
-      {
-        addOrganization(organization,function(err,orgid)
-        {
+      } else {
+        
+        var organization = new orgModel(organizationdata);
+        //calling to addorganization method
+        addOrganization(organization,function(err,orgid){
           //add an admin user of organization
-          if(err)
-          {
+          if(err){
             console.log("error in adding organization");
           }
           console.log("organization successfully saved");
           var user=new userModel(userdata);
           //to add an admin user
-          userapi.addUser(user,req.get('host'),function(result)
-          {
-            if(result=="failure")
-            {
+          userapi.addUser(user,req.get('host'),function(result){
+            if(result=="failure"){
               console.log("add an admin user unsuccessfull");
               res.send("errror in saving organization user");
-            }
-            else
-            {
+            } else{
                 //to add an invites user
                 console.log("admin user successfully saved for organization");
                 console.log("---------------------------");
                 console.log("calling to  add admin group method");
                     
                 console.log("---------------------------");
-                addAdminGroup( req.body.user.email,orgid,function(result)
-                {
-                  if( result=="failure" )
-                  {
+                addAdminGroup( req.body.user.email,orgid,function(result) {
+                  if( result=="failure" ){
+              
                     console.log("error in adding admin group in database");
                     res.send({"error":"adding adming group into usergroup"})
-                  }
-                  else
-                  {
+                  } else {
                     console.log("added admin group in usergroup")
                     //send verification mail to invites user
                     //console.log("adding invites user into database");
@@ -139,33 +95,26 @@ exports.signupOrganization = function(req,res)
 
                     */
                     console.log("req.body.usergrp"+req.body.usergrp);
-                    if( usergrp!=undefined )
-                    {
+                    if( usergrp!=undefined ){
                       console.log("---------------------------");
                       console.log("calling to add invite user and sendmail ");
                       
                       console.log("---------------------------");
-                      addInvitesUserAndSendMail( usergrp ,orgid,req.get('host'),function(result)
-                      {
-                        if( result == "failure")
-                        {
+                      addInvitesUserAndSendMail( usergrp ,orgid,req.get('host'),function(result){
+                        if( result == "failure") {
                           console.log("error in inviting user ");
                           res.send({"error":"error in inviting user and sending verification mail"});
-                        }
-                        else
-                        {
+                        } else {
+
                           console.log("inviteing group invites successfully");
                           console.log("---------------------------");
                           console.log("calling to addgroup members");
                           console.log("---------------------------");
-                          addGroupMembers( usergrp ,orgid ,function( result )
-                          {
-                              if(result=="failure")
-                              {
+                          //calling to addgroup members method
+                          addGroupMembers( usergrp ,orgid ,function( result ){
+                              if(result=="failure"){
                                 console.log("error in addding groupmembers into usergroup");
-                              }
-                              else
-                              {
+                              } else{
                                 console.log("add group memberes added successfully");
                                 res.send({"message":"organization saved","info":"organizatiobn saved ,user admin saved,send invite to usergroup"});
                               }
@@ -174,44 +123,35 @@ exports.signupOrganization = function(req,res)
                           //res.send("organization successfully saved");
                         }
                       });
-                    }
-                    else
-                    {
+                    } else{
                        console.log("add group memberes added successfully");
                        res.send({"message":"organization saved","info":"organizatiobn saved ,user admin saved,send invite to usergroup"});
-                    }
+                      }
                   }
                 });
               }
-
-           })
-    })
-  }
-  })
-}
+            })
+          })
+        }
+      })
+    }
 
 //addorganization method declaration
 /*
 It save organization and 
 callback orgid
 */
-addOrganization=function(organization,done)
-{ 
-    organization.save(function(err,organization)
-    {
+addOrganization=function(organization,done){ 
+    organization.save(function(err,organization){
       if(err){
       console.log(err+"error in saving new organization");
       done(err);
     }
-    if(organization)
-    {
+    if(organization){
       console.log("organization data"+organization);
       var orgid = organization._id;
       done(null,orgid);
-
-    }
-    else
-    {
+    } else {
       console.log("organization saved blank");
       done(err);
     }
@@ -221,8 +161,7 @@ addOrganization=function(organization,done)
 save all user according invite email and send verification email
 
 */
-addInvitesUserAndSendMail=function(usergrp,orgid,host,callback)
-{
+addInvitesUserAndSendMail=function(usergrp,orgid,host,callback){
   console.log("usergroup data"+usergrp);
   console.log("orgid"+orgid);
   var usergrplength=usergrp.length;
@@ -238,17 +177,14 @@ addInvitesUserAndSendMail=function(usergrp,orgid,host,callback)
     console.log("while loop");
     while(invites.length>0)
     {   
-      if(invites.contains(','))
-      {
+      if(invites.contains(',')){
         var pos=invites.indexOf(',');
         emails[j]=invites.substring(0,pos);
         invites=invites.substring(pos+1);
 
         console.log("remaining invites"+invites);
         j++;
-      }
-      else
-      {
+      } else {
           emails[j]=invites;
           invites=[];
           j++;
@@ -256,57 +192,46 @@ addInvitesUserAndSendMail=function(usergrp,orgid,host,callback)
     };
     console.log("email[ "+i+" ]"+emails);
   };
-      console.log("email[]"+emails); 
+  console.log("email[]"+emails); 
       //to add an invite user
-      var user;
+  var user;
      
-      var i=0;
-      var emaillength=emails.length;
-      eventEmitter.on('addinviteuser',function(i)
-      {
-        if(emaillength!=i)
-        {
-          user=new userModel({email:emails[i],orgid:new BSON.ObjectID(orgid+"")});
-          userapi.addInviteUser(user,host,function(result)
-          {
-           // console.log("result["+k+"]"+result);
-            if(result=="failure")
-            {
-              console.log("error in invite user saving");
-              callback(result);
-            }
-            if(result=="ignore")
-            {
-                console.log("invite user ignored");
-               i+=1;
-              eventEmitter.emit("addinviteuser",i);
-            }
-            else
-            {
-               console.log("invite user ignored");
-               i+=1;
-              eventEmitter.emit("addinviteuser",i);
-              
-              //callback(result);
-            }
-          });
-
+  var i=0;
+  var emaillength=emails.length;
+  eventEmitter.on('addinviteuser',function(i){
+    if(emaillength!=i){
+      
+      user=new userModel({email:emails[i],orgid:new BSON.ObjectID(orgid+"")});
+      userapi.addInviteUser(user,host,function(result){
+       // console.log("result["+k+"]"+result);
+        if(result=="failure"){
+          console.log("error in invite user saving");
+          callback(result);
         }
-        else
-        {
-          callback("success");
+        if(result=="ignore"){
+            console.log("invite user ignored");
+           i+=1;
+          eventEmitter.emit("addinviteuser",i);
+        } else {
+           console.log("invite user ignored");
+           i+=1;
+           eventEmitter.emit("addinviteuser",i);
+          
+          //callback(result);
         }
       });
-      eventEmitter.emit("addinviteuser",i);
-      
-           
+    } else {
+       callback("success");
+    }
+  });
+  eventEmitter.emit("addinviteuser",i);
 };
 /*
 it adds userid according to group into groupmembers
 so we can identify what is the role to user
 */
-addGroupMembers=function(usergrp,orgid,callback)
-{
+addGroupMembers=function(usergrp,orgid,callback){
+  
   console.log("usergroup data"+usergrp);
   console.log("orgid"+orgid);
   var usergrplength=usergrp.length;
@@ -326,17 +251,14 @@ addGroupMembers=function(usergrp,orgid,callback)
    // var emaildata="[";
     while(invites.length>0)
     {   
-      if(invites.contains(','))
-      {
+      if(invites.contains(',')){
         var pos=invites.indexOf(',');
         emails[j]=invites.substring(0,pos);
         invites=invites.substring(pos+1);
 
         console.log("remaining invites"+invites);
         j++;
-      }
-      else
-      {
+      } else  {
           emails[j]=invites;
           invites=[];
           j++;
@@ -347,20 +269,18 @@ addGroupMembers=function(usergrp,orgid,callback)
    }; //end of for loop
   //  emaildata+="]";
     /*to get all userid according to groupname */
-    console.log("usergrpdata"+grpname+emaildata);
-    var i=0;
+  console.log("usergrpdata"+grpname+emaildata);
+  var i=0;
   //var usergrpdatalength=usergrp.length;
   //addgrpmember defination
   //here we open an event
-  eventEmitter.on('addgrpmember',function(i)
-  {
+  eventEmitter.on('addgrpmember',function(i){
+    
     console.log("groupname:"+grpname[i]+" emails"+emaildata[i]);
-    if(usergrplength!=i)
-    { 
-      userModel.find({ email:{ $in :emaildata[i] }},{_id:1},function(err,user)
-      {
-        if( err )
-        {
+    if(usergrplength!=i){ 
+      
+      userModel.find({ email:{ $in :emaildata[i] }},{_id:1},function(err,user){
+        if( err ){
           console.log("error in finding userid according invites");
         }
         if( user )
@@ -373,31 +293,24 @@ addGroupMembers=function(usergrp,orgid,callback)
             console.log("newuser["+p+"]"+newuser[p]._id);
           }
           console.log("usergrp.grpname"+grpname[i]+" grpmembers"+newuser)
-          orgModel.update({ _id : new BSON.ObjectID(orgid+""),"usergrp.grpname":grpname[i]},{$pushAll:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status)
-          {
-            if( err )
-            {
+          orgModel.update({ _id : new BSON.ObjectID(orgid+""),"usergrp.grpname":grpname[i]},{$pushAll:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status){
+            if( err ){
               callback("failure");
               console.log("error in adding grpmembers in usergrp");
             }
-            if(status==1)
-            {
+            if(status==1){
               // callback("success");
-                console.log("successfully added grpmembers into usergrp");
-           
-              i+=1;
-              eventEmitter.emit("addgrpmember",i);
-             }
-             else
-             {
+             
+               console.log("successfully added grpmembers into usergrp");
+               i+=1;
+               eventEmitter.emit("addgrpmember",i);
+            } else {
               console.log("error in adding group members")
-             }
+            }
           });//end of orgmodel update
         }
       })
-    }
-    else
-    {
+    } else {
       callback("success");
     }
   });
@@ -407,26 +320,19 @@ addGroupMembers=function(usergrp,orgid,callback)
 crate an new group adming into usergroup
 and only add one userid which is admin of the organization
 */
-addAdminGroup=function(email,orgid,callback)
-{
+addAdminGroup=function(email,orgid,callback){
   console.log("admin email"+email);
-  userModel.find({email:email},{_id:1},function(err,user)
-  {
-    if(err)
-    {
+  userModel.find({email:email},{_id:1},function(err,user){
+    if(err){
       console.log("error in finding admin email for organization");
-    }
-    else
-    {
+    } else{
+      
       console.log()
-      orgModel.update({ _id:new BSON.ObjectID(orgid+"")},{$push:{usergrp:{grpname:"admin",grpmembers:user[0]._id}}},function(err,status)
-      {
-        if(err)
-        {
+      orgModel.update({ _id:new BSON.ObjectID(orgid+"")},{$push:{usergrp:{grpname:"admin",grpmembers:user[0]._id}}},function(err,status){
+        if(err){
           console.log("error in adding admin group into existing organization");
-        }
-        else
-        {
+        } else{
+          
           console.log("successfully added admin group into existing organization");
           callback("success");
         }
@@ -459,18 +365,15 @@ addAdminGroup=function(email,orgid,callback)
     var organizationHistory = new orgHistoryModel({orgid:new BSON.ObjectID(orgid),updatedby:"sunil current session user"});
   /*----currently manulay updated by-------*/
   //to save data into organization history
-    organizationHistory.save(function(err, orgHistory) 
-    {
-      if(err)
-       {
+    organizationHistory.save(function(err, orgHistory)  {
+      if(err){
          console.log(err+"error in saving orghistory");
          res.send({"error":"error in saving orgHistory"});
-       }
-      if(orgHistory)
-       {
+      }
+      if(orgHistory){
         console.log("organization history updated for organization id"+orgid+" by");
      //   res.send({"success":"organization history updated");
-       }
+      }
     });//end of organization save
            //to update an organization
     orgModel.update(
@@ -484,20 +387,16 @@ addAdminGroup=function(email,orgid,callback)
             location:[{address:address}]
           }
       },
-      function(err, updatestaus) 
-      {
-        if(err)
-        {
+      function(err, updatestaus) {
+        if(err){
           console.log(err + "error in saving new organization")
           res.send({"error":"error in updating neow organization"})
         }
-        if(updatestaus == 1)
-        { //send invite mean create  user,create token and send mail
+        if(updatestaus == 1){ //send invite mean create  user,create token and send mail
           res.send({"success":"organization data updated successfully"});
         }
-      }
-    )//end of organization update
-};
+      })//end of organization update
+  };
 
 //invites to group members
 exports.invites = function(req,res) { 
@@ -514,29 +413,28 @@ exports.invites = function(req,res) {
                   invites:"sunil@giantleapsystems.com,sunilmore6490@gmail.com"
                 }
               ];
-
+/*
+work is pending
+*/
 };//end of invites method
 
 
 //send an invite email to usergroup members
 
 exports.getAllOrganization = function(req,res) {
-  orgModel.find(function(err, organization)
-  {
+  orgModel.find(function(err, organization){
     if(err) {
       console.log(err+"errrro in retriving all organiztion details");
     }
     if(organization.length>0) {
       res.send(organization);
-    }
-    else {
+    } else {
       res.send("doesn't have any organization");
     }
   })
 };
 //delete a particular organization
-exports.deleteOrganization = function(req,res)
-{
+exports.deleteOrganization = function(req,res){
    var orgid = req.params.orgid;
    orgModel.update(
     {_id:new BSON.ObjectID(orgid) }, {$set:{status:"closed"}},
