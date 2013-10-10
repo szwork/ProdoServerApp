@@ -18,7 +18,9 @@ var ObjectId = mongoose.Schema.ObjectId;
 var verificationTokenSchema = new mongoose.Schema({
     _userId: { type:ObjectId,required: true, ref: 'User' },
     token: { type: String, required: true },
-    createddate: { type: Date, required: true, default: Date.now, expires: '4h' }
+    tokentype:{type:String},
+    createddate: { type: Date, required: true, default: Date.now, expires: '4h' },
+    status:{type:String,default:"active"}
 });
 
 verificationTokenSchema.methods.createVerificationToken = function (done) {

@@ -12,8 +12,7 @@
 */
 
 //require schema model
-var verificationTokenModel = require('../../../common/js/verification-token-model');
-var ForgotPasswordTokenModel=require('../../../common/js/forgot-password-token-model')
+var VerificationTokenModel=require('../../../common/js/verification-token-model')
 var userModel = require('./user-model');
 var EmailTemplateModel=require('../../../common/js/email-template-model');
 
@@ -35,7 +34,7 @@ exports.loginSession = function(req, res, next) {
     } 
     if (!user) {
      // req.session.messages =  [info.message];
-      return res.send("username and password is wrong")
+      return res.send({"err":[info.message]});
     }
     req.logIn(user, function(err) {
       if (err) { 
@@ -56,10 +55,17 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
       { 
         return done(err); 
       }
+
       if (!user) 
       {
         console.log("unkown user");
         return done(null, false, { message: 'Unknown user ' + email }); 
+      };
+      console.log("user data in login action"+user.verified);
+      if(user.verified==false)
+      {
+        console.log("verfication is not done please verify");
+        return done(null,false,{message:"please verfiy or resend verfication email"});
       }
     
       user.comparePassword(password, function(err, isMatch)
@@ -158,16 +164,16 @@ This function call from verfiyuser
 it pass token as parameter and get user as callback
 */ 
 verify = function(token, done) {
-  verificationTokenModel.findOne({token: token}, function (err, doc){
+  VerificationTokenModel.findOne({token: token,status:"active",tokentype:"user"}, function (err, userverificationtoken){
     if (err)
     {
      return done(err);
      console.log("error in verification token");
     }
-    console.log("verification token data"+doc);
-    if(doc!=null)
+    console.log("verification token data"+userverificationtoken);
+    if(userverificationtoken!=null)
     {  
-        userModel.findOne({_id: doc._userId}, function (err, user) {
+        userModel.findOne({_id: userverificationtoken._userId}, function (err, user) {
         if (err) {
           return done(err);
         }
@@ -175,7 +181,13 @@ verify = function(token, done) {
         user.save(function(err,user) {
                
         });
+        userverificationtoken["status"]="deactive";
+        userverificationtoken.save(function(err,user)
+        {
+          console.log("userverificationtoken token set deactive");
+        });
        // done(user);
+
         done(null,null,user);
         
        // done(user);
@@ -220,8 +232,8 @@ exports.forgotpassword=function(req,res)
     {
       //send forget password token to mail
       //User.find({username:})
-        var verificationToken = new ForgotPasswordTokenModel({_userId: user._id});
-        verificationToken.createforgotPasswordToken(function (err, token) 
+        var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"password"});
+        verificationToken.createVerificationToken(function (err, token) 
         {
             if (err) return console.log("Couldn't create verification token for forget password", err);
             var url="http://"+ req.get('host')+"/forgotpassword/"+token;
@@ -334,7 +346,7 @@ exports.forgotpasswordurlaction=function (req, res) {
 };
 verifyPasswordToken = function(token, done)
  {
-    ForgotPasswordTokenModel.findOne({token: token,status:"active"}, function (err, forgetpasswordtoken)
+    VerificationTokenModel.findOne({token: token,status:"active",tokentype:"password"}, function (err, forgetpasswordtoken)
     {
         if ( err )
         { 
@@ -404,7 +416,7 @@ adduser = function (user, host, callback)
       {
         /* calling to create verfication token*/
         //User.find({username:})
-        var verificationToken = new verificationTokenModel({_userId: user._id});
+        var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"user"});
         verificationToken.createVerificationToken(function (err, token) 
         {
           if (err)

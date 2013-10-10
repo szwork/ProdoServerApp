@@ -23,7 +23,7 @@ exports.init = function (app) {
   app.get("/forgotpassword/:token",api.userapi.forgotpasswordurlaction);
   app.post("/resetpassword", auth,api.userapi.resetpassword);
   app.get('/emailtemplate',api.emailtemplateapi.getAllEmailTemplate);
-  app.get('/loadsubcription',api.subscriptionapi.loadsubscriptiondata);
-  app.get('/subscriptionplan',api.subscriptionapi.getAllSubscriptionPlan);
-  app.get('/loademailtemplate',api.emailtemplateapi.loadEmailTemplate);
+  app.post('/loadsubcription',api.subscriptionapi.loadsubscriptiondata);
+  app.get('/subscription',api.subscriptionapi.getAllSubscriptionPlan);
+  app.post('/loademailtemplate',api.emailtemplateapi.loadEmailTemplate);
 }
