@@ -58,11 +58,7 @@ var subscription=mongoose.Schema(
 });
 
 var OrganizationSchema = mongoose.Schema({
-    _id:{
-        type: ShortId,
-        generator: commonapi.customIdGenerator,
-        generatorOptions: { customOption: 'org',alphabet:"abcdefghijklmnopqrs1234567890" }
-    },
+    _id:{type:String},
     parentorgid: { type: String, default:0 },
     //oranization has many suborganiztion then 1parent have many organization
     orgtype:{type:String},
