@@ -15,7 +15,7 @@
  var mongodb = require('mongodb');
  var mongoose = require('mongoose');
 
-mongoose.connect('localhost', 'prd-dev2');
+mongoose.connect('localhost', 'prd-dev');
 
 var db = mongoose.connection;
 

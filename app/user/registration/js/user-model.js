@@ -15,6 +15,7 @@ var mongoose = require('../../../common/js/db');
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var ObjectId = mongoose.Schema.ObjectId;
+var commonapi=require('../../../common/js/common-api');
 var subscription=mongoose.Schema(
 {
 
@@ -24,21 +25,55 @@ var subscription=mongoose.Schema(
         
 });
 var userSchema = mongoose.Schema({
+  _id:{type:String},
   fullname: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String},
   verified: { type:Boolean, default:false },
-  orgid: { type:ObjectId, ref: 'Organization' },
+  orgid: { type:String, ref: 'Organization' },
   subscription:[subscription]
 });
 
 //Encrypt the password when you save.
 userSchema.pre('save', function(next) {
 	var user = this;
+	console.log("userdata in pre"+user);
+	
 	if(!user.isModified('password')){
-		return next();
-	}
-
+		if(user.orgid){
+      		  	commonapi.getNextSequnce("user",function(err,nextsequnce){
+      		  	console.log(""+nextsequnce);
+      		  	user._id="uo"+nextsequnce;	
+				next();	
+      		  	})
+      		  
+      		  	
+    		} else{
+        	  		commonapi.getNextSequnce("user",function(err,nextsequnce){
+      		  	console.log(""+nextsequnce);
+      		  	user._id="ui"+nextsequnce;	
+      		  	next();	
+      		  	});
+      		  
+    		}
+	
+	} else{
+			if(user.orgid){
+      		  	commonapi.getNextSequnce("user",function(err,nextsequnce){
+      		  	console.log(""+nextsequnce);
+      		  	user._id="uo"+nextsequnce;	
+				//next();	
+      		  	})
+      		  
+      		  	
+    		} else{
+        	  		commonapi.getNextSequnce("user",function(err,nextsequnce){
+      		  	console.log(""+nextsequnce);
+      		  	user._id="ui"+nextsequnce;	
+      		  	//next();	
+      		  	});
+      		  
+    		}
 	bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
 		if(err) {
 			return next(err);
@@ -48,9 +83,14 @@ userSchema.pre('save', function(next) {
 				return next(err);
 			}
 			user.password = hash;
-			next();
+			
+
+    		next();
+		
 		});
 	});
+}
+
 });
 
 

@@ -16,7 +16,7 @@ var mongoose = require('./db');
 // Verification token model
 var ObjectId = mongoose.Schema.ObjectId;
 var verificationTokenSchema = new mongoose.Schema({
-    _userId: { type:ObjectId,required: true, ref: 'User' },
+    _userId: { type:String,required: true, ref: 'User' },
     token: { type: String, required: true },
     tokentype:{type:String},
     createddate: { type: Date, required: true, default: Date.now, expires: '4h' },

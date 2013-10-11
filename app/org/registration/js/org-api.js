@@ -67,7 +67,10 @@ exports.signupOrganization = function(req,res){
             console.log("error in adding organization");
           }
           console.log("organization successfully saved");
-          var user=new userModel(userdata);
+
+          var user=new userModel({email:userdata.email,fullname:userdata.fullname,password:userdata.password,orgid:orgid});
+          console.log("calling to userdata"+user);
+          console.log("response orgid after addorganization method"+orgid);
           //to add an admin user
           userapi.addUser(user,req.get('host'),function(result){
             if(result=="failure"){
@@ -201,7 +204,7 @@ addInvitesUserAndSendMail=function(usergrp,orgid,host,callback){
   eventEmitter.on('addinviteuser',function(i){
     if(emaillength!=i){
       
-      user=new userModel({email:emails[i],orgid:new BSON.ObjectID(orgid+"")});
+      user=new userModel({email:emails[i],orgid:orgid});
       userapi.addInviteUser(user,host,function(result){
        // console.log("result["+k+"]"+result);
         if(result=="failure"){
@@ -293,7 +296,7 @@ addGroupMembers=function(usergrp,orgid,callback){
             console.log("newuser["+p+"]"+newuser[p]._id);
           }
           console.log("usergrp.grpname"+grpname[i]+" grpmembers"+newuser)
-          orgModel.update({ _id : new BSON.ObjectID(orgid+""),"usergrp.grpname":grpname[i]},{$pushAll:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status){
+          orgModel.update({ _id :orgid,"usergrp.grpname":grpname[i]},{$pushAll:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status){
             if( err ){
               callback("failure");
               console.log("error in adding grpmembers in usergrp");
@@ -328,7 +331,7 @@ addAdminGroup=function(email,orgid,callback){
     } else{
       
       console.log()
-      orgModel.update({ _id:new BSON.ObjectID(orgid+"")},{$push:{usergrp:{grpname:"admin",grpmembers:user[0]._id}}},function(err,status){
+      orgModel.update({ _id:orgid},{$push:{usergrp:{grpname:"admin",grpmembers:user[0]._id}}},function(err,status){
         if(err){
           console.log("error in adding admin group into existing organization");
         } else{
@@ -362,7 +365,7 @@ addAdminGroup=function(email,orgid,callback){
   };
   
   //to track updated history of organization
-    var organizationHistory = new orgHistoryModel({orgid:new BSON.ObjectID(orgid),updatedby:"sunil current session user"});
+    var organizationHistory = new orgHistoryModel({orgid:orgid,updatedby:"sunil current session user"});
   /*----currently manulay updated by-------*/
   //to save data into organization history
     organizationHistory.save(function(err, orgHistory)  {

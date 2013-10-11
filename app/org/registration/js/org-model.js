@@ -13,6 +13,7 @@
 
 var mongoose = require('../../../common/js/db');
 var ObjectId = mongoose.Schema.ObjectId;
+var commonapi=require('../../../common/js/common-api');
 
 var UserGroupSchema = mongoose.Schema({     
       grpname:{type:String},
@@ -57,6 +58,11 @@ var subscription=mongoose.Schema(
 });
 
 var OrganizationSchema = mongoose.Schema({
+    _id:{
+        type: ShortId,
+        generator: commonapi.customIdGenerator,
+        generatorOptions: { customOption: 'org',alphabet:"abcdefghijklmnopqrs1234567890" }
+    },
     parentorgid: { type: String, default:0 },
     //oranization has many suborganiztion then 1parent have many organization
     orgtype:{type:String},
@@ -73,6 +79,20 @@ var OrganizationSchema = mongoose.Schema({
     subscription:[subscription]
 });
 
+OrganizationSchema.pre('save', function(next) {
+  var organization = this;
+  
+              commonapi.getNextSequnce("organization",function(err,nextsequnce){
+              
+              organization._id="org"+nextsequnce;  
+               next(); 
+              })
+            
+      
+        });
+
+       
+  
 var Organization = mongoose.model('organization', OrganizationSchema);
 
 //export model schema

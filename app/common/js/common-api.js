@@ -15,6 +15,8 @@ var nodemailer = require("nodemailer");
 //authentication  about send email
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
+var generateTimeId = require('time-uuid');
+var SequenceModel=require('./sequence-model');
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.giantleapsystems.com", // hostname
     secureConnection: true, // use SSL
@@ -53,3 +55,25 @@ exports.sendMail = function(message,callback){
       callback("success"); 
     });
 };
+
+
+exports.getNextSequnce=function(name,callback)
+{
+console.log("calling to getNextSequnce method");
+ SequenceModel.findAndModify(
+            { name: name },
+            [],
+            {$inc: { nextsequence: 1 } },{new:true},function(err,sequencedata)
+            {
+              if(err)
+              {
+                console.log(err+"error in sequcne collection");
+              }
+              console.log("sequencedata"+sequencedata)
+              callback(null,sequencedata.nextsequence)
+
+            });
+ 
+  // console.log("return sequence data"+ret);
+  
+}
