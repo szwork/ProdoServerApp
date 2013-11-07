@@ -370,7 +370,7 @@ addAdminGroup=function(email,orgid,callback){
   //to save data into organization history
     organizationHistory.save(function(err, orgHistory)  {
       if(err){
-         console.log(err+"error in saving orghistory");
+         logger.error(err+"error in saving orghistory");
          res.send({"error":"error in saving orgHistory"});
       }
       if(orgHistory){
@@ -392,7 +392,7 @@ addAdminGroup=function(email,orgid,callback){
       },
       function(err, updatestaus) {
         if(err){
-          console.log(err + "error in saving new organization")
+          logger.error(err + "error in saving new organization")
           res.send({"error":"error in updating neow organization"})
         }
         if(updatestaus == 1){ //send invite mean create  user,create token and send mail
