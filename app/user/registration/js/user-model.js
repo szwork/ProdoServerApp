@@ -103,6 +103,9 @@ userSchema.methods.comparePassword = function(candidatePassword, callback) {
 		callback(null, isMatch);
 	});
 };
+userSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+    return this.collection.findAndModify(query, sort, doc, options, callback);
+};
 
 //Seed a user
 var User = mongoose.model('User', userSchema);

@@ -23,24 +23,27 @@ var commonapi = require('../../../common/js/common-api');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var S=require('string');
-
+var logger=require("../../../common/js/logger");
 //default emiltemplate record saved
 
 //Create login session
 exports.loginSession = function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
     if (err) { 
+      logger.error(err);
       return next(err); 
     } 
     if (!user) {
      // req.session.messages =  [info.message];
+     logger.error(info.message);
       return res.send({"err":[info.message]});
     }
     req.logIn(user, function(err) {
       if (err) { 
         return next(err); 
       }
-      return res.send(user);
+      logger.info("Login Successfull");
+      return res.send({"success":{"message":"Login Successfull","user":user}});
     });
   })(req, res, next);
 };
@@ -62,18 +65,23 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
         console.log("verfication is not done please verify");
         return done(null,false,{message:"please verfiy or resend verfication email"});
       }
-      user.comparePassword(password, function(err, isMatch){
-          if ( err ){
-              return done(err);
-          }
-          if( isMatch ) {
-            return done(null, user);
-          }
-          else{
-            console.log("unknown password");
-            return done(null, false, { message: 'Invalid password' });
-          }
-      });
+      if(user.password){
+        user.comparePassword(password, function(err, isMatch){
+            if ( err ){
+                return done(err);
+            }
+            if( isMatch ) {
+              return done(null, user);
+            }
+            else{
+              console.log("unknown password");
+              return done(null, false, { message: 'Invalid password' });
+            }
+        });
+      }else{
+              console.log("you have not verifid and not created password");
+              return done(null, false, { message: 'you have not verifid and not created password' });
+      }
     });
 }));
 
@@ -94,7 +102,7 @@ exports.verifyUser = function (req, res, next) {
   var token = req.params.token;
   verify(token, function (dberr,err,user){
     if (dberr){ 
-      console.log("error in verify token "+err);
+      logger.error("error in verify token "+err);
       //return res.redirect("verification-failure");
       res.send({"error":"error in userverification token model"});
       /*here we call req.logIn passport for under session 
@@ -102,7 +110,7 @@ exports.verifyUser = function (req, res, next) {
         */
     } 
     if(err){
-      console.log("token is expired or invalid token");
+      logger.error("token is expired or invalid token");
       //return res.redirect("verification-failure");
       res.send({"exception":"token is expired or invalid token"});
       
@@ -129,9 +137,10 @@ exports.verifyUser = function (req, res, next) {
                  // not much point in attempting to send again, so we give up
                  // will need to give the user a mechanism to resend verification
                  // callback(result);
-                 res.send({"message":"unverified","info":"error in verifying user"});
+                 logger.error("Error in sending Welcome mail");
+                 res.send({"success":{"message":"Verified but not send welcome mail"});
                 } else {
-                  res.send({"message":"verified","info":"Successfully verified user"});
+                   res.send({"success":{"message":"Successfully verified"});
                 }
               });
           })
@@ -149,15 +158,17 @@ verify = function(token, done) {
      console.log("error in verification token");
     }
     console.log("verification token data"+userverificationtoken);
-    if(userverificationtoken!=null){  
-        userModel.findOne({_id: userverificationtoken._userId}, function (err, user) {
+    if(userverificationtoken){  
+       userModel.findAndModify(
+                { _id: userverificationtoken._userId},
+                [],
+                {$set: {verified:true}},{new:false},
+            function(err,user){
+        
         if (err) {
           return done(err);
-        }
-        user["verified"] = true;
-        user.save(function(err,user) {
-               
-        });
+        }else if(user){
+       
         userverificationtoken["status"]="deactive";
         userverificationtoken.save(function(err,user){
           console.log("userverificationtoken token set deactive");
@@ -165,11 +176,15 @@ verify = function(token, done) {
        // done(user);
 
         done(null,null,user);
-        
+        }else{
+          logger.error("token is expird or invalid token");   
+   // res.send({"error":"token is expired or invalid token"});
+          done(null,"error");
+        }
        // done(user);
       });
     } else{
-      console.log("token is expird or invalid token");
+      logger.error("token is expird or invalid token");
      // res.send({"error":"token is expired or invalid token"});
       done(null,"error");
     } 
@@ -181,14 +196,14 @@ exports.forgotpassword=function(req,res){
   var email=req.body.email;
   userModel.findOne({email:email},function(err,user){
     if(err){
-      console.log(err);
+      logger.error(err);
     }
     if(user){
       //send forget password token to mail
       //User.find({username:})
         var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"password"});
         verificationToken.createVerificationToken(function (err, token) {
-            if (err) return console.log("Couldn't create verification token for forget password", err);
+            if (err) return logger.error("Couldn't create verification token for forget password", err);
             var url="http://"+ req.get('host')+"/forgotpassword/"+token;
             //var url = "http://"+ host+"/verify/"+token;
           EmailTemplateModel.find({"templatetype":"password"},function(err,emailtemplate){
@@ -212,8 +227,10 @@ exports.forgotpassword=function(req,res){
                  // not much point in attempting to send again, so we give up
                  // will need to give the user a mechanism to resend verification
                  // callback(result);
+                 logger.error("Problem in sending password setting");
                  res.send({"message":"forget password","info":"Problem in sending password setting"});
                 } else {
+                  logger.info("password settings sent to your mail");
                   res.send({"message":"forget password","info":"password settings sent to your mail"})
                   //callback(result);
                 }
@@ -221,6 +238,7 @@ exports.forgotpassword=function(req,res){
           })
         });
     } else{
+        logger.error("email is not registered with prodonus ");
         res.send("email is not registered with prodonus");
     }
   })
@@ -235,9 +253,11 @@ exports.resetpassword=function(req,res){
           userModel.update({email:req.user.email},{$set:{password:hash}},function(err,status){
 
             if(err){
+              logger.error("error in reseting password "+err);
               res.send("error in reseting password");
             }
             if(status==1){
+              logger.info("password successfully updated")
               res.send("password successfully updated");
             }
           })
@@ -259,17 +279,19 @@ exports.forgotpasswordurlaction=function (req, res) {
     */
     verifyPasswordToken(token, function(dberr,err,user){
         if (dberr) {
+          logger.error(dberr);
           res.send({"dberror":"erro in forgetpasswordtoken collection"});
         }
         if(err){
-          console.log("tokne is expired or invalid token");
+          logger.error("tokne is expired or invalid token");
           res.send({"exception":"token is expired or invalid token"});
         } else{
               req.logIn(user, function(err){
                  if (err){ 
                     res.send({"error":"error in creating session for user"});
-                    console.log(err+"errro in creating session for particular userid");
+                    logger.error(err+"errro in creating session for particular userid");
                   } else{
+                    logger.info("create session and send it to resetpassword page");
                     res.send({"success":"create session and send it to resetpassword page"});
                   }
                 
@@ -280,16 +302,20 @@ exports.forgotpasswordurlaction=function (req, res) {
 verifyPasswordToken = function(token, done) {
     VerificationTokenModel.findOne({token: token,status:"active",tokentype:"password"}, function (err, forgetpasswordtoken){
         if ( err ){ 
+          logger.error(err);
           return done(err);
         }
         if(forgetpasswordtoken!=null){
           userModel.findOne({_id: forgetpasswordtoken._userId}, function (err, user) {
-              if (err) return done(err);
+              if (err) {
+                logger.error(err);
+                return done(err);
+              }
               console.log("user data"+user);
               forgetpasswordtoken["status"] = "deactive";
               forgetpasswordtoken.save(function(err,docs){
                 if(err){ 
-                    console.error(err);
+                    logger.error(err);
                     done(err);
                 }
                 if(docs){
@@ -308,7 +334,7 @@ exports.addInviteUser=function(user,host,callback){
   console.log("user email"+user["email"]);
   userModel.find({email:user["email"]},function(err,userdata){
     if(err){
-      console.log("error in checking in databae email alerady exist or not for invites");
+      logger.error("error in checking in databae email alerady exist or not for invites"+err);
     }
     console.log("userdata.length"+userdata.length);
     if(userdata.length!=0){
@@ -356,7 +382,7 @@ adduser = function (user, host, callback)
    
         user.save(function(err,user){
           if(err) {
-            console.log(err);
+            logger.error(err);
           } else {
         /* calling to create verfication token*/
         //User.find({username:})
@@ -369,7 +395,7 @@ adduser = function (user, host, callback)
             var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"user"});
             verificationToken.createVerificationToken(function (err, token) {
               if (err){  
-                return console.log("Couldn't create verification token", err);
+                return logger.error("Couldn't create verification token", err);
               }
               var url = "http://"+ host+"/verify/"+token;
               EmailTemplateModel.find({"templatetype":templatetype},function(err,emailtemplate){
@@ -390,13 +416,7 @@ adduser = function (user, host, callback)
                 console.log("requestd host"+ host);
                 //calling to sendmail method
                 commonapi.sendMail(message, function (result){
-                  if (result == "failure") {
-                 // not much point in attempting to send again, so we give up
-                 // will need to give the user a mechanism to resend verification
-                  callback(result);
-                  } else {
-                    callback(result);
-                  }
+                 callback(result);
                 });
               })
            });
@@ -417,22 +437,22 @@ exports.signup = function(req,res) {
     //calling to adduser function
     userModel.find({email:user["email"]},function(err,userdata){
       if(err){
-        console.log("error in checking in databae email alerady exist for individual user");
+        logger.error("error in checking in databae email alerady exist for individual user");
       }
       console.log("userdata"+userdata);
       if(userdata.length==0){
         adduser(user, req.get('host'),function(result) {
         if(result == "success") {
-        console.log("success: U100, V001"); //access the code from dictionary/basecamp
-        res.send("success: U100, V001");          
-        }   else {
-        console.log("error: C101");
-        res.send("error: C101");               
-      }
-    });
-  } else {
-      console.log("email already exists");
-      res.send({"exception":"email aleready exists"});
+          console.log("success: U100, V001"); //access the code from dictionary/basecamp
+          res.send("success: U100, V001");          
+        } else {
+          logger.error("Problem in adding new User");
+          res.send("error: C101");               
+        }
+     });
+    } else {
+      logger.error("email already exists");
+      res.send({"exception":"email already exists"});
     }
   })
 }

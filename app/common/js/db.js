@@ -15,13 +15,14 @@
  var mongodb = require('mongodb');
  var mongoose = require('mongoose');
 
-mongoose.connect('localhost', 'prd-dev');
-
+var CONFIG = require('config').Prodonus;
+// console.log("dbname:"+CONFIG.dbName+" dbhost"+CONFIG.dbHost);
+ mongoose.connect(CONFIG.dbHost, CONFIG.dbName);
 var db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error: Cannot connect to prd-dev'));
 db.once('open', function callback() {
-  console.log('Connected to prd-dev');
+  console.log('Connected to '+ CONFIG.dbName);
 });
 
 module.exports = mongoose;

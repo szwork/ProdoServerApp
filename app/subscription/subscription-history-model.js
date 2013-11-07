@@ -18,7 +18,7 @@ var commitment=mongoose.Schema({
       committype:String,
       amount:Number,
       currency:String
-    });
+    });s
 var subscriptionHistorySchema = mongoose.Schema({
   //planid: { type: String },//
   user_id:{type:ObjectId},//it may be orgid or userid

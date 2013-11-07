@@ -27,7 +27,7 @@ var S=require('string');
 var BSON = mongodb.BSONPure;
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
-
+var logger=require("../../../common/js/logger");
 
 //adding new organization
 exports.signupOrganization = function(req,res){
@@ -48,96 +48,96 @@ exports.signupOrganization = function(req,res){
   //5 
   //add an organiazation
   userModel.find({ email : userdata.email },function( err , users ){
-      if( err ){
+    if( err ){
 
-        console.log("error in database checking email id already exists or not");
-        res.send({"error":"error in database checking email id already exists or not"});
-      }
-      if(users.length!=0){
-        
-        console.log("email id already exists for organization save");
-        res.send({"exception":"email aleready exists for organization"});
-      } else {
-        
-        var organization = new orgModel(organizationdata);
-        //calling to addorganization method
-        addOrganization(organization,function(err,orgid){
-          //add an admin user of organization
-          if(err){
-            console.log("error in adding organization");
-          }
-          console.log("organization successfully saved");
-
-          var user=new userModel({email:userdata.email,fullname:userdata.fullname,password:userdata.password,orgid:orgid});
-          console.log("calling to userdata"+user);
-          console.log("response orgid after addorganization method"+orgid);
-          //to add an admin user
-          userapi.addUser(user,req.get('host'),function(result){
-            if(result=="failure"){
-              console.log("add an admin user unsuccessfull");
-              res.send("errror in saving organization user");
-            } else{
-                //to add an invites user
-                console.log("admin user successfully saved for organization");
-                console.log("---------------------------");
-                console.log("calling to  add admin group method");
-                    
-                console.log("---------------------------");
-                addAdminGroup( req.body.user.email,orgid,function(result) {
-                  if( result=="failure" ){
-              
-                    console.log("error in adding admin group in database");
-                    res.send({"error":"adding adming group into usergroup"})
-                  } else {
-                    console.log("added admin group in usergroup")
-                    //send verification mail to invites user
-                    //console.log("adding invites user into database");
-                    //add user id into grpmembers
-                    /*
-                      If no group added or no invities added 
-
-                    */
-                    console.log("req.body.usergrp"+req.body.usergrp);
-                    if( usergrp!=undefined ){
-                      console.log("---------------------------");
-                      console.log("calling to add invite user and sendmail ");
-                      
-                      console.log("---------------------------");
-                      addInvitesUserAndSendMail( usergrp ,orgid,req.get('host'),function(result){
-                        if( result == "failure") {
-                          console.log("error in inviting user ");
-                          res.send({"error":"error in inviting user and sending verification mail"});
-                        } else {
-
-                          console.log("inviteing group invites successfully");
-                          console.log("---------------------------");
-                          console.log("calling to addgroup members");
-                          console.log("---------------------------");
-                          //calling to addgroup members method
-                          addGroupMembers( usergrp ,orgid ,function( result ){
-                              if(result=="failure"){
-                                console.log("error in addding groupmembers into usergroup");
-                              } else{
-                                console.log("add group memberes added successfully");
-                                res.send({"message":"organization saved","info":"organizatiobn saved ,user admin saved,send invite to usergroup"});
-                              }
-
-                           });
-                          //res.send("organization successfully saved");
-                        }
-                      });
-                    } else{
-                       console.log("add group memberes added successfully");
-                       res.send({"message":"organization saved","info":"organizatiobn saved ,user admin saved,send invite to usergroup"});
-                      }
-                  }
-                });
-              }
-            })
-          })
-        }
-      })
+      logger.error("error in database checking email id already exists or not"+err);
+      res.send({"error":"error in database checking email id already exists or not"});
     }
+    if(users.length!=0){
+      
+      logger.error("email id already exists for organization save");
+      res.send({"exception":"email aleready exists for organization"});
+    } else {
+      
+      var organization = new orgModel(organizationdata);
+      //calling to addorganization method
+      addOrganization(organization,function(err,orgid){
+        //add an admin user of organization
+        if(err){
+          logger.error(err);
+          
+        }
+        console.log("organization successfully saved");
+
+        var user=new userModel({email:userdata.email,fullname:userdata.fullname,password:userdata.password,orgid:orgid});
+        console.log("calling to userdata"+user);
+        console.log("response orgid after addorganization method"+orgid);
+        //to add an admin user
+        userapi.addUser(user,req.get('host'),function(result){
+          if(result=="failure"){
+            logger.errror("add an admin user unsuccessfull");
+            res.send("errror in saving organization user");
+          } else{
+              //to add an invites user
+              console.log("admin user successfully saved for organization");
+              console.log("---------------------------");
+              console.log("calling to  add admin group method");
+                  
+              console.log("---------------------------");
+              addAdminGroup( req.body.user.email,orgid,function(result) {
+                if( result=="failure" ){
+            
+                  logger.error("error in adding admin group in database");
+                  res.send({"error":"adding adming group into usergroup"})
+                } else {
+                  console.log("added admin group in usergroup")
+                  //send verification mail to invites user
+                  //console.log("adding invites user into database");
+                  //add user id into grpmembers
+                  /*
+                    If no group added or no invities added 
+
+                  */
+                  console.log("req.body.usergrp"+req.body.usergrp);
+                  if( usergrp!=undefined ){
+                    console.log("---------------------------");
+                    console.log("calling to add invite user and sendmail ");
+                    
+                    console.log("---------------------------");
+                    addInvitesUserAndSendMail( usergrp ,orgid,req.get('host'),function(result){
+                      if( result == "failure") {
+                        logger.error("error in inviting user ");
+                        res.send({"error":"error in inviting user and sending verification mail"});
+                      } else {
+
+                        console.log("inviteing group invites successfully");
+                        console.log("---------------------------");
+                        console.log("calling to addgroup members");
+                        console.log("---------------------------");
+                        //calling to addgroup members method
+                        addGroupMembers( usergrp ,orgid ,function( result ){
+                            if(result=="failure"){
+                              logger.error("error in addding groupmembers into usergroup");
+                            } else{
+                              logger.error("add group memberes added successfully");
+                              res.send({"message":"organization saved","info":"organizatiobn saved ,user admin saved,send invite to usergroup"});
+                            }
+                        });
+                        //res.send("organization successfully saved");
+                      }
+                    });
+                  } else{
+                     logger.info("add group memberes added successfully");
+                     res.send({"message":"organization saved","info":"organizatiobn saved ,user admin saved,send invite to usergroup"});
+                  }
+                }
+              });
+            }
+          })
+        })
+      }
+    })
+  }
 
 //addorganization method declaration
 /*
@@ -202,7 +202,7 @@ addInvitesUserAndSendMail=function(usergrp,orgid,host,callback){
   var i=0;
   var emaillength=emails.length;
   eventEmitter.on('addinviteuser',function(i){
-    if(emaillength!=i){
+    if(emaillength>i){
       
       user=new userModel({email:emails[i],orgid:orgid});
       userapi.addInviteUser(user,host,function(result){
@@ -216,7 +216,7 @@ addInvitesUserAndSendMail=function(usergrp,orgid,host,callback){
            i+=1;
           eventEmitter.emit("addinviteuser",i);
         } else {
-           console.log("invite user ignored");
+           console.log("invite user added");
            i+=1;
            eventEmitter.emit("addinviteuser",i);
           
@@ -280,7 +280,7 @@ addGroupMembers=function(usergrp,orgid,callback){
   eventEmitter.on('addgrpmember',function(i){
     
     console.log("groupname:"+grpname[i]+" emails"+emaildata[i]);
-    if(usergrplength!=i){ 
+    if(usergrplength>i){ 
       
       userModel.find({ email:{ $in :emaildata[i] }},{_id:1},function(err,user){
         if( err ){
@@ -293,7 +293,7 @@ addGroupMembers=function(usergrp,orgid,callback){
           for(var p=0;p<user.length;p++)
           {
             newuser[p]=user[p]._id;
-            console.log("newuser["+p+"]"+newuser[p]._id);
+            console.log("newuser["+p+"]"+user[p]._id);
           }
           console.log("usergrp.grpname"+grpname[i]+" grpmembers"+newuser)
           orgModel.update({ _id :orgid,"usergrp.grpname":grpname[i]},{$pushAll:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status){
@@ -405,20 +405,8 @@ addAdminGroup=function(email,orgid,callback){
 exports.invites = function(req,res) { 
   //value taking from parameters
   var orgid = req.params.orgid;
-  //currently manually set usergrp data
-  var usergrp = [
-                 {
-                  grpname:"Service Engineers",
-                  invites:"neha@giantleapsystems.com"
-                 },
-                {
-                  grpname:"Production Engineers",
-                  invites:"sunil@giantleapsystems.com,sunilmore6490@gmail.com"
-                }
-              ];
-/*
-work is pending
-*/
+  var usergrp=req.body.usergrp;
+  res.send(usergrp);
 };//end of invites method
 
 
@@ -427,12 +415,13 @@ work is pending
 exports.getAllOrganization = function(req,res) {
   orgModel.find(function(err, organization){
     if(err) {
-      console.log(err+"errrro in retriving all organiztion details");
+      logger.error(err+"errrro in retriving all organiztion details");
     }
     if(organization.length>0) {
       res.send(organization);
     } else {
-      res.send("doesn't have any organization");
+      logger.error("doesn't have any organization");
+      res.send({"error":{"message":"doesn't have any organization"}});
     }
   })
 };
@@ -443,7 +432,7 @@ exports.deleteOrganization = function(req,res){
     {_id:new BSON.ObjectID(orgid) }, {$set:{status:"closed"}},
     function(err,updatestaus) {
       if(err) {
-        console.log(err+"error in deleting organization");
+        logger.error(err+"error in deleting organization");
       }
       if(updatestaus==1) {
         console.log("organization deleted");
@@ -458,7 +447,7 @@ exports.getOrganizationById = function(req,res) {
   var orgid = req.params.orgid;
   orgModel.find({_id:new BSON.ObjectID(orgid)},function(err,organization) {
     if(err){
-      console.log(err+"error in retriving organization by id")
+      logger.error(err+"error in retriving organization by id")
     }
     else if (organization) {
       res.send(organization);

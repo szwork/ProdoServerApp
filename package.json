@@ -17,6 +17,10 @@
     "bcrypt" : "*",
     "string":"*",
     "time-uuid":"*",
-    "mongoose-shortid":"*"
+    "mongoose-shortid":"*",
+    "config":"*",
+    "winston-mongodb":"*",
+    "winston":"*"
+
   }
 }

@@ -17,6 +17,7 @@ var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var generateTimeId = require('time-uuid');
 var SequenceModel=require('./sequence-model');
+var logger=require("./logger");
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.giantleapsystems.com", // hostname
     secureConnection: true, // use SSL
@@ -48,7 +49,7 @@ exports.sendMail = function(message,callback){
       if (error){
         // not much point in attempting to send again, so we give up
         // will need to give the user a mechanism to resend verification
-        console.error("Unable to send via Prodonus: " + error.message);
+        logger.error("Unable to send via Prodonus: " + error.message);
         callback("failure");
       }
       //sending succussful then success
