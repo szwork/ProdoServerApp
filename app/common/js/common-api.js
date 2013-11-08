@@ -27,6 +27,45 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
         pass: "Sunil12345"
       }
 });
+exports.loadsequences=function(req,res){
+  var sequencedata=[{
+    name: "user",
+    nextsequence:0
+   },
+   {
+    name: "organization",
+    nextsequence: 0
+  }
+   ];
+
+      SequenceModel.find({},function(err,sequencedata){
+        if(err){
+            console.error(err);
+        }else if(sequencedata.length==0){
+          /* SequenceModel.create(sequencedata,function(err,docs){
+            if(err){
+              console.log("error in inserting defaulte sequneces");
+            }
+            else{
+              console.log("default sequneces saved");
+              console.log("sequencedata"+sequencedata);
+              res.send({"success":"initia sequence data saved"});
+              //res.send({"success"})
+            }
+          });*/
+      var sequence=new SequenceModel({name:"user",nextsequence:0})
+      sequence.save(function(err,docs){
+
+      })
+
+        }else{
+          console.log("sequencedata already exists");
+          res.send({"error":"sequence data already exists"});
+        }
+      })
+     
+
+}
 //get bcrypt string
 exports.getbcrypstring=function(data,callback){
   bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
@@ -68,7 +107,7 @@ console.log("calling to getNextSequnce method");
             {
               if(err)
               {
-                console.log(err+"error in sequcne collection");
+                logger.error(err+"error in sequcne collection");
               }
               console.log("sequencedata"+sequencedata)
               callback(null,sequencedata.nextsequence)

@@ -18,12 +18,12 @@ var api = require("../api/api.js");
 var auth=require('../common/js/security');
 // Organization - REST api
 exports.init = function (app) {
-  app.post('/organization', api.orgapi.signupOrganization);
-  app.put('/organization/:orgid',auth, api.orgapi.updateOrganization);
-  app.delete('/organization/:orgid',auth, api.orgapi.deleteOrganization);
+  app.post('/api/organization', api.orgapi.signupOrganization);
+  app.put('/api/organization/:orgid',auth, api.orgapi.updateOrganization);
+  app.delete('/api/organization/:orgid',auth, api.orgapi.deleteOrganization);
 
   //Access to ONLY prodonus Admin //set up admin  role
-  app.get('/organization',api.orgapi.getAllOrganization); 
-  app.get('/organization/:orgid',auth, api.orgapi.getOrganizationById);
-  app.post('/invites/:orgid', auth,api.orgapi.invites);
+  app.get('/api/organization',api.orgapi.getAllOrganization); 
+  app.get('/api/organization/:orgid',auth, api.orgapi.getOrganizationById);
+  app.post('/api/invites/:orgid', auth,api.orgapi.invites);
 }

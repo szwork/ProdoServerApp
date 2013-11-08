@@ -138,9 +138,9 @@ exports.verifyUser = function (req, res, next) {
                  // will need to give the user a mechanism to resend verification
                  // callback(result);
                  logger.error("Error in sending Welcome mail");
-                 res.send({"success":{"message":"Verified but not send welcome mail"});
+                 res.send({"success":{"message":"Verified but not send welcome mail"}});
                 } else {
-                   res.send({"success":{"message":"Successfully verified"});
+                   res.send({"success":{"message":"Successfully verified"}});
                 }
               });
           })
@@ -397,7 +397,7 @@ adduser = function (user, host, callback)
               if (err){  
                 return logger.error("Couldn't create verification token", err);
               }
-              var url = "http://"+ host+"/verify/"+token;
+              var url = "http://"+ host+"/api/verify/"+token;
               EmailTemplateModel.find({"templatetype":templatetype},function(err,emailtemplate){
                 
                 console.log("emailtemplate"+emailtemplate);
@@ -435,25 +435,34 @@ exports.signup = function(req,res) {
     var user = new userModel(userdata);
      console.log("userdata"+userdata)
     //calling to adduser function
-    userModel.find({email:user["email"]},function(err,userdata){
-      if(err){
-        logger.error("error in checking in databae email alerady exist for individual user");
-      }
-      console.log("userdata"+userdata);
-      if(userdata.length==0){
-        adduser(user, req.get('host'),function(result) {
-        if(result == "success") {
-          console.log("success: U100, V001"); //access the code from dictionary/basecamp
-          res.send("success: U100, V001");          
-        } else {
-          logger.error("Problem in adding new User");
-          res.send("error: C101");               
+    if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
+
+
+      userModel.find({email:user["email"]},function(err,userdata){
+        if(err){
+          logger.error("error in checking in databae email alerady exist for individual user");
+          res.send({"error":{"message":err}});
         }
-     });
-    } else {
-      logger.error("email already exists");
-      res.send({"exception":"email already exists"});
-    }
-  })
+        console.log("userdata"+userdata);
+        if(userdata.length==0){
+          adduser(user, req.get('host'),function(result) {
+            if(result == "success") {
+              console.log("success: U100, V001"); //access the code from dictionary/basecamp
+              res.send({"success":{"message":"User Added Successfully"}});          
+            } else {
+              logger.error("Problem in adding new User");
+              res.send({"error":{"message":"Error in adding user"}});               
+            }
+          });
+       } else {
+          logger.error("email already exists");
+          res.send({"error":{"message":"email already exists"}});
+        }
+  })}else{
+    logger.error("Please send required data for registration");
+    res.send({"error":{"message":"Please send required data for registration"}});
+
+  }
+  
 }
     

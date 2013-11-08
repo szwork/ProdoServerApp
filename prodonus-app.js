@@ -55,7 +55,9 @@ files.forEach(function (file) {
     route.init(app);
 });
 
-
+app.get("/api",function(req,res){
+	res.send("Welcome to Prodonus");
+})
 // var log = new Log();
 
 // // defines app settings with default values for Prodonus

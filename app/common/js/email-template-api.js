@@ -3,7 +3,7 @@ var EmailTemplateModel=require('./email-template-model');
 exports.getAllEmailTemplate=function(req,res){
 	EmailTemplateModel.find({},{_id:0,__v:0},function(err,emailtemplate){
 		if(err){
-			console.log("error in gettin email templates");
+			logger.error("error in gettin email templates");
 		}
 		else{
 			res.send(emailtemplate);
