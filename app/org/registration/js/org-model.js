@@ -38,6 +38,7 @@ var LocationSchema = mongoose.Schema({
     	 	address1:String,
     		address2:String,
     		address3:String,
+        zipcode:String,
     		city:String,
     		state:String,
     		country:String
@@ -49,16 +50,10 @@ var LocationSchema = mongoose.Schema({
 var ContactSchema = mongoose.Schema({ customerhelpline: {type:String}
 });
 var subscription=mongoose.Schema(
-{
-
-        planid:{type:ObjectId,ref:"Subscription"} ,//individdual
-        planstartdate:{type:Date,default:Date.now()}, 
-        planexpirydate:Date
-        
-});
+);
 
 var OrganizationSchema = mongoose.Schema({
-    _id:{type:String},
+    orgid:{type:String},
     parentorgid: { type: String, default:0 },
     //oranization has many suborganiztion then 1parent have many organization
     orgtype:{type:String},
@@ -67,13 +62,18 @@ var OrganizationSchema = mongoose.Schema({
     description: { type:String },
     prdsetupdate: { type:Date,default:Date.now()}, /*the date the company was setup on prodonus*/
     prdclosedate: { type:Date },/* the date the company was closed on Prodonus*/
-    contact:[ContactSchema],//multiple contact numbers
+    contact_numbers:[ContactSchema],//multiple contact numbers
     location:[LocationSchema],
     usergrp:[UserGroupSchema],
     status: { type:String,default:"active"},/*wheather organization is active(1) or deactive(0)*/
     contractid:{type:String},
-    subscription:[subscription],
-    orginvites:[{type:String}]
+    subscription:{
+
+        planid:{type:ObjectId,ref:"Subscription"} ,//individdual
+        planstartdate:{type:Date,default:Date.now()}, 
+        planexpirydate:Date
+    },
+    orginvites:[{type:String}]//inivte by organization to other companies or manufacturer to join on prodonus
 });
 
 OrganizationSchema.pre('save', function(next) {
@@ -81,7 +81,7 @@ OrganizationSchema.pre('save', function(next) {
   
               commonapi.getNextSequnce("organization",function(err,nextsequnce){
               
-              organization._id="org"+nextsequnce;  
+              organization.orgid="org"+nextsequnce;  
                next(); 
               })
             

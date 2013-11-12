@@ -18,7 +18,7 @@ var api = require("../api/api.js");
 var auth=require('../common/js/security');
 // Organization - REST api
 exports.init = function (app) {
-  app.post('/api/organization', api.orgapi.signupOrganization);
+  app.post('/api/organization', auth,api.orgapi.signupOrganization);
   app.put('/api/organization/:orgid',auth, api.orgapi.updateOrganization);
   app.delete('/api/organization/:orgid',auth, api.orgapi.deleteOrganization);
 

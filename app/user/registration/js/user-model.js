@@ -8,7 +8,7 @@
 * date | author | description 
 * ----------------------------------------------------------------------
 * 27-3-2013 | xyx | Add a new property
-* 
+* 12-11-2013|Sunil|Add a subscription 
 */
 
 var mongoose = require('../../../common/js/db');
@@ -18,14 +18,14 @@ var ObjectId = mongoose.Schema.ObjectId;
 var commonapi=require('../../../common/js/common-api');
 
 var userSchema = mongoose.Schema({
-  _id:{type:String},
+  userid:{type:String},
   fullname: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String},
   verified: { type:Boolean, default:false },
   orgid: { type:String, ref: 'Organization' },
   subscription:{
-        planid:{type:ObjectId,ref:"Subscription"} ,//individdual
+        planid:{type:ObjectId,ref:"Subscription"} ,//referencing from Subscription 
         planstartdate:Date , 
         planexpirydate:Date
   }
@@ -35,59 +35,31 @@ var userSchema = mongoose.Schema({
 userSchema.pre('save', function(next) {
 	var user = this;
 	console.log("userdata in pre"+user);
-	
+	//this method will call when invite user that time user has not password
 	if(!user.isModified('password')){
-		if(user.orgid){
-      		  	commonapi.getNextSequnce("user",function(err,nextsequnce){
-      		  	console.log(""+nextsequnce);
-      		  	user._id="uo"+nextsequnce;	
-				next();	
-      		  	})
-      		  
-      		  	
-    		} else{
-        	  		commonapi.getNextSequnce("user",function(err,nextsequnce){
-      		  	console.log(""+nextsequnce);
-      		  	user._id="ui"+nextsequnce;	
-      		  	next();	
-      		  	});
-      		  
-    		}
-	
-	} else{
-			if(user.orgid){
-      		  	commonapi.getNextSequnce("user",function(err,nextsequnce){
-      		  	console.log(""+nextsequnce);
-      		  	user._id="uo"+nextsequnce;	
-				//next();	
-      		  	})
-      		  
-      		  	
-    		} else{
-        	  		commonapi.getNextSequnce("user",function(err,nextsequnce){
-      		  	console.log(""+nextsequnce);
-      		  	user._id="ui"+nextsequnce;	
-      		  	//next();	
-      		  	});
-      		  
-    		}
-	bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-		if(err) {
-			return next(err);
-		}
-		bcrypt.hash(user.password, salt, function(err, hash) {
-			if(err) {
-				return next(err);
-			}
-			user.password = hash;
-			
-
-    		next();
-		
+		commonapi.getNextSequnce("user",function(err,nextsequnce){
+	      console.log(""+nextsequnce);
+	      user.userid="u"+nextsequnce;
+	      next();
+		})
+	} else{//this condition call when normal signup
+		commonapi.getNextSequnce("user",function(err,nextsequnce){
+		    console.log(""+nextsequnce);
+		    user.userid="u"+nextsequnce;
+		    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+				if(err) {
+					return next(err);
+				}
+				bcrypt.hash(user.password, salt, function(err, hash) {
+					if(err) {
+						return next(err);
+					}
+					user.password = hash;
+					next();
+				})
+			})	
 		});
-	});
-}
-
+	}
 });
 
 

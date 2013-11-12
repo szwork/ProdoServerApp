@@ -57,7 +57,7 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
         return done(err); 
       }
       if (!user) {
-        console.log("unkown user");
+        console.log("unknown user");
         return done(null, false, { message: 'Unknown user ' + email }); 
       };
       console.log("user data in login action"+user.verified);
@@ -159,7 +159,7 @@ verify = function(token, done) {
     console.log("verification token data"+userverificationtoken);
     if(userverificationtoken){  
        userModel.findAndModify(
-                { _id: userverificationtoken._userId},
+                { userid: userverificationtoken._userId},
                 [],
                 {$set: {verified:true}},{new:false},
             function(err,user){
@@ -200,7 +200,7 @@ exports.forgotpassword=function(req,res){
     if(user){
       //send forget password token to mail
       //User.find({username:})
-        var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"password"});
+        var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"password"});
         verificationToken.createVerificationToken(function (err, token) {
             if (err) return logger.error("Couldn't create verification token for forget password", err);
             var url="http://"+ req.get('host')+"/forgotpassword/"+token;
@@ -305,7 +305,7 @@ verifyPasswordToken = function(token, done) {
           return done(err);
         }
         if(forgetpasswordtoken!=null){
-          userModel.findOne({_id: forgetpasswordtoken._userId}, function (err, user) {
+          userModel.findOne({userid: forgetpasswordtoken._userId}, function (err, user) {
               if (err) {
                 logger.error(err);
                 return done(err);
@@ -391,7 +391,7 @@ adduser = function (user, host, callback)
             } else{
               templatetype="verify"
             }
-            var verificationToken = new VerificationTokenModel({_userId: user._id,tokentype:"user"});
+            var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"user"});
             verificationToken.createVerificationToken(function (err, token) {
               if (err){  
                 return logger.error("Couldn't create verification token", err);
@@ -429,16 +429,10 @@ adduser = function (user, host, callback)
 
 
 exports.signup = function(req,res) {
-   // var username=req.body.username;
-    //var fullname = req.body.fullname;
-    //var email = req.body.email;
-    //var password = req.body.password;
     var  userdata=req.body;
     var user = new userModel(userdata);
-   //  console.log("userdata"+userdata)
-    //calling to adduser function
     if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
-        userModel.find({email:user["email"]},function(err,userdata){
+        userModel.find({email:userdata.email},function(err,userdata){
         if(err){
           logger.error("error in checking in databae email alerady exist for individual user");
           res.send({"error":{"message":err}});
@@ -457,7 +451,7 @@ exports.signup = function(req,res) {
           });
        } else {
        //   logger.error("email already exists");
-          logger.emit("error","email alerady exists",user["email"]);
+          logger.emit("error","email already exists",user["email"]);
           res.send({"error":{"message":"email already exists"}});
         }
   })}else{
