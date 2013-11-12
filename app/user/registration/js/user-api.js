@@ -139,7 +139,7 @@ exports.verifyUser = function (req, res, next) {
                  res.send({"success":{"message":"Verified but not send welcome mail"}});
                 } else {
                    logger.info("Verified Successfully");
-                   res.redirect("/activate");
+                   res.redirect("/signin");
                 }
               });
           })
