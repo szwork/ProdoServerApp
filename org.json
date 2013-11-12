@@ -1,0 +1,34 @@
+{
+	"organization":
+  		{
+  		"name":"Shrujan Systems",
+  		"description":"software company",
+  		"orgtype":"Company",
+  		"contractid":"contrat_002",
+  		"address":{
+		  		"address1":"Above Kaka Halwai",
+		  		"address2":"Dhole Patil Road",
+		  		"address3":"aund",
+				"country":"INDIA",
+		  		"state":"Maharashtra",
+				"city":"Pune"
+				},
+		"usergrp":[
+				  {
+				    "grpname":"Sales Manager",
+				    
+				    "invites":"sunil@giantleapsystems.com,sunilmore690@facebook.com"  
+				  },
+				  {
+				    "grpname":"Marketing",
+				    "invites":"sunilmore6490@gmail.com"  
+				  }],
+		"region":"Asia"
+
+		},
+	"user":{
+	"fullname":"Sunil More",
+	"email":"sunil@giantleapsystems.com",
+	"password":"sunil"
+	}
+}

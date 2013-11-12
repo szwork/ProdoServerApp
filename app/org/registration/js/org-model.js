@@ -72,7 +72,8 @@ var OrganizationSchema = mongoose.Schema({
     usergrp:[UserGroupSchema],
     status: { type:String,default:"active"},/*wheather organization is active(1) or deactive(0)*/
     contractid:{type:String},
-    subscription:[subscription]
+    subscription:[subscription],
+    orginvites:[{type:String}]
 });
 
 OrganizationSchema.pre('save', function(next) {

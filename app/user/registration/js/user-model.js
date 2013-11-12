@@ -16,14 +16,7 @@ var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var ObjectId = mongoose.Schema.ObjectId;
 var commonapi=require('../../../common/js/common-api');
-var subscription=mongoose.Schema(
-{
 
-        planid:{type:ObjectId,ref:"Subscription"} ,//individdual
-        planstartdate:Date , 
-        planexpirydate:Date
-        
-});
 var userSchema = mongoose.Schema({
   _id:{type:String},
   fullname: { type: String },
@@ -31,7 +24,11 @@ var userSchema = mongoose.Schema({
   password: { type: String},
   verified: { type:Boolean, default:false },
   orgid: { type:String, ref: 'Organization' },
-  subscription:[subscription]
+  subscription:{
+        planid:{type:ObjectId,ref:"Subscription"} ,//individdual
+        planstartdate:Date , 
+        planexpirydate:Date
+  }
 });
 
 //Encrypt the password when you save.

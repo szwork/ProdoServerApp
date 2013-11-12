@@ -113,7 +113,7 @@ exports.verifyUser = function (req, res, next) {
       logger.error("token is expired or invalid token");
       //return res.redirect("verification-failure");
      // res.send({"exception":"token is expired or invalid token"});
-     res.redirect("/regeneratetoken");
+     res.redirect("#/regeneratetoken");
       
     } else {
         //var url = "http://"+ host+"/verify/"+token;
@@ -139,7 +139,7 @@ exports.verifyUser = function (req, res, next) {
                  res.send({"success":{"message":"Verified but not send welcome mail"}});
                 } else {
                    logger.info("Verified Successfully");
-                   res.redirect("/signin");
+                   res.redirect("#/signin");
                 }
               });
           })
