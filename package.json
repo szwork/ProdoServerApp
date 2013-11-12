@@ -20,7 +20,7 @@
     "mongoose-shortid":"*",
     "config":"*",
     "winston-mongodb":"*",
-    "winston":"*",
+    "winston":"latest",
     "redis":"*"
   }
 }

@@ -112,7 +112,8 @@ exports.verifyUser = function (req, res, next) {
     if(err){
       logger.error("token is expired or invalid token");
       //return res.redirect("verification-failure");
-      res.send({"exception":"token is expired or invalid token"});
+     // res.send({"exception":"token is expired or invalid token"});
+     res.redirect("/regeneratetoken");
       
     } else {
         //var url = "http://"+ host+"/verify/"+token;
@@ -134,13 +135,11 @@ exports.verifyUser = function (req, res, next) {
               //calling to sendmail method
               commonapi.sendMail(message, function (result){
                 if (result == "failure") {
-                 // not much point in attempting to send again, so we give up
-                 // will need to give the user a mechanism to resend verification
-                 // callback(result);
                  logger.error("Error in sending Welcome mail");
                  res.send({"success":{"message":"Verified but not send welcome mail"}});
                 } else {
-                   res.send({"success":{"message":"Successfully verified"}});
+                   logger.info("Verified Successfully");
+                   res.redirect("/activate");
                 }
               });
           })
@@ -401,15 +400,18 @@ adduser = function (user, host, callback)
               EmailTemplateModel.find({"templatetype":templatetype},function(err,emailtemplate){
                 
                 console.log("emailtemplate"+emailtemplate);
+                var htmldata="<center><table width=500><tr bgcolor='black'><td><h2><font color='white'>Please confirm Your email address</font></h2></td></tr><tr><td><html><td></tr><tr bgcolor='black'><td height=30></td></tr></table></center>";
+                htmldata=S(htmldata);
                 var html=emailtemplate[0].description;
                 html=S(html);
-                html=html.replaceAll("<email>",user.email);
+                html=html.replaceAll("<name>",user.fullname);
                 html=html.replaceAll("<url>",url);
+                htmldata=htmldata.replaceAll("<html>",html.s);
                 var message = {
                     from: "Prodonus  <noreply@prodonus.com>", // sender address
                     to: user.email, // list of receivers
                     subject:emailtemplate[0].subject, // Subject line
-                    html: html+"" // html body
+                    html: htmldata.s // html body
                   };
                 console.log("email"+user.email)
                 console.log("message data"+message+" token data"+token);
@@ -431,23 +433,22 @@ exports.signup = function(req,res) {
     //var fullname = req.body.fullname;
     //var email = req.body.email;
     //var password = req.body.password;
-    var  userdata=req.body.user;
+    var  userdata=req.body;
     var user = new userModel(userdata);
-     console.log("userdata"+userdata)
+   //  console.log("userdata"+userdata)
     //calling to adduser function
     if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
-
-
-      userModel.find({email:user["email"]},function(err,userdata){
+        userModel.find({email:user["email"]},function(err,userdata){
         if(err){
           logger.error("error in checking in databae email alerady exist for individual user");
           res.send({"error":{"message":err}});
         }
-        console.log("userdata"+userdata);
+       // console.log("userdata"+userdata);
+       // logger.data("userdata");
         if(userdata.length==0){
           adduser(user, req.get('host'),function(result) {
             if(result == "success") {
-              console.log("success: U100, V001"); //access the code from dictionary/basecamp
+              logger.emit("info","User Added Successfully",user); //access the code from dictionary/basecamp
               res.send({"success":{"message":"User Added Successfully"}});          
             } else {
               logger.error("Problem in adding new User");
@@ -455,7 +456,8 @@ exports.signup = function(req,res) {
             }
           });
        } else {
-          logger.error("email already exists");
+       //   logger.error("email already exists");
+          logger.emit("error","email alerady exists",user["email"]);
           res.send({"error":{"message":"email already exists"}});
         }
   })}else{
