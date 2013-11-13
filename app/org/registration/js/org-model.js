@@ -49,48 +49,39 @@ var LocationSchema = mongoose.Schema({
 
 var ContactSchema = mongoose.Schema({ customerhelpline: {type:String}
 });
-var subscription=mongoose.Schema(
-);
+
 
 var OrganizationSchema = mongoose.Schema({
     orgid:{type:String},
     parentorgid: { type: String, default:0 },
     //oranization has many suborganiztion then 1parent have many organization
-    orgtype:{type:String},
+    orgtype:{type:String,require:true},
     //type means org is also a consumer orgtypid of consumer & also of company
-    name: { type:String },
+    name: { type:String ,require:true},
     description: { type:String },
-    prdsetupdate: { type:Date,default:Date.now()}, /*the date the company was setup on prodonus*/
-    prdclosedate: { type:Date },/* the date the company was closed on Prodonus*/
+    prodo_setupdate: { type:Date,default:Date.now()}, /*the date the company was setup on prodonus*/
+    prodo_closedate: { type:Date },/* the date the company was closed on Prodonus*/
     contact_numbers:[ContactSchema],//multiple contact numbers
     location:[LocationSchema],
     usergrp:[UserGroupSchema],
     status: { type:String,default:"active"},/*wheather organization is active(1) or deactive(0)*/
     contractid:{type:String},
     subscription:{
-
-        planid:{type:ObjectId,ref:"Subscription"} ,//individdual
-        planstartdate:{type:Date,default:Date.now()}, 
-        planexpirydate:Date
+      planid:{type:ObjectId,ref:"Subscription"} ,//individdual
+      planstartdate:{type:Date,default:Date.now()}, 
+      planexpirydate:Date
     },
-    orginvites:[{type:String}]//inivte by organization to other companies or manufacturer to join on prodonus
+    orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
+    terms:{type:Boolean}
+
 });
 
 OrganizationSchema.pre('save', function(next) {
   var organization = this;
-  
-              commonapi.getNextSequnce("organization",function(err,nextsequnce){
-              
-              organization.orgid="org"+nextsequnce;  
-               next(); 
-              })
-            
-      
-        });
-
-       
-  
+  commonapi.getNextSequnce("organization",function(err,nextsequnce){
+    organization.orgid="org"+nextsequnce;  
+    next(); 
+  })
+});
 var Organization = mongoose.model('organization', OrganizationSchema);
-
-//export model schema
 module.exports = Organization;

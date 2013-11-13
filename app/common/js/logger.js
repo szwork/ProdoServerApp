@@ -41,6 +41,13 @@ logger.on("error",function(message,email){
 logger.on("info",function(message,email){
   logger.info(message,{"userid":email});
 });
-
+logger.on("log",function(message){
+	if(CONFIG.debug==true){
+      console.log(message);
+    }
+})
+if(CONFIG.debug==false){
+ logger.remove(winston.transports.Console);
+}
 //winston.addColors(myCustomLevels.colors);
 module.exports=logger

@@ -30,58 +30,90 @@ var logger=require("../../../common/js/logger");
 exports.loginSession = function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
     if (err) { 
-      logger.error(err);
+      logger.emit("error","Error in passport authenticate",user);
       return next(err); 
     } 
     if (!user) {
      // req.session.messages =  [info.message];
-     logger.error(info.message);
-      return res.send({"err":[info.message]});
+     return res.send({"error":{"code":info.code,"message":info.message}});
+    }else {//valid user
+      var userdata={id:user.id,_id:user._id,userid:user.userid,email:user.email};
+      req.logIn(user,function(err){
+        if(err){
+          logger.emit("error","Error in creating session",user.userid);
+          res.send({"error":{"message":"Error in creating session"}})
+        }
+        //to check user has subscribed or not
+        isSubscribed(user,function(status){
+          if(status==false){//if user not subscribed to any plan
+            logger.emit("error","User is not subscribed to any plan",user.userid);
+            res.send({"error":{"code":"ES001","message":"User is not subscribed to any plan","user":user}})
+          }else{
+            isSubscriptionExpired(user,function(status){
+              if(status==true){//subscription is expired
+                    logger.emit("error","User subscribtion has expired",user.userid);
+                    res.send({"error":{"code":"ES002","message":"User subscribtion has expired","user":user}})
+              }else{
+                //to check he has done payment or not
+                hasDonePayment(user,function(status){
+                  if(status==false){//he has not make payment
+                    logger.emit("error","User has not make payment",user.userid);
+                    res.send({"error":{"code":"EP001","message":"User has not make payment","user":user}})
+                  }else{
+                    logger.emit("info","Login Successful",user.userid);
+                    res.send({"success":{"message":"Login Successful","user":user}})
+                  }
+                })//end of hasDonePayment
+              }
+            })//end of isSubscriptionExpired
+          }
+        })//end of isSubscribed
+      })//end of req.logIn
     }
-    req.logIn(user, function(err) {
-      if (err) { 
-        return next(err); 
-      }
-      logger.info("Login Successfull");
-      return res.send({"success":{"message":"Login Successfull","user":user}});
-    });
-  })(req, res, next);
+  })(req, res, next);//end of passport authenticate
 };
-
+//method to use user has subscribed to any plan or not
+isSubscribed=function(user,callback){
+ var isubscribed=true;
+ callback(isubscribed);
+}
+isSubscriptionExpired=function(user,callback){
+  var isubscribtionexpired=false;
+ callback(isubscribtionexpired);
+}
+hasDonePayment=function(user,callback){
+  var donepayment=false;
+  callback(donepayment);
+}
 //passport method
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
     console.log("email" + email +" password"+password);
     userModel.findOne({ email: email}, function(err, user) {
       if (err){ 
+        logger.emit("error","dberr-Error in db to find user");
         return done(err); 
       }
-      if (!user) {
-        console.log("unknown user");
-        return done(null, false, { message: 'Unknown user ' + email }); 
-      };
-      console.log("user data in login action"+user.verified);
-      if(user.verified==false){
-        console.log("verfication is not done please verify");
-        return done(null,false,{message:"please verfiy or resend verfication email"});
+      if (!user) {//to check user is exist or not
+        
+        logger.emit("error","Unknown user",email);
+        return done(null, false, {code:"EU001", message: 'Unknown user ' + email }); 
+      } else if(user.verified==false){
+        logger.emit("error","Unverified User",user.userid);
+        return done(null,false,{code:"EU003",message:"please verfiy or resend verfication email"});
       }
-      if(user.password){
-        user.comparePassword(password, function(err, isMatch){
-            if ( err ){
-                return done(err);
-            }
-            if( isMatch ) {
-              return done(null, user);
-            }
-            else{
-              console.log("unknown password");
-              return done(null, false, { message: 'Invalid password' });
-            }
-        });
-      }else{
-              console.log("you have not verifid and not created password");
-              return done(null, false, { message: 'you have not verifid and not created password' });
-      }
+      user.comparePassword(password, function(err, isMatch){
+        if ( err ){
+          logger.emit("error","eror in compare password method",user.userid);
+            return done(err);
+        } else if( isMatch ) {
+          logger.emit("info","password match",user.userid);
+          return done(null, user);
+        }else{
+          logger.emit("error","Invalid password",user.userid);
+          return done(null, false, {code:"EU002", message: 'Invalid password' });
+        }
+      });
     });
 }));
 
@@ -376,7 +408,7 @@ exports.addUser=function(user,host,callback){
 }
 adduser = function (user, host, callback) 
 {
-    console.log("calling to adduser function");
+    logger.emit("log","calling to adduser function");
     console.log("email"+user["email"])
    
         user.save(function(err,user){
@@ -434,7 +466,7 @@ exports.signup = function(req,res) {
     if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
         userModel.find({email:userdata.email},function(err,userdata){
         if(err){
-          logger.error("error in checking in databae email alerady exist for individual user");
+          logger.on("error","error in checking in databae email alerady exist for individual user",userdata.email);
           res.send({"error":{"message":err}});
         }
        // console.log("userdata"+userdata);

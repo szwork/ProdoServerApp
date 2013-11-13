@@ -19,16 +19,36 @@ var commonapi=require('../../../common/js/common-api');
 
 var userSchema = mongoose.Schema({
   userid:{type:String},
-  fullname: { type: String },
+  firstname: { type: String },
+  lastname:{type:String},
+  dob:{type:Date},
+  gender:{type:String},
+  phone:{type:String},
+  mobile:{type:String},
   email: { type: String, required: true, unique: true },
   password: { type: String},
-  verified: { type:Boolean, default:false },
+  verified: { type:Boolean, default:false },//after verifying email sets true
+  address:{
+  	address1:{type:String},
+    address2:{type:String},
+  	address3:{type:String},
+  	city:{type:String},
+  	state:{type:String},
+  	country:{type:String},
+  	zipcode:{type:String}
+   },
   orgid: { type:String, ref: 'Organization' },
   subscription:{
         planid:{type:ObjectId,ref:"Subscription"} ,//referencing from Subscription 
-        planstartdate:Date , 
-        planexpirydate:Date
-  }
+        planstartdate:{type:Date} , 
+        planexpirydate:{type:Date}
+  },
+  payment:{paymentid:{type:String,ref:"payment"}},
+  payment_history:{paymentid:{type:String,ref:"payment"}},
+  products_followed: [{prodle:{type:String,ref:"product"}}], //list of prodle - product ids handles #12934xyz
+  proucts_recommends:[{prodle:{type:String,ref:"product"} , rating:{type:String} ,repeat_value:{type:String}}], //list of prodles
+  status:{type:String,default:"active"}
+
 });
 
 //Encrypt the password when you save.
