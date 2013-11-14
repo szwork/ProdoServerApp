@@ -57,7 +57,7 @@ exports.signupOrganization = function(req,res){
               } else {
                 logger.emit("log","added admin group in usergroup")
                 logger.emit("log","req.body.usergrp"+req.body.usergrp);
-                if( usergrp!=undefined ){
+                if( usergrp.length!=0){
                   logger.emit("log","---------------------------");
                   logger.emit("log","calling to add invite user and sendmail");
                   
@@ -291,18 +291,18 @@ addGroupMembers=function(usergrp,orgid,callback){
   //  emaildata+="]";
     /*to get all userid according to groupname */
   logger.emit("log","usergrpdata"+grpname+emaildata);
-  var i=0;
+  //var i=0;
   //var usergrpdatalength=usergrp.length;
   //addgrpmember defination
   //here we open an event
-  eventEmitter.on('addgrpmember',function(i){
-    
+  eventEmitter.on('addgrpmember',function(value){
+    var grpmemberaddedlength=value;
     logger.emit("log","groupname:"+grpname[i]+" emails"+emaildata[i]);
-    if(usergrplength>i){ 
+    if(usergrplength>grpmemberaddedlength){ 
       
-      userModel.find({ email:{ $in :emaildata[i] }},{userid:1},function(err,user){
+      userModel.find({ email:{ $in :emaildata[grpmemberaddedlength] }},{userid:1},function(err,user){
         if( err ){
-          logger.emit("error","error in finding userid according invites",req.user.userid);
+          logger.emit("error","error in finding userid according invites",emaildata[i]);
         }
         if( user )
         { //add the userid into respective group
@@ -323,10 +323,12 @@ addGroupMembers=function(usergrp,orgid,callback){
               // callback("success");
              
                logger.emit("log","successfully added grpmembers into usergrp");
-               i+=1;
-               eventEmitter.emit("addgrpmember",i);
+               grpmemberaddedlength+=1;
+               eventEmitter.emit("addgrpmember",grpmemberaddedlength);
             } else {
-              logger.emit("log","error in adding group members")
+              logger.emit("log","error in adding group members");
+               grpmemberaddedlength+=1;
+               eventEmitter.emit("addgrpmember",grpmemberaddedlength);
             }
           });//end of orgmodel update
         }
@@ -335,7 +337,7 @@ addGroupMembers=function(usergrp,orgid,callback){
       callback("success");
     }
   });
-  eventEmitter.emit("addgrpmember",i);
+  eventEmitter.emit("addgrpmember",0);
 }
 
  //to update an existing organization
@@ -410,12 +412,12 @@ exports.invites = function(req,res) {
 exports.getAllOrganization = function(req,res) {
   orgModel.find(function(err, organization){
     if(err) {
-      logger.emit("error",err+"errrro in retriving all organiztion details",req.user.userid);
+      logger.emit("error",err+"error in retriving all organiztion details",req.user.userid);
     }
     if(organization.length>0) {
       res.send(organization);
     } else {
-      logger.error("error","doesn't have any organization",req.user.usrid);
+      logger.error("error","doesn't have any organization",req.user.userid);
       res.send({"error":{"message":"doesn't have any organization"}});
     }
   })

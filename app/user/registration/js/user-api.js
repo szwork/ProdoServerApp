@@ -474,7 +474,7 @@ exports.signup = function(req,res) {
         if(userdata.length==0){
           adduser(user, req.get('host'),function(result) {
             if(result == "success") {
-              logger.emit("info","User Added Successfully",user); //access the code from dictionary/basecamp
+              logger.emit("info","User Added Successfully",user["email"]); //access the code from dictionary/basecamp
               res.send({"success":{"message":"User Added Successfully"}});          
             } else {
               logger.error("Problem in adding new User");
