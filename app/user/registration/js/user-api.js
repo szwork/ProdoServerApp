@@ -47,18 +47,18 @@ exports.loginSession = function(req, res, next) {
         isSubscribed(user,function(status){
           if(status==false){//if user not subscribed to any plan
             logger.emit("error","User is not subscribed to any plan",user.userid);
-            res.send({"error":{"code":"ES001","message":"User is not subscribed to any plan","user":user}})
+            res.send({"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}})
           }else{
             isSubscriptionExpired(user,function(status){
               if(status==true){//subscription is expired
                     logger.emit("error","User subscribtion has expired",user.userid);
-                    res.send({"error":{"code":"ES002","message":"User subscribtion has expired","user":user}})
+                    res.send({"error":{"code":"AS002","message":"User subscribtion has expired","user":user}})
               }else{
                 //to check he has done payment or not
                 hasDonePayment(user,function(status){
                   if(status==false){//he has not make payment
                     logger.emit("error","User has not make payment",user.userid);
-                    res.send({"error":{"code":"EP001","message":"User has not make payment","user":user}})
+                    res.send({"error":{"code":"AP001","message":"User has not make payment","user":user}})
                   }else{
                     logger.emit("info","Login Successful",user.userid);
                     res.send({"success":{"message":"Login Successful","user":user}})
@@ -97,10 +97,10 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
       if (!user) {//to check user is exist or not
         
         logger.emit("error","Unknown user",email);
-        return done(null, false, {code:"EU001", message: 'Unknown user ' + email }); 
+        return done(null, false, {code:"AU001", message: 'Unknown user ' + email }); 
       } else if(user.verified==false){
         logger.emit("error","Unverified User",user.userid);
-        return done(null,false,{code:"EU003",message:"please verfiy or resend verfication email"});
+        return done(null,false,{code:"AU003",message:"please verfiy or resend verfication email"});
       }
       user.comparePassword(password, function(err, isMatch){
         if ( err ){
@@ -111,7 +111,7 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
           return done(null, user);
         }else{
           logger.emit("error","Invalid password",user.userid);
-          return done(null, false, {code:"EU002", message: 'Invalid password' });
+          return done(null, false, {code:"AU002", message: 'Invalid password' });
         }
       });
     });

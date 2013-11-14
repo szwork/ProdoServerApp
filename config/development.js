@@ -1,6 +1,6 @@
 module.exports = {
     Prodonus: {
-      dbName: "prd-dev",
+      dbName: "prodo-dev",
       dbHost: "localhost",
       dbPort: "27017",
       debug:true
