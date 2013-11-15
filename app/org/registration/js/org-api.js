@@ -34,7 +34,7 @@ var logger=require("../../../common/js/logger");
 exports.addOrganization = function(req,res){
  
  
-  var organizationdata=req.body;
+  var organizationdata=req.body.organization;
   logger.emit("organization data"+organizationdata);
   //var userdata=req.body.user;
   //logger.emit("userdata"+userdata);
