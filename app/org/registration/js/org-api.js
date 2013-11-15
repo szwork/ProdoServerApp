@@ -369,6 +369,7 @@ exports.updateOrganization = function(req,res) {
       logger.emit("error",err + "error in saving new organization",req.user.userid)
       res.send({"error":{"message":"error in updating neow organization"}})
     }else if(updatestaus==1){
+      var organizationHistory=new orgModel({orgid:orgid,updatedby:req.user.userid});
       organizationHistory.save(function(err, orgHistory) {
         if(err){
            logger.emit("error",err+"error in saving orghistory",req.user.userid);
@@ -398,7 +399,7 @@ exports.invites = function(req,res) {
 //send an invite email to usergroup members
 
 exports.getAllOrganization = function(req,res) {
-  orgModel.find(function(err, organization){
+  orgModel.find({status:"active"},function(err, organization){
     if(err) {
       logger.emit("error",err+"error in retriving all organiztion details",req.user.userid);
       res.send({"error":{"message":"error in retriving all organiztion details"}})
