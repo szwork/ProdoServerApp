@@ -390,7 +390,7 @@ exports.addInviteUser=function(user,host,callback){
 }
 
 exports.addUser=function(req,res){
-    var  userdata=req.body;
+    var  userdata=req.body.user;
     var user = new userModel(userdata);
     if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
         userModel.find({email:userdata.email},function(err,userdata){
