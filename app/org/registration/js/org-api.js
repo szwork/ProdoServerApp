@@ -64,18 +64,78 @@ exports.addOrganization = function(req,res){
                   logger.emit("log","calling to add invite user and sendmail");
                   
                   logger.emit("log","---------------------------");
-                  addInvitesUserAndSendMail( usergrp ,orgid,req.get('host'),function(result){
-                    if( result == "failure") {
+                  var usergrplength=usergrp.length;
+                  var invites;
+                  var grpname=[];
+                  var emaildata=[];
+                //  var usergrpdata=[];
+                  var j=0;//number of emails in respective group
+                  //var k=0;//for usergrpdata
+                  var inviteuseremails=[];
+                  var usergroup=[];
+                  for(var i=0;i<usergrplength;i++)
+                  {
+                    //var grpname;
+                    var emails=[];
+                    invites=usergrp[i].invites;
+                    invites=S(invites);
+                    grpname[i]=usergrp[i].grpname;
+                   // var emaildata="[";
+                    while(invites.length>0)
+                    {   
+
+                      if(invites.contains(',')){
+                        var pos=invites.indexOf(',');
+                        console.log("emails"+invites);
+                        if(invites.substring(0,pos).trim().length!=0){
+                          emails[j]=invites.substring(0,pos).trim().s;
+                        }
+                       
+                        invites=invites.substring(pos+1);
+
+                        logger.emit("log","remaining invites"+invites);
+                        j++;
+                      } else  {
+                        console.log("emails"+invites);
+                          if(invites.trim().length!=0){
+                             emails[j]=invites.trim().s;
+                          }
+                         
+                          invites=[];
+                          j++;
+                      }
+                    }
+                    emaildata[i]=emails;
+                    inviteuseremails=inviteuseremails.concat(emails);
+                    usergroup[i]={grpname:grpname[i],usermails:emails};
+                    
+                   // usergrpdata[i]={"grpname":usergrp[i].grpname,"emails":emaildata[i]}
+                   }; //end of for loop
+                  console.log("new usergroup"+JSON.stringify(usergroup));
+                  console.log(inviteuseremails);
+                  addInvitesUser( inviteuseremails ,orgid,req.get('host'),function(err,userdata){
+                    if(err) {
                       logger.emit("error","error in inviting user ",req.user.userid);
                       res.send({"error":"error in inviting user and sending verification mail"});
                     } else {
+                      console.log("userdata length"+userdata.length);
+                      if(userdata.length>0){
+                        sendInviteEmailToUser(userdata,function(result){
+                          if(result=="failure"){
 
+                          }else{
+
+                          }
+                        })
+                      }
+
+                      
                       logger.emit("log","inviting group invites successfully");
                       logger.emit("log","---------------------------");
                       logger.emit("log","calling to addgroup members");
                       logger.emit("log","---------------------------");
                       //calling to addgroup members method
-                      addGroupMembers( usergrp ,orgid ,function( result ){
+                      addGroupMembers( usergroup ,orgid ,function( result ){
                           if(result=="failure"){
                             logger.emit("error","error in addding groupmembers into usergroup",req.user.userid);
                           } else{
@@ -83,9 +143,12 @@ exports.addOrganization = function(req,res){
                             res.send({"message":"organization saved","info":"organizatiobn saved ,user admin saved,send invite to usergroup"});
                           }
                       });
-                      //res.send("organization successfully saved");
                     }
-                  });
+                      //res.send("organization successfully saved");
+                    })
+               
+                  
+                  
                 } else{
                    logger.emit("log","add group memberes added successfully");
                    res.send({"message":"organization saved","info":"organizatiobn saved ,user admin saved,send invite to usergroup"});
@@ -178,145 +241,124 @@ addAdminGroup=function(userid,orgid,callback){
 save all user according invite email and send verification email
 
 */
-addInvitesUserAndSendMail=function(usergrp,orgid,host,callback){
-
- 
-  logger.emit("usergroup data"+usergrp);
-  logger.emit("orgid"+orgid);
-  var usergrplength=usergrp.length;
-  var invites;
-  var emails=[];
-  var j=0;
-  logger.emit("log","usergroup data"+usergrp.invites);
-  logger.emit("log","usergrp length"+usergrp.length);
-  for(var i=0;i<usergrplength;i++)
-  {
-    invites=usergrp[i].invites;
-    invites=S(invites);
-    logger.emit("log","while loop");
-    while(invites.length>0)
-    {   
-      if(invites.contains(',')){
-        var pos=invites.indexOf(',');
-        emails[j]=invites.substring(0,pos).trim();
-        invites=invites.substring(pos+1);
-
-        logger.emit("log","remaining invites"+invites);
-        j++;
-      } else {
-          emails[j]=invites.trim();
-          invites=[];
-          j++;
-      }
-    };
-    logger.emit("log","email[ "+i+" ]"+emails);
-  };
-  logger.emit("emails"+emails); 
-      //to add an invite user
-  var user;
-     
-  //var i=0;
-  var emaillength=emails.length;
-
-  logger.emit("info","inite user length:"+emaillength);
-  eventEmitter.on('addinviteuser',function(i){
-
-    if(emaillength>i){
-      userModel.findOne({email:emails[i]},{userid:1},function(err,user){
-        if(err){
-
-        }else if(user){
-          i+=1;
-          eventEmitter.emit("addinviteuser",i);
-          
-      }else{
-        user=new userModel({email:emails[i],orgid:orgid});
-          userapi.addInviteUser(user,host,function(result){
-           // logger.emit("result["+k+"]"+result);
-            if(result=="failure"){
-              logger.emit("log","error in invite user saving");
-              callback(result);
-            }
-            if(result=="ignore"){
-               logger.emit("log","invite user ignored");
-                i+=1;
-                eventEmitter.emit("addinviteuser",i);
-            } else {
-               logger.emit("log","invite user added");
-               i+=1;
-               eventEmitter.emit("addinviteuser",i);
-            }
-          });
-
-         
-      }
-    })
-  } else {
-       callback("success");
+addInvitesUser=function(invitemails,orgid,host,callback){
+  var invitemailsdata=[];
+  var invitemailsdatalength=0;
+  var inviteemaillength=invitemails.length
+  //to ignore undefined value
+  for(var i=0;i<inviteemaillength;i++){
+    if(invitemails[i]!=undefined){
+      invitemailsdata[invitemailsdatalength]=invitemails[i];
+      invitemailsdatalength+=1;
+    }
   }
-});
-  var initialvalue=0;
-  eventEmitter.emit("addinviteuser",initialvalue);
- 
+  console.log("invitemaildata"+invitemailsdata);
+  //it will check invite user already exist or not if exist then ignore if not then add as a new user
+  userModel.find({email:{$in:invitemailsdata}},{email:1},function(err,user){
+    if(err){
+
+    }else{
+      console.log("userdata"+user);
+      if(user.length>0){//to ignore already exist user
+        for(var i=0;i<user.length;i++){
+          for(var j=0;j<invitemailsdata.length;j++){
+            if(invitemailsdata[j]==user[i].email){
+              invitemailsdata.splice(j,1);
+            }
+          }
+        }
+      }
+
+      var userdata=[];
+      for(var i=0;i<invitemailsdata.length;i++)
+      {
+        console.log("email["+i+"]:"+invitemailsdata[i]);
+        userdata[i]={email:invitemailsdata[i],orgid:orgid,password:Math.floor(Math.random()*100000)}
+      }
+      console.log("finalinviteuserdata"+invitemailsdata+"finalinviteuserdata length:"+invitemailsdata.length);
+      if(userdata.length>0){
+        userModel.create(userdata,function(err,inviteuserdata){
+          if(err){
+            logger.emit("error","Error adding all invite user",orgid);
+            callback("failure");
+          }else{
+            logger.emit("info","All invite user added",orgid);
+            callback(null,userdata);
+          }
+        })
+      }else{
+        callback(null,userdata);
+      }
+    }
+  })
+  
 };
 /*
 it adds userid according to group into groupmembers
 so we can identify what is the role to user
 */
+sendInviteEmailToUser=function(userdata,callback){
+  console.log("Userdata"+userdata);
+EmailTemplateModel.findOne({templatetype:"invite"},function(err,emailtemplatedata){
+  if(err){
+    logger.emit("error","Error in db to find invite template data",userdata[0].orgid);
+    callback("failure");
+  }else if(emailtemplatedata){
+      var emailtemplate=S(emailtemplatedata.description);
+       var usergrplength=userdata.length;
+       eventEmitter.on('sendinvitemail',function(i){
+          var emailtemplate=S(emailtemplatedata.description);
+          if(usergrplength>i){
+             var html=emailtemplate; 
+             html=emailtemplate.replaceAll("<email>",userdata[i].email);
+             html=emailtemplate.replaceAll("<password>",userdata[i].password);
+             console.log("email message"+html);
+             var message = {
+                from: "Prodonus  <noreply@prodonus.com>", // sender address
+                to: userdata[i].email, // list of receivers
+                subject:emailtemplatedata.subject, // Subject line
+                html: html.s // html body
+              };
+             commonapi.sendMail(message,function(result){
+              if (result == "failure") {
+                 logger.emit("error","Error in sending invite mail to "+userdata[i].email,userdata[i].orgid);
+                 i+=1;
+                 eventEmitter.emit("sendinvitemail",i);
+                } else {
+                  console.log("sent to"+userdata[i].email);
+                 i+=1;
+                 eventEmitter.emit("sendinvitemail",i);
+                }
+             })
+            
+          } else {
+            callback("success");
+          }
+        });
+       eventEmitter.emit("sendinvitemail",0);
+      
+  }else{
+    logger.emit("error","invite template not found",userdata[0].orgid);
+  }
+
+})
+  
+}
 addGroupMembers=function(usergrp,orgid,callback){
   
  
-  logger.emit("log","usergroup data"+usergrp);
-  logger.emit("log","orgid"+orgid);
   var usergrplength=usergrp.length;
-  var invites;
-  var grpname=[];
-  var emaildata=[];
-//  var usergrpdata=[];
-  var j=0;//number of emails in respective group
-  //var k=0;//for usergrpdata
-  for(var i=0;i<usergrplength;i++)
-  {
-    //var grpname;
-    var emails=[];
-    invites=usergrp[i].invites;
-    invites=S(invites);
-    grpname[i]=usergrp[i].grpname;
-   // var emaildata="[";
-    while(invites.length>0)
-    {   
-      if(invites.contains(',')){
-        var pos=invites.indexOf(',');
-        emails[j]=invites.substring(0,pos);
-        invites=invites.substring(pos+1);
-
-        logger.emit("log","remaining invites"+invites);
-        j++;
-      } else  {
-          emails[j]=invites;
-          invites=[];
-          j++;
-      }
-    }
-    emaildata[i]=emails;
-   // usergrpdata[i]={"grpname":usergrp[i].grpname,"emails":emaildata[i]}
-   }; //end of for loop
-  //  emaildata+="]";
-    /*to get all userid according to groupname */
-  logger.emit("log","usergrpdata"+grpname+emaildata);
-  //var i=0;
-  //var usergrpdatalength=usergrp.length;
-  //addgrpmember defination
-  //here we open an event
+  console.log("usergrp"+usergrp);
+  console.log("sdd"+usergrp[0].usermails);
   eventEmitter.on('addgrpmember',function(i){
   
 
-    logger.emit("log","groupname:"+grpname[i]+" emails"+emaildata[i]);
+    //logger.emit("log","groupname:"+usergrp[i].grpname+" emails"+usergrp[i].usermails);
     if(usergrplength>i){ 
       
-      userModel.find({ email:{ $in :emaildata[i] }},{userid:1},function(err,user){
+      userModel.find({ email:{ $in :usergrp[i].usermails }},{userid:1},function(err,user){
         if( err ){
-          logger.emit("error","error in finding userid according invites",emaildata[i]);
+          logger.emit("error","error in finding userid according invites",usergrp[i].usermails);
         }
         if( user.length!=0 )
         { //add the userid into respective group
@@ -327,8 +369,8 @@ addGroupMembers=function(usergrp,orgid,callback){
             newuser[p]=user[p].userid;
             logger.emit("log","newuser["+p+"]"+user[p].userid);
           }
-          logger.emit("log","usergrp.grpname"+grpname[i]+" grpmembers"+newuser)
-          orgModel.update({ orgid :orgid,"usergrp.grpname":grpname[i]},{$pushAll:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status){
+          logger.emit("log","usergrp.grpname"+usergrp[i].grpname+" grpmembers"+newuser)
+          orgModel.update({ orgid :orgid,"usergrp.grpname":usergrp[i].grpname},{$pushAll:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status){
             if( err ){
               callback("failure");
               logger.emit("error","error in adding grpmembers in usergrp",req.user.userid);
