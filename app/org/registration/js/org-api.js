@@ -26,11 +26,13 @@ var mongodb = require("mongodb");
 var S=require('string');
 var BSON = mongodb.BSONPure;
 var events = require('events');
+var events = require('events');
 var eventEmitter = new events.EventEmitter();
 var logger=require("../../../common/js/logger");
 
 //adding new organization
-exports.signupOrganization = function(req,res){
+exports.addOrganization = function(req,res){
+ 
  
   var organizationdata=req.body;
   logger.emit("organization data"+organizationdata);
@@ -95,6 +97,7 @@ exports.signupOrganization = function(req,res){
          }  
 
   })
+ 
     }
    
 checkOrganizationValidation=function(organization,user,callback){
@@ -176,6 +179,8 @@ save all user according invite email and send verification email
 
 */
 addInvitesUserAndSendMail=function(usergrp,orgid,host,callback){
+
+ 
   logger.emit("usergroup data"+usergrp);
   logger.emit("orgid"+orgid);
   var usergrplength=usergrp.length;
@@ -193,32 +198,39 @@ addInvitesUserAndSendMail=function(usergrp,orgid,host,callback){
     {   
       if(invites.contains(',')){
         var pos=invites.indexOf(',');
-        emails[j]=invites.substring(0,pos);
+        emails[j]=invites.substring(0,pos).trim();
         invites=invites.substring(pos+1);
 
         logger.emit("log","remaining invites"+invites);
         j++;
       } else {
-          emails[j]=invites;
+          emails[j]=invites.trim();
           invites=[];
           j++;
       }
     };
     logger.emit("log","email[ "+i+" ]"+emails);
   };
-  logger.emit("email[]"+emails); 
+  logger.emit("emails"+emails); 
       //to add an invite user
   var user;
      
-  var i=0;
+  //var i=0;
   var emaillength=emails.length;
+
+  logger.emit("info","inite user length:"+emaillength);
   eventEmitter.on('addinviteuser',function(i){
+
     if(emaillength>i){
       userModel.findOne({email:emails[i]},{userid:1},function(err,user){
         if(err){
 
-        }else if(!user){
-          user=new userModel({email:emails[i],orgid:orgid});
+        }else if(user){
+          i+=1;
+          eventEmitter.emit("addinviteuser",i);
+          
+      }else{
+        user=new userModel({email:emails[i],orgid:orgid});
           userapi.addInviteUser(user,host,function(result){
            // logger.emit("result["+k+"]"+result);
             if(result=="failure"){
@@ -236,16 +248,16 @@ addInvitesUserAndSendMail=function(usergrp,orgid,host,callback){
             }
           });
 
-      }else{
-         i+=1;
-         eventEmitter.emit("addinviteuser",i);
+         
       }
     })
   } else {
        callback("success");
   }
 });
-  eventEmitter.emit("addinviteuser",i);
+  var initialvalue=0;
+  eventEmitter.emit("addinviteuser",initialvalue);
+ 
 };
 /*
 it adds userid according to group into groupmembers
@@ -253,6 +265,7 @@ so we can identify what is the role to user
 */
 addGroupMembers=function(usergrp,orgid,callback){
   
+ 
   logger.emit("log","usergroup data"+usergrp);
   logger.emit("log","orgid"+orgid);
   var usergrplength=usergrp.length;
@@ -295,18 +308,19 @@ addGroupMembers=function(usergrp,orgid,callback){
   //var usergrpdatalength=usergrp.length;
   //addgrpmember defination
   //here we open an event
-  eventEmitter.on('addgrpmember',function(value){
-    var grpmemberaddedlength=value;
+  eventEmitter.on('addgrpmember',function(i){
+  
+
     logger.emit("log","groupname:"+grpname[i]+" emails"+emaildata[i]);
-    if(usergrplength>grpmemberaddedlength){ 
+    if(usergrplength>i){ 
       
-      userModel.find({ email:{ $in :emaildata[grpmemberaddedlength] }},{userid:1},function(err,user){
+      userModel.find({ email:{ $in :emaildata[i] }},{userid:1},function(err,user){
         if( err ){
           logger.emit("error","error in finding userid according invites",emaildata[i]);
         }
-        if( user )
+        if( user.length!=0 )
         { //add the userid into respective group
-          logger.emit("log","userid by email"+user);
+          logger.emit("log","userid by email");
           var newuser=[];
           for(var p=0;p<user.length;p++)
           {
@@ -323,12 +337,12 @@ addGroupMembers=function(usergrp,orgid,callback){
               // callback("success");
              
                logger.emit("log","successfully added grpmembers into usergrp");
-               grpmemberaddedlength+=1;
-               eventEmitter.emit("addgrpmember",grpmemberaddedlength);
+               i+=1;
+               eventEmitter.emit("addgrpmember",i);
             } else {
               logger.emit("log","error in adding group members");
-               grpmemberaddedlength+=1;
-               eventEmitter.emit("addgrpmember",grpmemberaddedlength);
+               i+=1;
+               eventEmitter.emit("addgrpmember",i);
             }
           });//end of orgmodel update
         }
@@ -338,66 +352,40 @@ addGroupMembers=function(usergrp,orgid,callback){
     }
   });
   eventEmitter.emit("addgrpmember",0);
+  
 }
 
  //to update an existing organization
- exports.updateOrganization = function(req,res) {
+exports.updateOrganization = function(req,res) {
   //value taking from body
-  var name = req.body.name;
-  var description = req.body.description;
-  var orgtype = req.body.orgtype;
-  var contacts = req.body.contacts;
-  var contractid = req.body.contractid;
-  var region = req.body.region;
-  //value taking from parameter
-  var orgid = req.params.orgid;
-
-  var address = {
-    add1: req.body.address1,
-    add2: req.body.address2,
-    add3: req.body.address3,
-    country: req.body.country,
-    state: req.body.state,
-    city: req.body.city
-  };
-  
+  var orgid=req.params.orgid;
+  var organizationdata=req.body.organization;
   //to track updated history of organization
-    var organizationHistory = new orgHistoryModel({orgid:orgid,updatedby:"sunil current session user"});
+    
   /*----currently manulay updated by-------*/
   //to save data into organization history
-    organizationHistory.save(function(err, orgHistory)  {
-      if(err){
-         logger.emit("error",err+"error in saving orghistory",req.user.userid);
-         res.send({"error":"error in saving orgHistory"});
-      }
-      if(orgHistory){
-        logger.emit("log","organization history updated for organization id"+orgid+" by");
-     //   res.send({"success":"organization history updated");
-      }
-    });//end of organization save
-           //to update an organization
-    orgModel.update(
-      {orgid:orgid},
-      {$set:
-          {
-            name:name,
-            description:description,
-            orgtype:orgtype,
-            contact:contacts,
-            location:[{address:address}]
-          }
-      },
-      function(err, updatestaus) {
+   orgModel.update({orgid:orgid},{$set:organizationdata},function(err, updatestaus) {
+    if(err){
+      logger.emit("error",err + "error in saving new organization",req.user.userid)
+      res.send({"error":{"message":"error in updating neow organization"}})
+    }else if(updatestaus==1){
+      organizationHistory.save(function(err, orgHistory) {
         if(err){
-          logger.emit("error",err + "error in saving new organization",req.user.userid)
-          res.send({"error":"error in updating neow organization"})
+           logger.emit("error",err+"error in saving orghistory",req.user.userid);
+           res.send({"error":{"message":"error in saving orgHistory"}});
         }
-        if(updatestaus == 1){ //send invite mean create  user,create token and send mail
-          res.send({"success":"organization data updated successfully"});
+        if(orgHistory){
+          logger.emit("log","organization updated for organization id"+orgid+" by");
+          res.send({"success":{"message":"organization  updated successfully"}});//end of organization save
         }
-      })//end of organization update
-  };
-
+      }) 
+    }else{
+      logger.emit("error","No organization to update",req.user.userid);
+      res.send({"error":{"message":"No organization to update"}});
+    }
+  })
+}
+ 
 //invites to group members
 exports.invites = function(req,res) { 
   //value taking from parameters
@@ -413,8 +401,10 @@ exports.getAllOrganization = function(req,res) {
   orgModel.find(function(err, organization){
     if(err) {
       logger.emit("error",err+"error in retriving all organiztion details",req.user.userid);
+      res.send({"error":{"message":"error in retriving all organiztion details"}})
     }
-    if(organization.length>0) {
+    if(organization.length!=0) {
+      logger.emit("success","get all organization details",req.user.userid);
       res.send(organization);
     } else {
       logger.error("error","doesn't have any organization",req.user.userid);
@@ -426,28 +416,32 @@ exports.getAllOrganization = function(req,res) {
 exports.deleteOrganization = function(req,res){
    var orgid = req.params.orgid;
    orgModel.update(
-    {orgid:orgid }, {$set:{status:"closed"}},
+    {orgid:orgid }, {$set:{status:"deactive"}},
     function(err,updatestaus) {
       if(err) {
         logger.emit("error",err+"error in deleting organization",req.user.userid);
       }
       if(updatestaus==1) {
         logger.emit("log","organization deleted");
-        res.send("organization deleted");
+        res.send({"success":{"message":"organization deleted"}});
       }
     })//end of Organization update method
 };//end of deleteorganizations
 
 
 //get organization by id
-exports.getOrganizationById = function(req,res) {
+exports.getOrganization = function(req,res) {
   var orgid = req.params.orgid;
-  orgModel.find({orgid:orgid},function(err,organization) {
+  orgModel.findOne({orgid:orgid},function(err,organization) {
     if(err){
       logger.emit("error",err+"error in retriving organization by id",req.user.userid);
-    }
-    else if (organization) {
-      res.send(organization);
+      res.send({"error":{"message":"Error in db to get organization"}});
+    }else if (organization) {
+      logger.emit("log","get organization details");
+      res.send({"success":{"message":"","organization":organization}});
+    }else{
+      logger.emit("error","Organization not found",req.user.userid);
+      res.send({"error":{"message":"Organization not found"}});
     }
   })
 };

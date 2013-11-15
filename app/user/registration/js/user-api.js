@@ -389,22 +389,101 @@ exports.addInviteUser=function(user,host,callback){
   })
 }
 
-exports.addUser=function(user,host,callback){
-   console.log("calling to addUser for admin organization");
-      adduser(user, host,function(result) {
-      if(result == "success") {
-        console.log("success: U100, V001"); 
-        callback(result);
-        //access the code from dictionary/basecamp
-        //res.send("success: U100, V001");          
-      } 
-      else {
-        console.log("error: C101");
-        //res.send("error: C101");
-        callback(result);               
-      }
-    });
-   
+exports.addUser=function(req,res){
+    var  userdata=req.body;
+    var user = new userModel(userdata);
+    if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
+        userModel.find({email:userdata.email},function(err,userdata){
+        if(err){
+          logger.on("error","error in checking in databae email alerady exist for individual user",userdata.email);
+          res.send({"error":{"message":err}});
+        }
+       // console.log("userdata"+userdata);
+       // logger.data("userdata");
+        if(userdata.length==0){
+          adduser(user, req.get('host'),function(result) {
+            if(result == "success") {
+              logger.emit("info","User Added Successfully",user["email"]); //access the code from dictionary/basecamp
+              res.send({"success":{"message":"User Added Successfully"}});          
+            } else {
+              logger.error("Problem in adding new User");
+              res.send({"error":{"message":"Error in adding user"}});               
+            }
+          });
+       } else {
+       //   logger.error("email already exists");
+          logger.emit("error","email already exists",user["email"]);
+          res.send({"error":{"message":"email already exists"}});
+        }
+  })}else{
+    logger.error("Please send required data for registration");
+    res.send({"error":{"message":"Please send required data for registration"}});
+
+  }
+}
+//get list of all user details
+exports.getAllUser=function(req,res){
+  userModel.find({},function(err,user){
+    if(err){
+      logger.emit("error","Error in db to get all user details",req.user.userid);
+      res.send({"error":{"message":"Error in db to get all user details"}})
+    }else if(user.length!=0){
+      logger.emit("info","get all user details",req.user.userid);
+      res.send({"success":{"user":user}});
+    }else{
+      logger.emit("error","No user",req.user.userid);
+      res.send({"error":{"message":"No user"}});
+    }
+  })
+}
+//get single user details
+exports.getUser=function(req,res){
+  var userid=req.params.userid;
+   userModel.find({userid:userid},function(err,user){
+    if(err){
+      logger.emit("error","Error in db to get  user details",req.user.userid);
+      res.send({"error":{"message":"Error in db to get user details"}})
+    }else if(user.length!=0){
+      logger.emit("info","get user details",req.user.userid);
+      res.send({"success":{"user":user}});
+    }else{
+      logger.emit("error", "user not exists",req.user.userid);
+      res.send({"error":{"message":"user not exists"}});
+    }
+  })
+};
+//update the user details
+exports.updateUser=function(req,res){
+  var userid=req.params.userid;
+  var userdata=req.body.user;
+  userModel.update({userid:userid},{$set:userdata},function(err,status){
+    if(err){
+      logger.emit("error","Error in db to update  user details",req.user.userid);
+      res.send({"error":{"message":"Error in db to update user details"}})
+    }else if(status==1){
+      logger.emit("info","update user details",req.user.userid);
+      res.send({"success":{"message":"Updated Successfully"}});
+    }else{
+      logger.emit({"error":{"message":" user not exists"}});
+      res.send({"error":{"message":"user not exists"}}); 
+    }
+  })
+}
+//delete user details
+exports.deleteUser=function(req,res){
+ var userid=req.params.userid;
+  userModel.update({userid:userid},{$set:{status:"deactive"}},function(err,status){
+    if(err){
+      logger.emit("error","Error in db to delete  user details",req.user.userid);
+      res.send({"error":{"message":"Error in db to delete user details"}})
+    }else if(status==1){
+      logger.emit("info","delete user details",req.user.userid);
+      res.send({"success":{"message":"delete Successfully"}});
+    }else{
+      logger.emit({"error":{"message":" user not exists"}});
+      res.send({"error":{"message":"user not exists"}}); 
+    }
+  }) 
 }
 adduser = function (user, host, callback) 
 {
@@ -460,37 +539,3 @@ adduser = function (user, host, callback)
       
 
 
-exports.signup = function(req,res) {
-    var  userdata=req.body;
-    var user = new userModel(userdata);
-    if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
-        userModel.find({email:userdata.email},function(err,userdata){
-        if(err){
-          logger.on("error","error in checking in databae email alerady exist for individual user",userdata.email);
-          res.send({"error":{"message":err}});
-        }
-       // console.log("userdata"+userdata);
-       // logger.data("userdata");
-        if(userdata.length==0){
-          adduser(user, req.get('host'),function(result) {
-            if(result == "success") {
-              logger.emit("info","User Added Successfully",user["email"]); //access the code from dictionary/basecamp
-              res.send({"success":{"message":"User Added Successfully"}});          
-            } else {
-              logger.error("Problem in adding new User");
-              res.send({"error":{"message":"Error in adding user"}});               
-            }
-          });
-       } else {
-       //   logger.error("email already exists");
-          logger.emit("error","email already exists",user["email"]);
-          res.send({"error":{"message":"email already exists"}});
-        }
-  })}else{
-    logger.error("Please send required data for registration");
-    res.send({"error":{"message":"Please send required data for registration"}});
-
-  }
-  
-}
-    
