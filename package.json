@@ -21,6 +21,7 @@
     "config":"*",
     "winston-mongodb":"*",
     "winston":"latest",
-    "redis":"*"
+    "redis":"*",
+    "shortid":"*"
   }
 }

@@ -90,17 +90,19 @@ exports.sendMail = function(message,callback){
         // will need to give the user a mechanism to resend verification
         logger.error("Unable to send via Prodonus: " + error.message);
         callback("failure");
+      }else{
+        callback("success"); 
       }
       //sending succussful then success
-      callback("success"); 
+      
     });
 };
 
 
 exports.getNextSequnce=function(name,callback)
 {
-console.log("calling to getNextSequnce method");
- SequenceModel.findAndModify(
+  console.log("calling to getNextSequnce method");
+  SequenceModel.findAndModify(
             { name: name },
             [],
             {$inc: { nextsequence: 1 } },{new:true},function(err,sequencedata)

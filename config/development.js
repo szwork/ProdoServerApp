@@ -3,6 +3,7 @@ module.exports = {
       dbName: "prodo-dev",
       dbHost: "localhost",
       dbPort: "27017",
-      debug:true
+      debug:true,
+      serverName:"localhost:9000"
     }
   }

@@ -22,6 +22,9 @@ var verificationTokenSchema = new mongoose.Schema({
     createddate: { type: Date, required: true, default: Date.now, expires: '4h' },
     status:{type:String,default:"active"}
 });
+verificationTokenSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+    return this.collection.findAndModify(query, sort, doc, options, callback);
+};
 
 verificationTokenSchema.methods.createVerificationToken = function (done) {
     var verificationToken = this;

@@ -12,7 +12,7 @@
 */
 
 var orgapi = require("../org/registration/js/org-api");
-var userapi = require("../user/registration/js/user-api");
+var userapi = require("../user/js/user-api");
 var emailtemplateapi = require("../common/js/email-template-api");
 var subscriptionapi=require("../subscription/subscription-api");
 var commonapi=require("../common/js/common-api");

@@ -11,14 +11,16 @@
 * 12-11-2013|Sunil|Add a subscription 
 */
 
-var mongoose = require('../../../common/js/db');
+var mongoose = require('../../common/js/db');
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var ObjectId = mongoose.Schema.ObjectId;
-var commonapi=require('../../../common/js/common-api');
-
+var commonapi=require('../../common/js/common-api');
+var shortId = require('shortid');
+var logger=require("../../common/js/logger")
 var userSchema = mongoose.Schema({
   userid:{type:String},
+  fullname:{type:String},
   firstname: { type: String },
   lastname:{type:String},
   dob:{type:Date},
@@ -37,7 +39,8 @@ var userSchema = mongoose.Schema({
   	country:{type:String},
   	zipcode:{type:String}
    },
-  orgid: { type:String, ref: 'Organization' },
+  orgid: { type:String, ref: 'Organization'},
+  isAdmin:{type:Boolean,default:false},
   subscription:{
         planid:{type:ObjectId,ref:"Subscription"} ,//referencing from Subscription 
         planstartdate:{type:Date} , 
@@ -46,41 +49,34 @@ var userSchema = mongoose.Schema({
   payment:{paymentid:{type:String,ref:"payment"}},
   payment_history:{paymentid:{type:String,ref:"payment"}},
   products_followed: [{prodle:{type:String,ref:"product"}}], //list of prodle - product ids handles #12934xyz
-  proucts_recommends:[{prodle:{type:String,ref:"product"} , rating:{type:String} ,repeat_value:{type:String}}], //list of prodles
-  status:{type:String,default:"active"}
+  products_recommends:[{prodle:{type:String,ref:"product"} , rating:{type:String} ,repeat_value:{type:String}}], //list of prodles
+  status:{type:String,default:"active"},
+  terms:{type:Boolean}
 
 });
 
-//Encrypt the password when you save.
+//Encrypt the password and generate the idwhen you save.
 userSchema.pre('save', function(next) {
 	var user = this;
-	console.log("userdata in pre"+user);
-	//this method will call when invite user that time user has not password
-	if(!user.isModified('password')){
-		commonapi.getNextSequnce("user",function(err,nextsequnce){
-	      console.log(""+nextsequnce);
-	      user.userid="u"+nextsequnce;
-	      next();
+	logger.emit("log","userdata in pre"+user);
+	user.userid="u"+shortId.generate();
+	logger.emit("log","shortid"+user.userid);
+	bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+		if(err) {
+			return next(err);
+		}
+		bcrypt.hash(user.password, salt, function(err, hash) {
+			if(err) {
+				return next(err);
+			}
+			user.password = hash;
+			logger.emit("log","password"+user.password);
+			next();
 		})
-	} else{//this condition call when normal signup
-		commonapi.getNextSequnce("user",function(err,nextsequnce){
-		    console.log(""+nextsequnce);
-		    user.userid="u"+nextsequnce;
-		    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-				if(err) {
-					return next(err);
-				}
-				bcrypt.hash(user.password, salt, function(err, hash) {
-					if(err) {
-						return next(err);
-					}
-					user.password = hash;
-					next();
-				})
-			})	
-		});
-	}
+	})	
 });
+	
+
 
 
 //Password comparePassword

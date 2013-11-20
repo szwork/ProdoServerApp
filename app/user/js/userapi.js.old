@@ -1,31 +1,3 @@
-/*
-* Overview: User api
-* Dated:
-* Author: Sunil More
-* Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
-* Change History:
-* ----------------------------------------------------------------------
-* date | author | description 
-* ----------------------------------------------------------------------
-* 27-3-2013 | xyx | Add a new property
-* 03-10-2013|sunil|add forgot password method
-*/
-
-//require schema model
-var VerificationTokenModel=require('../../../common/js/verification-token-model')
-var userModel = require('./user-model');
-var EmailTemplateModel=require('../../../common/js/email-template-model');
-
-//require cusome api
-var commonapi = require('../../../common/js/common-api');
-
-//require libraary
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var S=require('string');
-var logger=require("../../../common/js/logger");
-//default emiltemplate record saved
-
 //Create login session
 exports.loginSession = function(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
@@ -37,28 +9,48 @@ exports.loginSession = function(req, res, next) {
      // req.session.messages =  [info.message];
      return res.send({"error":{"code":info.code,"message":info.message}});
     }else {//valid user
-      var userdata={id:user.id,_id:user._id,userid:user.userid,email:user.email};
+      if(user.orgid!=undefined){
+       // var doc=orgModel.
+        orgModel.findOne({orgid:user.orgid},{name:1,usergrp:1,orgtype:1},function(err,organization){
+            if(err){
+
+            }else if(organization){
+              var usergrp=organization.usergrp;
+              for(var i=0;i<usergrp.length;i++){
+                var grpmember=usergrp[i].grpmembers;
+
+              }
+             
+              logger.emit("log",usergrp);
+              
+              logger.emit("log","usergrp length"+usergrp.length);
+            }else{
+
+            }
+          });
+    //  var userdata={id:user.id,_id:user._id,userid:user.userid,email:user.email};
       req.logIn(user,function(err){
         if(err){
           logger.emit("error","Error in creating session",user.userid);
           res.send({"error":{"message":"Error in creating session"}})
         }
         //to check user has subscribed or not
+        
         isSubscribed(user,function(status){
-          if(status==false){//if user not subscribed to any plan
+          if(status==false){//if user has not subscribed to any plan
             logger.emit("error","User is not subscribed to any plan",user.userid);
             res.send({"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}})
           }else{
             isSubscriptionExpired(user,function(status){
               if(status==true){//subscription is expired
-                    logger.emit("error","User subscribtion has expired",user.userid);
-                    res.send({"error":{"code":"AS002","message":"User subscribtion has expired","user":user}})
+                    logger.emit("error","User subscription has expired",user.userid);
+                    res.send({"error":{"code":"AS002","message":"User subscription has expired","user":user}})
               }else{
                 //to check he has done payment or not
                 hasDonePayment(user,function(status){
                   if(status==false){//he has not make payment
-                    logger.emit("error","User has not make payment",user.userid);
-                    res.send({"error":{"code":"AP001","message":"User has not make payment","user":user}})
+                    logger.emit("error","User has not made payment",user.userid);
+                    res.send({"error":{"code":"AP001","message":"User has not made payment","user":user}})
                   }else{
                     logger.emit("info","Login Successful",user.userid);
                     res.send({"success":{"message":"Login Successful","user":user}})
@@ -70,20 +62,43 @@ exports.loginSession = function(req, res, next) {
         })//end of isSubscribed
       })//end of req.logIn
     }
-  })(req, res, next);//end of passport authenticate
+  }})(req, res, next);//end of passport authenticate
 };
 //method to use user has subscribed to any plan or not
 isSubscribed=function(user,callback){
  var isubscribed=true;
+ if(user.subscription.planid==undefined){
+
+ }else{
+
+ }
  callback(isubscribed);
 }
 isSubscriptionExpired=function(user,callback){
-  var isubscribtionexpired=false;
- callback(isubscribtionexpired);
+  var isubscriptionexpired=false;
+ callback(isubscriptionexpired);
 }
 hasDonePayment=function(user,callback){
-  var donepayment=false;
+  //user is invited by organization admin 
+  /*user.orgid exist and not admin then the user has invited by user
+  if(user.organization.orgid!=undefined)
+  { 
+    if(user.organization.isAdmin==true){//admin of organization
+
+    }else{
+      there is no need to make payment
+    }
+  
+  }else{//idividual user
+      
+  }
+  //user.orgid exist
+  //user is admin for particular user to check in admingroup userid
+*/
+  var donepayment=true;
   callback(donepayment);
+
+  //callback(null,donepayment);
 }
 //passport method
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
@@ -97,7 +112,7 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
       if (!user) {//to check user is exist or not
         
         logger.emit("error","Unknown user",email);
-        return done(null, false, {code:"AU001", message: 'Unknown user ' + email }); 
+        return done(null, false, {code:"AU001", message: 'User does not exists' }); 
       } else if(user.verified==false){
         logger.emit("error","Unverified User",user.userid);
         return done(null,false,{code:"AU003",message:"please verfiy or resend verfication email"});
@@ -162,7 +177,7 @@ exports.verifyUser = function (req, res, next) {
                 html: html+"" // html body
               };
               console.log("email"+user.email)
-             // console.log("message data"+message+" token data"+token);
+      User       // console.log("message data"+message+" token data"+token);
              // console.log("requestd host"+ host);
               //calling to sendmail method
               commonapi.sendMail(message, function (result){
@@ -388,39 +403,54 @@ exports.addInviteUser=function(user,host,callback){
     }
   })
 }
-
-exports.addUser=function(req,res){
-    var  userdata=req.body.user;
-    var user = new userModel(userdata);
-    if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
-        userModel.find({email:userdata.email},function(err,userdata){
-        if(err){
-          logger.on("error","error in checking in databae email alerady exist for individual user",userdata.email);
-          res.send({"error":{"message":err}});
-        }
-       // console.log("userdata"+userdata);
-       // logger.data("userdata");
-        if(userdata.length==0){
-          adduser(user, req.get('host'),function(result) {
-            if(result == "success") {
-              logger.emit("info","User Added Successfully",user["email"]); //access the code from dictionary/basecamp
-              res.send({"success":{"message":"User Added Successfully"}});          
-            } else {
-              logger.error("Problem in adding new User");
-              res.send({"error":{"message":"Error in adding user"}});               
-            }
-          });
-       } else {
-       //   logger.error("email already exists");
-          logger.emit("error","email already exists",user["email"]);
-          res.send({"error":{"message":"email already exists"}});
-        }
-  })}else{
-    logger.error("Please send required data for registration");
-    res.send({"error":{"message":"Please send required data for registration"}});
-
-  }
+validationForAddUser=function(userdata,callback){
+ // if(userdata)
 }
+
+// exports.addUser=function(req,res){
+
+//     User.on("failedUserRegistration",function(err){
+//       logger.emit("error",err.error.message,req.user.userid);
+//       res.send(err);
+//     });
+//     User.on("successfulUserRegistration",function(err){
+//       logger.emit("error",err.error.message,req.user.userid);
+//       res.send(err);
+//     })
+//     var  userdata=req.body.user;
+//     validationForAddUser(userdata,function(error,success){
+
+//     })
+//     var user = new userModel(userdata);
+//     if(userdata.email!=undefined && userdata.password!=undefined&&userdata.fullname!=undefined){
+//         userModel.find({email:userdata.email},function(err,userdata){
+//         if(err){
+//           logger.on("error","error in checking in databae email alerady exist for individual user",userdata.email);
+//           res.send({"error":{"message":err}});
+//         }
+//        // console.log("userdata"+userdata);
+//        // logger.data("userdata");
+//         if(userdata.length==0){
+//           adduser(user, req.get('host'),function(result) {
+//             if(result == "success") {
+//               logger.emit("info","User Added Successfully",user["email"]); //access the code from dictionary/basecamp
+//               res.send({"success":{"message":"User Added Successfully"}});          
+//             } else {
+//               logger.error("Problem in adding new User");
+//               res.send({"error":{"message":"Error in adding user"}});               
+//             }
+//           });
+//        } else {
+//        //   logger.error("email already exists");
+//           logger.emit("error","email already exists",user["email"]);
+//           res.send({"error":{"message":"email already exists"}});
+//         }
+//   })}else{
+//     logger.error("Please send required data for registration");
+//     res.send({"error":{"message":"Please send required data for registration"}});
+
+//   }
+// }
 //get list of all user details
 exports.getAllUser=function(req,res){
   userModel.find({},function(err,user){
@@ -428,6 +458,7 @@ exports.getAllUser=function(req,res){
       logger.emit("error","Error in db to get all user details",req.user.userid);
       res.send({"error":{"message":"Error in db to get all user details"}})
     }else if(user.length!=0){
+
       logger.emit("info","get all user details",req.user.userid);
       res.send({"success":{"user":user}});
     }else{
@@ -439,11 +470,12 @@ exports.getAllUser=function(req,res){
 //get single user details
 exports.getUser=function(req,res){
   var userid=req.params.userid;
-   userModel.find({userid:userid},function(err,user){
+   userModel.findOne({userid:userid},function(err,user){
     if(err){
       logger.emit("error","Error in db to get  user details",req.user.userid);
       res.send({"error":{"message":"Error in db to get user details"}})
-    }else if(user.length!=0){
+    }else if(user){
+      console.log("user subscription"+user.subscription.planid);
       logger.emit("info","get user details",req.user.userid);
       res.send({"success":{"user":user}});
     }else{
@@ -452,10 +484,32 @@ exports.getUser=function(req,res){
     }
   })
 };
+validateUpdateUserData=function(userdata,callback){
+  if(userdata==undefined){
+    callback("please send required data for user update");
+  }else {
+    callback(null,"success");
+
+  }
+}
 //update the user details
 exports.updateUser=function(req,res){
   var userid=req.params.userid;
   var userdata=req.body.user;
+  //validate();
+  //update()
+  logger.emit("log","userdata"+userdata);
+  logger.emit("log","boydata"+req.body);
+
+
+  validateUpdateUserData(userdata,function(err,success){
+    if(err){
+      logger.emit("error",err,req.user.userid);
+      res.send({"error":{"message":err}})
+
+    }else{
+
+  
   userModel.update({userid:userid},{$set:userdata},function(err,status){
     if(err){
       logger.emit("error","Error in db to update  user details",req.user.userid);
@@ -466,6 +520,8 @@ exports.updateUser=function(req,res){
     }else{
       logger.emit({"error":{"message":" user not exists"}});
       res.send({"error":{"message":"user not exists"}}); 
+    }
+  })
     }
   })
 }
@@ -537,5 +593,3 @@ adduser = function (user, host, callback)
        })
 }
       
-
-

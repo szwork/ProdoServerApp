@@ -14,7 +14,7 @@
 
 var mongoose = require('../common/js/db');
 var commitment=mongoose.Schema({
-      committype:String,
+      commitmenttype:String,
       amount:Number,
       currency:String
     });

@@ -6,26 +6,18 @@ var subscriptionarray=
 [
 	{
 		plantype:"individual",
-		planpaymentcommitment:
-		[{
+		planpaymentcommitment:[
+		{
 			committype:"monthly",
 			amount:5,
 			currency:"dollar"
-		}]
-	},
-	{
-		plantype:"individual",
-	    planpaymentcommitment:
-		[{
+		},
+		{
 			committype:"quarterly",
 			amount:10,
 			currency:"dollar"
-		}]
-	},
-	{
-		plantype:"individual",
-	    planpaymentcommitment:
-		[{
+		},
+		{
 			committype:"yearly",
 			amount:50,
 			currency:"dollar"
@@ -33,26 +25,18 @@ var subscriptionarray=
 	},
 	{
 		plantype:"company",
-		planpaymentcommitment:
-		[{
+		planpaymentcommitment:[
+		{
 			committype:"monthly",
 			amount:10,
 			currency:"dollar"
-		}]
-	},
-	{
-		plantype:"company",
-	    planpaymentcommitment:
-		[{
+		},
+		{
 			committype:"quarterly",
 			amount:25,
 			currency:"dollar"
-		}]
-	},
-	{
-		plantype:"company",
-	    planpaymentcommitment:
-		[{
+		},
+		{
 			committype:"yearly",
 			amount:100,
 			currency:"dollar"
@@ -65,26 +49,19 @@ var subscriptionarray=
 			committype:"monthly",
 			amount:20,
 			currency:"dollar"
-		}]
-	},
-	{
-		plantype:"manufacturer",
-	    planpaymentcommitment:
-		[{
+		},
+		{
 			committype:"quarterly",
 			amount:50,
 			currency:"dollar"
-		}]
-	},
-	{
-		plantype:"manufacturer",
-	    planpaymentcommitment:
-		[{
+		},
+		{
 			committype:"yearly",
 			amount:180,
 			currency:"dollar"
 		}]
-	}];
+	}
+];
 SubscriptionModel.create(subscriptionarray,function(err,docs)
 {
 	if(err)
@@ -99,7 +76,7 @@ SubscriptionModel.create(subscriptionarray,function(err,docs)
 };
 exports.getAllSubscriptionPlan=function(req,res)
 {
-	SubscriptionModel.find(function(err,subscription)
+	SubscriptionModel.find({},function(err,subscription)
 	{
 		if(err)
 		{
