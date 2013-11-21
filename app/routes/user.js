@@ -18,16 +18,17 @@ var auth=require('../common/js/security');
 exports.init = function (app) {
   //USER CRUD
 
-   app.get('/api/verify/:token',api.userapi.activateAccount);
-   app.post('/api/signin', api.userapi.signin);
-
+  app.get('/api/verify/:token',api.userapi.activateAccount);
+  app.post('/api/signin', api.userapi.signin);
   app.post('/api/user', api.userapi.addUser);//add new user
-   app.get("/api/user",auth,api.userapi.getAllUser);//get all user data
-   app.get("/api/user/:userid",auth,api.userapi.getUser);//get single user data
+  app.get("/api/user",auth,api.userapi.getAllUser);//get all user data
+  app.get("/api/user/:userid",auth,api.userapi.getUser);//get single user data
   app.put("/api/user/:userid",auth,api.userapi.updateUser);//update the user data
-   app.delete("/api/user/:userid",auth,api.userapi.deleteUser);//delete user
-   app.post('/api/recaptcha',api.userapi.recaptcha); 
-   app.post('/api/forgotpassword',api.userapi.forgotPassword);
+  app.delete("/api/user/:userid",auth,api.userapi.deleteUser);//delete user
+  app.post('/api/recaptcha',api.userapi.recaptcha); 
+  app.post('/api/forgotpassword',api.userapi.forgotPassword);
+  app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
+  
   // app.get("/api/forgotpassword/:token",api.userapi.forgotpasswordurlaction);
   // app.post("/api/resetpassword", auth,api.userapi.resetpassword);
   // app.get('/api/emailtemplate',api.emailtemplateapi.getAllEmailTemplate);

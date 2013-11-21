@@ -271,7 +271,20 @@ exports.recaptcha = function(req, res) {
 
 }
 
-exports.regenerateVerificationToken = function(req, res) {
+exports.regenerateVerificationUrl = function(req, res) {
+  var user=new User();
+  var email=req.body.email;
+
+  user.on("failedRegenerateVerificationUrl",function(err){
+      logger.emit("error", err.error.message);
+      res.send(err);
+    });
+
+  user.on("successfulregenerateVerificationUrl",function(result){
+      logger.emit("info", result.success.message);
+      res.send(result);
+    });
+  user.regenerateVerificationUrl(email)
 
 }
 

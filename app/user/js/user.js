@@ -28,6 +28,16 @@ User.prototype.registerUser = function() {
 	_validateRegisterUser(self,this.user);
 	 ////////////////////////////////////
 };
+var isValidEmail=function(email){
+
+	if(email==undefined){
+	 	return {"error":{"code":"AV001","message":"please enter emailid"}};
+	}else if(!regxemail.test(email)){
+		return {"error":{"code":"AV001","message":"please enter valid email"}};
+ 	}else{
+ 		return {"success":{"message":"Valid email id"}};
+ 	}
+}
 //validate user registration data
 var _validateRegisterUser = function(self,userdata) {
 		//check if user exist in database
@@ -44,14 +54,12 @@ var _validateRegisterUser = function(self,userdata) {
 
 	 	  if( userdata.fullname==undefined){
 		  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please enter fullname"}});
-	 	  } else if(userdata.email==undefined){
-	 	    self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please enter emailid"}});
-		  }else if(!regxemail.test(userdata.email)){
- 	  		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please enter valid email"}});
-	 	  }else if(userdata.password==undefined){
+	 	  } else if(isValidEmail(userdata.email).error!=undefined){
+	 	    self.emit("failedUserRegistration",isValidEmail(userdata.email));
+		  }else if(userdata.password==undefined){
 		  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please enter passsword"}});
-	 	  } else if(userdata.password.length<9){
-	 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword maximum length should be 8"}});
+	 	  } else if(userdata.password.length<5){
+	 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword minimum length should be 6"}});
 		  // }else if(passwordformatvalidtion){//to be done later
 	 	 //  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword maximum length should be 8"}});
 	 	  }	else if(userdata.terms==false){
@@ -59,9 +67,9 @@ var _validateRegisterUser = function(self,userdata) {
 	 	  }else{
 	 	    	logger.emit("log","_validated");
 
-	 	    	/////////////////////
+	 	    	///////////////////////
 	 			  _addUser(self,userdata);
-	 			  /////////////////////
+	 			  ///////////////////////
 	 	  }
 		}
 	})
@@ -233,10 +241,8 @@ User.prototype.signin = function() {
 var _validateSignin=function(self,userdata){
 	console.log("signin1");
 	console.log("userdata"+userdata.email+userdata.password);
-	if(userdata.email==undefined){
-		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please enter emailid"}});
-	}else if(!regxemail.test(userdata.email)){
-		self.emit("failedUserSigin",{"error":{"code":"AV001","message":"please enter valid email"}});
+	if(isValidEmail(userdata.email).error!=undefined){
+	 	self.emit("failedUserSignin",isValidEmail(userdata.email));
 	}else if(userdata.password==undefined){
 		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please enter password"}});
 	}else{
@@ -437,6 +443,7 @@ User.prototype.sendPasswordSetting = function(email) {
 	_validateSendPasswordSetting(self,email);
 	/////////////////////////////////////
 };
+
 var _validateSendPasswordSetting=function(self,email){
 	logger.emit("log","_validateSendPasswordSetting");
 	if(email==undefined){
@@ -469,15 +476,21 @@ var _isProdonusRegisteredEmailId=function(self,email){
 var _createOTPPasswordSetting=function(self,user){
 	logger.emit("log","_createOTPPasswordSetting");
 	var otp = Math.floor(Math.random()*100000000);
-	userModel.update({userid:user.userid},{$set:{passsword:otp,isOtpPassword:true}},function(err,status){
+	commonapi.getbcrypstring(otp,function(err,hashpassword){
 		if(err){
-			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
-		}else if(status!=1){
-			self.emit("failedSendPasswordSetting",{"error":{"code":"AU002","message":"User does't exists"}});
+			self.emit("failedSendPasswordSetting",{"error":{"code":"AB001","message":"Error in get bcrypt passsword"}});
 		}else{
-			////////////////////////////////
-			_sendPasswordSetting(self,user,otp);
-			////////////////////////////////
+			userModel.update({userid:user.userid},{$set:{password:hashpassword,isOtpPassword:true}},function(err,status){
+				if(err){
+					self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
+				}else if(status!=1){
+					self.emit("failedSendPasswordSetting",{"error":{"code":"AU002","message":"User does't exists"}});
+				}else{
+					////////////////////////////////
+					_sendPasswordSetting(self,user,otp);
+					////////////////////////////////
+				}
+			})
 		}
 	})
 };
@@ -528,7 +541,9 @@ var _validateReCaptcha=function(self,reCaptcha,clientip){
 	}else if(clientip==undefined){
 		self.emit("failedRecaptcha",{"error":{"code":"AV001","message":"Please send clientip through header"}});
 	}else{
+		////////////////////////////////////////////////
 		_requestRecaptchaService(self,reCaptcha,clientip);
+		///////////////////////////////////////////////
 	}
 }
 var _requestRecaptchaService=function(self,reCaptcha,clientip){
@@ -552,6 +567,90 @@ var _requestRecaptchaService=function(self,reCaptcha,clientip){
 				self.emit("failedRecaptcha",{"error":{"message":errmessage}});
   		}
   });
+};
+
+User.prototype.regenerateVerificationUrl = function(email) {
+	var self=this;
+	if(isValidEmail(email).error!=undefined){
+	 	self.emit("failedRegenerateVerificationUrl",isValidEmail(email));
+	}else{
+	////////////////////////////////////////
+	_isValidUserToRegenerateToken(self,email);
+	/////////////////////////////////////
+	}
+};
+var _isValidUserToRegenerateToken=function(self,email){
+	userModel.findOne({email:email},function(err,user){
+		if(err){
+			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"ED001","message":"Error in db to find user"}});
+		}else if(!user){
+			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AU002","message":"User does't exists"}});
+		}else{
+			////////////////////////////////////////
+		_regenerateVerificationToken(self,user);
+			/////////////////////////////////////
+		}
+	})
 }
+var _regenerateVerificationToken=function(self,user){
+	var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"user"});
+        verificationToken.createVerificationToken(function (err, token) {
+        	console.log("addedUser1");
+          if (err){  
+            self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AT001","message":"Error in db to create verificationToken"}});
+          }else{
+          	console.log("addedUser2");
+          	logger.emit("log","createdtoken");
+
+          	//////////////////////////////////////
+          _sendRegenerateTokenMail(self,token,user);
+           //////////////////////////////////////
+          }
+		})
+};
+var  _sendRegenerateTokenMail=function(self,token,user){
+	EmailTemplateModel.findOne({"templatetype":"verify"},function(err,emailtemplate){
+			console.log("addedUser4");
+			if(err){
+				console.log("addedUser5");
+				self.emit("failedRegenerateVerificationUrl",{"error":{"code":"ED001","message":"Error in db to find verify emailtemplate"}});
+			}else if(emailtemplate){
+				console.log("addedUser6");
+				var url = "http://"+CONFIG.serverName+"/api/verify/"+token;
+				var html=emailtemplate.description;
+	            html=S(html);
+	            html=html.replaceAll("<name>",user.fullname);
+	            html=html.replaceAll("<url>",url);
+	          	var message = {
+	                from: "Prodonus  <noreply@prodonus.com>", // sender address
+	                to: user.email, // list of receivers
+	                subject:emailtemplate.subject, // Subject line
+	                html: html.s // html body
+	              };
+	            
+	            //calling to sendmail method
+	            commonapi.sendMail(message, function (result){
+	            	if(result=="failure"){
+	            		self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AT001","message":"Error to send verification email"}});
+	            	}else{
+	            		logger.emit("info","User added successfully");
+	            		/////////////////////////////////
+	            		_successfulRegenerateToken(self)
+	            		////////////////////////////////
+	            	}
+	            });
+	        }else{
+	        	self.emit("failedRegenerateVerificationUrl",{"error":{"code":"ED002","message":"Server setup template issue"}});
+			}
+	    })
+};
+var _successfulRegenerateToken=function(self){
+	//validate the user data
+		logger.emit("log","_successfulUserDeletion");
+	
+		self.emit("successfulregenerateVerificationUrl", {"success":{"message":"Regenarte token send successfully"}});
+}
+		
+
            
               

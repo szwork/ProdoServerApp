@@ -70,15 +70,17 @@ exports.loadsequences=function(req,res){
 exports.getbcrypstring=function(data,callback){
   bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
     if(err) {
-      return next(err);
-    }
-    bcrypt.hash(data, salt, function(err, hash) {
-      if(err) {
-        return next(err);
-      }
-      console.log("hash data"+hash);
-      callback(hash)
+      callback(err);
+    }else{
+      bcrypt.hash(data+"", salt, function(err, hash) {
+        console.log(err);
+        if(err) {
+          callback(err);
+        }else{
+          callback(null,hash)  
+        }
       });
+    }
   });
 }
 //send an email
