@@ -32,6 +32,15 @@ var orgModel=require("../../org/registration/js/org-model");
 
 //NEW
 //=====================================================
+var isAuthorizedUser=function(userid,sessionuserid){
+  var isAdmin=true;//to be done later user is admin
+  
+  if(userid==sessionuserid || isAdmin){
+    return true;
+  }else{
+    return false;
+  }
+}
 exports.addUser = function(req,res){
    var  userdata = req.body.user;
    var user = new User(userdata);
@@ -148,10 +157,12 @@ passport.deserializeUser(function(id, done) {
     done(err, user);
   });
 });
+//update the user details
 exports.updateUser = function(req, res) {
   var userid=req.params.userid;
-  var userdata=req.body;
+  var userdata=req.body.user;
   var user = new User(userdata);
+  var sessionuserid=req.user.userid;
     user.on("failedUserUpdation",function(err){
       console.log("failedUserRegistration"+err)
       logger.emit("error", err.error.message);
@@ -162,12 +173,17 @@ exports.updateUser = function(req, res) {
       logger.emit("info", result.success.message);
       res.send(result);
     });
-    var userid=req.params.userid;
-    var sessionuserid=req.user.userid;
-    var  userdata = req.body.user;
-     user.updateUser(userid,sessionuserid);
+    
+    
+    
+    if(isAuthorizedUser(userid,sessionuserid)){
+      user.updateUser(userid);
+    }else{
+     user.emit("failedUserUpdation",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+    }
+    
 }
-
+//delete user set status-deactive
 exports.deleteUser = function(req, res) {
 var userid=req.params.userid;
 var sessionuserid=req.user.userid;
@@ -182,18 +198,59 @@ var user=new User();
       res.send(result);
     });
    
-   
-     user.deleteUser(userid,sessionuserid);
+    if(isAuthorizedUser(userid,sessionuserid)){
+       user.deleteUser(userid);
+    }else{
+      user.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+    }
 }
-
+//get user details
 exports.getUser = function(req, res) {
+  var userid=req.params.userid;
+  var sessionuserid=req.user.userid;
+  var user=new User();
+  user.on("failedUserGet",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+      res.send(err);
+    });
 
-}
+    user.on("successfulUserGet",function(result){
+      logger.emit("info", result.success.message);
+      res.send(result);
+    });
+    user.getUser(userid);
 
-exports.getAllUsers = function(req, res) {
+};
 
+//get all user details
+exports.getAllUser = function(req, res) {
+  
+  var sessionuserid=req.user.userid;
+  var user=new User();
+  user.on("failedUserGetAll",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+      res.send(err);
+    });
+
+    user.on("successfulUserGetAll",function(result){
+      logger.emit("info", result.success.message);
+      res.send(result);
+    });
+    user.getAllUsers();
 }
 exports.forgotPassword = function(req, res) {
+  var email=req.body.email;
+  var user=new User();
+  user.on("failedSendPasswordSetting",function(err){
+      logger.emit("error", err.error.message);
+      res.send(err);
+    });
+
+    user.on("successfulForgotPassword",function(result){
+      logger.emit("info", result.success.message);
+      res.send(result);
+    });
+    user.sendPasswordSetting(email);
 
 }
 

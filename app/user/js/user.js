@@ -26,38 +26,39 @@ User.prototype.registerUser = function() {
 	_validateRegisterUser(self,this.user);
 	 ////////////////////////////////////
 };
-var _validateRegisterUser = function(self,user) {
+//validate user registration data
+var _validateRegisterUser = function(self,userdata) {
 		//check if user exist in database
 		//abc(err,userdata,this)
-	userModel.findOne({email:user.email},{email:1},function(err,userdata){
+	userModel.findOne({email:userdata.email},{email:1},function(err,user){
 		if(err){
 			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
-		}else if(userdata){
+		}else if(user){
 			// console.log("userData777"+userdata);
 			self.emit("failedUserRegistration",{"error":{"code":"AU001","message":"Email already exist"}});
 		}else{
 		// validate the new user data
 			
 
-	 	  if( user.fullname==undefined){
+	 	  if( userdata.fullname==undefined){
 		  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please enter fullname"}});
-	 	  } else if(user.email==undefined){
+	 	  } else if(userdata.email==undefined){
 	 	    self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please enter emailid"}});
-		  }else if(!regxemail.test(user.email)){
+		  }else if(!regxemail.test(userdata.email)){
  	  		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please enter valid email"}});
-	 	  }else if(user.password==undefined){
+	 	  }else if(userdata.password==undefined){
 		  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please enter passsword"}});
-	 	  } else if(user.password.length<9){
+	 	  } else if(userdata.password.length<9){
 	 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword maximum length should be 8"}});
 		  // }else if(passwordformatvalidtion){//to be done later
 	 	 //  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword maximum length should be 8"}});
-	 	  }	else if(user.terms==false){
+	 	  }	else if(userdata.terms==false){
 	 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
 	 	  }else{
 	 	    	logger.emit("log","_validated");
 
 	 	    	/////////////////////
-	 			  _addUser(self,user);
+	 			  _addUser(self,userdata);
 	 			  /////////////////////
 	 	  }
 		}
@@ -247,7 +248,19 @@ var _validateSignin=function(self,userdata){
 
 User.prototype.signinSession=function(user){
 var self=this;
-_isSubscribed(self,user);
+//////////////////////
+_isOTPUser(self,user);
+////////////////////
+
+};
+var _isOTPUser=function(self,user){
+	if(user.isOtpPassword==true){
+		self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
+	}else{
+		/////////////////////////
+		_isSubscribed(self,user);
+		/////////////////////////
+	}
 }
 var _isSubscribed=function(self,user){
  	var isubscribed=true;
@@ -309,26 +322,13 @@ var _successfulUserSigin = function(self,user) {
 		self.emit("successfulUserSignin",{"success":{"message":"Login Successful","user":user}});
 	}
 
-var isAuthorizedUser=function(userid,sessionuserid){
-	var isAdmin=true;//to be done later user is admin
-	
-	if(userid!=sessionuserid&& isAdmin){
-		return false;
-	}else{
-		return true;
-	}
-}
-User.prototype.updateUser = function(userid,sessionuserid) {
+
+User.prototype.updateUser = function(userid) {
 	var self=this;
-	console.log("userid"+userid);
-	console.log("sessionuserid"+sessionuserid);
 	var userdata=this.user;
-	if(!isAuthorizedUser(userid,sessionuserid)){
-		self.emit("failedUserUpdation",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
-	}else{
-		_updateUser(self,userid,userdata);
-	}
-	
+	/////////////////////////////////
+	_updateUser(self,userid,userdata);
+	////////////////////////////////
 };
 
 var _updateUser=function(self,userid,userdata){
@@ -341,7 +341,9 @@ var _updateUser=function(self,userid,userdata){
 
 			self.emit("failedUserUpdation",{"error":{"code":"AU002","message":"Provided userid is wrong"}});
 		}else{
+			/////////////////////////////
 			_successfulUserUpdation(self);
+			/////////////////////////////
 		}
 	})
 }
@@ -351,13 +353,12 @@ var _successfulUserUpdation = function(self) {
 		logger.emit("log","successfulUserUpdation");
 		self.emit("successfulUserUpdation", {"success":{"message":"User Updated Successfully"}});
 	}
-User.prototype.deleteUser = function(userid,sessionuserid) {
+User.prototype.deleteUser = function(userid) {
 	var self=this;
-	if(!isAuthorizedUser(userid,sessionuserid)){
-		self.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
-	}else{
-		_deleteUser(self,userid);
-	}
+	////////////////////////
+	_deleteUser(self,userid);
+	///////////////////////
+	
 };
 var _deleteUser=function(self,userid){
 	userModel.update({userid:userid},{$set:{status:"deactive"}},function(err,userupdatestatus){
@@ -366,7 +367,9 @@ var _deleteUser=function(self,userid){
 		}else if(userupdatestatus!=1){
 			self.emit("failedUserDeletion",{"error":{"code":"AU002","message":"Provided userid is wrong"}});
 		}else{
+			/////////////////////////////
 			_successfulUserDeletion(self);
+			////////////////////////////
 		}
 	})
 }
@@ -376,8 +379,139 @@ var _successfulUserDeletion = function(self) {
 	
 		self.emit("successfulUserDeletion", {"success":{"message":"User Deleted Successfully"}});
 	}
-User.prototype.getUser = function() {
+
+
+User.prototype.getUser = function(userid) {
+	var self=this;
+	_getUser(self,userid);
 };
+var _getUser=function(self,userid){
+	userModel.findOne({userid:userid},function(err,user){
+		if(err){
+			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find user"}});
+		}else if(!user){
+			self.emit("failedUserGet",{"error":{"code":"AU002","message":"User does't exists"}});
+
+		}else{
+				////////////////////////////////
+			_successfulUserGet(self,user);
+			//////////////////////////////////
+
+		}
+	})
+}
+var _successfulUserGet=function(self,user){
+	logger.emit("log","_successfulUserGet");
+	self.emit("successfulUserGet", {"success":{"message":"Getting User details Successfully","user":user}});
+}
 User.prototype.getAllUsers = function() {
+	var self=this;
+	//////////////////
+	_getAllUsers(self);
+	///////////////////
+};
+var _getAllUsers=function(self){
+	userModel.find({},function(err,user){
+		if(err){
+			self.emit("failedUserGetAll",{"error":{"code":"ED001","message":"Error in db to find all users"}});
+		}else if(user.length==0){
+			self.emit("failedUserGetAll",{"error":{"code":"AU003","message":"No user exists"}});
+		}else{
+			////////////////////////////////
+			_successfulUserGetAll(self,user);
+			//////////////////////////////////
+		}
+	})
 };
 
+var _successfulUserGetAll=function(self,user){
+	logger.emit("log","_successfulUserGetAll");
+	self.emit("successfulUserGetAll", {"success":{"message":"Getting User details Successfully","user":user}});
+}
+
+User.prototype.sendPasswordSetting = function(email) {
+	var self=this;
+	////////////////////////////////////////
+	_validateSendPasswordSetting(self,email);
+	/////////////////////////////////////
+};
+var _validateSendPasswordSetting=function(self,email){
+	logger.emit("log","_validateSendPasswordSetting");
+	if(email==undefined){
+		logger.emit("log","_isProdonusRegisteredEmailId");
+	 	    self.emit("failedSendPasswordSetting",{"error":{"code":"AV001","message":"please enter emailid"}});
+	}else if(!regxemail.test(email)){
+	//	logger.emit("log","_isProdonusRegisteredEmailId");
+ 	  self.emit("failedSendPasswordSetting",{"error":{"code":"AV001","message":"please enter valid email"}});
+ 	}else{
+ 		logger.emit("log","_isProdonusRegisteredEmailId");
+ 		////////////////////////////////////////
+ 		_isProdonusRegisteredEmailId(self,email);
+ 		/////////////////////////////////////////
+ 	}  		
+};
+var _isProdonusRegisteredEmailId=function(self,email){
+	logger.emit("log","_isProdonusRegisteredEmailId");
+	userModel.findOne({email:email},{userid:1,email:1,firstname:1,lastname:1,fullname:1},function(err,user){
+		if(err){
+			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find users"}});
+		}else if(!user){
+			self.emit("failedSendPasswordSetting",{"error":{"code":"AU004","message":"Please give prodonus registered email id"}});
+		}else{
+			////////////////////////////////////
+			_createOTPPasswordSetting(self,user);
+			///////////////////////////////////
+		}
+	})
+};
+var _createOTPPasswordSetting=function(self,user){
+	logger.emit("log","_createOTPPasswordSetting");
+	var otp = Math.floor(Math.random()*100000000);
+	userModel.update({userid:user.userid},{$set:{passsword:otp,isOtpPassword:true}},function(err,status){
+		if(err){
+			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
+		}else if(status!=1){
+			self.emit("failedSendPasswordSetting",{"error":{"code":"AU002","message":"User does't exists"}});
+		}else{
+			////////////////////////////////
+			_sendPasswordSetting(self,user,otp);
+			////////////////////////////////
+		}
+	})
+};
+
+var _sendPasswordSetting=function(self,user,otp){
+logger.emit("log","_sendPasswordSetting");
+  EmailTemplateModel.findOne({"templatetype":"password"},function(err,emailtemplate){
+  	if(err){
+			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find password emailtemplate"}});
+  	}else if(emailtemplate){
+  			var description=S(emailtemplate.description);
+  			description=description.replaceAll("<password>",otp);
+  			description=description.replaceAll("<fullname>",user.fullname);
+  			var message = {
+                from: "Prodonus  <noreply@prodonus.com>", // sender address
+                to: user.email, // list of receivers
+                subject:emailtemplate.subject, // Subject line
+                html: description.s // html body
+              };
+        commonapi.sendMail(message, function (result){
+          if (result == "failure") {
+                self.emit("failedSendPasswordSetting",{"error":{"code":"AU005","message":"Error to send password reset setting"}});
+          } else {
+          			/////////////////////////////
+              _successfulForgotPassword(self);   
+               //////////////////////////////
+          }
+        });
+  	}else{
+  		self.emit("failedSendPasswordSetting",{"error":{"code":"ED002","message":"Server setup template issue"}});
+  	}
+  })
+};
+var _successfulForgotPassword=function(self){
+	logger.emit("log","successfulForgotPassword");
+	self.emit("successfulForgotPassword", {"success":{"message":"Password Settings Successfully sent"}});
+}
+           
+              
