@@ -122,7 +122,6 @@ exports.signin = function(req, res) {
 }
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
-    console.log("email" + email +" password"+password);
     userModel.findOne({ email: email}, function(err, user) {
       if (err){ 
        return done(err); 
@@ -130,15 +129,13 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
       if (!user) {//to check user is exist or not
         return done(null, false, {code:"AU001", message: 'User does not exists' }); 
       } else if(user.verified==false){
-        logger.emit("error","Unverified User",user.userid);
         return done(null,false,{code:"AU003",message:"please verfiy or resend verfication email"});
       }
       user.comparePassword(password, function(err, isMatch){
         if ( err ){
-          logger.emit("error","eror in compare password method",user.userid);
-            return done(err);
+          return done(err);
         } else if( isMatch ) {
-          logger.emit("info","password match",user.userid);
+          
           return done(null, user);
         }else{
           logger.emit("error","Invalid password",user.userid);
@@ -285,7 +282,6 @@ exports.regenerateVerificationUrl = function(req, res) {
       res.send(result);
     });
   user.regenerateVerificationUrl(email)
-
 }
 
 

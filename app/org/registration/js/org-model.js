@@ -13,7 +13,8 @@
 
 var mongoose = require('../../../common/js/db');
 var ObjectId = mongoose.Schema.ObjectId;
-var commonapi=require('../../../common/js/common-api');
+
+var shortId = require('shortid');
 
 var UserGroupSchema = mongoose.Schema({     
       grpname:{type:String},
@@ -78,9 +79,8 @@ var OrganizationSchema = mongoose.Schema({
 
 OrganizationSchema.pre('save', function(next) {
   var organization = this;
-  commonapi.getNextSequnce("organization",function(err,nextsequnce){
-    organization.orgid="org"+nextsequnce;  
-    next(); 
+  organization.orgid="org"+shortId.generate();  
+  next(); 
   })
 });
 var Organization = mongoose.model('organization', OrganizationSchema);

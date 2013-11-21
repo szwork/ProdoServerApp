@@ -10,13 +10,13 @@ var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var regxemail = /\S+@\S+\.\S+/;
+var qs = require('querystring');
 var request=require("request");
 var User = function(userdata) {
 	this.user=userdata;
 };
-var qs = require('querystring');
- 
+
+var regxemail = /\S+@\S+\.\S+/; 
 User.prototype = new events.EventEmitter;
 module.exports = User;
 
