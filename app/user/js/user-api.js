@@ -254,6 +254,23 @@ exports.forgotPassword = function(req, res) {
 
 }
 
+exports.recaptcha = function(req, res) {
+  var user=new User();
+  var recaptcha=req.body.recaptcha;
+  var clientip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+  user.on("failedRecaptcha",function(err){
+      logger.emit("error", err.error.message);
+      res.send(err);
+    });
+
+    user.on("successfulRecaptcha",function(result){
+      logger.emit("info", result.success.message);
+      res.send(result);
+    });
+    user.reCaptcha(recaptcha,clientip);
+
+}
+
 exports.regenerateVerificationToken = function(req, res) {
 
 }

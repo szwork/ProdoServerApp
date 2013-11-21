@@ -26,7 +26,7 @@ exports.init = function (app) {
    app.get("/api/user/:userid",auth,api.userapi.getUser);//get single user data
   app.put("/api/user/:userid",auth,api.userapi.updateUser);//update the user data
    app.delete("/api/user/:userid",auth,api.userapi.deleteUser);//delete user
-
+   app.post('/api/recaptcha',api.userapi.recaptcha); 
    app.post('/api/forgotpassword',api.userapi.forgotPassword);
   // app.get("/api/forgotpassword/:token",api.userapi.forgotpasswordurlaction);
   // app.post("/api/resetpassword", auth,api.userapi.resetpassword);

@@ -11,9 +11,11 @@ var CONFIG = require('config').Prodonus;
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var regxemail = /\S+@\S+\.\S+/;
+var request=require("request");
 var User = function(userdata) {
 	this.user=userdata;
 };
+var qs = require('querystring');
  
 User.prototype = new events.EventEmitter;
 module.exports = User;
@@ -512,6 +514,44 @@ logger.emit("log","_sendPasswordSetting");
 var _successfulForgotPassword=function(self){
 	logger.emit("log","successfulForgotPassword");
 	self.emit("successfulForgotPassword", {"success":{"message":"Password Settings Successfully sent"}});
+}
+
+User.prototype.reCaptcha = function(reCaptcha,clientip) {
+	var self=this;
+	////////////////////////////////////////
+	_validateReCaptcha(self,reCaptcha,clientip);
+	/////////////////////////////////////
+};
+var _validateReCaptcha=function(self,reCaptcha,clientip){
+	if(reCaptcha.challenge==undefined || reCaptcha.response==undefined){
+		self.emit("failedRecaptcha",{"error":{"code":"AV001","message":"Please send challenge or response for captcha"}});
+	}else if(clientip==undefined){
+		self.emit("failedRecaptcha",{"error":{"code":"AV001","message":"Please send clientip through header"}});
+	}else{
+		_requestRecaptchaService(self,reCaptcha,clientip);
+	}
+}
+var _requestRecaptchaService=function(self,reCaptcha,clientip){
+	logger.emit("log","privatekey="+CONFIG.recaptchaPrivateKey+"recaptchaUrl="+CONFIG.recaptchaUrl+"clientip="+ clientip);
+	var reCaptchaData={privatekey:CONFIG.recaptchaPrivateKey,remoteip:clientip,challenge:reCaptcha.challenge,response:reCaptcha.response};
+	// console.log(reCaptchaData);
+	request.post(CONFIG.recaptchaUrl,{form:reCaptchaData} ,function (error, response,body) {
+  		if(error){
+  			self.emit("failedRecaptcha",{"error":{"message":errmessage}});
+  		}else if(!response){
+  			self.emit("failedRecaptcha",{"error":{"message":"please check your internet connection"}});
+  		}else if (response.statusCode != 200) {
+  			self.emit("failedRecaptcha",{"error":{"code":"AR001","message":"Google reCaptcha server issue"}});
+  		}
+  		var responsedata=S(body);
+  		if(responsedata.contains("true")){
+  			self.emit("successfulRecaptcha",{"success":{"message":"Recaptcha Successfully"}});
+  			//successfulRecaptcha
+  		}else{
+  			var errmessage=responsedata.replaceAll("false","").s;
+				self.emit("failedRecaptcha",{"error":{"message":errmessage}});
+  		}
+  });
 }
            
               
