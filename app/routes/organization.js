@@ -20,9 +20,10 @@ var auth=require('../common/js/security');
 exports.init = function (app) {
 
   app.post('/api/organization', auth,api.orgapi.addOrganization);//create
-  app.get('/api/organization',auth,api.orgapi.getAllOrganization); //read
-  app.get('/api/organization/:orgid',auth, api.orgapi.getOrganization);//read
   app.put('/api/organization/:orgid',auth, api.orgapi.updateOrganization);//update
+   app.get('/api/organization',auth,api.orgapi.getAllOrganization); //read
+  app.get('/api/organization/:orgid',auth, api.orgapi.getOrganization);//read
+ 
   app.delete('/api/organization/:orgid',auth, api.orgapi.deleteOrganization);//delete
 
   //Access to ONLY prodonus Admin //set up admin  role

@@ -18,15 +18,17 @@ var auth=require('../common/js/security');
 exports.init = function (app) {
   //USER CRUD
 
-  app.get('/api/verify/:token',api.userapi.activateAccount);
-  app.post('/api/signin', api.userapi.signin);
-  app.post('/api/user', api.userapi.addUser);//add new user
+
+  app.post('/api/user/signin', api.userapi.signin);
+  app.post('/api/user/signup', api.userapi.addUser);//add new user
   app.get("/api/user",auth,api.userapi.getAllUser);//get all user data
   app.get("/api/user/:userid",auth,api.userapi.getUser);//get single user data
   app.put("/api/user/:userid",auth,api.userapi.updateUser);//update the user data
   app.delete("/api/user/:userid",auth,api.userapi.deleteUser);//delete user
+  app.post('/api/user/forgotpassword',api.userapi.forgotPassword);
+
   app.post('/api/recaptcha',api.userapi.recaptcha); 
-  app.post('/api/forgotpassword',api.userapi.forgotPassword);
+  app.get('/api/verify/:token',api.userapi.activateAccount);
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
   
   // app.get("/api/forgotpassword/:token",api.userapi.forgotpasswordurlaction);

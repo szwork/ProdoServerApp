@@ -31,7 +31,9 @@ User.prototype.registerUser = function() {
 var isValidEmail=function(email){
 
 	if(email==undefined){
-	 	return {"error":{"code":"AV001","message":"please enter emailid"}};
+	 	return {"error":{"code":"AV001","message":"please pass emailid"}};
+	}else if(email.trim().length==0){
+		return {"error":{"code":"AV001","message":"please enter emailid"}};
 	}else if(!regxemail.test(email)){
 		return {"error":{"code":"AV001","message":"please enter valid email"}};
  	}else{

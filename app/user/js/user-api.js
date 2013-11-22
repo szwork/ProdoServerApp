@@ -35,7 +35,7 @@ var orgModel=require("../../org/registration/js/org-model");
 var isAuthorizedUser=function(userid,sessionuserid){
   var isAdmin=true;//to be done later user is admin
   
-  if(userid==sessionuserid || isAdmin){
+  if( userid==sessionuserid || isAdmin){
     return true;
   }else{
     return false;
@@ -281,6 +281,7 @@ exports.regenerateVerificationUrl = function(req, res) {
       logger.emit("info", result.success.message);
       res.send(result);
     });
+
   user.regenerateVerificationUrl(email)
 }
 

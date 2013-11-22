@@ -21,3 +21,6 @@ AS001-User is not subscribed to any plan
 AP002-ERROR IN PASSPORT TO AUTHNTICATE
 ///////////
 AB001-error in bcrypt password
+/////////////
+AO001-You can add only one organization
+AO002-Provided orgid does'nt exists

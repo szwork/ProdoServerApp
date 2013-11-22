@@ -29,6 +29,7 @@ var UserGroupSchema = mongoose.Schema({
 	}
 );
 var LocationSchema = mongoose.Schema({
+      locationtype:{type:String},//location type means service centers,office address,
 		  geo:
       {
         latitude:{type:String},
@@ -44,12 +45,11 @@ var LocationSchema = mongoose.Schema({
     		state:String,
     		country:String
     	},
+      contacts:[{customerhelpline:String}],
     	region:{type:String},
     	timezone:{type:String}
 });
 
-var ContactSchema = mongoose.Schema({ customerhelpline: {type:String}
-});
 
 
 var OrganizationSchema = mongoose.Schema({
@@ -62,7 +62,6 @@ var OrganizationSchema = mongoose.Schema({
     description: { type:String },
     prodo_setupdate: { type:Date,default:Date.now()}, /*the date the company was setup on prodonus*/
     prodo_closedate: { type:Date },/* the date the company was closed on Prodonus*/
-    contact_numbers:[ContactSchema],//multiple contact numbers
     location:[LocationSchema],
     usergrp:[UserGroupSchema],
     status: { type:String,default:"active"},/*wheather organization is active(1) or deactive(0)*/
@@ -82,6 +81,6 @@ OrganizationSchema.pre('save', function(next) {
   organization.orgid="org"+shortId.generate();  
   next(); 
   })
-});
+
 var Organization = mongoose.model('organization', OrganizationSchema);
 module.exports = Organization;
