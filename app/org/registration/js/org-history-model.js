@@ -20,7 +20,7 @@ var organizationHistorySchema = mongoose.Schema({
   	updatedby:{ type:String }
 });
 
-var OrganizationHistory = mongoose.model('organizationshistory', organizationHistorySchema);
+var OrganizationHistory = mongoose.model('organization_history', organizationHistorySchema);
 
 //export model schema
 module.exports=OrganizationHistory;

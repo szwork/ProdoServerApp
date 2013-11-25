@@ -11,6 +11,7 @@ AU001-email already exists
 AU002-User does't exists
 AU003-No user exists
 AU004-Please give prodonus registered email id
+AU005-User does'nt exists
 AR001-recaptcha error
 //////////////
 ET002-Error in Db to send welcome mail

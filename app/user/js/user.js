@@ -28,6 +28,7 @@ User.prototype.registerUser = function() {
 	_validateRegisterUser(self,this.user);
 	 ////////////////////////////////////
 };
+//to check email validation
 var isValidEmail=function(email){
 
 	if(email==undefined){
@@ -95,7 +96,7 @@ var _validateRegisterUser = function(self,userdata) {
 	      	}
 	    })
 	};
-
+	//create verification token
 	var _createVerificationToken = function(self,user){
 		var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"user"});
         verificationToken.createVerificationToken(function (err, token) {
@@ -112,6 +113,7 @@ var _validateRegisterUser = function(self,userdata) {
           }
 		})
 	};
+	//find verify template and send verification token
 	var _sendVerificationEmail = function(self,token, user) {
 		//send verification email to activate the user account
 		console.log("addedUser3");
@@ -166,6 +168,7 @@ User.prototype.activateAccount = function(token) {
 	///////////////////////
 
 };
+//verify token to activate account
 var _verifyToken = function(self,token) {
 	console.log("calling to verify token");
 	// self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in Db to find verification token"}});
@@ -184,17 +187,73 @@ var _verifyToken = function(self,token) {
           }else if(!user){
           		self.emit("failedUserActivation",{"error":{"code":"AV001","message":"Error in verifying user"}});
         	}else{
-
+        		//here it will check user of type invitee user or not
+        		if(user.password!=undefined && user.orgid==undefined){
         		///////////////////////////
-        	 _sendWelcomeEmail(self,user);	
+        	 _sendWelcomeEmail(self,user);	//user
+        	 ////////////////////////////	
+        		}else{
+        		///////////////////////////
+        	 _sendWelcomeInviteEmail(self,user);	//invitee user 
         	 ////////////////////////////
         	}
-        })
+        }
+      })
     }
   })
 };
+var _sendWelcomeInviteEmail = function (self,user) {
+	
+   EmailTemplateModel.findOne({"templatetype":"welcomeinvite"},function(err,emailtemplate){
+	   	if(err){
+	   		self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in db to find welcome emailtemplate"}});
+	   	}else if(emailtemplate){
+	   		var otp = Math.floor(Math.random()*100000000);
+	   		commonapi.getbcrypstring(otp,function(err,hashpassword){
+					if(err){
+						self.emit("failedUserActivation",{"error":{"code":"AB001","message":"Error in get bcrypt passsword"}});
+					}else{
+						userModel.update({userid:user.userid},{$set:{password:hashpassword,isOtpPassword:true}},function(err,status){
+							if(err){
+								self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
+							}else if(status!=1){
+								self.emit("failedUserActivation",{"error":{"code":"AU002","message":"User does't exists"}});
+							}else{
+								var html=emailtemplate.description;
+			    	    html=S(html);
+			      		html=html.replaceAll("<orgname>",user.orgid);
+			      		html=html.replaceAll("<password>",otp);
+			      		var message = {
+					        from: "Prodonus  <noreply@prodonus.com>", // sender address
+					        to: user.email, // list of receivers
+					        subject:emailtemplate.subject, // Subject line
+					        html: html+"" // html body
+			      		};
+			      		commonapi.sendMail(message, function (result){
+					        if (result == "failure") {
+					        	self.emit("failedUserActivation",{"error":{"code":"AT001","message":"Error in to send welcome mail"}});
+					        } else {
+					        	//successfull user activation
+					        	////////////////////////////////
+					           _successfulUserActivation(self);
+					           ///////////////////////////////
+					        }
+			     			});
+							}
+						})
+					}
+				})
+	   		
+	   	}else{
+	   		self.emit("failedUserActivation",{"error":{"code":"ED002","message":"Server setup template issue"}});
+
+	   	}
+	 })
+     
+ };
+//send welcome mail
 var _sendWelcomeEmail = function (self,user) {
- 	
+	
    EmailTemplateModel.findOne({"templatetype":"welcome"},function(err,emailtemplate){
 	   	if(err){
 	   		self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find welcome emailtemplate"}});
@@ -202,6 +261,7 @@ var _sendWelcomeEmail = function (self,user) {
 	   		var html=emailtemplate.description;
     	    html=S(html);
       		html=html.replaceAll("<fullname>",user.fullname);
+      		
       		var message = {
 		        from: "Prodonus  <noreply@prodonus.com>", // sender address
 		        to: user.email, // list of receivers
@@ -210,7 +270,7 @@ var _sendWelcomeEmail = function (self,user) {
       		};
       		commonapi.sendMail(message, function (result){
 		        if (result == "failure") {
-		        	self.emit("failedUserActivation",{"error":{"code":"AT002","message":"Error in to send welcome mail"}});
+		        	self.emit("failedUserActivation",{"error":{"code":"AT001","message":"Error in to send welcome mail"}});
 		        } else {
 		        	//successfull user activation
 		        	////////////////////////////////
@@ -225,6 +285,7 @@ var _sendWelcomeEmail = function (self,user) {
 	 })
      
  };
+ //after successuser activation
  var _successfulUserActivation = function(self) {
 		//validate the user data
 		logger.emit("info","successfulUserActivation");
@@ -478,6 +539,7 @@ var _isProdonusRegisteredEmailId=function(self,email){
 var _createOTPPasswordSetting=function(self,user){
 	logger.emit("log","_createOTPPasswordSetting");
 	var otp = Math.floor(Math.random()*100000000);
+
 	commonapi.getbcrypstring(otp,function(err,hashpassword){
 		if(err){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"AB001","message":"Error in get bcrypt passsword"}});
@@ -514,7 +576,7 @@ logger.emit("log","_sendPasswordSetting");
               };
         commonapi.sendMail(message, function (result){
           if (result == "failure") {
-                self.emit("failedSendPasswordSetting",{"error":{"code":"AU005","message":"Error to send password reset setting"}});
+                self.emit("failedSendPasswordSetting",{"error":{"code":"AT001","message":"Error to send password reset setting"}});
           } else {
           			/////////////////////////////
               _successfulForgotPassword(self);   
@@ -551,7 +613,7 @@ var _validateReCaptcha=function(self,reCaptcha,clientip){
 var _requestRecaptchaService=function(self,reCaptcha,clientip){
 	logger.emit("log","privatekey="+CONFIG.recaptchaPrivateKey+"recaptchaUrl="+CONFIG.recaptchaUrl+"clientip="+ clientip);
 	var reCaptchaData={privatekey:CONFIG.recaptchaPrivateKey,remoteip:clientip,challenge:reCaptcha.challenge,response:reCaptcha.response};
-	// console.log(reCaptchaData);
+	// logger.emit("log",reCaptchaData);
 	request.post(CONFIG.recaptchaUrl,{form:reCaptchaData} ,function (error, response,body) {
   		if(error){
   			self.emit("failedRecaptcha",{"error":{"message":errmessage}});
