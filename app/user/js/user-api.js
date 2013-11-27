@@ -308,4 +308,8 @@ exports.resetPassword=function(req,res){
      user.emit("failedResetPassword",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
     }
 }
+exports.signOutSessions=function(req,res){
+    req.logout();
+    res.send({"success":{"message":"You have successfully signed out"}});
+}
 //old data
