@@ -510,17 +510,19 @@ User.prototype.sendPasswordSetting = function() {
 
 var _validateSendPasswordSetting=function(self){
 	logger.emit("log","_validateSendPasswordSetting");
-	var email=self.user.email;
-	if(email==undefined){
-		logger.emit("log","_isProdonusRegisteredEmailId");
+	
+	if(self.user==undefined){
+	    self.emit("failedSendPasswordSetting",{"error":{"code":"AV001","message":"please send user data"}});
+	}else if(user.email==undefined){
+		   logger.emit("log","_isProdonusRegisteredEmailId");
 	 	    self.emit("failedSendPasswordSetting",{"error":{"code":"AV001","message":"please enter emailid"}});
-	}else if(!regxemail.test(email)){
+	}else if(!regxemail.test(user.email)){
 	//	logger.emit("log","_isProdonusRegisteredEmailId");
  	  self.emit("failedSendPasswordSetting",{"error":{"code":"AV001","message":"please enter valid email"}});
  	}else{
  		logger.emit("log","_isProdonusRegisteredEmailId");
  		////////////////////////////////////////
- 		_isProdonusRegisteredEmailId(self,email);
+ 		_isProdonusRegisteredEmailId(self,user.email);
  		/////////////////////////////////////////
  	}  		
 };

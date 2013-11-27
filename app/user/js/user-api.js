@@ -85,9 +85,10 @@ exports.activateAccount = function(req, res) {
 };
 exports.signin = function(req, res) {
   var  userdata = req.body;
+  logger.emit("log","req body"+userdata);
   var user = new User(userdata);
   user.on("failedUserSignin",function(err){
-    console.log("failedUserRegistration"+err)
+    console.log("failedUserSignin"+err)
     logger.emit("error", err.error.message);
     res.send(err);
   });
