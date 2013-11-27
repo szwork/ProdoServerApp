@@ -511,7 +511,7 @@ User.prototype.sendPasswordSetting = function() {
 
 var _validateSendPasswordSetting=function(self){
 	logger.emit("log","_validateSendPasswordSetting");
-	var user=this.user;
+	var user=self.user;
 	if(user==undefined){
 	    self.emit("failedSendPasswordSetting",{"error":{"code":"AV001","message":"please send user data"}});
 	}else if(user.email==undefined){
