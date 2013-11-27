@@ -217,7 +217,7 @@ var _sendWelcomeInviteEmail = function (self,user) {
 							if(err){
 								self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
 							}else if(status!=1){
-								self.emit("failedUserActivation",{"error":{"code":"AU002","message":"User does't exists"}});
+								self.emit("failedUserActivation",{"error":{"code":"AU005","message":"User does't exists"}});
 							}else{
 								var html=emailtemplate.description;
 			    	    html=S(html);
@@ -403,14 +403,14 @@ User.prototype.updateUser = function(userid) {
 };
 
 var _updateUser=function(self,userid,userdata){
-	
+	userdata.updatedate=new Date();
 	logger.emit("log","_updateUser");
 	userModel.update({userid:userid},{$set:userdata},function(err,userupdatestatus){
 		if(err){
 			self.emit("failedUserUpdation",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(userupdatestatus!=1){
 
-			self.emit("failedUserUpdation",{"error":{"code":"AU002","message":"Provided userid is wrong"}});
+			self.emit("failedUserUpdation",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 		}else{
 			/////////////////////////////
 			_successfulUserUpdation(self);
@@ -432,11 +432,12 @@ User.prototype.deleteUser = function(userid) {
 	
 };
 var _deleteUser=function(self,userid){
+	userdata.removedate=new Date();
 	userModel.update({userid:userid},{$set:{status:"deactive"}},function(err,userupdatestatus){
 		if(err){
 			self.emit("failedUserDeletion",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(userupdatestatus!=1){
-			self.emit("failedUserDeletion",{"error":{"code":"AU002","message":"Provided userid is wrong"}});
+			self.emit("failedUserDeletion",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 		}else{
 			/////////////////////////////
 			_successfulUserDeletion(self);
@@ -461,7 +462,7 @@ var _getUser=function(self,userid){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find user"}});
 		}else if(!user){
-			self.emit("failedUserGet",{"error":{"code":"AU002","message":"User does't exists"}});
+			self.emit("failedUserGet",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 
 		}else{
 				////////////////////////////////
@@ -548,7 +549,7 @@ var _createOTPPasswordSetting=function(self,user){
 				if(err){
 					self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
 				}else if(status!=1){
-					self.emit("failedSendPasswordSetting",{"error":{"code":"AU002","message":"User does't exists"}});
+					self.emit("failedSendPasswordSetting",{"error":{"code":"AU005","message":"User does't exists"}});
 				}else{
 					////////////////////////////////
 					_sendPasswordSetting(self,user,otp);
@@ -648,7 +649,7 @@ var _isValidUserToRegenerateToken=function(self,email){
 		if(err){
 			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"ED001","message":"Error in db to find user"}});
 		}else if(!user){
-			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AU002","message":"User does't exists"}});
+			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AU005","message":"User does't exists"}});
 		}else{
 			////////////////////////////////////////
 		_regenerateVerificationToken(self,user);
@@ -714,7 +715,75 @@ var _successfulRegenerateToken=function(self){
 	
 		self.emit("successfulregenerateVerificationUrl", {"success":{"message":"Regenarte token send successfully"}});
 }
-		
 
+		
+User.prototype.resetPassword = function(userid) {
+	var self=this;
+	var userdata=this.user;
+
+
+	////////////////////////////////
+	_validateResetPassword(self,userid);
+	/////////////////////////////
+	
+};
+var _validateResetPassword=function(self,userid){
+	var userdata=self.user;
+	if(userdata==undefined){
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please Provide Userdata"}});
+	}else if(userdata.currentpassword==undefined){
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please send currentpassword"}});
+	}else if(userdata.currentpassword.trim().length<0){
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"please enter currentpassword"}});
+	}else if(userdata.newpassword==undefined){
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please send newpassword"}});
+	}else if(userdata.newpassword.trim().length<0){
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"please enter newpassword"}});
+	}else{
+		/////////////////////////////
+		_resetPassword(self,userid,userdata);
+		////////////////////////////
+	}
+
+}
+var _resetPassword=function(self,userid,userdata){
+	var currentpassword=userdata.currentpassword;
+	var newpassword=userdata.newpassword;
+	logger.emit("log","_resetPassword");
+	userModel.findOne({userid:userid},{userid:1,password:1},function(err,user){
+		if(err){
+			self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to update user data"}});
+		}else if(!user){
+			self.emit("failedUserResetPassword",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
+		}else{
+
+			user.comparePassword(currentpassword, function(err, isMatch){
+      			if ( err ){
+          			self.emit("failedUserResetPassword",{"error":{"code":"AU006","message":"Error in comparing password"}});
+        		 } else if( !isMatch ) {
+          			self.emit("failedUserResetPassword",{"error":{"code":"AU002","message":"Your current password is wrong"}});
+    			}else{
+          			user.password=newpassword;
+          			user.save(function(err,user_data){
+          				if(err){
+          					self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to change the password"}});
+          				}else{
+          					/////////////////////////////
+						   _successfulUserResetPassword(self);
+							/////////////////////////////
+          				}
+          			})
+       		   }
+      		});
+			
+		}
+	})
+}
+var _successfulUserResetPassword = function(self) {
+		//validate the user data
+		logger.emit("log","_successfulUserResetPassword");
+		logger.emit("log","_successfulUserResetPassword");
+		self.emit("successfulUserResetPassword", {"success":{"message":"User password changed successfully"}});
+	}
            
               

@@ -130,7 +130,7 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
         return done(null, false, {code:"AU001", message: 'User does not exists' }); 
       } else if(user.verified==false){
         return done(null,false,{code:"AU003",message:"please verfiy or resend verfication email"});
-      }
+      }else{
       user.comparePassword(password, function(err, isMatch){
         if ( err ){
           return done(err);
@@ -142,6 +142,7 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
           return done(null, false, {code:"AU002", message: 'Invalid password' });
         }
       });
+    }
     });
 }));
 
@@ -212,7 +213,7 @@ exports.getUser = function(req, res) {
     });
 
     user.on("successfulUserGet",function(result){
-      logger.emit("info", result.success.message);
+      logger.emit("info", result.success.message,req.user.userid);
       res.send(result);
     });
     user.getUser(userid);
@@ -230,7 +231,7 @@ exports.getAllUser = function(req, res) {
     });
 
     user.on("successfulUserGetAll",function(result){
-      logger.emit("info", result.success.message);
+      logger.emit("info", result.success.message,req.user.userid);
       res.send(result);
     });
     user.getAllUsers();
@@ -285,5 +286,25 @@ exports.regenerateVerificationUrl = function(req, res) {
   user.regenerateVerificationUrl(email)
 }
 
+exports.resetPassword=function(req,res){
 
+  var userdata=req.body.user;
+  var user=new User(userdata);
+  var userid=req.params.userid;
+  var sessionuserid=req.user.userid;
+  user.on("failedUserResetPassword",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+      res.send(err);
+    });
+
+    user.on("successfulUserResetPassword",function(result){
+      logger.emit("info", result.success.message,req.user.userid);
+      res.send(result);
+    });
+   if(isAuthorizedUser(userid,sessionuserid)){
+      user.resetPassword(userid);
+    }else{
+     user.emit("failedResetPassword",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+    }
+}
 //old data
