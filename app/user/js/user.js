@@ -21,11 +21,11 @@ User.prototype = new events.EventEmitter;
 module.exports = User;
 
 //register new register
-User.prototype.registerUser = function() {
+User.prototype.registerUser = function(host) {
 	var self=this;
 
 		///////////////////////////////////
-	_validateRegisterUser(self,this.user);
+	_validateRegisterUser(self,this.user,host);
 	 ////////////////////////////////////
 };
 //to check email validation
@@ -42,7 +42,7 @@ var isValidEmail=function(email){
  	}
 }
 //validate user registration data
-var _validateRegisterUser = function(self,userdata) {
+var _validateRegisterUser = function(self,userdata,host) {
 		//check if user exist in database
 		//abc(err,userdata,this)
 	userModel.findOne({email:userdata.email},{email:1},function(err,user){
@@ -71,13 +71,13 @@ var _validateRegisterUser = function(self,userdata) {
 	 	    	logger.emit("log","_validated");
 
 	 	    	///////////////////////
-	 			  _addUser(self,userdata);
+	 			  _addUser(self,userdata,host);
 	 			  ///////////////////////
 	 	  }
 		}
 	})
 };
-   var _addUser = function(self,userdata) {
+   var _addUser = function(self,userdata,host) {
 		//adding user
 		var user=userModel(userdata);
 	    user.save(function(err,user){
@@ -91,13 +91,13 @@ var _validateRegisterUser = function(self,userdata) {
 				console.log("addedUser");
 
 				///////////////////////////////////
-				_createVerificationToken(self,user);		        
+				_createVerificationToken(self,user,host);		        
 				///////////////////////////////////
 	      	}
 	    })
 	};
 	//create verification token
-	var _createVerificationToken = function(self,user){
+	var _createVerificationToken = function(self,user,host){
 		var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"user"});
         verificationToken.createVerificationToken(function (err, token) {
         	console.log("addedUser1");
@@ -108,13 +108,14 @@ var _validateRegisterUser = function(self,userdata) {
           	logger.emit("log","createdtoken");
 
           	//////////////////////////////////////
-          _sendVerificationEmail(self,token,user);
+          _sendVerificationEmail(self,token,user,host);
            //////////////////////////////////////
           }
 		})
 	};
 	//find verify template and send verification token
-	var _sendVerificationEmail = function(self,token, user) {
+	var _sendVerificationEmail = function(self,token, user,host) {
+		logger.emit("log","host"+host);
 		//send verification email to activate the user account
 		console.log("addedUser3");
 		EmailTemplateModel.findOne({"templatetype":"verify"},function(err,emailtemplate){
@@ -124,7 +125,7 @@ var _validateRegisterUser = function(self,userdata) {
 				self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find verify emailtemplate"}});
 			}else if(emailtemplate){
 				console.log("addedUser6");
-				var url = "http://"+CONFIG.serverName+"/api/verify/"+token;
+				var url = "http://"+host+"/api/verify/"+token;
 				var html=emailtemplate.description;
 	            html=S(html);
 	            html=html.replaceAll("<name>",user.fullname);

@@ -56,7 +56,7 @@ exports.addUser = function(req,res){
     });
 
   
-     user.registerUser();
+     user.registerUser(req.get("host"));
 }
 
 
