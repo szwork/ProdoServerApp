@@ -28,7 +28,7 @@ var pricingHistorySchema = mongoose.Schema({
 
 var commentSchema = mongoose.Schema({
   commentid:{type:String},
-  commentby:{type:String},
+  userid:{type:String,ref:"User"},
   profile_pic_Urlpath:{type:String}, 
   username:{type:String}, 
   productid:{type:String},   
@@ -65,8 +65,6 @@ var productSchema = mongoose.Schema({
   features: [productFeature], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 
   incompatability: [{prodle:{type:String,ref:"product"}}], 
-  
-  product_images: [{prodle:{type:String,ref:"product"}}], 
   status:{type:String,default:"init"},//init,active,inactive
   createddate:{type:Date,default:Date.now},
   modifieddate:{type:Date},
