@@ -23,7 +23,7 @@ var productTagsSchema = mongoose.Schema({
 var commentSchema = mongoose.Schema({
   commentid:{type:String},
   commentby:{type:String},
-  profile_pic_Urlpath:{type:String}, 
+  profilepicpath:{type:String}, 
   username:{type:String}, 
   productid:{type:String},   
   status:{type:String},
@@ -75,4 +75,4 @@ var productSchema = mongoose.Schema({
 //Seed a product
 var Product = mongoose.model('Product', productSchema);
 
-module.exports = Product;
+module.exports = Category;
