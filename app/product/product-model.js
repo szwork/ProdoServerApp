@@ -5,7 +5,7 @@
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
 * Change History:
 * ----------------------------------------------------------------------
-* date | author | description 
+* Date | author | description 
 * ----------------------------------------------------------------------
 * 27-3-2013 | xyx | Add a new property
 */
@@ -17,6 +17,12 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger")
 
 var productTagsSchema = mongoose.Schema({
+
+});
+var pricingSchema = mongoose.Schema({
+
+});
+var pricingHistorySchema = mongoose.Schema({
 
 });
 
@@ -46,30 +52,30 @@ var productSchema = mongoose.Schema({
   orgprodid:{type:String},
   name: { type: String },
   display_name:{type:String},
-  model_no:{type:Date},
+  model_no:{type:String},
   model_name:{type:String},
-  phone:{type:String},
   serial_no:{type:String},
   description: { type: String},
   introduction_date: { type: String},
-  sale_discontinuation_date:{type:date},
-  support_discontinuation_date: { type:date },
-  banneddate: { type: date },
-  product_images: [{prodle:{type:String,ref:"product"}}], 
-  features: [{prodle:{type:String,ref:"product"}}], 
+  sale_discontinuation_date:{type:Date},
+  support_discontinuation_date: { type:Date },
+  banneddate: { type: Date },
+  product_images: [{image:{type:String}}], 
+  category: [{prodle:{type:String,ref:"product"}}], 
+  features: [productFeature], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 
   incompatability: [{prodle:{type:String,ref:"product"}}], 
-  category: [{prodle:{type:String,ref:"product"}}], 
+  
   product_images: [{prodle:{type:String,ref:"product"}}], 
-  status:{type:String,default:"active"},
-  modified_date:
-  createddate:
-  removeddate:
-  comments_shown:5
-  product_comments: [{prodle:{type:String,ref:"comments"}}], 
-  pricing:
-  pricing history:[ {}, {}]
-  blogs: [blogid, blogid]
+  status:{type:String,default:"init"},//init,active,inactive
+  createddate:{type:Date,default:Date.now},
+  modifieddate:{type:Date},
+  removeddate:{type:Date},
+  comments_shown:{type;Number},
+  product_comments: [commentSchema], 
+  pricing:[pricingSchema],
+  pricinghistory:[pricingHistorySchema],
+  blogs: [{blogid:{type:String}}]
 });
 
 //Seed a product

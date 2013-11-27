@@ -237,8 +237,8 @@ exports.getAllUser = function(req, res) {
     user.getAllUsers();
 }
 exports.forgotPassword = function(req, res) {
-  var email=req.body.email;
-  var user=new User();
+  var userdata=req.body.user
+  var user=new User(userdata);
   user.on("failedSendPasswordSetting",function(err){
       logger.emit("error", err.error.message);
       res.send(err);
@@ -248,7 +248,7 @@ exports.forgotPassword = function(req, res) {
       logger.emit("info", result.success.message);
       res.send(result);
     });
-    user.sendPasswordSetting(email);
+    user.sendPasswordSetting();
 
 }
 

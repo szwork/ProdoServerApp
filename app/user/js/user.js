@@ -501,15 +501,16 @@ var _successfulUserGetAll=function(self,user){
 	self.emit("successfulUserGetAll", {"success":{"message":"Getting User details Successfully","user":user}});
 }
 
-User.prototype.sendPasswordSetting = function(email) {
+User.prototype.sendPasswordSetting = function() {
 	var self=this;
 	////////////////////////////////////////
-	_validateSendPasswordSetting(self,email);
+	_validateSendPasswordSetting(self);
 	/////////////////////////////////////
 };
 
-var _validateSendPasswordSetting=function(self,email){
+var _validateSendPasswordSetting=function(self){
 	logger.emit("log","_validateSendPasswordSetting");
+	var email=self.user.email;
 	if(email==undefined){
 		logger.emit("log","_isProdonusRegisteredEmailId");
 	 	    self.emit("failedSendPasswordSetting",{"error":{"code":"AV001","message":"please enter emailid"}});
