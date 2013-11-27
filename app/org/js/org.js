@@ -1,12 +1,12 @@
 var util = require("util");
 var events = require("events");
-var userModel = require('../../../user/js/user-model');
+var userModel = require('../../user/js/user-model');
 var orgModel=require("./org-model");
-var logger=require("../../../common/js/logger");
+var logger=require("../../common/js/logger");
 var S=require("string");
-var EmailTemplateModel=require('../../../common/js/email-template-model');
+var EmailTemplateModel=require('../../common/js/email-template-model');
 var orgHistoryModel=require("./org-history-model");
-var verificationTokenModel = require('../../../common/js/verification-token-model');
+var verificationTokenModel = require('../../common/js/verification-token-model');
 var Organization = function(organizationdata) {
 	this.organization=organizationdata;
 };

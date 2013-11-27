@@ -13,6 +13,7 @@ AU002-Password invalid
 AU003-No user exists
 AU004-Please give prodonus registered email id
 AU005-User does'nt exists
+AU006-ERROR IN COMPARING PASSWORD
 AR001-recaptcha error
 //////////////
 ET002-Error in Db to send welcome mail

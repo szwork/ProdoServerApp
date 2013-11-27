@@ -26,7 +26,7 @@ var S=require('string');
 var logger=require("../../common/js/logger");
 var CONFIG = require('config').Prodonus;
 var User=require("./user");
-var orgModel=require("../../org/registration/js/org-model");
+var orgModel=require("../../org/js/org-model");
 //default emiltemplate record saved
 
 

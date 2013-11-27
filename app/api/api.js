@@ -11,14 +11,17 @@
 * 
 */
 
-var orgapi = require("../org/registration/js/org-api");
+var orgapi = require("../org/js/org-api");
 var userapi = require("../user/js/user-api");
+var productapi=require("../product/js/product-api");
 var emailtemplateapi = require("../common/js/email-template-api");
 var subscriptionapi=require("../subscription/subscription-api");
 var commonapi=require("../common/js/common-api");
 
 exports.orgapi = orgapi;
 exports.userapi = userapi;
+exports.productapi = productapi;
+
 //exports.commonapi=commonapi;
 exports.subscriptionapi=subscriptionapi;
 exports.emailtemplateapi=emailtemplateapi;

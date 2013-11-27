@@ -25,23 +25,21 @@ var pricingSchema = mongoose.Schema({
 var pricingHistorySchema = mongoose.Schema({
 
 });
+var productFeatureSchema = mongoose.Schema({
+
+});
 
 var commentSchema = mongoose.Schema({
   commentid:{type:String},
-  userid:{type:String,ref:"User"},
-  profile_pic_Urlpath:{type:String}, 
-  username:{type:String}, 
-  productid:{type:String},   
+  user:{userid:{type:String,ref:"User"},profile_pic_Urlpath:{type:String},fullname:{type:String},orgname:{type:String},grpname:{type:String}},
   status:{type:String},
-  datecreated:{type:String}, 
-  dateremoved:{type:String},   
+  datecreated:{type:Date}, 
+  dateremoved:{type:Date},   
   commenttext:{type:String},   
   tags:{type:String}, 
-  orgid:{type:String, ref:"productTagsSchema"}
-  companyname:{type:String},   
-  groupname:{type:String},   
-  images:{type:String}, 
-  replyComments:{type:String, ref:"Schema"}
+  orgid:{type:String},
+  images:{type:String}
+  
 
 });
 
@@ -62,20 +60,24 @@ var productSchema = mongoose.Schema({
   banneddate: { type: Date },
   product_images: [{image:{type:String}}], 
   category: [{prodle:{type:String,ref:"product"}}], 
-  features: [productFeature], 
+  features: [productFeatureSchema], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 
   incompatability: [{prodle:{type:String,ref:"product"}}], 
   status:{type:String,default:"init"},//init,active,inactive
   createddate:{type:Date,default:Date.now},
   modifieddate:{type:Date},
   removeddate:{type:Date},
-  comments_shown:{type;Number},
+  comments_shown:{type:Number},
   product_comments: [commentSchema], 
   pricing:[pricingSchema],
   pricinghistory:[pricingHistorySchema],
   blogs: [{blogid:{type:String}}]
 });
-
+productSchema.pre('save', function(next) {
+  var product = this;
+  product.prodle="#"+shortId.generate();  
+  next(); 
+  })
 //Seed a product
 var Product = mongoose.model('Product', productSchema);
 

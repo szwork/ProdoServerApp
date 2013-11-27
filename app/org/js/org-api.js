@@ -13,14 +13,14 @@
 //impprting alll required model
 var orgModel = require('./org-model');
 var orgHistoryModel = require('./org-history-model'); 
-var userModel = require('../../../user/js/user-model');
-var verificationTokenModel = require('../../../common/js/verification-token-model');
-var EmailTemplateModel=require('../../../common/js/email-template-model');
+var userModel = require('../../user/js/user-model');
+var verificationTokenModel = require('../../common/js/verification-token-model');
+var EmailTemplateModel=require('../../common/js/email-template-model');
 
 var CONFIG = require('config').Prodonus;
 //importing require userdefined api
-var commonapi = require('../../../common/js/common-api');
-var userapi = require('../../../user/js/user-api');
+var commonapi = require('../../common/js/common-api');
+var userapi = require('../../user/js/user-api');
 
 //importing system
 var mongodb = require("mongodb");
@@ -29,7 +29,7 @@ var BSON = mongodb.BSONPure;
 var events = require('events');
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
-var logger=require("../../../common/js/logger");
+var logger=require("../../common/js/logger");
 var Organization=require("./org");
 
 //adding new organization
