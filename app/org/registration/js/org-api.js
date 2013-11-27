@@ -17,6 +17,7 @@ var userModel = require('../../../user/js/user-model');
 var verificationTokenModel = require('../../../common/js/verification-token-model');
 var EmailTemplateModel=require('../../../common/js/email-template-model');
 
+var CONFIG = require('config').Prodonus;
 //importing require userdefined api
 var commonapi = require('../../../common/js/common-api');
 var userapi = require('../../../user/js/user-api');
@@ -54,26 +55,44 @@ exports.addOrganization = function(req,res){
     var emailtemplate=S(emailtemplatedata.description);
     logger.emit("log",userdata);
     if(userdata.length>i){
-       var html=S(emailtemplate); 
-       html=emailtemplate.replaceAll("<email>",userdata[i].email);
-       html=emailtemplate.replaceAll("<password>",userdata[i].password);
-       var message = {
-          from: "Prodonus  <noreply@prodonus.com>", // sender address
-          to: userdata[i].email, // list of receivers
-          subject:emailtemplatedata.subject, // Subject line
-          html: html.s // html body
-        };
-       commonapi.sendMail(message,function(result){
-        if (result == "failure") {
-           logger.emit("error","Error in sending invite mail to "+userdata[i].email,req.user.userid);
-           i+=1;
-           organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-          } else {
-       
-           i+=1;
-           organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-          }
-       })
+      userModel.findOne({email:userdata[i].email},{userid:1},function(err,user){
+        if(err){
+            logger.emit("error","error in db to find users",req.user.userid);
+        }else if(!user){
+            logger.emit("error","user does'nt exists",req.user.userid);
+        }else{
+          var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"user"});
+          verificationToken.createVerificationToken(function (err, token) {
+            if (err){  
+                logger.emit("error","Error in crating verification token for"+user.userid,req.user.userid);
+            }else{
+                var html=S(emailtemplate); 
+                var url = "http://"+req.get("host")+"/api/verify/"+token;
+                html=emailtemplate.replaceAll("<email>",user.email);
+                html=emailtemplate.replaceAll("<url>",url);
+                
+               var message = {
+                  from: "Prodonus  <noreply@prodonus.com>", // sender address
+                  to: userdata[i].email, // list of receivers
+                  subject:emailtemplatedata.subject, // Subject line
+                  html: html.s // html body
+              };
+              commonapi.sendMail(message,function(result){
+                if (result == "failure") {
+                   logger.emit("error","Error in sending invite mail to "+userdata[i].email,req.user.userid);
+                  
+                   organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+                   //i+=1;
+                   //organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+                } else {
+                   i+=1;
+                   organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+                  }
+              })
+            }
+          })
+        }
+      })
     } else {
       logger.emit("log","successfully sent invite email");
     }
@@ -122,7 +141,7 @@ exports.updateOrganization = function(req, res) {
      var isAdmin=false;
      if(req.user.orgid==orgid || isAdmin) {
       //////////////////////
-      organization.deleteOrganization(orgid);
+      organization.deleteOrganization(orgid,sessionuserid);
      }else{
        organization.emit("failedOrgDeletion",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
      }

@@ -20,7 +20,7 @@ var CONFIG = require('config').Prodonus;
  mongoose.connect(CONFIG.dbHost, CONFIG.dbName);
 var db = mongoose.connection;
 
-db.on('error', console.error.bind(console, 'connection error: Cannot connect to prd-dev'));
+db.on('error', console.error.bind(console, 'connection error: Cannot connect to '+CONFIG.dbName));
 db.once('open', function callback() {
   console.log('Connected to '+ CONFIG.dbName);
 });

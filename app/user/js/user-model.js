@@ -52,8 +52,10 @@ var userSchema = mongoose.Schema({
   products_followed: [{prodle:{type:String,ref:"product"}}], //list of prodle - product ids handles #12934xyz
   products_recommends:[{prodle:{type:String,ref:"product"} , rating:{type:String} ,repeat_value:{type:String}}], //list of prodles
   status:{type:String,default:"active"},
-  terms:{type:Boolean}
-
+  terms:{type:Boolean},
+  adddate:{ type:Date,default:Date.now },
+  updatedate:{ type:Date},
+  removedate:{ type:Date}
 });
 
 //Encrypt the password and generate the idwhen you save.
@@ -62,19 +64,24 @@ userSchema.pre('save', function(next) {
 	logger.emit("log","userdata in pre"+user);
 	user.userid="u"+shortId.generate();
 	logger.emit("log","shortid"+user.userid);
-	bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-		if(err) {
-			return next(err);
-		}
-		bcrypt.hash(user.password, salt, function(err, hash) {
-			if(err) {
-				return next(err);
-			}
-			user.password = hash;
-			logger.emit("log","password"+user.password);
-			next();
-		})
-	})	
+  if(user.password!=undefined){
+    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+      if(err) {
+        return next(err);
+      }
+      bcrypt.hash(user.password, salt, function(err, hash) {
+        if(err) {
+          return next(err);
+        }
+        user.password = hash;
+        logger.emit("log","password"+user.password);
+        next();
+      })
+    })
+  }else{
+    next();
+  }
+		
 });
 	
 

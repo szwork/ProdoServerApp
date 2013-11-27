@@ -5,6 +5,8 @@ var orgModel=require("./org-model");
 var logger=require("../../../common/js/logger");
 var S=require("string");
 var EmailTemplateModel=require('../../../common/js/email-template-model');
+var orgHistoryModel=require("./org-history-model");
+var verificationTokenModel = require('../../../common/js/verification-token-model');
 var Organization = function(organizationdata) {
 	this.organization=organizationdata;
 };
@@ -143,7 +145,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
 		logger.emit("log","invitee"+invitees);
 		userModel.find({email:{$in:invitees}},{email:1},function(err,user){
 	    if(err){
-	    	self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find users"}});
+	    	self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find users"+err}});
 	    }else{
 	      for(var i=0;i<user.length;i++)
 	      {
@@ -157,12 +159,12 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	      var userdata=[];
 	      for(var i=0;i<invitees.length;i++)
 	      {
-	        userdata[i]={email:invitees[i],orgid:organization.orgid,password:Math.floor(Math.random()*100000),isOtpPassword:true}
+	        userdata[i]={email:invitees[i],orgid:organization.orgid}
 	      }
 	      if(userdata.length>0){
 	        userModel.create(userdata,function(err,inviteuserdata){
 	          if(err){
-	            self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to create users"}});
+	            self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to create users"+err}});
 	          }else if(inviteuserdata){
 	          	logger.emit("log",inviteuserdata);
 	          	var inviteusers=userdata;
@@ -294,7 +296,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	};
 
 
-	Organization.prototype.updateOrganization = function(orgid) {
+	Organization.prototype.updateOrganization = function(orgid,sessionuserid) {
 		var self=this;
 		var orgdata=this.organization;
 		logger.emit("log",orgdata);
@@ -302,12 +304,12 @@ Organization.prototype.addOrganization=function(sessionuserid){
 			self.emit("failedOrgUpdation",{"error":{"code":"AV001","message":"Please provide organizationdata"}});
 		}else{
 		////////////////////////////////////////
-		_updateOrganization(self,orgid,orgdata);
+		_updateOrganization(self,orgid,orgdata,sessionuserid);
 		///////////////////////////////////////
 		}
 };
 
-var _updateOrganization=function(self,orgid,orgdata){
+var _updateOrganization=function(self,orgid,orgdata,sessionuserid){
 	
 	logger.emit("log","_updateOrganization");
 	orgModel.update({orgid:orgid},{$set:orgdata},function(err,organizationupdatestatus){
@@ -315,6 +317,19 @@ var _updateOrganization=function(self,orgid,orgdata){
 			self.emit("failedOrgUpdation",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(organizationupdatestatus!=1){
 			self.emit("failedOrgUpdation",{"error":{"code":"AU002","message":"Provided orgid is wrong"}});
+		}else{
+			/////////////////////////////////////
+			_updateOrganizationHistory(self,orgid,sessionuserid);
+			////////////////////////////////////
+		}
+	})
+}
+var _updateOrganizationHistory=function(self,orgid,sessionuserid){
+	var orghistorydata=new orgHistoryModel({orgid:orgid,updatedby:sessionuserid});
+
+	orghistorydata.save(function(err,orghistorydata){
+		if(err){
+			self.emit("failedOrgUpdation",{"error":{"code":"ED001","message":"Error in db to history model update"}});
 		}else{
 			/////////////////////////////////////
 			_successfulOrganizationUpdation(self);
@@ -328,25 +343,40 @@ var _successfulOrganizationUpdation = function(self) {
 	
 		self.emit("successfulOrgUpdation", {"success":{"message":"Organization Updated Successfully"}});
 	}
-Organization.prototype.deleteOrganization = function(orgid) {
+Organization.prototype.deleteOrganization = function(orgid,sessionuserid) {
 		var self=this;
 		
 		
 	
 		////////////////////////////////////////
-		_deleteOrganization(self,orgid);
+		_deleteOrganization(self,orgid,sessionuserid);
 		///////////////////////////////////////
 		
 };
 
-var _deleteOrganization=function(self,orgid){
+var _deleteOrganization=function(self,orgid,sessionuserid){
 	
 	logger.emit("log","_deleteOrganization");
 	orgModel.update({orgid:orgid},{$set:{status:"deactive"}},function(err,organizationdeletestatus){
 		if(err){
 			self.emit("failedOrgDeletion",{"error":{"code":"ED001","message":"Error in db to deleteuser data"}});
 		}else if(organizationdeletestatus!=1){
-			self.emit("failedOrgDeletion",{"error":{"code":"AU002","message":"Provided orgid is wrong"}});
+			self.emit("failedOrgDeletion",{"error":{"code":"AO002","message":"Provided orgid is wrong"}});
+		}else{
+			////////////////////////////////////
+			_deleteOrganizationHistory(self,orgid,sessionuserid);
+			///////////////////////////////////
+		}
+	})
+}
+var _deleteOrganizationHistory=function(self,orgid,sessionuserid){
+	var orghistorydata=new orgHistoryModel({orgid:orgid,updatedby:sessionuserid});
+
+	
+
+	orghistorydata.save(function(err,orghistorydata){
+		if(err){
+			self.emit("failedOrgDeletion",{"error":{"code":"ED001","message":"Error in db to history model update"}});
 		}else{
 			/////////////////////////////////////
 			_successfulOrganizationDeletion(self);
@@ -371,9 +401,9 @@ var _getOrganization=function(self,orgid){
 		}else if(!organization){
 			self.emit("failedUserGet",{"error":{"code":"AO002","message":"Organization doesnt exists"}});
 		}else{
-				////////////////////////////////
+			 /////////////////////////////////////////////
 			_successfulOrganizationGet(self,organization);
-			//////////////////////////////////
+			/////////////////////////////////////////////
 
 		}
 	})
@@ -395,9 +425,9 @@ var _getAllOrganization=function(self){
 		}else if(organization.length==0){
 			self.emit("failedUserGetAll",{"error":{"code":"AO003","message":"No organization exists"}});
 		}else{
-			////////////////////////////////
+			////////////////////////////////////////////////
 			_successfulOrganizationGetAll(self,organization);
-			//////////////////////////////////
+			///////////////////////////////////////////////
 		}
 	})
 };

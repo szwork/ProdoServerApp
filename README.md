@@ -7,10 +7,12 @@ Error code:
 AV001-for all validation i.e. user,organization,product
 AD001-For all database error
 AT001-regenerate verification token
+/////////////
 AU001-email already exists
-AU002-User does't exists
+AU002-Password invalid
 AU003-No user exists
 AU004-Please give prodonus registered email id
+AU005-User does'nt exists
 AR001-recaptcha error
 //////////////
 ET002-Error in Db to send welcome mail
