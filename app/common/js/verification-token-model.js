@@ -19,7 +19,7 @@ var verificationTokenSchema = new mongoose.Schema({
     _userId: { type:String,required: true, ref: 'User' },
     token: { type: String, required: true },
     tokentype:{type:String},
-    createddate: { type: Date, required: true, default: Date.now, expires: '4h' },
+    createddate: { type: Date, required: true, default: Date.now },
     status:{type:String,default:"active"}
 });
 verificationTokenSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
