@@ -75,8 +75,9 @@ exports.activateAccount = function(req, res) {
     logger.emit("info", result.success.message);
     res.send(result);
   });
+
   user.on("tokenredirect",function(redirecturl){
-    
+  logger.emit("log","calling to tokenredirect"+redirecturl);   
     res.redirect(redirecturl);
   });
 

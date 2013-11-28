@@ -64,7 +64,7 @@ app.get("/api",function(req,res){
 // app.set('log level', process.env.PRODONUS_LOG_LEVEL || Log.DEBUG);
 // app.set('session secret', process.env.PRODONUS_SESSION_SECRET || 'secret');
 // app.set('session age', process.env.PRODONUS_SESSION_AGE || 3600);
-app.set('port', process.env.PRODONUS_PORT || 9000);
+app.set('port', process.env.PRODONUS_PORT || 8000);
 
 
 // // configures default logger available for middleware and requests

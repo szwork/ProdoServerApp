@@ -48,13 +48,13 @@ var commentSchema = mongoose.Schema({
 var productSchema = mongoose.Schema({
   prodle:{type:String, required: true, unique: true},
   orgprodid:{type:String},
-  name: { type: String },
-  display_name:{type:String},
-  model_no:{type:String},
-  model_name:{type:String},
-  serial_no:{type:String},
-  description: { type: String},
-  introduction_date: { type: String},
+  name: { type: String },/**/
+  display_name:{type:String},/**/
+  model_no:{type:String},/**/
+  model_name:{type:String},/**/
+  serial_no:{type:String},/**/
+  description: { type: String},/**/
+  introduction_date: { type: Date},
   sale_discontinuation_date:{type:Date},
   support_discontinuation_date: { type:Date },
   banneddate: { type: Date },
@@ -75,8 +75,10 @@ var productSchema = mongoose.Schema({
 });
 productSchema.pre('save', function(next) {
   var product = this;
-  product.prodle="#"+shortId.generate();  
+  product.prodle=shortId.generate();  
+   console.log("product pre"+product);
   next(); 
+ 
   })
 //Seed a product
 var Product = mongoose.model('Product', productSchema);

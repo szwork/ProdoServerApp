@@ -29,30 +29,36 @@ Product.prototype = new events.EventEmitter;
 module.exports = Product;
 
 
-Product.prototype.addProduct=function(sessionuserid){
+Product.prototype.addProduct=function(orgid,sessionuserid){
 	var self=this;
 	var productdata=this.product;
-	_validateProductData(self,productdata,sessionuserid);
+	_validateProductData(self,productdata,orgid,sessionuserid);
 }
 
-	var _validateProductData = function(self,productdata,sessionuserid) {
+	var _validateProductData = function(self,productdata,orgid,sessionuserid) {
 		//validate the org data
 		
-		  if(productdata.name==undefined){
-		  	self.emit("failedOrgAdd",{"error":{"message":"Please type organization name"}});
-		  } else if(productdata.orgtype==undefined){
-		    self.emit("failedOrgAdd",{"error":{"message":"please select organization type"}});
-		  }else if(productdata.location==undefined){
-		  	self.emit("failedOrgAdd",{"error":{"message":"please give a location details"}});
-		  }else if(productdata.terms==false){
-		  	self.emit("failedOrgAdd",{"error":{"message":"please agree the terms and condition"}});
-		  }else{
-		    	logger.emit("log","_validated");
-					//this.emit("validated", productdata);
-					////////////////////////////////////////////////////////////
-					_hasAlreadyProduct(self,productdata,sessionuserid);
-					///////////////////////////////////////////////////////////
+		  // if(productdata.name==undefined){
+		  // 	self.emit("failedOrgAdd",{"error":{"message":"Please type organization name"}});
+		  // } else if(productdata.orgtype==undefined){
+		  //   self.emit("failedOrgAdd",{"error":{"message":"please select organization type"}});
+		  // }else if(productdata.location==undefined){
+		  // 	self.emit("failedOrgAdd",{"error":{"message":"please give a location details"}});
+		  // }else if(productdata.terms=e=false){
+		  // 	self.emit("failedOrgAdd",{"error":{"message":"please agree the terms and condition"}});
+		  // }else{
+		  //   	logger.emit("log","_validated");
+				// 	//this.emit("validated", productdata);
+				// 	////////////////////////////////////////////////////////////
+				// 	_hasAlreadyProduct(self,productdata,sessionuserid);
+				// 	///////////////////////////////////////////////////////////
 				
-		  }
+		  // }
+		  productdata.orgid=orgid;
+		  var product=new productModel(productdata);
+		  product.save(function(err,product_data){
+		  	logger.emit("error",err);
+		  	self.emit("successfulProductAdd",{"success":{"message":"Product added sucessfully"}})
+		  })
    
 	};

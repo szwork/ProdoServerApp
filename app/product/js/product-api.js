@@ -35,9 +35,10 @@ exports.addProduct=function(req,res){
     });
     
     var isAdmin=false;
+    logger.emit("log",productdata);
     if(req.user.orgid==orgid || isAdmin)
     {
-      product.addProduct(orgid);
+      product.addProduct(orgid,sessionuserid);
     }else{
        product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
     }
