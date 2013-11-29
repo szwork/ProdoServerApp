@@ -17,7 +17,7 @@ var logger = require("../../common/js/logger");
 var productModel = require("./product-model");
 var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
-
+var shortId = require('shortid');
 
 
 var Product = function(productdata) {
@@ -29,13 +29,13 @@ Product.prototype = new events.EventEmitter;
 module.exports = Product;
 
 
-Product.prototype.addProduct=function(orgid,sessionuserid){
+Product.prototype.addProduct=function(orgid,sessionprodle){
 	var self=this;
 	var productdata=this.product;
-	_validateProductData(self,productdata,orgid,sessionuserid);
+	_validateProductData(self,productdata,orgid,sessionprodle);
 }
 
-	var _validateProductData = function(self,productdata,orgid,sessionuserid) {
+	var _validateProductData = function(self,productdata,orgid,sessionprodle) {
 		//validate the org data
 		
 		  // if(productdata.name==undefined){
@@ -50,7 +50,7 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 		  //   	logger.emit("log","_validated");
 				// 	//this.emit("validated", productdata);
 				// 	////////////////////////////////////////////////////////////
-				// 	_hasAlreadyProduct(self,productdata,sessionuserid);
+				// 	_hasAlreadyProduct(self,productdata,sessionprodle);
 				// 	///////////////////////////////////////////////////////////
 				
 		  // }
@@ -62,3 +62,64 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 		  })
    
 	};
+Product.prototype.commentToProduct=function(prodle,commentdata){
+	var self=this;
+	console.log("commentdata"+commentdata);
+	commentdata.commentid="prc"+shortId.generate();
+	commentdata.status="active";
+	commentdata.datecreated=new Date();  
+	productModel.update({prodle:prodle},{$push:{product_comments:commentdata}},function(err,commentstatus){
+		if(err){
+
+		}else{
+			console.log("commentstatus"+commentstatus);
+			self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully"}})
+		}
+	})
+}
+Product.prototype.getProduct = function(prodle) {
+	var self=this;
+	_getProduct(self,prodle);
+};
+var _getProduct=function(self,prodle){
+	productModel.findOne({prodle:prodle},function(err,product){
+		if(err){
+			self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Error in db to find Product"}});
+		}else if(!product){
+			self.emit("failedGetProduct",{"error":{"code":"AU005","message":"Provided prodle is wrong"}});
+		}else{
+			 ////////////////////////////////
+			_successfulGetProduct(self,product);
+			//////////////////////////////////
+
+		}
+	})
+}
+var _successfulGetProduct=function(self,product){
+	logger.emit("log","_successfulProductGet");
+	self.emit("successfulGetProduct", {"success":{"message":"Getting Product details Successfully","product":product}});
+}
+Product.prototype.getAllProduct = function() {
+	var self=this;
+	//////////////////
+	_getAllProduct(self);
+	///////////////////
+};
+var _getAllProduct=function(self){
+	productModel.find({},function(err,product){
+		if(err){
+			self.emit("failedGetAllProduct",{"error":{"code":"ED001","message":"Error in db to find all product"}});
+		}else if(product.length==0){
+			self.emit("failedGetAllProduct",{"error":{"code":"AU003","message":"No product exists"}});
+		}else{
+			////////////////////////////////
+			_successfulGetAllProduct(self,product);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetAllProduct=function(self,product){
+	logger.emit("log","successfulGetAllProduct");
+	self.emit("successfulGetAllProduct", {"success":{"message":"Getting All Product details Successfully","product":product}});
+}

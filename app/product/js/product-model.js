@@ -32,13 +32,14 @@ var productFeatureSchema = mongoose.Schema({
 var commentSchema = mongoose.Schema({
   commentid:{type:String},
   user:{userid:{type:String,ref:"User"},profile_pic_Urlpath:{type:String},fullname:{type:String},orgname:{type:String},grpname:{type:String}},
-  status:{type:String},
+  //orgname and grpname set when user is organization  user
+  status:{type:String,defualt:"active"},
   datecreated:{type:Date}, 
   dateremoved:{type:Date},   
   commenttext:{type:String},   
-  tags:{type:String}, 
-  orgid:{type:String},
-  images:{type:String}
+  tags:[{type:String,ref:"Tags"}], 
+  
+  
   
 
 });
@@ -46,7 +47,8 @@ var commentSchema = mongoose.Schema({
 ////////////
 //Product Data Model
 var productSchema = mongoose.Schema({
-  prodle:{type:String, required: true, unique: true},
+  prodle:{type:String,unique: true},
+  orgid:{type:String,ref:"Organization"},//means manufacturer
   orgprodid:{type:String},
   name: { type: String },/**/
   display_name:{type:String},/**/

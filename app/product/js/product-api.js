@@ -43,3 +43,60 @@ exports.addProduct=function(req,res){
        product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
     }
 }
+exports.commentToProduct=function(req,res){
+  var prodle=req.params.prodle;
+  var commentdata=req.body.product_comment;
+  var userdata=commentdata.user;
+  var sessionuserid=req.user.userid;
+var product = new Product();
+  product.on("failedCommentToProduct",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      res.send(err);
+    });
+    product.on("successfulCommentToProduct",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      res.send(result);
+    });
+    
+   
+    if(userdata.userid==req.user.userid){
+      product.commentToProduct(prodle,commentdata);
+    }else{
+      product.emit("failedCommentToProduct",{"error":{"code":"EA001","message":"Provided user data does not match with sesion user data"}})
+    }
+   
+}
+exports.getProduct=function(req,res){
+   var sessionuserid=req.user.userid;
+   var prodle=req.params.prodle;
+   var product = new Product();
+   product.on("failedGetProduct",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      res.send(err);
+    });
+    product.on("successfulGetProduct",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      res.send(result);
+    });
+    
+   
+    
+      product.getProduct(prodle);
+    
+}
+exports.getAllProduct=function(req,res){
+   var sessionuserid=req.user.userid;
+   
+   var product = new Product();
+   product.on("failedGetAllProduct",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      res.send(err);
+    });
+    product.on("successfulGetAllProduct",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      res.send(result);
+    });
+    product.getAllProduct();
+    
+}
+

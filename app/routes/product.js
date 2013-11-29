@@ -7,8 +7,9 @@ exports.init = function (app) {
 
   
   app.post('/api/product/:orgid',auth, api.productapi.addProduct);//add new product
-  // app.get("/api/product",auth,api.productapi.getAllProduct);//get all product data
-  // app.get("/api/product/:prodle",auth,api.productapi.getProduct);//get single product data
+  app.post("/api/product/addcomment/:prodle",auth,api.productapi.commentToProduct);
+   app.get("/api/product",auth,api.productapi.getAllProduct);//get all product data
+  app.get("/api/product/:prodle",auth,api.productapi.getProduct);//get single product data
   // app.put("/api/product/:prodle",auth,api.productapi.updateProduct);//update the product data
   // app.delete("/api/product/:prodle",auth,api.productapi.deleteProduct);//delete product
   

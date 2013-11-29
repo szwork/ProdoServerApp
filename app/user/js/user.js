@@ -12,6 +12,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var qs = require('querystring');
 var request=require("request");
+var orgModel=require("../../org/js/org-model");
 var User = function(userdata) {
 	this.user=userdata;
 };
@@ -179,7 +180,7 @@ var _verifyToken = function(self,token) {
 
     	self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in Db to find verification token"}});
     } else if (!userVerificationToken){
-       self.emit("tokenredirect","#/regeneratetoken")
+      self.emit("tokenredirect","#/regeneratetoken");
     }else{
     	userModel.findAndModify({ userid: userVerificationToken._userId},[],
                 {$set: {verified:true}},{new:false}, function(err,user){
@@ -320,12 +321,53 @@ var _validateSignin=function(self,userdata){
 
 User.prototype.signinSession=function(user){
 var self=this;
-//////////////////////
-_isOTPUser(self,user);
 ////////////////////
-
+_isOrganizationUser(self,user);
+/////////////////////
 };
+_isOrganizationUser=function(self,user){
+	if(user.orgid!=undefined){
+		//console.log("organization user");
+		orgModel.findOne({orgid:user.orgid},{name:1,usergrp:1,orgtype:1},function(err,organization){
+            if(err){
+
+            }else if(organization){
+            	var grpname="";
+              var usergrp=organization.usergrp;
+              for(var i=0;i<usergrp.length;i++){
+                var grpmember=usergrp[i].grpmembers;
+                for(var j=0;j<grpmember.length;j++){
+                	if(user.userid==grpmember[j]){
+                		grpname=usergrp[i].grpname;
+                	}
+
+                }
+              }
+              //user=JSON.stringify(user);
+              var userdata=JSON.stringify(user);
+              userdata=JSON.parse(userdata);
+              userdata.orgname=organization.name;
+            
+
+              userdata.grpname=grpname;
+              console.log("user"+userdata.orgname);
+
+              console.log("user in org"+user+"organization name"+organization.name+"grpname"+grpname);
+              //////////////////////
+				_isOTPUser(self,userdata);
+			////////////////////
+            }else{
+
+            }
+         }); 
+	}else{
+		//////////////////////
+		_isOTPUser(self,user);
+		////////////////////
+	}
+}
 var _isOTPUser=function(self,user){
+	
 	if(user.isOtpPassword==true){
 		self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
 	}else{
