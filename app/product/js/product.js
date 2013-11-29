@@ -29,39 +29,50 @@ Product.prototype = new events.EventEmitter;
 module.exports = Product;
 
 
-Product.prototype.addProduct=function(orgid,sessionprodle){
+Product.prototype.addProduct=function(orgid,sessionuserid){
 	var self=this;
 	var productdata=this.product;
-	_validateProductData(self,productdata,orgid,sessionprodle);
+	////////////////////////////////////////////////////////////
+	_validateProductData(self,productdata,orgid,sessionuserid);
+	//////////////////////////////////////////////////////////
 }
 
-	var _validateProductData = function(self,productdata,orgid,sessionprodle) {
+	var _validateProductData = function(self,productdata,orgid,sessionuserid) {
 		//validate the org data
-		
-		  // if(productdata.name==undefined){
-		  // 	self.emit("failedOrgAdd",{"error":{"message":"Please type organization name"}});
-		  // } else if(productdata.orgtype==undefined){
-		  //   self.emit("failedOrgAdd",{"error":{"message":"please select organization type"}});
-		  // }else if(productdata.location==undefined){
-		  // 	self.emit("failedOrgAdd",{"error":{"message":"please give a location details"}});
-		  // }else if(productdata.terms=e=false){
-		  // 	self.emit("failedOrgAdd",{"error":{"message":"please agree the terms and condition"}});
-		  // }else{
-		  //   	logger.emit("log","_validated");
-				// 	//this.emit("validated", productdata);
-				// 	////////////////////////////////////////////////////////////
-				// 	_hasAlreadyProduct(self,productdata,sessionprodle);
-				// 	///////////////////////////////////////////////////////////
-				
-		  // }
-		  productdata.orgid=orgid;
-		  var product=new productModel(productdata);
-		  product.save(function(err,product_data){
-		  	logger.emit("error",err);
-		  	self.emit("successfulProductAdd",{"success":{"message":"Product added sucessfully"}})
-		  })
-   
+		 if(productdata==undefined){
+		 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please provide data to add product"}});
+		 }else if(productdata.name==undefined){
+	   	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
+	   } else if(productdata.description==undefined){
+	    self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
+	   }else if(productdata.location==undefined){
+	  	self.emit("failedProductAdd",{"error":{"message":"please give a location details"}});
+	   }else{
+
+	   	/////////////////////////////
+	   	_addProduct(self,productdata);
+	   	///////////////////////
+	   }
 	};
+	var _addProduct=function(self,productdata){
+		productdata.orgid=orgid;
+	  var product=new productModel(productdata);
+	  product.save(function(err,product_data){
+	  	if(err){
+	  		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
+	  	}else{
+	  		///////////////////////
+	  		_successfulProductAdd(self);
+	  		//////////////////////////
+	  	  
+	  	}
+	  })
+
+	}
+	var _successfulProductAdd=function(self){
+		logger.log("log","_successfulProductAdd");
+		self.emit("successfulProductAdd",{"success":{"message":"Product added sucessfully"}})
+	}
 Product.prototype.commentToProduct=function(prodle,commentdata){
 	var self=this;
 	console.log("commentdata"+commentdata);
@@ -70,28 +81,38 @@ Product.prototype.commentToProduct=function(prodle,commentdata){
 	commentdata.datecreated=new Date();  
 	productModel.update({prodle:prodle},{$push:{product_comments:commentdata}},function(err,commentstatus){
 		if(err){
-
+			self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
+		}else if(commentstatus!=1){
+			self.emit("failedCommentToProduct",{"error":{"code":"AP001","message":"Error in db to give comment to product"}});
 		}else{
-			console.log("commentstatus"+commentstatus);
-			self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully"}})
+
+			///////////////////////////////////
+			_successfulcommentToProduct(self);
+			/////////////////////////////////
+			
 		}
 	})
 }
+var _successfulcommentToProduct=function(self){
+	logger.emit("log","_successfulcommentToProduct");
+	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully"}})
+}
 Product.prototype.getProduct = function(prodle) {
 	var self=this;
+	/////////////////////////
 	_getProduct(self,prodle);
+	////////////////////////
 };
 var _getProduct=function(self,prodle){
 	productModel.findOne({prodle:prodle},function(err,product){
 		if(err){
 			self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Error in db to find Product"}});
 		}else if(!product){
-			self.emit("failedGetProduct",{"error":{"code":"AU005","message":"Provided prodle is wrong"}});
+			self.emit("failedGetProduct",{"error":{"code":"AP001","message":"Provided prodle is wrong"}});
 		}else{
 			 ////////////////////////////////
 			_successfulGetProduct(self,product);
 			//////////////////////////////////
-
 		}
 	})
 }
@@ -110,7 +131,7 @@ var _getAllProduct=function(self){
 		if(err){
 			self.emit("failedGetAllProduct",{"error":{"code":"ED001","message":"Error in db to find all product"}});
 		}else if(product.length==0){
-			self.emit("failedGetAllProduct",{"error":{"code":"AU003","message":"No product exists"}});
+			self.emit("failedGetAllProduct",{"error":{"code":"AP002","message":"No product exists"}});
 		}else{
 			////////////////////////////////
 			_successfulGetAllProduct(self,product);

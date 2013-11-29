@@ -12,7 +12,7 @@ AU001-email already exists
 AU002-Password invalid
 AU003-No user exists
 AU004-Please give prodonus registered email id
-AU005-User does'nt exists
+
 AU006-ERROR IN COMPARING PASSWORD
 AR001-recaptcha error
 //////////////
@@ -27,3 +27,9 @@ AB001-error in bcrypt password
 /////////////
 AO001-You can add only one organization
 AO002-Provided orgid does'nt exists
+
+
+
+//////////product////////////
+AP001-prodct id is wrong or prodct doesn't exist
+AP002-No product exists
