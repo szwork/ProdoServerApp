@@ -48,11 +48,11 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	   }else{
 
 	   	/////////////////////////////
-	   	_addProduct(self,productdata);
+	   	_addProduct(self,productdata,orgid);
 	   	///////////////////////
 	   }
 	};
-	var _addProduct=function(self,productdata){
+	var _addProduct=function(self,productdata,orgid){
 		productdata.orgid=orgid;
 	  var product=new productModel(productdata);
 	  product.save(function(err,product_data){
