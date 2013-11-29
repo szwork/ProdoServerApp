@@ -45,8 +45,6 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	   	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
 	   } else if(productdata.description==undefined){
 	    self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
-	   }else if(productdata.location==undefined){
-	  	self.emit("failedProductAdd",{"error":{"message":"please give a location details"}});
 	   }else{
 
 	   	/////////////////////////////

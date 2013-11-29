@@ -36,7 +36,7 @@ exports.addProduct=function(req,res){
     
     var isAdmin=false;
     logger.emit("log",productdata);
-    if(req.user.orgid==orgid || isAdmin)
+    if(req.user.orgid==orgid)
     {
       product.addProduct(orgid,sessionuserid);
     }else{
