@@ -24,6 +24,7 @@
     "redis":"*",
     "shortid":"*",
     "request":"*",
-    "querystring":"*"
+    "querystring":"*",
+    "socket.io":"*"
   }
 }

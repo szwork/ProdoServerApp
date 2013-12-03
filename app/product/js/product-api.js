@@ -36,6 +36,7 @@ exports.addProduct=function(req,res){
     
     var isAdmin=false;
     logger.emit("log",productdata);
+    
     if(req.user.orgid==orgid)
     {
       product.addProduct(orgid,sessionuserid);
@@ -98,5 +99,25 @@ exports.getAllProduct=function(req,res){
     });
     product.getAllProduct();
     
+}
+exports.addCommentBySocket=function(prodle,commentdata,callback){
+  
+  
+  var userdata=commentdata.user;
+  
+  var product = new Product();
+  product.on("failedCommentToProduct",function(err){
+      logger.emit("error", err.error.message);
+      callback(err);
+    });
+    product.on("successfulCommentToProduct",function(result){
+      logger.emit("info", result.success.message);
+       callback(null,result);
+    });
+    
+   
+      product.commentToProduct(prodle,commentdata);
+  
+
 }
 

@@ -313,7 +313,7 @@ var _validateSignin=function(self,userdata){
 	}else{
 		console.log("signin2");
 		///////////////////////
-		self.emit("passportauthenticate");
+		self.emit("passportauthenticate",userdata);
 		///////////////////////
 	}
 }

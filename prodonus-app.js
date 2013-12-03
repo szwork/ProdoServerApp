@@ -23,7 +23,7 @@ var http = require('http');
 var fs = require('fs');
 var passport=require('passport');
 var path = require('path');
-
+var api=require("./app/api/api");
 
 var app = express();
 app.use(express.favicon());
@@ -45,7 +45,8 @@ app.use(express.compress());
 /*All the routes files are described and stored in the routes directory
 * All the routes for prodonus are initialized in the code below. The init function
 * is called on all the routes.
-*/
+*/var server=http.createServer(app);
+var io = require('socket.io').listen(server);
 var RouteDir = './app/routes',
     files = fs.readdirSync(RouteDir);
 
@@ -59,7 +60,21 @@ app.get("/api",function(req,res){
 	res.send("Welcome to Prodonus");
 })
 // var log = new Log();
+io.sockets.on('connection', function(socket) {
+    socket.on('addComment', function(prodle,commentdata) {
+     api.productapi.addCommentBySocket(prodle,commentdata,function(err,result){
 
+     	if(err){
+     		socket.emit("commentResponse",err,null);
+     	}else{
+
+     		socket.emit("commentResponse",result,{name:"Sunil More",address:"Karve Nagar"});
+     	}
+     	
+     })  
+        //socket.emit("send-file","");
+  });
+})
 // // defines app settings with default values for Prodonus
 // app.set('log level', process.env.PRODONUS_LOG_LEVEL || Log.DEBUG);
 // app.set('session secret', process.env.PRODONUS_SESSION_SECRET || 'secret');
@@ -81,8 +96,9 @@ app.set('port', process.env.PRODONUS_PORT || 8000);
 //     app.use(express.logger(format));
 // }
 
-
+module.exports = io;
 //Set the Prodonus Server
-http.createServer(app).listen(app.get('port'), function(){
+
+server.listen(app.get('port'), function(){
   console.log('Prodonus is ready to server on port ' + app.get('port'));
 });

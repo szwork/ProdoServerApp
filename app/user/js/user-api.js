@@ -86,11 +86,16 @@ exports.activateAccount = function(req, res) {
 };
 exports.signin = function(req, res) {
   var  userdata = req.body;
+  //req.body=req.body;
   logger.emit("log","req body"+userdata);
   var user = new User(userdata);
   user.on("failedUserSignin",function(err){
-    console.log("failedUserSignin"+err)
-    logger.emit("error", err.error.message);
+    if(err.error.user!=undefined){
+      logger.emit("login success"+err.error.message);
+    }else{
+      logger.emit("failed signin"+err.error.message);
+    }
+    logger.emit("error", err.error.message,req.body.email);
     res.send(err);
   });
   //
@@ -99,7 +104,7 @@ exports.signin = function(req, res) {
     res.send(result);
   });
 
-  user.on("passportauthenticate",function(){
+  user.on("passportauthenticate",function(userdata){
     passport.authenticate('local', function(err, userdata, info) {
       if (err) { 
         user.emit("failedUserSignin",{"error":{"code":"AP002","message":"Error in passport to authenticate"}});
@@ -116,7 +121,7 @@ exports.signin = function(req, res) {
           }
         });
       }
-    })(req, res);//end of passport authenticate
+    })(req,res);//end of passport authenticate
   });
   //first calling sigin
   user.signin();
@@ -164,7 +169,7 @@ exports.updateUser = function(req, res) {
   var user = new User(userdata);
   var sessionuserid=req.user.userid;
     user.on("failedUserUpdation",function(err){
-      console.log("failedUserRegistration"+err)
+      logger.emit("log","failedUserRegistration"+JSON.stringify(err));
       logger.emit("error", err.error.message);
       res.send(err);
     });
