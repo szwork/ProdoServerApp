@@ -1,0 +1,1 @@
+{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "hh-dev.workorders", "name" : "_id_" }, { "v" : 1, "key" : { "workorderid" : 1 }, "unique" : true, "ns" : "hh-dev.workorders", "name" : "workorderid_1", "background" : true, "safe" : null } ] }

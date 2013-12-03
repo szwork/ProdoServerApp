@@ -1,0 +1,178 @@
+Prodonus is ready to server on port 8000
+Connected to prodo-dev
+_validateSendPasswordSetting
+_isProdonusRegisteredEmailId
+_isProdonusRegisteredEmailId
+_createOTPPasswordSetting
+undefined
+_sendPasswordSetting
+successfulForgotPassword
+[32minfo[39m: Password Settings Successfully sent userid=undefined
+122.169.65.120 - - [Wed, 27 Nov 2013 10:16:07 GMT] "POST /api/user/forgotpassword HTTP/1.1" 200 75 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+signin1
+userdataneha.singhal3107@gmail.comundefined
+failedUserRegistration[object Object]
+122.169.65.120 - - [Wed, 27 Nov 2013 10:20:16 GMT] "POST /api/user/signin HTTP/1.1" 200 80 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+signin1
+userdataneha.singhal3107@gmail.com574373
+signin2
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+122.169.65.120 - - [Wed, 27 Nov 2013 10:21:46 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+signin1
+userdataneha.singhal3107@gmail.com574373
+signin2
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+122.169.65.120 - - [Wed, 27 Nov 2013 10:26:46 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+signin1
+userdataneha.singhal3107@gmail.com574373
+signin2
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+122.169.65.120 - - [Wed, 27 Nov 2013 10:33:37 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+signin1
+userdataneha.singhal3107@gmail.com574373
+signin2
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+122.169.65.120 - - [Wed, 27 Nov 2013 10:42:03 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+signin1
+userdataneha.singhal3107@gmail.comp@55w0rd
+signin2
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+122.169.65.120 - - [Wed, 27 Nov 2013 10:42:50 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+signin1
+userdatan.singhal31@gmail.comsacdsvfdv
+signin2
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+122.169.65.120 - - [Wed, 27 Nov 2013 10:43:46 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
+failedUserRegistration[object Object]
