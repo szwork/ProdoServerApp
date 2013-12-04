@@ -298,7 +298,7 @@ exports.regenerateVerificationUrl = function(req, res) {
       res.send(result);
     });
 
-  user.regenerateVerificationUrl(email)
+  user.regenerateVerificationUrl(email,req.get("host"));
 }
 
 exports.resetPassword=function(req,res){

@@ -681,17 +681,17 @@ var _requestRecaptchaService=function(self,reCaptcha,clientip){
   });
 };
 
-User.prototype.regenerateVerificationUrl = function(email) {
+User.prototype.regenerateVerificationUrl = function(email,host){
 	var self=this;
 	if(isValidEmail(email).error!=undefined){
 	 	self.emit("failedRegenerateVerificationUrl",isValidEmail(email));
 	}else{
 	////////////////////////////////////////
-	_isValidUserToRegenerateToken(self,email);
+	_isValidUserToRegenerateToken(self,email,host);
 	/////////////////////////////////////
 	}
 };
-var _isValidUserToRegenerateToken=function(self,email){
+var _isValidUserToRegenerateToken=function(self,email,host){
 	userModel.findOne({email:email},function(err,user){
 		if(err){
 			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"ED001","message":"Error in db to find user"}});
@@ -699,36 +699,36 @@ var _isValidUserToRegenerateToken=function(self,email){
 			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AU005","message":"User does't exists"}});
 		}else{
 			////////////////////////////////////////
-		_regenerateVerificationToken(self,user);
+		_regenerateVerificationToken(self,user,host);
 			/////////////////////////////////////
 		}
 	})
 }
-var _regenerateVerificationToken=function(self,user){
+var _regenerateVerificationToken=function(self,user,host){
 	var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"user"});
         verificationToken.createVerificationToken(function (err, token) {
-        	console.log("addedUser1");
+        	
           if (err){  
             self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AT001","message":"Error in db to create verificationToken"}});
           }else{
-          	console.log("addedUser2");
+          	
           	logger.emit("log","createdtoken");
 
           	//////////////////////////////////////
-          _sendRegenerateTokenMail(self,token,user);
+          _sendRegenerateTokenMail(self,token,user,host);
            //////////////////////////////////////
           }
 		})
 };
-var  _sendRegenerateTokenMail=function(self,token,user){
+var  _sendRegenerateTokenMail=function(self,token,user,host){
 	EmailTemplateModel.findOne({"templatetype":"verify"},function(err,emailtemplate){
-			console.log("addedUser4");
+			
 			if(err){
-				console.log("addedUser5");
+				
 				self.emit("failedRegenerateVerificationUrl",{"error":{"code":"ED001","message":"Error in db to find verify emailtemplate"}});
 			}else if(emailtemplate){
 				console.log("addedUser6");
-				var url = "http://"+CONFIG.serverName+"/api/verify/"+token;
+				var url = "http://"+host+"/api/verify/"+token;
 				var html=emailtemplate.description;
 	            html=S(html);
 	            html=html.replaceAll("<name>",user.fullname);
