@@ -10,9 +10,11 @@
 * 27-3/2013 | xyx | Add a new property
 * 
 */
-
+var app=require("../../../prodonus-app");
 auth = function (req, res, next) {
   if (req.isAuthenticated()) { return next(); }
+  //app.set("userid","");
+  
   res.send({"error":{"message":"please login to continue this operation"}});
 }
 module.exports= auth;

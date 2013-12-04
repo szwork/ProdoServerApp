@@ -63,6 +63,7 @@ app.get("/api",function(req,res){
 io.sockets.on('connection', function(socket) {
     socket.on('addComment', function(prodle,commentdata) {
      api.productapi.addCommentBySocket(prodle,commentdata,function(err,result){
+        var userid=app.get("userid");
 
      	if(err){
      		socket.emit("commentResponse",err,null);
@@ -96,9 +97,9 @@ app.set('port', process.env.PRODONUS_PORT || 8000);
 //     app.use(express.logger(format));
 // }
 
-module.exports = io;
+//module.exports = app;
 //Set the Prodonus Server
-
+global.userid = "";
 server.listen(app.get('port'), function(){
   console.log('Prodonus is ready to server on port ' + app.get('port'));
 });

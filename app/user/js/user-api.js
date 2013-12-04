@@ -18,7 +18,7 @@ var EmailTemplateModel=require('../../common/js/email-template-model');
 
 //require cusome api
 var commonapi = require('../../common/js/common-api');
-
+var app=require("../../../prodonus-app");
 //require libraary
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -85,10 +85,12 @@ exports.activateAccount = function(req, res) {
    user.activateAccount(token);
 };
 exports.signin = function(req, res) {
-  var  userdata = req.body;
+  var  userdata = req.body.user;
   //req.body=req.body;
   logger.emit("log","req body"+userdata);
   var user = new User(userdata);
+  //console.log("myvar"+myvar);
+ 
   user.on("failedUserSignin",function(err){
     if(err.error.user!=undefined){
       logger.emit("login success"+err.error.message);
@@ -99,29 +101,35 @@ exports.signin = function(req, res) {
     res.send(err);
   });
   //
-  user.on("successfulUserSignin",function(result){
+  user.on("successfulUserSignin",function(result)
+  {
     logger.emit("info", result.success.message);
     res.send(result);
   });
 
   user.on("passportauthenticate",function(userdata){
+    var passportrequest={};
+    passportrequest.body=userdata;
     passport.authenticate('local', function(err, userdata, info) {
       if (err) { 
+
         user.emit("failedUserSignin",{"error":{"code":"AP002","message":"Error in passport to authenticate"}});
       } else if (info) {
         user.emit("failedUserSignin",{"error":{"code":info.code,"message":info.message}});
        }else {//valid user
         req.logIn(userdata,function(err){
           if(err){
+            logger.emit("log","passport sesion problem"+err);
             user.emit("failedUserSignin",{"error":{"code":"AP001","message":"Error in creating session"}});
           }else{
+            userid=userdata.userid;
             ///////////////////////////
             user.signinSession(userdata);
             ///////////////////////////
           }
         });
       }
-    })(req,res);//end of passport authenticate
+    })(passportrequest,res);//end of passport authenticate
   });
   //first calling sigin
   user.signin();

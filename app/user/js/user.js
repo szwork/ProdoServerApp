@@ -291,7 +291,7 @@ var _sendWelcomeEmail = function (self,user) {
  var _successfulUserActivation = function(self) {
 		//validate the user data
 		logger.emit("info","successfulUserActivation");
-		self.emit("tokenredirect","#/signin");
+		self.emit("tokenredirect","#/activateaccount");
 	}
 
 //signin
@@ -313,6 +313,7 @@ var _validateSignin=function(self,userdata){
 	}else{
 		console.log("signin2");
 		///////////////////////
+		//_passportauthenticate(self,userdata);
 		self.emit("passportauthenticate",userdata);
 		///////////////////////
 	}
