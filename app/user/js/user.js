@@ -305,8 +305,9 @@ User.prototype.signin = function() {
 	}
 var _validateSignin=function(self,userdata){
 	console.log("signin1");
-	console.log("userdata"+userdata.email+userdata.password);
-	if(isValidEmail(userdata.email).error!=undefined){
+	if(userdata==undefined){
+		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please provide userdata"}});
+	}else if(isValidEmail(userdata.email).error!=undefined){
 	 	self.emit("failedUserSignin",isValidEmail(userdata.email));
 	}else if(userdata.password==undefined){
 		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please enter password"}});

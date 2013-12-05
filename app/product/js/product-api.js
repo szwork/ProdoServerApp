@@ -45,37 +45,40 @@ exports.addProduct=function(req,res){
     }
 }
 exports.commentToProduct=function(req,res){
+  logger.emit("log","/////////calling to commentToProduct/////////");
   var prodle=req.params.prodle;
   var commentdata=req.body.product_comment;
-  var userdata=commentdata.user;
+
+  //var userdata=commentdata.user;
   var sessionuserid=req.user.userid;
-var product = new Product();
+  var product = new Product();
   product.on("failedCommentToProduct",function(err){
-      logger.emit("error", err.error.message,sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("log","//////End of commentToProduct//////");
       res.send(err);
     });
     product.on("successfulCommentToProduct",function(result){
+      logger.emit("log","success:"+result.success.message+":"+sessionuserid);
       logger.emit("info", result.success.message,sessionuserid);
       res.send(result);
     });
+    product.commentToProduct(sessionuserid,prodle,commentdata);
     
-   
-    if(userdata.userid==req.user.userid){
-      product.commentToProduct(prodle,commentdata);
-    }else{
-      product.emit("failedCommentToProduct",{"error":{"code":"EA001","message":"Provided user data does not match with sesion user data"}})
-    }
    
 }
 exports.getProduct=function(req,res){
+  logger.emit("log","///////Calling to Get Products///////");
    var sessionuserid=req.user.userid;
    var prodle=req.params.prodle;
    var product = new Product();
    product.on("failedGetProduct",function(err){
+     logger.emit("log","error:"+err.error.message+":"+sessionuserid);
       logger.emit("error", err.error.message,sessionuserid);
       res.send(err);
     });
     product.on("successfulGetProduct",function(result){
+      logger.emit("log","Getting Product details successfully");
       logger.emit("info", result.success.message,sessionuserid);
       res.send(result);
     });
@@ -90,6 +93,7 @@ exports.getAllProduct=function(req,res){
    
    var product = new Product();
    product.on("failedGetAllProduct",function(err){
+      logger.emit("log","error:"+err.error.message+":"+sessionuserid);
       logger.emit("error", err.error.message,sessionuserid);
       res.send(err);
     });

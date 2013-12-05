@@ -85,17 +85,20 @@ exports.activateAccount = function(req, res) {
    user.activateAccount(token);
 };
 exports.signin = function(req, res) {
-  var  userdata = req.body.user;
+  logger.emit("log","///////calling to signin//////////");
+  var  userdata = req.body;
   //req.body=req.body;
   logger.emit("log","req body"+userdata);
   var user = new User(userdata);
   //console.log("myvar"+myvar);
  
   user.on("failedUserSignin",function(err){
+    logger.emit("log","///////End of signin//////////");
+  
     if(err.error.user!=undefined){
-      logger.emit("login success"+err.error.message);
+      logger.emit("log","login success"+err.error.message);
     }else{
-      logger.emit("failed signin"+err.error.message);
+      logger.emit("log","failed signin"+err.error.message);
     }
     logger.emit("error", err.error.message,req.body.email);
     res.send(err);
@@ -103,6 +106,7 @@ exports.signin = function(req, res) {
   //
   user.on("successfulUserSignin",function(result)
   {
+    logger.emit("log","Succesfull Signin")
     logger.emit("info", result.success.message);
     res.send(result);
   });
@@ -174,6 +178,7 @@ passport.deserializeUser(function(id, done) {
 exports.updateUser = function(req, res) {
   var userid=req.params.userid;
   var userdata=req.body.user;
+
   var user = new User(userdata);
   var sessionuserid=req.user.userid;
     user.on("failedUserUpdation",function(err){
