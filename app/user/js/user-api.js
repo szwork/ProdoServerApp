@@ -123,6 +123,7 @@ exports.signin = function(req, res) {
        }else {//valid user
         req.logIn(userdata,function(err){
           if(err){
+            // req.sesion.userid=req.user.userid;
             logger.emit("log","passport sesion problem"+err);
             user.emit("failedUserSignin",{"error":{"code":"AP001","message":"Error in creating session"}});
           }else{
@@ -329,6 +330,7 @@ exports.resetPassword=function(req,res){
 }
 exports.signOutSessions=function(req,res){
     req.logout();
+    //req.session.destroy();
     res.send({"success":{"message":"You have successfully signed out"}});
 }
 //old data

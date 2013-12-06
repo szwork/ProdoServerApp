@@ -18,6 +18,11 @@ var SALT_WORK_FACTOR = 10;
 var generateTimeId = require('time-uuid');
 var SequenceModel=require('./sequence-model');
 var logger=require("./logger");
+var fs = require('fs');
+var FileUploadModel=require("./file-upload-model");
+var AWS = require('aws-sdk');
+var exec = require('child_process').exec;
+var path=require("path");
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.giantleapsystems.com", // hostname
     secureConnection: true, // use SSL
@@ -27,6 +32,12 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
         pass: "Sunil12345"
       }
 });
+// AWS.config.region = 'ap-southeast-1';
+// AWS.config.AWS_ACCESS_KEY_ID = "AKIAJOGXRBMWHVXPSC7Q";
+// AWS.config.AWS_SECRET_ACCESS_KEY = '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';
+AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
+AWS.config.update({region:'ap-southeast-1'});
+var s3bucket = new AWS.S3();
 exports.loadsequences=function(req,res){
   var sequencedata=[{
     name: "user",
@@ -119,5 +130,138 @@ exports.getNextSequnce=function(name,callback)
             });
  
   // console.log("return sequence data"+ret);
+  
+}
+exports.uploadFiles=function(file,dirname,action,callback){
+  var file_name=file.filename;
+  var file_buffer=file.filebuffer;
+  var file_length=file.filelength;  
+  var file_type=file.filetype;
+
+  var fileName = dirname + '/tmp/uploads/' + file_name;
+  fs.open(fileName, 'a', 0755, function(err, fd) {
+    if (err) {
+      callback(err)
+    }else{
+      var ext = path.extname(fileName||'').split('.');
+      ext=ext[ext.length - 1];
+      console.log("buffer size"+file_buffer.size);
+      console.log("file extension"+ext);
+      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+        if(err){
+          callback(err);
+        }else{
+          console.log(written+" bytes are written from buffer");
+          var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+           var bucketFolder;
+           var params;
+          if(action.user!=undefined){//user upload
+             bucketFolder="prodonus/user/"+action.user.userid;
+             params = {
+                         Bucket: bucketFolder,
+                         Key: action.user.userid+s3filekey,
+                         Body: writebuffer,
+                         //ACL: 'public-read-write',
+                         ContentType: file_type
+                };
+             userFileUpload(userid,params,function(err,imagelocation){
+              fs.close(fd, function() {
+                                  console.log('File saved successful!');
+               });
+            })
+          }else if(action.org!=undefined){//organization upload
+             bucketFolder="prodonus/org/"+action.org.orgid;
+             params = {
+                         Bucket: bucketFolder,
+                         Key: action.org.orgid+s3filekey,
+                         Body: writebuffer,
+                         //ACL: 'public-read-write',
+                         ContentType: file_type
+                };
+             orgFileUpload(orgid,params,function(err,imagelocation){
+                fs.close(fd, function() {
+                    console.log('File saved successful!');
+                  });
+             })
+          }else{//product uploads
+             bucketFolder="prodonus/org/"+action.product.orgid+"/product/"+action.product.prodle;
+             params = {
+                         Bucket: bucketFolder,
+                         Key: action.product.orgid+action.product.prodle+s3filekey,
+                         Body: writebuffer,
+                         //ACL: 'public-read-write',
+                         ContentType: file_type
+                };
+             orgFileUpload(prodle,params,function(err,imagelocation){
+              fs.close(fd, function() {
+                    console.log('File saved successful!');
+                  });
+             })
+          }
+          ///////S3-AMAZON BUCKET/////
+        
+        }
+      });
+    }
+  })
+}
+
+var userFileUpload=function(userid,awsparams,callback){
+  s3bucket.putObject(awsparams, function(err, data) {
+    if (err) {
+      console.log(err)
+      callback(err)
+    } else {
+      logger.emit("log","fileupload saved");
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Bucket,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject', params1, function (err, url) {
+        if(err){
+          logger.emit("error","Error in getting getSignedUrl");
+          callback(err);
+        }else{
+          var newprofileurl=url;
+          UserModel.upate({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
+            if(err){
+              callback(err);
+            }else if(profilepicupdatestatus==1){
+              callback(null,newprofileurl)
+            }else{
+              callback("provided is wrong");
+            }
+          })
+        }
+      });
+    }
+  }) 
+}
+var orgFileUpload=function(orgid,awsparams,callback){
+ s3bucket.putObject(awsparams, function(err, data) {
+    if (err) {
+      console.log(err)
+      callback(err)
+    } else {
+      logger.emit("log","fileupload saved");
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Bucket,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject', params1, function (err, url) {
+        if(err){
+          logger.emit("error","Error in getting getSignedUrl");
+          callback(err);
+        }else{
+          var newprofileurl=url;
+          OrgModel.upate({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
+            if(err){
+              callback(err);
+            }else if(profilepicupdatestatus==1){
+              callback(null,newprofileurl)
+            }else{
+              callback("provided is wrong");
+            }
+          })
+        }
+      });
+    }
+  })  
+}
+var productFileUpload=function(awsparams,callback){
   
 }

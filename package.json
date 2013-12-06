@@ -25,6 +25,11 @@
     "shortid":"*",
     "request":"*",
     "querystring":"*",
-    "socket.io":"*"
+    "socket.io":"*",
+    "aws-sdk":"*",
+    "fs":"*",
+    "passport.socketio":"*",
+    "connect":"*",
+    "connect-redis":"*"
   }
 }

@@ -55,7 +55,8 @@ var userSchema = mongoose.Schema({
   terms:{type:Boolean},
   adddate:{ type:Date,default:Date.now },
   updatedate:{ type:Date},
-  removedate:{ type:Date}
+  removedate:{ type:Date},
+  profile_pic:{type:String}
 });
 
 //Encrypt the password and generate the idwhen you save.

@@ -24,14 +24,22 @@ var fs = require('fs');
 var passport=require('passport');
 var path = require('path');
 var api=require("./app/api/api");
-
+//var SessionSockets = require('session.socket.io');
+var connect = require('connect');
+ var passportSocketIo = require("passport.socketio");
 var app = express();
+var redis = require("redis").createClient();
+var RedisStore = require('connect-redis')(express);
+
+var redisstore =new RedisStore({ host: 'localhost', port: 5000, client: redis });
+
 app.use(express.favicon());
 app.use(express.logger());
 app.use(express.cookieParser());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.session({ secret: 'keyboard cat' }));
+
+app.use(express.session({secret:"qwerty1234",store: redisstore,key:"express.sid"}));
 // Initialize Passport!  Also use passport.session() middleware, to support
 // persistent login sessions (recommended).
 app.use(passport.initialize());
@@ -39,6 +47,11 @@ app.use(passport.session());
 app.use(app.router);
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 
+
+//////
+
+  
+/////
 // enables compression for all requests
 app.use(express.compress());
 
@@ -46,7 +59,36 @@ app.use(express.compress());
 * All the routes for prodonus are initialized in the code below. The init function
 * is called on all the routes.
 */var server=http.createServer(app);
+
+////////////socket i.o/////////////
 var io = require('socket.io').listen(server);
+
+io.set('authorization', passportSocketIo.authorize({
+  cookieParser: express.cookieParser,
+  key:         'express.sid',       // the name of the cookie where express/connect stores its session_id
+  secret:      "qwerty1234",    // the session_secret to parse the cookie
+  store:       redisstore,        // we NEED to use a sessionstore. no memorystore please
+  success:     onAuthorizeSuccess,  // *optional* callback on success - read more below
+  fail:        onAuthorizeFail,     // *optional* callback on fail/error - read more below
+}));
+
+function onAuthorizeSuccess(data, accept){
+  console.log('successful connection to socket.io');
+
+  // The accept-callback still allows us to decide whether to
+  // accept the connection or not.
+  accept(null, true);
+}
+
+function onAuthorizeFail(data, message, error, accept){
+  if(error)
+    throw new Error(message);
+  console.log('failed connection to socket.io:', message);
+
+  // We use this callback to log all of our failed connections.
+  accept(null, false);
+}
+////////////////////////////////////////
 var RouteDir = './app/routes',
     files = fs.readdirSync(RouteDir);
 
@@ -60,11 +102,14 @@ app.get("/api",function(req,res){
 	res.send("Welcome to Prodonus");
 })
 // var log = new Log();
-io.sockets.on('connection', function(socket) {
+io.on('connection', function(socket) {
+    var sessionuserid=socket.handshake.user.userid;
+    console.log("passport sessiond"+socket.handshake.sessionID);
+    console.log("sessionuserid"+sessionuserid)
     socket.on('addComment', function(prodle,commentdata) {
-     api.productapi.addCommentBySocket(prodle,commentdata,function(err,result){
-        var userid=app.get("userid");
-
+       console.log("caolling to addcoment server socket");
+     api.productapi.addCommentBySocket(sessionuserid,prodle,commentdata,function(err,result){
+       
      	if(err){
      		socket.emit("commentResponse",err,null);
      	}else{
@@ -75,7 +120,18 @@ io.sockets.on('connection', function(socket) {
      })  
         //socket.emit("send-file","");
   });
+  socket.on('uploadFiles', function(file,action) {
+    api.commonapi.uploadFiles(file,__dirname,action,function(err,url){
+      if(err){
+        console.log("error in uploadFiles"+err);
+      }else{
+        socket.emit("uploadFileResponse",url);
+      }
+    })
+  })
 })
+
+
 // // defines app settings with default values for Prodonus
 // app.set('log level', process.env.PRODONUS_LOG_LEVEL || Log.DEBUG);
 // app.set('session secret', process.env.PRODONUS_SESSION_SECRET || 'secret');

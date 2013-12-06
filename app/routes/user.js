@@ -30,7 +30,7 @@ exports.init = function (app) {
   app.post('/api/recaptcha',api.userapi.recaptcha); 
   app.get('/api/verify/:token',api.userapi.activateAccount);
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
-  app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword)
+  app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
   // app.get("/api/forgotpassword/:token",api.userapi.forgotpasswordurlaction);
   // app.post("/api/resetpassword", auth,api.userapi.resetpassword);
   // app.get('/api/emailtemplate',api.emailtemplateapi.getAllEmailTemplate);

@@ -48,7 +48,7 @@ exports.commentToProduct=function(req,res){
   logger.emit("log","/////////calling to commentToProduct/////////");
   var prodle=req.params.prodle;
   var commentdata=req.body.product_comment;
-
+  logger.emit("log","commentdata"+commentdata)
   //var userdata=commentdata.user;
   var sessionuserid=req.user.userid;
   var product = new Product();
@@ -69,23 +69,20 @@ exports.commentToProduct=function(req,res){
 }
 exports.getProduct=function(req,res){
   logger.emit("log","///////Calling to Get Products///////");
-   var sessionuserid=req.user.userid;
-   var prodle=req.params.prodle;
-   var product = new Product();
-   product.on("failedGetProduct",function(err){
-     logger.emit("log","error:"+err.error.message+":"+sessionuserid);
-      logger.emit("error", err.error.message,sessionuserid);
-      res.send(err);
-    });
-    product.on("successfulGetProduct",function(result){
-      logger.emit("log","Getting Product details successfully");
-      logger.emit("info", result.success.message,sessionuserid);
-      res.send(result);
-    });
-    
-   
-    
-      product.getProduct(prodle);
+ var sessionuserid=req.user.userid;
+ var prodle=req.params.prodle;
+ var product = new Product();
+ product.on("failedGetProduct",function(err){
+   logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    res.send(err);
+  });
+  product.on("successfulGetProduct",function(result){
+    logger.emit("log","Getting Product details successfully");
+    logger.emit("info", result.success.message,sessionuserid);
+    res.send(result);
+  });
+  product.getProduct(prodle);
     
 }
 exports.getAllProduct=function(req,res){
@@ -104,7 +101,7 @@ exports.getAllProduct=function(req,res){
     product.getAllProduct();
     
 }
-exports.addCommentBySocket=function(prodle,commentdata,callback){
+exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
   
   
   var userdata=commentdata.user;
@@ -120,7 +117,7 @@ exports.addCommentBySocket=function(prodle,commentdata,callback){
     });
     
    
-      product.commentToProduct(prodle,commentdata);
+      product.commentToProduct(sessionuserid,prodle,commentdata);
   
 
 }
