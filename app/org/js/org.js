@@ -44,13 +44,13 @@ Organization.prototype.addOrganization=function(sessionuserid){
 		userModel.findOne({userid:sessionuserid,orgid:null},{userid:1},function(err,user){
 			if(err){
 					self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find user"}});
-				}else if(!user){
-						self.emit("failedOrgAdd",{"error":{"code":"AO001","message":"You can add only one organization"}});
-				}else{
+				}else if(user){
 					logger.emit("log","_hasAlreadyOrganization");
 					///////////////////////////////////////
 					_addOrganization(self,organizationdata,sessionuserid);
 					/////////////////////////////////
+				}else{
+					self.emit("failedOrgAdd",{"error":{"code":"AO001","message":"You can add only one organization"}});
 				}
 		})
 	}
@@ -88,29 +88,29 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	var _addAdminGroup = function(self,organization,sessionuserid) {
 		//validate the org data
 		orgModel.update({ orgid:organization.orgid},{$push:{usergrp:{grpname:"admin",grpmembers:sessionuserid}}},function(err,status){
-      if(err){
-       	self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to add admin group"}});
-      } else if(status!=1){
-      	self.emit("failedOrgAdd",{"error":{"code":"AO002","message":"Provided orgid doesn't exists"}});
-      }else{
-      	var organizationdata=self.organization;
-      	var invites="";
-      	for(var i=0;i<organizationdata.usergrp.length;i++){
+	      if(err){
+	       	self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to add admin group"}});
+	      } else if(status!=1){
+	      	self.emit("failedOrgAdd",{"error":{"code":"AO002","message":"Provided orgid doesn't exists"}});
+	      }else{
+	      	var organizationdata=self.organization;
+	      	var invites="";
+	      	for(var i=0;i<organizationdata.usergrp.length;i++){
 
-      		invites+=organizationdata.usergrp[0].invites;
-      	}
-      	if(invites.trim().length==0){
-	      	logger.emit("log","there is not ivtitee");
-	      	////////////////////////////////
-	      	_successfulOrgAdd(self);
-	      	///////////////////////////////
-      	}else{
-      		logger.emit("log","_addUserInvitees");
-	      	///////////////////////////////////
-	      	_addUserInvitees(self,organization);
-	      	/////////////////////////////////////
-      	}
-      }
+	      		invites+=organizationdata.usergrp[0].invites;
+	      	}
+	      	if(invites.trim().length==0){
+		      	logger.emit("log","there is not ivtitee");
+		      	////////////////////////////////
+		      	_successfulOrgAdd(self);
+		      	///////////////////////////////
+	      	}else{
+	      		logger.emit("log","_addUserInvitees");
+		      	///////////////////////////////////
+		      	_addUserInvitees(self,organization);
+		      	/////////////////////////////////////
+	      	}
+	      }
     })
 	};
 
@@ -190,21 +190,20 @@ Organization.prototype.addOrganization=function(sessionuserid){
 		//validate the org data
 		var initialvalue=0;
 		EmailTemplateModel.findOne({templatetype:"invite"},function(err,emailtemplate){
-	  	if(err){
-	    	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
-	  	}else if(!emailtemplate){
-	  		self.emit("failedOrgAdd",{"error":{"code":"ED002","message":"Server setup template issue"}});
-	    }else{
+		  	if(err){
+		    	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
+		  	}else if(emailtemplate){
+		  		logger.emit("log","calling to sendinvitemail");
+					/////////////////////////////////////////////////////////////////////////////////
+					self.emit("sendinvitemail", userdata,emailtemplate,organization.name,initialvalue);
+					////////////////////////////////////////////////////////////////////////////////
 
-	    	logger.emit("log","calling to sendinvitemail");
-				/////////////////////////////////////////////////////////////////////////////////
-				self.emit("sendinvitemail", userdata,emailtemplate,organization.name,initialvalue);
-				////////////////////////////////////////////////////////////////////////////////
-
-				/////////////////////////////////////////
-				_addInviteeGroupMembers(self,organization);
-				///////////////////////////////////////
-			}
+					/////////////////////////////////////////
+					_addInviteeGroupMembers(self,organization);
+					///////////////////////////////////////
+		    }else{
+		  		self.emit("failedOrgAdd",{"error":{"code":"ED002","message":"Server setup template issue"}});
+		  	}
 		})
 	}
 
@@ -398,13 +397,12 @@ var _getOrganization=function(self,orgid){
 	orgModel.findOne({orgid:orgid},function(err,organization){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find organizationdata"}});
-		}else if(!organization){
-			self.emit("failedUserGet",{"error":{"code":"AO002","message":"Organization doesnt exists"}});
-		}else{
+		}else if(organization){
 			 /////////////////////////////////////////////
 			_successfulOrganizationGet(self,organization);
 			/////////////////////////////////////////////
-
+		}else{
+		  self.emit("failedUserGet",{"error":{"code":"AO002","message":"Organization doesnt exists"}});
 		}
 	})
 }

@@ -69,7 +69,7 @@ exports.commentToProduct=function(req,res){
 }
 exports.getProduct=function(req,res){
   logger.emit("log","///////Calling to Get Products///////");
- var sessionuserid=req.user.userid;
+  var sessionuserid=req.user.userid;
  var prodle=req.params.prodle;
  var product = new Product();
  product.on("failedGetProduct",function(err){
@@ -105,7 +105,7 @@ exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
   
   
   var userdata=commentdata.user;
-  
+ 
   var product = new Product();
   product.on("failedCommentToProduct",function(err){
       logger.emit("error", err.error.message);

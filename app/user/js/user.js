@@ -179,10 +179,8 @@ var _verifyToken = function(self,token) {
     if (err){
 
     	self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in Db to find verification token"}});
-    } else if (!userVerificationToken){
-      self.emit("tokenredirect","#/regeneratetoken");
-    }else{
-    	userModel.findAndModify({ userid: userVerificationToken._userId},[],
+    } else if (userVerificationToken){
+      userModel.findAndModify({ userid: userVerificationToken._userId},[],
                 {$set: {verified:true}},{new:false}, function(err,user){
           if(err){
     			self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in Db to find verification token"}});
@@ -201,6 +199,9 @@ var _verifyToken = function(self,token) {
         	}
         }
       })
+    }else{
+    	
+    	self.emit("tokenredirect","#/regeneratetoken");
     }
   })
 };
@@ -294,7 +295,7 @@ var _sendWelcomeEmail = function (self,user) {
 		self.emit("tokenredirect","#/activateaccount");
 	}
 
-//signin
+//signinfi
 User.prototype.signin = function() {
 	 var self=this;
 	 var userdata=self.user;
@@ -506,14 +507,12 @@ var _getUser=function(self,userid){
 	userModel.findOne({userid:userid},function(err,user){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find user"}});
-		}else if(!user){
-			self.emit("failedUserGet",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
-
-		}else{
-				////////////////////////////////
+		}else if(user){
+	         ////////////////////////////////
 			_successfulUserGet(self,user);
 			//////////////////////////////////
-
+		}else{
+		    self.emit("failedUserGet",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 		}
 	})
 }
@@ -576,12 +575,13 @@ var _isProdonusRegisteredEmailId=function(self,email){
 	userModel.findOne({email:email},{userid:1,email:1,firstname:1,lastname:1,fullname:1},function(err,user){
 		if(err){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find users"}});
-		}else if(!user){
-			self.emit("failedSendPasswordSetting",{"error":{"code":"AU004","message":"Please give prodonus registered email id"}});
-		}else{
+		}else if(user){
 			////////////////////////////////////
 			_createOTPPasswordSetting(self,user);
 			///////////////////////////////////
+		}else{
+			self.emit("failedSendPasswordSetting",{"error":{"code":"AU004","message":"Please give prodonus registered email id"}});
+			
 		}
 	})
 };
@@ -696,12 +696,12 @@ var _isValidUserToRegenerateToken=function(self,email,host){
 	userModel.findOne({email:email},function(err,user){
 		if(err){
 			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"ED001","message":"Error in db to find user"}});
-		}else if(!user){
-			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AU005","message":"User does't exists"}});
+		}else if(user){
+				////////////////////////////////////////
+		       _regenerateVerificationToken(self,user,host);
+		     	/////////////////////////////////////
 		}else{
-			////////////////////////////////////////
-		_regenerateVerificationToken(self,user,host);
-			/////////////////////////////////////
+			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AU005","message":"User does't exists"}});
 		}
 	})
 }
@@ -801,10 +801,7 @@ var _resetPassword=function(self,userid,userdata){
 	userModel.findOne({userid:userid},{userid:1,password:1},function(err,user){
 		if(err){
 			self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to update user data"}});
-		}else if(!user){
-			self.emit("failedUserResetPassword",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
-		}else{
-
+		}else if(user){
 			user.comparePassword(currentpassword, function(err, isMatch){
       			if ( err ){
           			self.emit("failedUserResetPassword",{"error":{"code":"AU006","message":"Error in comparing password"}});
@@ -823,7 +820,8 @@ var _resetPassword=function(self,userid,userdata){
           			})
        		   }
       		});
-			
+		}else{
+			self.emit("failedUserResetPassword",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 		}
 	})
 }

@@ -23,6 +23,9 @@ var FileUploadModel=require("./file-upload-model");
 var AWS = require('aws-sdk');
 var exec = require('child_process').exec;
 var path=require("path");
+var UserModel=require("../../user/js/user-model");
+var OrgModel=require("../../org/js/org-model");
+var ProductModel=require("../../product/js/product-model");
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.giantleapsystems.com", // hostname
     secureConnection: true, // use SSL
@@ -166,11 +169,14 @@ exports.uploadFiles=function(file,dirname,action,callback){
                 };
              userFileUpload(userid,params,function(err,imagelocation){
               fs.close(fd, function() {
-                                  console.log('File saved successful!');
+                                  console.log('File user saved successful!');
                });
             })
           }else if(action.org!=undefined){//organization upload
+            console.log("organization image upload");
              bucketFolder="prodonus/org/"+action.org.orgid;
+
+             console.log("key"+action.org.orgid+s3filekey);
              params = {
                          Bucket: bucketFolder,
                          Key: action.org.orgid+s3filekey,
@@ -178,7 +184,12 @@ exports.uploadFiles=function(file,dirname,action,callback){
                          //ACL: 'public-read-write',
                          ContentType: file_type
                 };
-             orgFileUpload(orgid,params,function(err,imagelocation){
+             orgFileUpload(action.org.orgid,params,function(err,imagelocation){
+                if(err){
+                  console.log("org upload error"+err);
+                }else{
+
+                }
                 fs.close(fd, function() {
                     console.log('File saved successful!');
                   });
@@ -192,7 +203,10 @@ exports.uploadFiles=function(file,dirname,action,callback){
                          //ACL: 'public-read-write',
                          ContentType: file_type
                 };
-             orgFileUpload(prodle,params,function(err,imagelocation){
+             productFileUpload(action.product.prodle,params,function(err,imagelocation){
+              if(err){
+                console.log("product fileupload error"+err);
+              }
               fs.close(fd, function() {
                     console.log('File saved successful!');
                   });
@@ -213,14 +227,15 @@ var userFileUpload=function(userid,awsparams,callback){
       callback(err)
     } else {
       logger.emit("log","fileupload saved");
-      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Bucket,Expires: 60*60*24*365};
-      s3bucket.getSignedUrl('getObject', params1, function (err, url) {
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject',params1, function (err, url) {
         if(err){
-          logger.emit("error","Error in getting getSignedUrl");
+          logger.emit("error","Error in getting getSignedUrl"+err);
           callback(err);
         }else{
           var newprofileurl=url;
-          UserModel.upate({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
+          console.log("url"+newprofileurl);
+          userModel.update({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
             if(err){
               callback(err);
             }else if(profilepicupdatestatus==1){
@@ -241,20 +256,21 @@ var orgFileUpload=function(orgid,awsparams,callback){
       callback(err)
     } else {
       logger.emit("log","fileupload saved");
-      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Bucket,Expires: 60*60*24*365};
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
       s3bucket.getSignedUrl('getObject', params1, function (err, url) {
         if(err){
-          logger.emit("error","Error in getting getSignedUrl");
+          logger.emit("log","Error in getting getSignedUrl"+err);
           callback(err);
         }else{
-          var newprofileurl=url;
-          OrgModel.upate({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
+         // var newprofileurl=url;
+          OrgModel.update({orgid:orgid},{$push:{org_images:{image:url}}},function(err,orguploadstatus){
             if(err){
+              logger.emit("log","Error in updatin"+err);
               callback(err);
-            }else if(profilepicupdatestatus==1){
-              callback(null,newprofileurl)
+            }else if(orguploadstatus==1){
+              callback(null,url)
             }else{
-              callback("provided is wrong");
+              callback("provided orgid is wrong");
             }
           })
         }
@@ -262,6 +278,31 @@ var orgFileUpload=function(orgid,awsparams,callback){
     }
   })  
 }
-var productFileUpload=function(awsparams,callback){
-  
+var productFileUpload=function(prodle,awsparams,callback){
+  s3bucket.putObject(awsparams, function(err, data) {
+    if (err) {
+      console.log(err)
+      callback(err)
+    } else {
+      logger.emit("log","fileupload saved");
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject',params1, function (err, url) {
+        if(err){
+          logger.emit("error","Error in getting getSignedUrl");
+          callback(err);
+        }else{
+          // var newprofileurl=url;
+          ProductModel.update({prodle:prodle},{$push:{product_images:{image:url}}},function(err,productuploadstatus){
+            if(err){
+              callback(err);
+            }else if(productuploadstatus==1){
+              callback(null,url)
+            }else{
+              callback("provided prodle is wrong");
+            }
+          })
+        }
+      });
+    }
+  })  
 }

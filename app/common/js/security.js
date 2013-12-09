@@ -15,7 +15,7 @@ auth = function (req, res, next) {
   if (req.isAuthenticated()) { 
   	return next(); }
   //app.set("userid","");
-  req.session.destroy();
+ // req.session.destroy();
   res.send({"error":{"message":"please login to continue this operation"}});
 }
 module.exports= auth;

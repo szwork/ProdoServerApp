@@ -71,6 +71,7 @@ io.set('authorization', passportSocketIo.authorize({
   success:     onAuthorizeSuccess,  // *optional* callback on success - read more below
   fail:        onAuthorizeFail,     // *optional* callback on fail/error - read more below
 }));
+//io.set( 'origins', '' );
 
 function onAuthorizeSuccess(data, accept){
   console.log('successful connection to socket.io');
@@ -82,8 +83,8 @@ function onAuthorizeSuccess(data, accept){
 
 function onAuthorizeFail(data, message, error, accept){
   if(error)
-    throw new Error(message);
-  console.log('failed connection to socket.io:', message);
+    console.log("redis server not  stared");
+    console.log('failed connection to socket.io:', message);
 
   // We use this callback to log all of our failed connections.
   accept(null, false);
@@ -121,6 +122,15 @@ io.on('connection', function(socket) {
         //socket.emit("send-file","");
   });
   socket.on('uploadFiles', function(file,action) {
+    ///action for user profile update
+     //action:{user:{userid:}}
+     //action for org images upload
+     //action:{org:{userid:,orgid:}}
+     //action for product images upload
+     //action:{product:{userid:,orgid:,prodle:}}
+      
+console.log("calling to Upload files");
+    ///////////////
     api.commonapi.uploadFiles(file,__dirname,action,function(err,url){
       if(err){
         console.log("error in uploadFiles"+err);

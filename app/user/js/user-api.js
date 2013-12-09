@@ -127,7 +127,7 @@ exports.signin = function(req, res) {
             logger.emit("log","passport sesion problem"+err);
             user.emit("failedUserSignin",{"error":{"code":"AP001","message":"Error in creating session"}});
           }else{
-            userid=userdata.userid;
+           // userid=userdata.userid;
             ///////////////////////////
             user.signinSession(userdata);
             ///////////////////////////

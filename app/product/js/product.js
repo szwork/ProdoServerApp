@@ -136,12 +136,14 @@ var _getProduct=function(self,prodle){
 	productModel.findOne({prodle:prodle},function(err,product){
 		if(err){
 			self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Error in db to find Product"}});
-		}else if(!product){
-			self.emit("failedGetProduct",{"error":{"code":"AP001","message":"Provided prodle is wrong"}});
-		}else{
+		}else if(product){
 			 ////////////////////////////////
 			_successfulGetProduct(self,product);
+
 			//////////////////////////////////
+		}else{
+			
+			self.emit("failedGetProduct",{"error":{"code":"AP001","message":"Provided prodle is wrong"}});
 		}
 	})
 }
