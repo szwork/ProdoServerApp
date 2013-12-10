@@ -32,7 +32,13 @@ var redis = require("redis").createClient();
 var RedisStore = require('connect-redis')(express);
 
 var redisstore =new RedisStore({ host: 'localhost', port: 5000, client: redis });
-
+app.use(function(req, res, next) {
+  console.log("calling to app use");
+  res.on('header', function() {
+    console.trace('HEADERS GOING TO BE WRITTEN');
+  });
+  next();
+});
 app.use(express.favicon());
 app.use(express.logger());
 app.use(express.cookieParser());

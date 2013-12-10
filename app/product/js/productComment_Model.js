@@ -17,41 +17,18 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger")
 
 
-var productTagsSchema = mongoose.Schema({
-  tagid:{type:String}, 
-  tagname:{type:String}, 
-  tagmantic:{type:String}, 
-  {
-    goodbad:10 //0 ugly and 10 awesome
-  }
-  tagemotic:{type:String}, 
-  { //angry, passion, shy , irritable, dissapointed, happy, feeling great, satisfied, delighted, ecstatic, shocking, difficult, slow, low, fast, 
-    angry: 1
-    ecstatic: 10
-    passion:21
-  }
 
-});
 
 var productCommentSchema = mongoose.Schema({
   commentid:{type:String}, 
-  commentby:{type:String}, 
-  profilepicpath:{type:String}, 
-  username:{type:String}, 
-  productid:{type:String, ref:"productTagsSchema"}
+  user:{userid:{type:String,ref:"User"},profile_pic_Urlpath:{type:String},fullname:{type:String},orgname:{type:String},grpname:{type:String}},
+  prodle:{type:String, ref:"Product"},
   status:{type:String}, 
-  datecreated:{type:String}, 
-  dateremoved:{type:String}, 
-  commenttext:{type:String},
-  tags:{type:String}, 
-  commentby:{type:String}, 
-  orgid:{type:String}, 
-  companyname:{type:String},   
-  groupname:{type:String}, 
-  usergeneratedimages:{type:String}, 
-  orgid:{type:String}, 
-  companyname:{type:String}, 
-  replyComments: [{commentid:{type:String}, }]
+  datecreated:{type:Date}, 
+  dateremoved:{type:Date},   
+  commenttext:{type:String},   
+  tags:[{type:String,ref:"Tags"}]
+  
 });
 
 //Seed a product Comment

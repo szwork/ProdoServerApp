@@ -41,6 +41,12 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
+exports.removeListner=function(emitter,callback){
+  emitter.removeAllListeners(function(stream){
+    console.log(emitter+" listner removed");
+    callback(emitter+" listner removed");
+  });
+}
 exports.loadsequences=function(req,res){
   var sequencedata=[{
     name: "user",
