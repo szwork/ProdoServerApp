@@ -36,8 +36,7 @@ var warrantySchema = mongoose.Schema({
   features: [{prodle:{type:String,ref:"product"}}], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 
   incompatability: [{prodle:{type:String,ref:"product"}}], 
-  category: [{prodle:{type:String,ref:"product"}}], 
-  product_images: [{prodle:{type:String,ref:"product"}}], 
+  category: [{prodle:{type:String,ref:"product"}}],  
   status:{type:String,default:"active"},
   modified_date:
   createddate:

@@ -33,7 +33,7 @@ var RedisStore = require('connect-redis')(express);
 
 var redisstore =new RedisStore({ host: 'localhost', port: 5000, client: redis });
 app.use(function(req, res, next) {
-  console.log("calling to app use");
+  
   res.on('header', function() {
     console.trace('HEADERS GOING TO BE WRITTEN');
   });
@@ -42,7 +42,9 @@ app.use(function(req, res, next) {
 app.use(express.favicon());
 app.use(express.logger());
 app.use(express.cookieParser());
-app.use(express.bodyParser());
+// app.use(express.bodyParser());
+app.use(express.json());
+app.use(express.urlencoded());
 app.use(express.methodOverride());
 
 app.use(express.session({secret:"qwerty1234",store: redisstore,key:"express.sid"}));

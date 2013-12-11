@@ -69,23 +69,38 @@ logger.emit("log","calling to activate Account");
     console.log("failedUserActivation" + err)
     logger.emit("error", err.error.message);
     html=html.replaceAll("<message>",err.error.message).s;
-   commonapi.removeListner(user,function(result){
-      logger.log("log","All user listner removed");
-    })
+   // user.removeListener('failedUserActivation', function (stream) {
+   //   logger.emit("log","failedUserActivation event removed");
+   // });
     res.send(html);
   });
 
   user.on("successfullUserActivation",function(result){
     logger.emit("info", result.success.message);
-    commonapi.removeListner(user,function(result){
-      logger.log("log","All user listner removed");
-    })
+   // this.removeListener('successfullUserActivation', function (stream) {
+   //   logger.emit("log","successfullUserActivation event removed");
+   // });
     res.send(result);
   });
 
   user.on("tokenredirect",function(redirecturl){
-  logger.emit("log","calling to tokenredirect"+redirecturl);   
-    res.redirect(redirecturl);
+    logger.emit("log","calling to tokenredirect"+redirecturl);
+ 
+  // commonapi.removeListner(user,function(result){
+  //     logger.log("log","All user listner removed");
+  //   })
+  //commonapi.removeListner(user);
+    // var redirect_data="<html><body><script>";
+    //  redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
+    //  redirect_data+="</script>Please wait page redirect to Prodonus </body></html>"
+    //  // res.writeHead(200, {'Content-Length': redirect_data.length,'Content-Type': 'text/html' });
+  
+   res.redirect(redirecturl);
+  // user.removeListner("tokenredirect",function(stream){
+  //   console.log("lsitner removed");
+  // })
+
+  
   });
 
   var token = req.params.token;

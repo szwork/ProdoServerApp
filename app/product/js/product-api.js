@@ -20,7 +20,7 @@ var logger=require("../../common/js/logger");
 var Product=require("./product");
 
 exports.addProduct=function(req,res){
-	var orgid=req.params.orgid;
+	  var orgid=req.params.orgid;
   	var productdata=req.body.product;
   	var product = new Product(productdata);
   	var sessionuserid=req.user.userid;
