@@ -1,178 +1,88 @@
+info: socket.io started
 Prodonus is ready to server on port 8000
 Connected to prodo-dev
-_validateSendPasswordSetting
-_isProdonusRegisteredEmailId
-_isProdonusRegisteredEmailId
-_createOTPPasswordSetting
-undefined
-_sendPasswordSetting
-successfulForgotPassword
-[32minfo[39m: Password Settings Successfully sent userid=undefined
-122.169.65.120 - - [Wed, 27 Nov 2013 10:16:07 GMT] "POST /api/user/forgotpassword HTTP/1.1" 200 75 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
+///////calling to signin//////////
+req body[object Object]
 signin1
-userdataneha.singhal3107@gmail.comundefined
-failedUserRegistration[object Object]
-122.169.65.120 - - [Wed, 27 Nov 2013 10:20:16 GMT] "POST /api/user/signin HTTP/1.1" 200 80 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
-signin1
-userdataneha.singhal3107@gmail.com574373
 signin2
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-122.169.65.120 - - [Wed, 27 Nov 2013 10:21:46 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
+///////End of signin//////////
+login successUser subscription has expired
+114.143.183.59 - - [Wed, 11 Dec 2013 05:00:58 GMT] "POST /api/user/signin HTTP/1.1" 200 593 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.19 Safari/537.36"
+114.143.183.59 - - [Wed, 11 Dec 2013 05:01:02 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 304 - "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.19 Safari/537.36"
+///////calling to signin//////////
+req body[object Object]
 signin1
-userdataneha.singhal3107@gmail.com574373
 signin2
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-122.169.65.120 - - [Wed, 27 Nov 2013 10:26:46 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
+///////End of signin//////////
+failed signinInvalid password
+///////End of signin//////////
+failed signinInvalid password
+114.143.183.59 - - [Wed, 11 Dec 2013 05:01:20 GMT] "POST /api/user/signin HTTP/1.1" 200 75 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
+///////End of signin//////////
+failed signinInvalid password
+///////End of signin//////////
+failed signinInvalid password
+///////calling to signin//////////
+req body[object Object]
 signin1
-userdataneha.singhal3107@gmail.com574373
 signin2
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-122.169.65.120 - - [Wed, 27 Nov 2013 10:33:37 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+114.143.183.59 - - [Wed, 11 Dec 2013 05:01:27 GMT] "POST /api/user/signin HTTP/1.1" 200 593 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+114.143.183.59 - - [Wed, 11 Dec 2013 05:01:32 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 200 77 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
+114.143.183.59 - - [Wed, 11 Dec 2013 05:01:32 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 304 - "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
+///////calling to signin//////////
+req body[object Object]
 signin1
-userdataneha.singhal3107@gmail.com574373
 signin2
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-122.169.65.120 - - [Wed, 27 Nov 2013 10:42:03 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-signin1
-userdataneha.singhal3107@gmail.comp@55w0rd
-signin2
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-122.169.65.120 - - [Wed, 27 Nov 2013 10:42:50 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-signin1
-userdatan.singhal31@gmail.comsacdsvfdv
-signin2
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-122.169.65.120 - - [Wed, 27 Nov 2013 10:43:46 GMT] "POST /api/user/signin HTTP/1.1" 200 57 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.114 Safari/537.36"
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
-failedUserRegistration[object Object]
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+114.143.183.59 - - [Wed, 11 Dec 2013 05:12:26 GMT] "POST /api/user/signin HTTP/1.1" 200 593 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+///////End of signin//////////
+login successUser subscription has expired
+114.143.183.59 - - [Wed, 11 Dec 2013 05:12:29 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 304 - "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
+114.143.183.59 - - [Wed, 11 Dec 2013 09:46:44 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 200 77 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36"
