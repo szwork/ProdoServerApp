@@ -31,7 +31,7 @@ exports.init = function (app) {
   app.get('/api/verify/:token',api.userapi.activateAccount);
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
-  app.get("/api/user/isLogin",function(req,res){
+  app.get("/api/isLogin",function(req,res){
     if (req.isAuthenticated()){
       res.send({status:true,sessionid:req.sessionID});
     }
@@ -47,4 +47,4 @@ exports.init = function (app) {
   // app.post('/api/loademailtemplate',api.emailtemplateapi.loadEmailTemplate);
   // app.post('/api/loadsequence',api.commonapi.loadsequences);
    
-}/
+}
