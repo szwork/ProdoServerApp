@@ -18,7 +18,7 @@ var productModel = require("./product-model");
 var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var shortId = require('shortid');
-
+var ProductComment=require("./productComment_Model")
 
 var Product = function(productdata) {
 	this.product = productdata;
@@ -107,18 +107,32 @@ var _isSessionUserToComment=function(self,sessionuserid,prodle,commentdata){
 var __commentToProduct=function(self,prodle,commentdata){
 	commentdata.commentid="prc"+shortId.generate();
 	commentdata.status="active";
-	commentdata.datecreated=new Date();  
-	productModel.update({prodle:prodle},{$push:{product_comments:commentdata}},function(err,commentstatus){
+	commentdata.datecreated=new Date();
+	commentdata.prodle=prodle;
+	var product_comment=new ProductComment(commentdata);
+	product_comment.save(function(err,product_commentdata){
 		if(err){
-			self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
-		}else if(commentstatus!=1){
-			self.emit("failedCommentToProduct",{"error":{"code":"AP001","message":"prodct id is wrong"}});
+			self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
 		}else{
-
-			///////////////////////////////////
-			_successfulcommentToProduct(self);
-			/////////////////////////////////
-			
+			var q = ProductComment.find({prodle:prodle},{_id:0,prodle:0}).sort({datecreated:-1}).limit(5);
+			q.exec(function(err, comments) {
+				if(err){
+					self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to find Product Comment"}});
+				}else{
+					productModel.update({prodle:prodle},{$set:{product_comments:comments}},function(err,commentstatus){
+						if(err){
+							self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
+						}else if(commentstatus!=1){datecreated
+							self.emit("failedCommentToProduct",{"error":{"code":"AP001","message":"prodct id is wrong"}});
+						}else{
+							///////////////////////////////////
+							_successfulcommentToProduct(self);
+							/////////////////////////////////
+				
+						}
+					})
+				}
+  			})
 		}
 	})
 }

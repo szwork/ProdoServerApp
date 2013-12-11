@@ -62,17 +62,24 @@ exports.addUser = function(req,res){
 
 
 exports.activateAccount = function(req, res) {
+logger.emit("log","calling to activate Account");
   var user = new User();
   var html=S("<html><body><h1><font color=blue><a href='http://"+req.get("host")+"'>Prodonus</a></font></h1><br><message></body></html>");
   user.on("failedUserActivation",function(err){
     console.log("failedUserActivation" + err)
     logger.emit("error", err.error.message);
     html=html.replaceAll("<message>",err.error.message).s;
+   commonapi.removeListner(user,function(result){
+      logger.log("log","All user listner removed");
+    })
     res.send(html);
   });
 
   user.on("successfullUserActivation",function(result){
     logger.emit("info", result.success.message);
+    commonapi.removeListner(user,function(result){
+      logger.log("log","All user listner removed");
+    })
     res.send(result);
   });
 
