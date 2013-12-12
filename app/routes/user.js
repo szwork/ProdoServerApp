@@ -26,7 +26,7 @@ exports.init = function (app) {
   app.put("/api/user/:userid",auth,api.userapi.updateUser);//update the user data
   app.delete("/api/user/:userid",auth,api.userapi.deleteUser);//delete user
   app.post('/api/user/forgotpassword',api.userapi.forgotPassword);
-  app.get('/api/logout',auth,api.userapi.signOutSessions);
+  app.post('/api/logout',auth,api.userapi.signOutSessions);
   app.post('/api/recaptcha',api.userapi.recaptcha); 
   app.get('/api/verify/:token',api.userapi.activateAccount);
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
