@@ -107,6 +107,11 @@ logger.emit("log","calling to activate Account");
    user.activateAccount(token);
 };
 exports.signin = function(req, res) {
+   if (req.isAuthenticated()){
+     // res.send({status:true,sessionid:req.sessionID,userid:req.user.userid});
+     req.logout();
+    }
+   
   logger.emit("log","///////calling to signin//////////");
   var  userdata = req.body;
   //req.body=req.body;

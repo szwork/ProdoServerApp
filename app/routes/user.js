@@ -33,7 +33,7 @@ exports.init = function (app) {
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
   app.get("/api/isLogin",function(req,res){
     if (req.isAuthenticated()){
-      res.send({status:true,sessionid:req.sessionID});
+      res.send({status:true,sessionid:req.sessionID,userid:req.user.userid});
     }
     else{
       res.send({status:false});

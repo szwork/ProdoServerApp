@@ -32,13 +32,13 @@ var redis = require("redis").createClient();
 var RedisStore = require('connect-redis')(express);
 
 var redisstore =new RedisStore({ host: 'localhost', port: 5000, client: redis });
-app.use(function(req, res, next) {
+// app.use(function(req, res, next) {
   
-  res.on('header', function() {
-    console.trace('HEADERS GOING TO BE WRITTEN');
-  });
-  next();
-});
+//   res.on('header', function() {
+//     console.trace('HEADERS GOING TO BE WRITTEN');
+//   });
+//   next();
+// });
 app.use(express.favicon());
 app.use(express.logger());
 app.use(express.cookieParser());
@@ -118,12 +118,11 @@ io.on('connection', function(socket) {
     socket.on('addComment', function(prodle,commentdata) {
        console.log("caolling to addcoment server socket");
      api.productapi.addCommentBySocket(sessionuserid,prodle,commentdata,function(err,result){
-       
-     	if(err){
+       if(err){
      		socket.emit("commentResponse",err,null);
      	}else{
 
-     		socket.emit("commentResponse",result,{name:"Sunil More",address:"Karve Nagar"});
+     		socket.emit("commentResponse",result);
      	}
      	
      })  

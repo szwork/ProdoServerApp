@@ -22,6 +22,7 @@ var Product=require("./product");
 exports.addProduct=function(req,res){
 	  var orgid=req.params.orgid;
   	var productdata=req.body.product;
+    logger.emit("log","req product body"+JSON.stringify(req.body));
   	var product = new Product(productdata);
   	var sessionuserid=req.user.userid;
     product.on("failedProductAdd",function(err){
@@ -48,7 +49,7 @@ exports.commentToProduct=function(req,res){
   logger.emit("log","/////////calling to commentToProduct/////////");
   var prodle=req.params.prodle;
   var commentdata=req.body.product_comment;
-  logger.emit("log","commentdata"+commentdata)
+  logger.emit("log","commentdata"+JSON.stringify(commentdata))
   //var userdata=commentdata.user;
   var sessionuserid=req.user.userid;
   var product = new Product();
@@ -70,33 +71,46 @@ exports.commentToProduct=function(req,res){
 exports.getProduct=function(req,res){
   logger.emit("log","///////Calling to Get Products///////");
   var sessionuserid=req.user.userid;
- var prodle=req.params.prodle;
- var product = new Product();
- product.on("failedGetProduct",function(err){
-   logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+  var prodle=req.params.prodle;
+   var product ;//= new Product();
+     product.setMaxListeners(0); 
+
+  product.on("failedGetProduct",function(err){
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
     logger.emit("error", err.error.message,sessionuserid);
     res.send(err);
+     // eventEmitter.removeListener(this);
   });
   product.on("successfulGetProduct",function(result){
     logger.emit("log","Getting Product details successfully");
     logger.emit("info", result.success.message,sessionuserid);
     res.send(result);
+    // eventEmitter.removeListener(this);
   });
+ 
   product.getProduct(prodle);
-    
 }
 exports.getAllProduct=function(req,res){
+    // req.setMaxListeners(0); 
+
    var sessionuserid=req.user.userid;
    
    var product = new Product();
+   product.setMaxListeners(0); 
    product.on("failedGetAllProduct",function(err){
       logger.emit("log","error:"+err.error.message+":"+sessionuserid);
       logger.emit("error", err.error.message,sessionuserid);
+
       res.send(err);
+
     });
     product.on("successfulGetAllProduct",function(result){
       logger.emit("info", result.success.message,sessionuserid);
+      product.removeAllListeners(this);
       res.send(result);
+       // product.removeListener(this,function(stream){
+       //  logger.log("listner "+this+"removed");
+       // });
     });
     product.getAllProduct();
     

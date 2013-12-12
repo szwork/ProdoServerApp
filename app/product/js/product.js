@@ -115,18 +115,18 @@ var __commentToProduct=function(self,prodle,commentdata){
 			self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
 		}else{
 			var q = ProductComment.find({prodle:prodle},{_id:0,prodle:0}).sort({datecreated:-1}).limit(5);
-			q.exec(function(err, comments) {
+			q.exec(function(err, productcomments) {
 				if(err){
 					self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to find Product Comment"}});
 				}else{
-					productModel.update({prodle:prodle},{$set:{product_comments:comments}},function(err,commentstatus){
+					productModel.update({prodle:prodle},{$set:{product_comments:productcomments}},function(err,commentstatus){
 						if(err){
 							self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
 						}else if(commentstatus!=1){datecreated
 							self.emit("failedCommentToProduct",{"error":{"code":"AP001","message":"prodct id is wrong"}});
 						}else{
 							///////////////////////////////////
-							_successfulcommentToProduct(self);
+							_successfulcommentToProduct(self,productcommentsproductcomments);
 							/////////////////////////////////
 				
 						}
@@ -136,9 +136,9 @@ var __commentToProduct=function(self,prodle,commentdata){
 		}
 	})
 }
-var _successfulcommentToProduct=function(self){
+var _successfulcommentToProduct=function(self,productcomments){
 	logger.emit("log","_successfulcommentToProduct");
-	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully"}})
+	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully","prouduct_comment":productcomments}})
 }
 Product.prototype.getProduct = function(prodle) {
 	var self=this;

@@ -41,11 +41,12 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
-exports.removeListner=function(emitter,callback){
-  emitter.removeAllListeners(function(stream){
-    console.log(emitter+" listner removed");
-    callback(emitter+" listner removed");
-  });
+exports.removeListner=function(emitter){
+     emitter.removeAllListener(function()
+        {
+                console.log('removing "message" listener');
+        });
+
 }
 exports.loadsequences=function(req,res){
   var sequencedata=[{
@@ -175,6 +176,7 @@ exports.uploadFiles=function(file,dirname,action,callback){
                 };
              userFileUpload(userid,params,function(err,imagelocation){
               fs.close(fd, function() {
+                 exec("rm -rf '"+fileName+"'");
                                   console.log('File user saved successful!');
                });
             })
@@ -197,6 +199,7 @@ exports.uploadFiles=function(file,dirname,action,callback){
 
                 }
                 fs.close(fd, function() {
+                  exec("rm -rf '"+fileName+"'");
                     console.log('File saved successful!');
                   });
              })
@@ -214,6 +217,7 @@ exports.uploadFiles=function(file,dirname,action,callback){
                 console.log("product fileupload error"+err);
               }
               fs.close(fd, function() {
+                 exec("rm -rf '"+fileName+"'");
                     console.log('File saved successful!');
                   });
              })
@@ -298,6 +302,7 @@ var productFileUpload=function(prodle,awsparams,callback){
           callback(err);
         }else{
           // var newprofileurl=url;
+
           ProductModel.update({prodle:prodle},{$push:{product_images:{image:url}}},function(err,productuploadstatus){
             if(err){
               callback(err);
