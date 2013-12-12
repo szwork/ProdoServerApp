@@ -47,11 +47,13 @@ exports.addUser = function(req,res){
     user.on("failedUserRegistration",function(err){
       console.log("failedUserRegistration"+err)
       logger.emit("error", err.error.message);
+      user.removeAllListeners();
       res.send(err);
     });
 
     user.on("successfulUserRegistration",function(result){
       logger.emit("info", result.success.message);
+      user.removeAllListeners();
       res.send(result);
     });
 
@@ -72,6 +74,7 @@ logger.emit("log","calling to activate Account");
    // user.removeListener('failedUserActivation', function (stream) {
    //   logger.emit("log","failedUserActivation event removed");
    // });
+  user.removeAllListeners();
     res.send(html);
   });
 
@@ -80,6 +83,7 @@ logger.emit("log","calling to activate Account");
    // this.removeListener('successfullUserActivation', function (stream) {
    //   logger.emit("log","successfullUserActivation event removed");
    // });
+  user.removeAllListeners();
     res.send(result);
   });
 
@@ -90,15 +94,17 @@ logger.emit("log","calling to activate Account");
   //     logger.log("log","All user listner removed");
   //   })
   //commonapi.removeListner(user);
-    // var redirect_data="<html><body><script>";
-    //  redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
-    //  redirect_data+="</script>Please wsait page redirect to Prodonus </body></html>"
-    //  // res.writeHead(200, {'Content-Length': redirect_data.length,'Content-Type': 'text/html' });
-  
-   res.redirect(redirecturl);
-  // user.removeListner("tokenredirect",function(stream){
-  //   console.log("lsitner removed");
-  // })
+    var redirect_data="<html><body><script>";
+     redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
+     redirect_data+="</script>Please wsait page redirect to Prodonus </body></html>"
+   //  res.writeHead(200, {'Content-Length': redirect_data.length,'Content-Type': 'text/html' });
+    user.removeAllListeners();
+
+    res.send(redirect_data);
+
+   // user.removeListner("tokenredirect",function(stream){
+   //   console.log("lsitner removed");
+   // })
 
   
   });
@@ -128,6 +134,7 @@ exports.signin = function(req, res) {
       logger.emit("log","failed signin"+err.error.message);
     }
     logger.emit("error", err.error.message,req.body.email);
+    user.removeAllListeners();
     res.send(err);
   });
   //
@@ -135,6 +142,7 @@ exports.signin = function(req, res) {
   {
     logger.emit("log","Succesfull Signin")
     logger.emit("info", result.success.message);
+    user.removeAllListeners();
     res.send(result);
   });
 
@@ -212,11 +220,13 @@ exports.updateUser = function(req, res) {
     user.on("failedUserUpdation",function(err){
       logger.emit("log","failedUserRegistration"+JSON.stringify(err));
       logger.emit("error", err.error.message);
+      user.removeAllListeners();
       res.send(err);
     });
 
     user.on("successfulUserUpdation",function(result){
       logger.emit("info", result.success.message);
+      user.removeAllListeners();
       res.send(result);
     });
     
@@ -236,11 +246,13 @@ var sessionuserid=req.user.userid;
 var user=new User();
     user.on("failedUserDeletion",function(err){
       logger.emit("error", err.error.message,req.user.userid);
+      user.removeAllListeners();
       res.send(err);
     });
 
     user.on("successfulUserDeletion",function(result){
       logger.emit("info", result.success.message);
+      user.removeAllListeners();
       res.send(result);
     });
    
@@ -257,11 +269,13 @@ exports.getUser = function(req, res) {
   var user=new User();
   user.on("failedUserGet",function(err){
       logger.emit("error", err.error.message,req.user.userid);
+      user.removeAllListeners();
       res.send(err);
     });
 
     user.on("successfulUserGet",function(result){
       logger.emit("info", result.success.message,req.user.userid);
+      user.removeAllListeners();
       res.send(result);
     });
     user.getUser(userid);
@@ -275,11 +289,13 @@ exports.getAllUser = function(req, res) {
   var user=new User();
   user.on("failedUserGetAll",function(err){
       logger.emit("error", err.error.message,req.user.userid);
+      user.removeAllListeners();
       res.send(err);
     });
 
     user.on("successfulUserGetAll",function(result){
       logger.emit("info", result.success.message,req.user.userid);
+      user.removeAllListeners();
       res.send(result);
     });
     user.getAllUsers();
@@ -289,11 +305,13 @@ exports.forgotPassword = function(req, res) {
   var user=new User(userdata);
   user.on("failedSendPasswordSetting",function(err){
       logger.emit("error", err.error.message);
+      user.removeAllListeners();
       res.send(err);
     });
 
     user.on("successfulForgotPassword",function(result){
       logger.emit("info", result.success.message);
+      user.removeAllListeners();
       res.send(result);
     });
     user.sendPasswordSetting();
@@ -306,11 +324,13 @@ exports.recaptcha = function(req, res) {
   var clientip = req.header('x-forwarded-for') || req.connection.remoteAddress;
   user.on("failedRecaptcha",function(err){
       logger.emit("error", err.error.message);
+      user.removeAllListeners();
       res.send(err);
     });
 
     user.on("successfulRecaptcha",function(result){
       logger.emit("info", result.success.message);
+      user.removeAllListeners();
       res.send(result);
     });
     user.reCaptcha(recaptcha,clientip);
@@ -323,11 +343,13 @@ exports.regenerateVerificationUrl = function(req, res) {
 
   user.on("failedRegenerateVerificationUrl",function(err){
       logger.emit("error", err.error.message);
+      user.removeAllListeners();
       res.send(err);
     });
 
   user.on("successfulregenerateVerificationUrl",function(result){
       logger.emit("info", result.success.message);
+      user.removeAllListeners();
       res.send(result);
     });
 
@@ -342,11 +364,13 @@ exports.resetPassword=function(req,res){
   var sessionuserid=req.user.userid;
   user.on("failedUserResetPassword",function(err){
       logger.emit("error", err.error.message,req.user.userid);
+      user.removeAllListeners();
       res.send(err);
     });
 
     user.on("successfulUserResetPassword",function(result){
       logger.emit("info", result.success.message,req.user.userid);
+      user.removeAllListeners();
       res.send(result);
     });
    if(isAuthorizedUser(userid,sessionuserid)){

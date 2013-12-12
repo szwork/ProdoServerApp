@@ -54,8 +54,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(app.router);
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+app.use(function(req, res, next) {
+  console.log("app use headers");
+  req.headers['if-none-match'] = 'no-match-for-this';
+  next();  
+});
 
-
+/////to disable no cache always give 200 statuscode for eache request
+app.disable('etag');
 //////
 
   
@@ -172,7 +178,7 @@ app.set('port', process.env.PRODONUS_PORT || 8000);
 
 //module.exports = app;
 //Set the Prodonus Server
-global.userid = "";
+// global.userid = "";
 server.listen(app.get('port'), function(){
   console.log('Prodonus is ready to server on port ' + app.get('port'));
 });

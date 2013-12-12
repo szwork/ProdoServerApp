@@ -45,10 +45,12 @@ exports.addOrganization = function(req,res){
   
   organization.on("successfulOrgAdd",function(result){
     logger.emit("info",result.success.message);
+    organization.removeAllListeners();
     res.send(result);
   });
   organization.on("failedOrgAdd",function(err){
     logger.emit("error",err.error.message,req.user.userid);
+    organization.removeAllListeners();
     res.send(err);
   })
   organization.on('sendinvitemail',function(userdata,emailtemplatedata,orgname,i){
@@ -108,11 +110,13 @@ exports.updateOrganization = function(req, res) {
   var sessionuserid=req.user.userid;
     organization.on("failedOrgUpdation",function(err){
       logger.emit("error", err.error.message,sessionuserid);
+      organization.removeAllListeners();
       res.send(err);
     });
 
     organization.on("successfulOrgUpdation",function(result){
       logger.emit("info", result.success.message,sessionuserid);
+      organization.removeAllListeners();
       res.send(result);
     });
     
@@ -131,11 +135,13 @@ exports.updateOrganization = function(req, res) {
   var organization=new Organization();
       organization.on("failedOrgDeletion",function(err){
         logger.emit("error", err.error.message,req.user.userid);
+        organization.removeAllListeners();
         res.send(err);
       });
 
       organization.on("successfulOrgDeletion",function(result){
         logger.emit("info", result.success.message);
+        organization.removeAllListeners();
         res.send(result);
       });
      var isAdmin=false;
@@ -153,11 +159,13 @@ exports.getOrganization = function(req, res) {
   var organization=new Organization();
   organization.on("failedOrganizationGet",function(err){
       logger.emit("error", err.error.message,req.user.userid);
+      organization.removeAllListeners();
       res.send(err);
     });
 
     organization.on("successfulOrganizationGet",function(result){
       logger.emit("info", result.success.message);
+      organization.removeAllListeners();
       res.send(result);
     });
     organization.getOrganization(orgid);
@@ -169,11 +177,13 @@ exports.getAllOrganization = function(req, res) {
   var organization=new Organization();
   organization.on("failedOrganizationGetAll",function(err){
       logger.emit("error", err.error.message,req.user.userid);
+      organization.removeAllListeners();
       res.send(err);
     });
 
     organization.on("successfulOrganizationGetAll",function(result){
       logger.emit("info", result.success.message);
+      organization.removeAllListeners();
       res.send(result);
     });
     organization.getAllOrganization();
