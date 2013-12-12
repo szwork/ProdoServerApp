@@ -38,6 +38,6 @@ verificationTokenSchema.methods.createVerificationToken = function (done) {
       console.log("Verification token", verificationToken);
     });
 };
-
+verificationTokenSchema.set('redisCache', true);
 var VerificationTokenModel = mongoose.model('verificationtoken', verificationTokenSchema);
 module.exports = VerificationTokenModel;

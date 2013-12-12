@@ -26,12 +26,12 @@ exports.init = function (app) {
   app.put("/api/user/:userid",auth,api.userapi.updateUser);//update the user data
   app.delete("/api/user/:userid",auth,api.userapi.deleteUser);//delete user
   app.post('/api/user/forgotpassword',api.userapi.forgotPassword);
-  app.get('/api/signout/user',auth,api.userapi.signOutSessions);
+  app.get('/api/logout',auth,api.userapi.signOutSessions);
   app.post('/api/recaptcha',api.userapi.recaptcha); 
   app.get('/api/verify/:token',api.userapi.activateAccount);
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
-  app.get("/api/isLogin",function(req,res){
+  app.get("/api/isloggedin",function(req,res){
     if (req.isAuthenticated()){
       res.send({status:true,sessionid:req.sessionID,userid:req.user.userid});
     }

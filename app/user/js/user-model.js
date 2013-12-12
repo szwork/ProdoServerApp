@@ -100,7 +100,7 @@ userSchema.methods.comparePassword = function(candidatePassword, callback) {
 userSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
     return this.collection.findAndModify(query, sort, doc, options, callback);
 };
-
+ userSchema.set('redisCache', true)
 //Seed a user
 var User = mongoose.model('User', userSchema);
 

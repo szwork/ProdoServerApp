@@ -115,7 +115,7 @@ var __commentToProduct=function(self,prodle,commentdata){
 			self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
 		}else{
 			var q = ProductComment.find({prodle:prodle},{_id:0,prodle:0}).sort({datecreated:-1}).limit(5);
-			q.exec(function(err, productcomments) {
+			q.lean().exec(function(err, productcomments) {
 				if(err){
 					self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to find Product Comment"}});
 				}else{
@@ -147,7 +147,7 @@ Product.prototype.getProduct = function(prodle) {
 	////////////////////////
 };
 var _getProduct=function(self,prodle){
-	productModel.findOne({prodle:prodle},function(err,product){
+	productModel.findOne({prodle:prodle}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Error in db to find Product"}});
 		}else if(product){
@@ -172,7 +172,7 @@ Product.prototype.getAllProduct = function() {
 	///////////////////
 };
 var _getAllProduct=function(self){
-	productModel.find({},function(err,product){
+	productModel.find({}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProduct",{"error":{"code":"ED001","message":"Error in db to find all product"}});
 		}else if(product.length==0){

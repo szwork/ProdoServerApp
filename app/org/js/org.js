@@ -41,7 +41,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
    
 	};
 	var _hasAlreadyOrganization=function(self,organizationdata,sessionuserid){
-		userModel.findOne({userid:sessionuserid,orgid:null},{userid:1},function(err,user){
+		userModel.findOne({userid:sessionuserid,orgid:null},{userid:1}).lean().exec(function(err,user){
 			if(err){
 					self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find user"}});
 				}else if(user){
@@ -143,7 +143,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
 		};
 		console.log("invitee"+invitees);
 		logger.emit("log","invitee"+invitees);
-		userModel.find({email:{$in:invitees}},{email:1},function(err,user){
+		userModel.find({email:{$in:invitees}},{email:1}).lean().exec(function(err,user){
 	    if(err){
 	    	self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find users"+err}});
 	    }else{
@@ -189,7 +189,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	var _sendEmailToInvitees = function(self,organization,userdata) {
 		//validate the org data
 		var initialvalue=0;
-		EmailTemplateModel.findOne({templatetype:"invite"},function(err,emailtemplate){
+		EmailTemplateModel.findOne({templatetype:"invite"}).lean().exec(function(err,emailtemplate){
 		  	if(err){
 		    	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
 		  	}else if(emailtemplate){
@@ -248,7 +248,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
 
 		if(usergrp.length>i){ 
       
-      userModel.find({ email:{ $in :usergrp[i].grpinvites }},{userid:1},function(err,user){
+      userModel.find({ email:{ $in :usergrp[i].grpinvites }},{userid:1}).lean().exec(function(err,user){
         if( err ){
           self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find user"}});
         }else if( user.length==0 ){
@@ -394,7 +394,8 @@ Organization.prototype.getOrganization = function(orgid) {
 	_getOrganization(self,orgid);
 };
 var _getOrganization=function(self,orgid){
-	orgModel.findOne({orgid:orgid},function(err,organization){
+
+	orgModel.findOne({orgid:orgid}).lean().exec(function(err,organization){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find organizationdata"}});
 		}else if(organization){
@@ -417,7 +418,8 @@ Organization.prototype.getAllOrganization = function() {
 	///////////////////
 };
 var _getAllOrganization=function(self){
-	orgModel.find({},function(err,organization){
+	
+	userModel.find({}).lean().exec(function(err,organization){
 		if(err){
 			self.emit("failedUserGetAll",{"error":{"code":"ED001","message":"Error in db to find all organizations"}});
 		}else if(organization.length==0){

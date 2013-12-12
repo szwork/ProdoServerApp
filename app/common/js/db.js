@@ -14,12 +14,18 @@
 
  var mongodb = require('mongodb');
  var mongoose = require('mongoose');
-
+var mongooseRedisCache = require("mongoose-redis-cache");
 var CONFIG = require('config').Prodonus;
 // console.log("dbname:"+CONFIG.dbName+" dbhost"+CONFIG.dbHost);
  mongoose.connect(CONFIG.dbHost, CONFIG.dbName);
 var db = mongoose.connection;
 
+    // mongooseRedisCache(mongoose)
+    mongooseRedisCache(mongoose, {
+       host: "localhost",
+       port: "6379"
+      
+     })
 db.on('error', console.error.bind(console, 'connection error: Cannot connect to '+CONFIG.dbName));
 db.once('open', function callback() {
   console.log('Connected to '+ CONFIG.dbName);

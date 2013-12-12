@@ -46,7 +46,7 @@ var isValidEmail=function(email){
 var _validateRegisterUser = function(self,userdata,host) {
 		//check if user exist in database
 		//abc(err,userdata,this)
-	userModel.findOne({email:userdata.email},{email:1},function(err,user){
+	userModel.findOne({email:userdata.email},{email:1}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
 		}else if(user){
@@ -119,7 +119,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 		logger.emit("log","host"+host);
 		//send verification email to activate the user account
 		console.log("addedUser3");
-		EmailTemplateModel.findOne({"templatetype":"verify"},function(err,emailtemplate){
+		EmailTemplateModel.findOne({"templatetype":"verify"}).lean().exec(function(err,emailtemplate){
 			console.log("addedUser4");
 			if(err){
 				console.log("addedUser5");
@@ -207,7 +207,7 @@ var _verifyToken = function(self,token) {
 };
 var _sendWelcomeInviteEmail = function (self,user) {
 	
-   EmailTemplateModel.findOne({"templatetype":"welcomeinvite"},function(err,emailtemplate){
+   EmailTemplateModel.findOne({"templatetype":"welcomeinvite"}).lean().exec(function(err,emailtemplate){
 	   	if(err){
 	   		self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in db to find welcome emailtemplate"}});
 	   	}else if(emailtemplate){
@@ -257,7 +257,7 @@ var _sendWelcomeInviteEmail = function (self,user) {
 //send welcome mail
 var _sendWelcomeEmail = function (self,user) {
 	
-   EmailTemplateModel.findOne({"templatetype":"welcome"},function(err,emailtemplate){
+   EmailTemplateModel.findOne({"templatetype":"welcome"}).lean().exec(function(err,emailtemplate){
 	   	if(err){
 	   		self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find welcome emailtemplate"}});
 	   	}else if(emailtemplate){
@@ -331,7 +331,7 @@ _isOrganizationUser(self,user);
 _isOrganizationUser=function(self,user){
 	if(user.orgid!=undefined){
 		//console.log("organization user");
-		orgModel.findOne({orgid:user.orgid},{name:1,usergrp:1,orgtype:1},function(err,organization){
+		orgModel.findOne({orgid:user.orgid},{name:1,usergrp:1,orgtype:1}).lean().exec(function(err,organization){
             if(err){
 
             }else if(organization){
@@ -504,7 +504,7 @@ User.prototype.getUser = function(userid) {
 	_getUser(self,userid);
 };
 var _getUser=function(self,userid){
-	userModel.findOne({userid:userid},function(err,user){
+	userModel.findOne({userid:userid}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find user"}});
 		}else if(user){
@@ -527,7 +527,7 @@ User.prototype.getAllUsers = function() {
 	///////////////////
 };
 var _getAllUsers=function(self){
-	userModel.find({},function(err,user){
+	userModel.find({}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedUserGetAll",{"error":{"code":"ED001","message":"Error in db to find all users"}});
 		}else if(user.length==0){
@@ -572,7 +572,7 @@ var _validateSendPasswordSetting=function(self){
 };
 var _isProdonusRegisteredEmailId=function(self,email){
 	logger.emit("log","_isProdonusRegisteredEmailId");
-	userModel.findOne({email:email},{userid:1,email:1,firstname:1,lastname:1,fullname:1},function(err,user){
+	userModel.findOne({email:email},{userid:1,email:1,firstname:1,lastname:1,fullname:1}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find users"}});
 		}else if(user){
@@ -610,7 +610,7 @@ var _createOTPPasswordSetting=function(self,user){
 
 var _sendPasswordSetting=function(self,user,otp){
 logger.emit("log","_sendPasswordSetting");
-  EmailTemplateModel.findOne({"templatetype":"password"},function(err,emailtemplate){
+  EmailTemplateModel.findOne({"templatetype":"password"}).lean().exec(function(err,emailtemplate){
   	if(err){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find password emailtemplate"}});
   	}else if(emailtemplate){

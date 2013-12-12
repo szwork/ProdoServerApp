@@ -22,6 +22,7 @@ var sequenceSchema = new mongoose.Schema({
 sequenceSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
   return this.collection.findAndModify(query, sort, doc, options, callback);
 };
+sequenceSchema.set('redisCache', true);
 
 var SequenceModel = mongoose.model('sequence', sequenceSchema);
 module.exports = SequenceModel;

@@ -30,6 +30,7 @@
     "fs":"*",
     "passport.socketio":"*",
     "connect":"*",
-    "connect-redis":"*"
+    "connect-redis":"*",
+    "mongoose-redis-cache":"*"
   }
 }
