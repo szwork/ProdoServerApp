@@ -142,7 +142,5 @@ exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
     
    
       product.commentToProduct(sessionuserid,prodle,commentdata);
-  
-
 }
 

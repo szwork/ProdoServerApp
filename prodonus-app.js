@@ -127,8 +127,9 @@ io.on('connection', function(socket) {
        if(err){
      		socket.emit("commentResponse",err,null);
      	}else{
-
-     		socket.emit("commentResponse",result);
+         
+     		socket.broadcast.emit("commentResponse",null,result);
+        //broadcast by warrenty and product comment
      	}
      	
      })  

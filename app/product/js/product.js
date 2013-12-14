@@ -18,7 +18,7 @@ var productModel = require("./product-model");
 var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var shortId = require('shortid');
-var ProductComment=require("./productComment_Model")
+var CommentModel=require("./comment-model");
 
 var Product = function(productdata) {
 	this.product = productdata;
@@ -109,24 +109,24 @@ var __commentToProduct=function(self,prodle,commentdata){
 	commentdata.status="active";
 	commentdata.datecreated=new Date();
 	commentdata.prodle=prodle;
-	var product_comment=new ProductComment(commentdata);
+	var product_comment=new CommentModel(commentdata);
 	product_comment.save(function(err,product_commentdata){
 		if(err){
 			self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
 		}else{
-			var q = ProductComment.find({prodle:prodle},{_id:0,prodle:0}).sort({datecreated:-1}).limit(5);
-			q.lean().exec(function(err, productcomments) {
+			var q = CommentModel.find({prodle:prodle,type:"product"},{_id:0,prodle:0}).sort({datecreated:-1}).limit(5);
+			q.lean().exec(function(err, CommentModels) {
 				if(err){
 					self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to find Product Comment"}});
 				}else{
-					productModel.update({prodle:prodle},{$set:{product_comments:productcomments}},function(err,commentstatus){
+					productModel.update({prodle:prodle},{$set:{product_comments:CommentModels}},function(err,commentstatus){
 						if(err){
 							self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
-						}else if(commentstatus!=1){datecreated
+						}else if(commentstatus!=1){
 							self.emit("failedCommentToProduct",{"error":{"code":"AP001","message":"prodct id is wrong"}});
 						}else{
 							///////////////////////////////////
-							_successfulcommentToProduct(self,productcommentsproductcomments);
+							_successfulcommentToProduct(self,product_commentdata);
 							/////////////////////////////////
 				
 						}
@@ -136,9 +136,9 @@ var __commentToProduct=function(self,prodle,commentdata){
 		}
 	})
 }
-var _successfulcommentToProduct=function(self,productcomments){
+var _successfulcommentToProduct=function(self,newcomment){
 	logger.emit("log","_successfulcommentToProduct");
-	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully","prouduct_comment":productcomments}})
+	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully","prouduct_comment":newcomment}})
 }
 Product.prototype.getProduct = function(prodle) {
 	var self=this;
