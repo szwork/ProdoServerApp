@@ -83,7 +83,9 @@ productSchema.pre('save', function(next) {
  
   })
 //Seed a product
- productSchema.set('redisCache', true)
+ productSchema.set('redisCache', true);
+ productSchema.set('expires', 90);
+ 
 var Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;

@@ -31,7 +31,8 @@ var productCommentSchema = mongoose.Schema({
   tags:[{type:String,ref:"Tags"}]
   
 });
-
+productCommentSchema.set('redisCache', true);
+ productCommentSchema.set('expires', 90);
 //Seed a product Comment
 var ProductComment = mongoose.model('ProductComment', productCommentSchema);
 

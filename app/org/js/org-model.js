@@ -83,6 +83,7 @@ OrganizationSchema.pre('save', function(next) {
   next(); 
   })
  OrganizationSchema.set('redisCache', true);
+ OrganizationSchema.set('expires', 90);
  // mongooseRedisCache(mongoose)
    
 
