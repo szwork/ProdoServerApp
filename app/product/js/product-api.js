@@ -103,7 +103,7 @@ exports.getAllProduct=function(req,res){
    var sessionuserid=req.user.userid;
    
    var product = new Product();
-   product.setMaxListeners(0); 
+   // product.setMaxListeners(0); 
    product.on("failedGetAllProduct",function(err){
       logger.emit("log","error:"+err.error.message+":"+sessionuserid);
       logger.emit("error", err.error.message,sessionuserid);
@@ -115,7 +115,7 @@ exports.getAllProduct=function(req,res){
       logger.emit("info", result.success.message,sessionuserid);
       product.removeAllListeners();
      // res.header('Cache-Control', 'no-cache');
-      res.json(result);
+      res.send(result);
        // product.removeListener(this,function(stream){
        //  logger.log("listner "+this+"removed");
        // });

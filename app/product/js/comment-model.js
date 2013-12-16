@@ -24,6 +24,7 @@ var productCommentSchema = mongoose.Schema({
   user:{userid:{type:String,ref:"User"},profile_pic_Urlpath:{type:String},fullname:{type:String},orgname:{type:String},grpname:{type:String}},
   prodle:{type:String, ref:"Product"},
   status:{type:String}, 
+  type:{type:String},
   datecreated:{type:Date}, 
   dateremoved:{type:Date},   
   commenttext:{type:String},   

@@ -118,7 +118,7 @@ var __commentToProduct=function(self,prodle,commentdata){
 			q.lean().exec(function(err, CommentModels) {
 				if(err){
 					self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to find Product Comment"}});
-				}else{
+				}else if(CommentModels.length!=0){//there is no comment of product type
 					productModel.update({prodle:prodle},{$set:{product_comments:CommentModels}},function(err,commentstatus){
 						if(err){
 							self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
@@ -128,9 +128,12 @@ var __commentToProduct=function(self,prodle,commentdata){
 							///////////////////////////////////
 							_successfulcommentToProduct(self,product_commentdata);
 							/////////////////////////////////
-				
 						}
 					})
+				}else{//if there is no new product update comment
+					///////////////////////////////////
+					_successfulcommentToProduct(self,product_commentdata);
+					/////////////////////////////////
 				}
   			})
 		}
@@ -138,7 +141,7 @@ var __commentToProduct=function(self,prodle,commentdata){
 }
 var _successfulcommentToProduct=function(self,newcomment){
 	logger.emit("log","_successfulcommentToProduct");
-	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully","prouduct_comment":newcomment}})
+	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully","product_comment":newcomment}})
 }
 Product.prototype.getProduct = function(prodle) {
 	var self=this;
