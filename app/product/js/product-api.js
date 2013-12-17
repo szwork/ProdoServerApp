@@ -77,7 +77,7 @@ exports.getProduct=function(req,res){
   var sessionuserid=req.user.userid;
   var prodle=req.params.prodle;
    var product= new Product();
-     product.setMaxListeners(0); 
+     // product.setMaxListeners(0); 
 
   product.on("failedGetProduct",function(err){
     logger.emit("log","error:"+err.error.message+":"+sessionuserid);

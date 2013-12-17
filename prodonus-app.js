@@ -125,10 +125,14 @@ io.on('connection', function(socket) {
        console.log("caolling to addcoment server socket");
      api.productapi.addCommentBySocket(sessionuserid,prodle,commentdata,function(err,result){
        if(err){
-     		socket.emit("commentResponse",err,null);
+     		socket.emit("addcommentResponse",err,null);
      	}else{
-         
-     		socket.broadcast.emit("commentResponse",null,result);
+         if(commentdata.type=="product"){
+          socket.broadcast.emit("productcommentResponse",null,result);
+         }else{
+          socket.broadcast.emit("warrantycommentResponse",null,result);
+         }
+     		
         //broadcast by warrenty and product comment
      	}
      	
