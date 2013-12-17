@@ -47,31 +47,31 @@ exports.addProduct=function(req,res){
        product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
     }
 }
-exports.commentToProduct=function(req,res){
-  logger.emit("log","/////////calling to commentToProduct/////////");
-  var prodle=req.params.prodle;
-  var commentdata=req.body.product_comment;
-  logger.emit("log","commentdata"+JSON.stringify(commentdata))
-  //var userdata=commentdata.user;
-  var sessionuserid=req.user.userid;
-  var product = new Product();
-  product.on("failedCommentToProduct",function(err){
-    logger.emit("error", err.error.message,sessionuserid);
-    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
-    logger.emit("log","//////End of commentToProduct//////");
-    product.removeAllListeners();
-    res.send(err);
-  });
-    product.on("successfulCommentToProduct",function(result){
-      logger.emit("log","success:"+result.success.message+":"+sessionuserid);
-      logger.emit("info", result.success.message,sessionuserid);
-      product.removeAllListeners();
-      res.send(result);
-    });
-    product.commentToProduct(sessionuserid,prodle,commentdata);
+// exports.commentToProduct=function(req,res){
+//   logger.emit("log","/////////calling to commentToProduct/////////");
+//   var prodle=req.params.prodle;
+//   var commentdata=req.body.product_comment;
+//   logger.emit("log","commentdata"+JSON.stringify(commentdata))
+//   //var userdata=commentdata.user;
+//   var sessionuserid=req.user.userid;
+//   var product = new Product();
+//   product.on("failedCommentToProduct",function(err){
+//     logger.emit("error", err.error.message,sessionuserid);
+//     logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+//     logger.emit("log","//////End of commentToProduct//////");
+//     product.removeAllListeners();
+//     res.send(err);
+//   });
+//     product.on("successfulCommentToProduct",function(result){
+//       logger.emit("log","success:"+result.success.message+":"+sessionuserid);
+//       logger.emit("info", result.success.message,sessionuserid);
+//       product.removeAllListeners();
+//       res.send(result);
+//     });
+//     product.commentToProduct(sessionuserid,prodle,commentdata);
     
    
-}
+// }
 exports.getProduct=function(req,res){
   logger.emit("log","///////Calling to Get Products///////");
   var sessionuserid=req.user.userid;
