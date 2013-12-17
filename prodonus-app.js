@@ -119,24 +119,24 @@ app.get("/api",function(req,res){
 // var log = new Log();
 io.on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
-    console.log("passport sessiond"+socket.handshake.sessionID);
-    console.log("sessionuserid"+sessionuserid)
+    // console.log("passport sessiond"+socket.handshake.sessionID);
+    // console.log("sessionuserid"+sessionuserid)
     socket.on('addComment', function(prodle,commentdata) {
        console.log("caolling to addcoment server socket");
-     api.productapi.addCommentBySocket(sessionuserid,prodle,commentdata,function(err,result){
+       api.productapi.addCommentBySocket(sessionuserid,prodle,commentdata,function(err,result){
        if(err){
-     		socket.emit("addcommentResponse",err,null);
-     	}else{
-         if(commentdata.type=="product"){
-          socket.broadcast.emit("productcommentResponse",null,result);
-         }else{
-          socket.broadcast.emit("warrantycommentResponse",null,result);
-         }
-     		
-        //broadcast by warrenty and product comment
-     	}
-     	
-     })  
+            logger.emit("log","calling to addcomment response");  
+     	    	socket.emit("addcommentResponse",err,null);
+      	}else{
+           if(commentdata.type=="product"){
+            logger.emit("log","calling to productcommentResponse response");  
+            socket.broadcast.emit("productcommentResponse",null,result);
+           }else{
+            logger.emit("log","calling to warrantycommentResponse response");  
+            socket.broadcast.emit("warrantycommentResponse",null,result);
+           }
+     		}
+     	})  
         //socket.emit("send-file","");
   });
   socket.on('uploadFiles', function(file,action) {

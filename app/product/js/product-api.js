@@ -126,7 +126,8 @@ exports.getAllProduct=function(req,res){
 exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
   
   
-  var userdata=commentdata.user;
+  // var userdata=commentdata.user;
+  
  
   var product = new Product();
   product.on("failedCommentToProduct",function(err){
