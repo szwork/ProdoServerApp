@@ -19,21 +19,24 @@ var logger = require("../../common/js/logger")
 
 
 
-var productCommentSchema = mongoose.Schema({
+var CommentSchema = mongoose.Schema({
   commentid:{type:String}, 
   user:{userid:{type:String,ref:"User"},profile_pic_Urlpath:{type:String},fullname:{type:String},orgname:{type:String},grpname:{type:String}},
   prodle:{type:String, ref:"Product"},
-  status:{type:String}, 
+  status:{type:String,default:"active"}, 
   type:{type:String},
-  datecreated:{type:Date}, 
+  datecreated:{type:Date,default:Date.now}, 
   dateremoved:{type:Date},   
   commenttext:{type:String},   
   tags:[{type:String,ref:"Tags"}]
   
 });
-productCommentSchema.set('redisCache', true);
- productCommentSchema.set('expires', 90);
+CommentSchema.set('redisCache', true);
+ CommentSchema.set('expires', 90);
 //Seed a product Comment
-var ProductComment = mongoose.model('ProductComment', productCommentSchema);
+CommentSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+    return this.collection.findAndModify(query, sort, doc, options, callback);
+};
+var ProductComment = mongoose.model('comments', CommentSchema);
 
 module.exports = ProductComment;

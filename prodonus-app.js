@@ -168,7 +168,7 @@ app.get("/api",function(req,res){
 // app.set('session age', process.env.PRODONUS_SESSION_AGE || 3600);
 app.set('port', process.env.PRODONUS_PORT || 8000);
 
-api.commentapi.init(io);
+api.commentapi.comment(io);
 
 // // configures default logger available for middleware and requests
 // app.use(function (req, res, next) {

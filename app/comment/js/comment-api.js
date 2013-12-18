@@ -29,7 +29,25 @@ var logger=require("../../common/js/logger");
 //   });
 //   comment.addComment(sessionuserid,prodle);
 // }
-exports.init=function(io){ 
+exports.deleteComment = function(req, res) {
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var comment=new Comment();
+    comment.on("failedCommentDeletion",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+    
+      res.send(err);
+    });
+
+    comment.on("successfulCommentDeletion",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+    });
+  comment.deleteComment(sessionuserid,commentid);
+    
+}
+exports.comment=function(io){ 
 io.sockets.on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
     // console.log("passport sessiond"+socket.handshake.sessionID);

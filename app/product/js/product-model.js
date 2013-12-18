@@ -86,6 +86,6 @@ productSchema.pre('save', function(next) {
  productSchema.set('redisCache', true);
  productSchema.set('expires', 90);
  
-var Product = mongoose.model('Product', productSchema);
+var Product = mongoose.model('products', productSchema);
 
 module.exports = Product;

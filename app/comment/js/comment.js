@@ -6,6 +6,27 @@ var events = require("events");
 var shortId = require('shortid');
 var logger=require("../../common/js/logger");
 
+
+
+var updateLatestProductComment=function(prodle){
+	CommentModel.find({type:"product",status:"active"},{prodle:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
+		if(err){
+			logger.emit("log","Error in updation latest 5 product comment");
+		}else if(comment.length!=0){
+			ProductModel.update({prodle:prodle},{$set:{product_comments:comment}},function(err,latestupatestatus){
+				if(err){
+					logger.emit("error","Error in updation latest 5 product comment");
+				}else if(latestupatestatus==1){
+					logger.emit("log","Latest 5 product comments updated");			
+				}else{
+					logger.emit("error","Given product id is wrong to update latest 5 comments");
+				}
+			})
+		}else{
+			logger.emit("error","No comment of product type");
+		}
+	})
+}
 var Comment = function(commentdata) {
 	this.comment = commentdata;
 };
@@ -57,29 +78,16 @@ var __addComment=function(self,prodle,commentdata){
 		if(err){
 			self.emit("failedAddComment",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
 		}else{
-			var q = CommentModel.find({prodle:prodle,type:"product"},{_id:0,prodle:0}).sort({datecreated:-1}).limit(5);
-			q.lean().exec(function(err, CommentModels) {
-				if(err){
-					self.emit("failedAddComment",{"error":{"code":"ED001","message":"Error in db to find Product Comment"}});
-				}else if(CommentModels.length!=0){//there is no comment of product type
-					ProductModel.update({prodle:prodle},{$set:{product_comments:CommentModels}},function(err,commentstatus){
-						if(err)
-						{						
-						 	self.emit("failedAddComment",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
-						}else if(commentstatus!=1){
-							self.emit("failedAddComment",{"error":{"code":"AP001","message":"prodct id is wrong"}});
-						}else{
-							///////////////////////////////////
-							_successfulAddComment(self,product_commentdata);
-							/////////////////////////////////
-						}
-					})
-				}else{//if there is no new product update comment
-					///////////////////////////////////
-					_successfulAddComment(self,product_commentdata);
-					/////////////////////////////////
-				}
-  			})
+      
+      if(product_commentdata.type=="product"){
+      	updateLatestProductComment(product_commentdata.prodle);
+      }else{
+
+      }
+		///////////////////////////////////
+		_successfulAddComment(self,product_commentdata);
+		/////////////////////////////////
+				
 		}
 	})
 }
@@ -87,3 +95,56 @@ var _successfulAddComment=function(self,newcomment){
 	logger.emit("log","successfulAddComment");
 	self.emit("successfulAddComment",{"success":{"message":"Gave comment to product sucessfully","product_comment":newcomment}})
 }
+Comment.prototype.deleteComment = function(sessionuserid,commentid) {
+	var self=this;
+
+    /////////////////////////////////////////////////////////////
+	_isAuhorizedUserToDeleteComment(self,sessionuserid,commentid);
+	/////////////////////////////////////////////////////////////
+	
+};
+var _isAuhorizedUserToDeleteComment=function(self,sessionuserid,commentid){
+  CommentModel.findOne({commentid:commentid},{user:1},function(err,comment){
+  	if(err){
+  		self.emit("failedCommentDeletion",{"error":{"code":"ED001","message":"Error in db to find Comment"}});
+  	}else if(comment){
+
+  		 if(comment.user.userid!=sessionuserid){
+  		 		self.emit("failedCommentDeletion",{"error":{"code":"EA001","message":"You are not authorize to delete this comment"}});	
+  		 }else{
+  		 	 //////////////////////////
+        _deleteComment(self,commentid);
+				/////////////////////////
+			}
+		}else{
+  		self.emit("failedCommentDeletion",{"error":{"code":"AC001","message":"comment id is wrong"}});
+  	}
+  })
+
+}
+var _deleteComment=function(self,commentid){
+	var commentdata={status:"deactive",dateremoved:new Date()};
+	
+  CommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
+		if(err){
+			self.emit("failedCommentDeletion",{"error":{"code":"ED001","message":"Error in db to delete comment"}});
+		}else if(!comment){
+			self.emit("failedCommentDeletion",{"error":{"code":"AC001","message":"Provided commentid is wrong"}});
+		}else{
+  
+			if(comment.type="product"){
+       updateLatestProductComment(comment.prodle);
+			}else{
+       //updateLatestWarrantyComment
+			}
+			/////////////////////////////
+			_successfulCommentDeletion(self);
+			////////////////////////////
+		}
+	})
+}
+var _successfulCommentDeletion = function(self) {
+		//validate the user data
+		logger.emit("log","_successfulCommentDeletion");
+  	self.emit("successfulCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
+	}
