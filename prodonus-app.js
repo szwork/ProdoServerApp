@@ -12,6 +12,7 @@
 * 27-3/2013 | xyx | Add a new property
 * 
 */
+var logger=require("./app/common/js/logger");
 
 var express = require('express');
 // var	routes = require('./routes');
@@ -23,7 +24,7 @@ var http = require('http');
 var fs = require('fs');
 var passport=require('passport');
 var path = require('path');
-var api=require("./app/api/api");
+var api =require("./app/api/api");
 //var SessionSockets = require('session.socket.io');
 var connect = require('connect');
  var passportSocketIo = require("passport.socketio");
@@ -122,21 +123,22 @@ io.on('connection', function(socket) {
     // console.log("passport sessiond"+socket.handshake.sessionID);
     // console.log("sessionuserid"+sessionuserid)
     socket.on('addComment', function(prodle,commentdata) {
-       console.log("caolling to addcoment server socket");
-       api.productapi.addCommentBySocket(sessionuserid,prodle,commentdata,function(err,result){
+       logger.emit("log","calling to addcoment server socket by"+sessionuserid);
+       api.commentapi.addCommentBySocket(sessionuserid,prodle,commentdata,function(err,result){
        if(err){
-            logger.emit("log","calling to addcomment response");  
-     	    	socket.emit("addcommentResponse",err,null);
+          socket.emit("addcommentResponse",err,null);
       	}else{
+          socket.emit("addcommentResponse",null,{"success":{"message":"Comment Added Successfully"}});
            if(commentdata.type=="product"){
-            logger.emit("log","calling to productcommentResponse response");  
             socket.broadcast.emit("productcommentResponse",null,result);
            }else{
-            logger.emit("log","calling to warrantycommentResponse response");  
             socket.broadcast.emit("warrantycommentResponse",null,result);
            }
      		}
-     	})  
+        socket.removeListener('addComment',function(stream){
+          console.log("addcoment removed");  
+        });
+      	})  
         //socket.emit("send-file","");
   });
   socket.on('uploadFiles', function(file,action) {
@@ -147,7 +149,7 @@ io.on('connection', function(socket) {
      //action for product images upload
      //action:{product:{userid:,orgid:,prodle:}}
       
-console.log("calling to Upload files");
+    console.log("calling to Upload files");
     ///////////////
     api.commonapi.uploadFiles(file,__dirname,action,function(err,url){
       if(err){

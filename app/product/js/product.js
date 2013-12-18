@@ -18,7 +18,7 @@ var productModel = require("./product-model");
 var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var shortId = require('shortid');
-var CommentModel=require("./comment-model");
+// var CommentModel=require("./comment-model");
 
 var Product = function(productdata) {
 	this.product = productdata;
@@ -71,78 +71,78 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 		logger.log("log","_successfulProductAdd");
 		self.emit("successfulProductAdd",{"success":{"message":"Product added sucessfully"}})
 	}
-Product.prototype.commentToProduct=function(sessionuserid,prodle,commentdata){
-	var self=this;
-      ////////////////////////////////////
-	_validateCommentData(self,sessionuserid,prodle,commentdata);
-	//////////////////////////////////////
+// Product.prototype.commentToProduct=function(sessionuserid,prodle,commentdata){
+// 	var self=this;
+//       ////////////////////////////////////
+// 	_validateCommentData(self,sessionuserid,prodle,commentdata);
+// 	//////////////////////////////////////
 	
-}
-var _validateCommentData=function(self,sessionuserid,prodle,commentdata) {
-	if(commentdata==undefined){
-	   self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please provide commentdata"}});	
-	}else if(commentdata.user==undefined){
-		self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please provide user to commentdata"}});		
-	}else if(commentdata.user.userid==undefined){
-		self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please provide userid with user object"}});		
-	} else if(commentdata.commenttext==undefined){
-		self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please pass commenttext"}});			
-	}else if(commentdata.commenttext.trim().length==0){
-		self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
-	}else{
-		///////////////////////////////////////////////////////
-		_isSessionUserToComment(self,sessionuserid,prodle,commentdata);
-		///////////////////////////////////////////////////////
-	}
-}
-var _isSessionUserToComment=function(self,sessionuserid,prodle,commentdata){
-	if(sessionuserid!=commentdata.user.userid){
-		self.emit("failedCommentToProduct",{"error":{"code":"EA001","message":"Provided userid is not match with sessionuserid"}})
-	}else{
-		///////////////////////////////////////////
-		__commentToProduct(self,prodle,commentdata);
-		///////////////////////////////////////////
-	}
-}
-var __commentToProduct=function(self,prodle,commentdata){
-	commentdata.commentid="prc"+shortId.generate();
-	commentdata.status="active";
-	commentdata.datecreated=new Date();
-	commentdata.prodle=prodle;
-	var product_comment=new CommentModel(commentdata);
-	product_comment.save(function(err,product_commentdata){
-		if(err){
-			self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
-		}else{
-			var q = CommentModel.find({prodle:prodle,type:"product"},{_id:0,prodle:0}).sort({datecreated:-1}).limit(5);
-			q.lean().exec(function(err, CommentModels) {
-				if(err){
-					self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to find Product Comment"}});
-				}else if(CommentModels.length!=0){//there is no comment of product type
-					productModel.update({prodle:prodle},{$set:{product_comments:CommentModels}},function(err,commentstatus){
-						if(err){
-							self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
-						}else if(commentstatus!=1){
-							self.emit("failedCommentToProduct",{"error":{"code":"AP001","message":"prodct id is wrong"}});
-						}else{
-							///////////////////////////////////
-							_successfulcommentToProduct(self,product_commentdata);
-							/////////////////////////////////
-						}
-					})
-				}else{//if there is no new product update comment
-					///////////////////////////////////
-					_successfulcommentToProduct(self,product_commentdata);
-					/////////////////////////////////
-				}
-  			})
-		}
-	})
-}
-var _successfulcommentToProduct=function(self,newcomment){
-	logger.emit("log","_successfulcommentToProduct");
-	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully","product_comment":newcomment}})
-}
+// }
+// var _validateCommentData=function(self,sessionuserid,prodle,commentdata) {
+// 	if(commentdata==undefined){
+// 	   self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please provide commentdata"}});	
+// 	}else if(commentdata.user==undefined){
+// 		self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please provide user to commentdata"}});		
+// 	}else if(commentdata.user.userid==undefined){
+// 		self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please provide userid with user object"}});		
+// 	} else if(commentdata.commenttext==undefined){
+// 		self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please pass commenttext"}});			
+// 	}else if(commentdata.commenttext.trim().length==0){
+// 		self.emit("failedCommentToProduct",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
+// 	}else{
+// 		///////////////////////////////////////////////////////
+// 		_isSessionUserToComment(self,sessionuserid,prodle,commentdata);
+// 		///////////////////////////////////////////////////////
+// 	}
+// }
+// var _isSessionUserToComment=function(self,sessionuserid,prodle,commentdata){
+// 	if(sessionuserid!=commentdata.user.userid){
+// 		self.emit("failedCommentToProduct",{"error":{"code":"EA001","message":"Provided userid is not match with sessionuserid"}})
+// 	}else{
+// 		///////////////////////////////////////////
+// 		__commentToProduct(self,prodle,commentdata);
+// 		///////////////////////////////////////////
+// 	}
+// }
+// var __commentToProduct=function(self,prodle,commentdata){
+// 	commentdata.commentid="prc"+shortId.generate();
+// 	commentdata.status="active";
+// 	commentdata.datecreated=new Date();
+// 	commentdata.prodle=prodle;
+// 	var product_comment=new CommentModel(commentdata);
+// 	product_comment.save(function(err,product_commentdata){
+// 		if(err){
+// 			self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
+// 		}else{
+// 			var q = CommentModel.find({prodle:prodle,type:"product"},{_id:0,prodle:0}).sort({datecreated:-1}).limit(5);
+// 			q.lean().exec(function(err, CommentModels) {
+// 				if(err){
+// 					self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to find Product Comment"}});
+// 				}else if(CommentModels.length!=0){//there is no comment of product type
+// 					productModel.update({prodle:prodle},{$set:{product_comments:CommentModels}},function(err,commentstatus){
+// 						if(err){
+// 							self.emit("failedCommentToProduct",{"error":{"code":"ED001","message":"Error in db to give comment to product"}});
+// 						}else if(commentstatus!=1){
+// 							self.emit("failedCommentToProduct",{"error":{"code":"AP001","message":"prodct id is wrong"}});
+// 						}else{
+// 							///////////////////////////////////
+// 							_successfulcommentToProduct(self,product_commentdata);
+// 							/////////////////////////////////
+// 						}
+// 					})
+// 				}else{//if there is no new product update comment
+// 					///////////////////////////////////
+// 					_successfulcommentToProduct(self,product_commentdata);
+// 					/////////////////////////////////
+// 				}
+//   			})
+// 		}
+// 	})
+// }
+// var _successfulcommentToProduct=function(self,newcomment){
+// 	logger.emit("log","_successfulcommentToProduct");
+// 	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully","product_comment":newcomment}})
+// }
 Product.prototype.getProduct = function(prodle) {
 	var self=this;
 	/////////////////////////

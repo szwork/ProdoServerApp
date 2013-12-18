@@ -17,11 +17,11 @@ var productapi=require("../product/js/product-api");
 var emailtemplateapi = require("../common/js/email-template-api");
 var subscriptionapi=require("../subscription/subscription-api");
 var commonapi=require("../common/js/common-api");
-
+var commentapi=require("../comment/js/comment-api");
 exports.orgapi = orgapi;
 exports.userapi = userapi;
 exports.productapi = productapi;
-
+exports.commentapi=commentapi;
 //exports.commonapi=commonapi;
 exports.subscriptionapi=subscriptionapi;
 exports.emailtemplateapi=emailtemplateapi;

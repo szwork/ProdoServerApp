@@ -127,18 +127,20 @@ exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
   
   
   // var userdata=commentdata.user;
-  
+  logger.emit("log","req boyd comment"+JSON.stringify(req.body));
  
   var product = new Product();
   product.on("failedCommentToProduct",function(err){
       logger.emit("error", err.error.message);
-      product.removeAllListeners(); 
+      
       callback(err);
+      product.removeAllListeners(); 
     });
     product.on("successfulCommentToProduct",function(result){
       logger.emit("info", result.success.message);
-      product.removeAllListeners();
+      
       callback(null,result);
+      product.removeAllListeners();
     });
     
    
