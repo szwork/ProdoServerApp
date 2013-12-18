@@ -5,6 +5,7 @@ var ProductModel=require("../../product/js/product-model");
 var events = require("events");
 var shortId = require('shortid');
 var logger=require("../../common/js/logger");
+
 var Comment = function(commentdata) {
 	this.comment = commentdata;
 };
