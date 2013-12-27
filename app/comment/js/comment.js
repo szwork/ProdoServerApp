@@ -5,7 +5,7 @@ var ProductModel=require("../../product/js/product-model");
 var events = require("events");
 var shortId = require('shortid');
 var logger=require("../../common/js/logger");
-
+var generateId = require('time-uuid');
 
 
 var updateLatestProductComment=function(prodle){
@@ -69,7 +69,7 @@ var _isSessionUserToComment=function(self,sessionuserid,prodle,commentdata){
 	}
 }
 var __addComment=function(self,prodle,commentdata){
-	commentdata.commentid="prc"+shortId.generate();
+	commentdata.commentid=generateId();
 	commentdata.status="active";
 	commentdata.datecreated=new Date();
 	commentdata.prodle=prodle;

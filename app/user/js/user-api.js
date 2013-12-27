@@ -130,10 +130,12 @@ exports.signin = function(req, res) {
   
     if(err.error.user!=undefined){
       logger.emit("log","login success"+err.error.message);
+      err.error.user.sessionid=req.sessionID;
     }else{
       logger.emit("log","failed signin"+err.error.message);
     }
     logger.emit("error", err.error.message,req.body.email);
+    
     user.removeAllListeners();
     res.send(err);
   });
@@ -143,6 +145,8 @@ exports.signin = function(req, res) {
     logger.emit("log","Succesfull Signin")
     logger.emit("info", result.success.message);
     user.removeAllListeners();
+    result=JSON.parse(result);
+    result.success.user.sessionid=req.sessionID;
     res.send(result);
   });
 
@@ -156,6 +160,12 @@ exports.signin = function(req, res) {
       } else if (info) {
         user.emit("failedUserSignin",{"error":{"code":info.code,"message":info.message}});
        }else {//valid user
+        // var user_sessiondata={_id:userdata._id,userid:userdata.userid,isAdmin:userdata.isAdmin};
+
+        //  if(userdata.orgid!=undefined){
+        //      user_sessiondata.orgid=userdata.orgid;
+        //  }
+        console.log("userdata"+userdata);
         req.logIn(userdata,function(err){
           if(err){
             // req.sesion.userid=req.user.userid;
@@ -385,3 +395,24 @@ exports.signOutSessions=function(req,res){
     res.send({"success":{"message":"You have successfully signed out"}});
 }
 //old data
+exports.isLoggedIn=function(req,res){
+
+    var user=new User();
+    user.on("failedIsLoggedIn",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+      user.removeAllListeners();
+      res.send(err);
+    });
+
+    user.on("successfulIsLoggedIn",function(result){
+      logger.emit("info", result.success.message,req.user.userid);
+      user.removeAllListeners();
+      result.success.user.sessionid=req.sessionID;
+      res.send(result);
+    });
+    if(req.isAuthenticated){
+      user.isloggedin(req.user);
+    }else{
+       user.emit("failedIsLoggedIn",{"error":{"code":"AL001","message":"User Session expired"}});
+    }
+}

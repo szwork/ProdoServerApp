@@ -31,14 +31,15 @@ exports.init = function (app) {
   app.get('/api/verify/:token',api.userapi.activateAccount);
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
-  app.get("/api/isloggedin",function(req,res){
-    if (req.isAuthenticated()){
-      res.send({status:true,sessionid:req.sessionID,userid:req.user.userid});
-    }
-    else{
-      res.send({status:false});
-    }
-  })
+  app.get("/api/isloggedin",api.userapi.isLoggedIn);
+  // function(req,res){
+  //   if (req.isAuthenticated()){
+  //     res.send({status:true,sessionid:req.sessionID,userid:req.user.userid});
+  //   }
+  //   else{
+  //     res.send({status:false});
+  //   }
+  // })
   // app.get("/api/forgotpassword/:token",api.userapi.forgotpasswordurlaction);
   // app.post("/api/resetpassword", auth,api.userapi.resetpassword);
   // app.get('/api/emailtemplate',api.emailtemplateapi.getAllEmailTemplate);

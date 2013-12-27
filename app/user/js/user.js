@@ -324,18 +324,18 @@ var _validateSignin=function(self,userdata){
 
 User.prototype.signinSession=function(user){
 var self=this;
-////////////////////
-_isOrganizationUser(self,user);
+///////////////////////////
+_isOTPUser(self,user);
 /////////////////////
 };
-_isOrganizationUser=function(self,user){
+var _isOrganizationUser=function(user,callback){
 	if(user.orgid!=undefined){
 		//console.log("organization user");
 		orgModel.findOne({orgid:user.orgid},{name:1,usergrp:1,orgtype:1}).lean().exec(function(err,organization){
             if(err){
 
             }else if(organization){
-            	var grpname="";
+              var grpname="";
               var usergrp=organization.usergrp;
               for(var i=0;i<usergrp.length;i++){
                 var grpmember=usergrp[i].grpmembers;
@@ -355,30 +355,65 @@ _isOrganizationUser=function(self,user){
               userdata.grpname=grpname;
               console.log("user"+userdata.orgname);
 
-              console.log("user in org"+user+"organization name"+organization.name+"grpname"+grpname);
-              //////////////////////
-				_isOTPUser(self,userdata);
-			////////////////////
-            }else{
+              console.log("user in org"+userdata+"organization name"+organization.name+"grpname"+grpname);
+              
+				/////////////////////////
+				callback(userdata);
+				/////////////////////////
+			}else{
 
             }
          }); 
 	}else{
-		//////////////////////
-		_isOTPUser(self,user);
-		////////////////////
+		/////////////////////////
+		callback(user);
+	    /////////////////////////
 	}
+}
+var getUserRequiredData=function(user,callback){
+
+	var user_senddata={userid:user.userid,fullname:user.fullname,products_followed:user.products_followed,isAdmin:user.isAdmin,isOtpPassword:user.isOtpPassword};
+	if(user.orgid!=undefined){
+		user_senddata.orgid=user.orgid;
+	}
+	 console.log(user);
+	_isOrganizationUser(user_senddata,function(user_senddata){
+		if(user.subscription.planid==undefined){
+			user_senddata.isSubscribed=false;
+		}else {
+			user_senddata.isSubscribed=true;
+			if(new Date(user.subscription.planexpirydate)<new Date()){//subscription expired
+				user_senddata.subscriptionExpired=true;
+			}else{
+				user_senddata.subscriptionExpired=false;
+				console.log(""+user.payment);
+				if(user.payment.paymentid==undefined){
+					user_senddata.hasDonePayment=false;
+				}else{
+					user_senddata.hasDonePayment=true;
+				}
+			}	
+		}
+		callback(user_senddata);
+
+	})
 }
 var _isOTPUser=function(self,user){
 	
-	if(user.isOtpPassword==true){
-		self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
-	}else{
+	getUserRequiredData(user,function(userdata){
+			if(userdata.isOtpPassword==true){
+				self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
+			}else{
+
 		/////////////////////////
-		_isSubscribed(self,user);
+		_isSubscribed(self,userdata);
 		/////////////////////////
-	}
+	}	
+	
+		})
+	
 }
+
 var _isSubscribed=function(self,user){
  	// var isubscribed=true;
 	// if(user.subscription.planid==undefined){
@@ -386,7 +421,8 @@ var _isSubscribed=function(self,user){
 	// }else{
 
 	// }
-	if(user.subscription==undefined){
+	// _checkUserIsSubscribed(user,function(user))
+	if(user.isSubscribed==false){
 		 self.emit("failedUserSignin",{"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}}); 
 	}else{
 		/////////////////////////////////
@@ -396,7 +432,7 @@ var _isSubscribed=function(self,user){
 }
 var _isSubscriptionExpired=function(self,user){
 	// var isubscriptionexpired=true;
-	if(new Date(subscription.planexpirydate)<new Date()){
+	if(user.subscriptionExpired==true){
 		self.emit("failedUserSignin",{"error":{"code":"AS002","message":"User subscription has expired","user":user}}); 
 	}else{
 		//to check user has made payment or not
@@ -424,8 +460,8 @@ var _hasDonePayment=function(self,user){
   //user.orgid exist
   //user is admin for particular user to check in admingroup userid
 */
-  var donepayment=true;
-  if(!donepayment){
+  //var donepayment=true;
+  if(user.hasDonePayment==false){
   	self.emit("failedUserSignin",{"error":{"code":"AP001","message":"User has not made payment","user":user}}); 
   }else{
   	///////////////////////////////
@@ -831,5 +867,21 @@ var _successfulUserResetPassword = function(self) {
 		logger.emit("log","_successfulUserResetPassword");
 		self.emit("successfulUserResetPassword", {"success":{"message":"User password changed successfully"}});
 	}
-           
+   
+User.prototype.isloggedin = function(user) {
+	var self=this;
+	_isLoogedIn(self,user);
+};
+var _isLoogedIn=function(self,user){
+	getUserRequiredData(user,function(userdata){
+		//////////////////////////
+         _successfulIsLoggedIn(self,userdata)
+		////////////////////////////
+	})
+	
+}
+var _successfulIsLoggedIn=function(self,user){
+	logger.emit("log","_successfulIsLoggedIn");
+	self.emit("successfulIsLoggedIn", {success:{message:"Getting User details Successfully",user:user}});
+}       
               
