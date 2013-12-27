@@ -48,7 +48,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
 
-app.use(express.session({secret:"qwerty1234",store: redisstore,key:"prodo.sid"}));
+app.use(express.session({secret:"qwerty1234",store: redisstore,key:"prodosid"}));
 // Initialize Passport!  Also use passport.session() middleware, to support
 // persistent login sessions (recommended).
 app.use(passport.initialize());
@@ -80,7 +80,7 @@ var io = require('socket.io').listen(server);
 
 io.set('authorization', passportSocketIo.authorize({
   cookieParser: express.cookieParser,
-  key:         'prodo.sid',       // the name of the cookie where express/connect stores its session_id
+  key:         'prodosid',       // the name of the cookie where express/connect stores its session_id
   secret:      "qwerty1234",    // the session_secret to parse the cookie
   store:       redisstore,        // we NEED to use a sessionstore. no memorystore please
   success:     onAuthorizeSuccess,  // *optional* callback on success - read more below
