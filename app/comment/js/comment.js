@@ -53,6 +53,8 @@ var _validateCommentData=function(self,sessionuserid,prodle) {
 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass commenttext"}});			
 	}else if(commentdata.commenttext.trim().length==0){
 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
+	}else if(commentdata.type==undefined){
+		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
 	}else{
 		///////////////////////////////////////////////////////
 		_isSessionUserToComment(self,sessionuserid,prodle,commentdata);

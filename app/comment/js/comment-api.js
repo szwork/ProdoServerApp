@@ -69,7 +69,7 @@ io.sockets.on('connection', function(socket) {
 
         })
         socket.emit("addcommentResponse",null,result);
-        if(commentdata.type=="product"){
+        if(result.success.product_comment.type=="product"){
           socket.broadcast.emit("productcommentResponse",null,result);
         }else{
           socket.broadcast.emit("warrantycommentResponse",null,result);

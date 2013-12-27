@@ -399,7 +399,7 @@ exports.isLoggedIn=function(req,res){
 
     var user=new User();
     user.on("failedIsLoggedIn",function(err){
-      logger.emit("error", err.error.message,req.user.userid);
+      
       user.removeAllListeners();
       res.send(err);
     });
@@ -410,7 +410,7 @@ exports.isLoggedIn=function(req,res){
       result.success.user.sessionid=req.sessionID;
       res.send(result);
     });
-    if(req.isAuthenticated){
+    if(req.isAuthenticated()){
       user.isloggedin(req.user);
     }else{
        user.emit("failedIsLoggedIn",{"error":{"code":"AL001","message":"User Session expired"}});
