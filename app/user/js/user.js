@@ -380,13 +380,13 @@ var _isOTPUser=function(self,user){
 	}
 }
 var _isSubscribed=function(self,user){
- 	var isubscribed=true;
+ 	// var isubscribed=true;
 	// if(user.subscription.planid==undefined){
 
 	// }else{
 
 	// }
-	if(!isubscribed){
+	if(user.subscription==undefined){
 		 self.emit("failedUserSignin",{"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}}); 
 	}else{
 		/////////////////////////////////
@@ -395,8 +395,8 @@ var _isSubscribed=function(self,user){
 	}
 }
 var _isSubscriptionExpired=function(self,user){
-	var isubscriptionexpired=true;
-	if(isubscriptionexpired){
+	// var isubscriptionexpired=true;
+	if(new Date(subscription.planexpirydate)<new Date()){
 		self.emit("failedUserSignin",{"error":{"code":"AS002","message":"User subscription has expired","user":user}}); 
 	}else{
 		//to check user has made payment or not
