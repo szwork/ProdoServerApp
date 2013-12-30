@@ -480,7 +480,7 @@ User.prototype.updateUser = function(userid) {
 	var self=this;
 	var userdata=this.user;
 	if(userdata==undefined){
-		self.emit("failedUserUpdation",{"error":{"code":"AV001","message":"Error in db to update user data"}});	
+		self.emit("failedUserUpdation",{"error":{"code":"AV001","message":"Please provide userdata"}});	
 	}else{
 			/////////////////////////////////
 	_updateUser(self,userid,userdata);

@@ -400,12 +400,14 @@ exports.isLoggedIn=function(req,res){
     var user=new User();
     user.on("failedIsLoggedIn",function(err){
       
-      user.removeAllListeners();
+      user.removeAllListeners("failedIsLoggedIn",function(stream){
+        logger.emit("log","failedIsLoggedIn event removed");
+      });
       res.send(err);
     });
 
     user.on("successfulIsLoggedIn",function(result){
-      logger.emit("info", result.success.message,req.user.userid);
+      logger.emit("info", result.success.message,result.success.user.userid);
       user.removeAllListeners();
       result.success.user.sessionid=req.sessionID;
       res.send(result);
