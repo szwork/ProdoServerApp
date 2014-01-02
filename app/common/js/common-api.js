@@ -177,8 +177,13 @@ exports.uploadFiles=function(file,dirname,action,callback){
              userFileUpload(userid,params,function(err,imagelocation){
               fs.close(fd, function() {
                  exec("rm -rf '"+fileName+"'");
-                                  console.log('File user saved successful!');
+                  console.log('File user saved successful!');
                });
+              if(err){
+                callback(err);
+              }else{
+                callback(null,imagelocation);
+              }
             })
           }else if(action.org!=undefined){//organization upload
             console.log("organization image upload");
@@ -195,8 +200,9 @@ exports.uploadFiles=function(file,dirname,action,callback){
              orgFileUpload(action.org.orgid,params,function(err,imagelocation){
                 if(err){
                   console.log("org upload error"+err);
+                   callback(err);
                 }else{
-
+                  callback(null,imagelocation);
                 }
                 fs.close(fd, function() {
                   exec("rm -rf '"+fileName+"'");
@@ -215,6 +221,9 @@ exports.uploadFiles=function(file,dirname,action,callback){
              productFileUpload(action.product.prodle,params,function(err,imagelocation){
               if(err){
                 console.log("product fileupload error"+err);
+                callback(err);
+              }else{
+                callback(null,imagelocation);
               }
               fs.close(fd, function() {
                  exec("rm -rf '"+fileName+"'");

@@ -154,6 +154,8 @@ io.on('connection', function(socket) {
     api.commonapi.uploadFiles(file,__dirname,action,function(err,url){
       if(err){
         console.log("error in uploadFiles"+err);
+        // socket.emit("uploadFileResponse",)
+        logger.emit("log","Error in upload "+action);
       }else{
         socket.emit("uploadFileResponse",url);
       }
