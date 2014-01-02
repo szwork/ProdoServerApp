@@ -521,9 +521,10 @@ User.prototype.deleteUser = function(userid) {
 	
 };
 var _deleteUser=function(self,userid)
+{
 	// var userdata={removedate:new Date(),status:"deactive"}
 	// userdata.removedate=new Date();
-	userModel.update({userid:userid},{$set:{removedate:new Date(),status:"deactive"}},function(err,userupdatestatus){
+	userModel.update({userid:userid},{$set:{removedate:new Date(),status:'deactive'}},function(err,userupdatestatus){
 		if(err){
 			self.emit("failedUserDeletion",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(userupdatestatus!=1){

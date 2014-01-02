@@ -187,7 +187,7 @@ exports.signin = function(req, res) {
 }
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
-    userModel.findOne({ email: email}, function(err, user) {
+    userModel.findOne({ email: email,status:"deactive"}, function(err, user) {
       if (err){ 
        return done(err); 
       }
