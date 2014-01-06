@@ -44,16 +44,16 @@ var isAuthorizedUser=function(userid,sessionuserid){
 exports.addUser = function(req,res){
    var  userdata = req.body.user;
    var user = new User(userdata);
-    user.on("failedUserRegistration",function(err){
+    user.once("failedUserRegistration",function(err){
       console.log("failedUserRegistration"+err)
       logger.emit("error", err.error.message);
-      user.removeAllListeners();
+      // //user.removeAllListeners();
       res.send(err);
     });
 
-    user.on("successfulUserRegistration",function(result){
+    user.once("successfulUserRegistration",function(result){
       logger.emit("info", result.success.message);
-      user.removeAllListeners();
+      // //user.removeAllListeners();
       res.send(result);
     });
 
@@ -67,27 +67,27 @@ exports.activateAccount = function(req, res) {
 logger.emit("log","calling to activate Account");
   var user = new User();
   var html=S("<html><body><h1><font color=blue><a href='http://"+req.get("host")+"'>Prodonus</a></font></h1><br><message></body></html>");
-  user.on("failedUserActivation",function(err){
+  user.once("failedUserActivation",function(err){
     console.log("failedUserActivation" + err)
     logger.emit("error", err.error.message);
     html=html.replaceAll("<message>",err.error.message).s;
    // user.removeListener('failedUserActivation', function (stream) {
    //   logger.emit("log","failedUserActivation event removed");
    // });
-  user.removeAllListeners();
+   // //user.removeAllListeners();
     res.send(html);
   });
 
-  user.on("successfullUserActivation",function(result){
+  user.once("successfullUserActivation",function(result){
     logger.emit("info", result.success.message);
    // this.removeListener('successfullUserActivation', function (stream) {
    //   logger.emit("log","successfullUserActivation event removed");
    // });
-  user.removeAllListeners();
+  // //user.removeAllListeners();
     res.send(result);
   });
 
-  user.on("tokenredirect",function(redirecturl){
+  user.once("tokenredirect",function(redirecturl){
     logger.emit("log","calling to tokenredirect"+redirecturl);
  
   // commonapi.removeListner(user,function(result){
@@ -98,7 +98,7 @@ logger.emit("log","calling to activate Account");
      redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
      redirect_data+="</script>Please wsait page redirect to Prodonus </body></html>"
    //  res.writeHead(200, {'Content-Length': redirect_data.length,'Content-Type': 'text/html' });
-    user.removeAllListeners();
+    // //user.removeAllListeners();
 
     res.send(redirect_data);
 
@@ -125,7 +125,7 @@ exports.signin = function(req, res) {
   var user = new User(userdata);
   //console.log("myvar"+myvar);
  
-  user.on("failedUserSignin",function(err){
+  user.once("failedUserSignin",function(err){
     logger.emit("log","///////End of signin//////////");
   
     if(err.error.user!=undefined){
@@ -136,21 +136,29 @@ exports.signin = function(req, res) {
     }
     logger.emit("error", err.error.message,req.body.email);
     
-    user.removeAllListeners();
-    res.send(err);
+    // //user.removeAllListeners("failedUserSignin",function(stream){
+    //   logger.emit("log"," failedUserSignin emitter removed");
+    // });
+    // res.send(err);
   });
   //
-  user.on("successfulUserSignin",function(result)
+  user.once("successfulUserSignin",function(result)
   {
     logger.emit("log","Succesfull Signin")
     logger.emit("info", result.success.message);
-    user.removeAllListeners();
+    //user.removeAllListeners();
     result=JSON.parse(result);
     result.success.user.sessionid=req.sessionID;
+
+    // //user.removeAllListeners("successfulUserSigninsuccessfulUserSignin",function(stream){
+    //   logger.emit("log"," successfulUserSignin emitter removed");
+    // });
     res.send(result);
   });
-
-  user.on("passportauthenticate",function(userdata){
+   user.removeListener("passportauthenticate",function(stream){
+      logger.emit("log"," successfulUserSignin emitter removed");
+    });
+  user.once("passportauthenticate",function(userdata){
     var passportrequest={};
     passportrequest.body=userdata;
     passport.authenticate('local', function(err, userdata, info) {
@@ -180,6 +188,7 @@ exports.signin = function(req, res) {
         });
       }
     })(passportrequest,res);//end of passport authenticate
+
   });
   //first calling sigin
   user.signin();
@@ -227,16 +236,16 @@ exports.updateUser = function(req, res) {
 
   var user = new User(userdata);
   var sessionuserid=req.user.userid;
-    user.on("failedUserUpdation",function(err){
+    user.once("failedUserUpdation",function(err){
       logger.emit("log","failedUserRegistration"+JSON.stringify(err));
       logger.emit("error", err.error.message);
-      user.removeAllListeners();
+      // //user.removeAllListeners();
       res.send(err);
     });
 
-    user.on("successfulUserUpdation",function(result){
+    user.once("successfulUserUpdation",function(result){
       logger.emit("info", result.success.message);
-      user.removeAllListeners();
+      // //user.removeAllListeners();
       res.send(result);
     });
     
@@ -254,15 +263,15 @@ exports.deleteUser = function(req, res) {
 var userid=req.params.userid;
 var sessionuserid=req.user.userid;
 var user=new User();
-    user.on("failedUserDeletion",function(err){
+    user.once("failedUserDeletion",function(err){
       logger.emit("error", err.error.message,req.user.userid);
-      user.removeAllListeners();
+      // //user.removeAllListeners();
       res.send(err);
     });
 
-    user.on("successfulUserDeletion",function(result){
+    user.once("successfulUserDeletion",function(result){
       logger.emit("info", result.success.message);
-      user.removeAllListeners();
+      // //user.removeAllListeners();
       res.send(result);
     });
    
@@ -277,15 +286,15 @@ exports.getUser = function(req, res) {
   var userid=req.params.userid;
   var sessionuserid=req.user.userid;
   var user=new User();
-  user.on("failedUserGet",function(err){
+  user.once("failedUserGet",function(err){
       logger.emit("error", err.error.message,req.user.userid);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(err);
     });
 
-    user.on("successfulUserGet",function(result){
+    user.once("successfulUserGet",function(result){
       logger.emit("info", result.success.message,req.user.userid);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(result);
     });
     user.getUser(userid);
@@ -297,15 +306,15 @@ exports.getAllUser = function(req, res) {
   
   var sessionuserid=req.user.userid;
   var user=new User();
-  user.on("failedUserGetAll",function(err){
+  user.once("failedUserGetAll",function(err){
       logger.emit("error", err.error.message,req.user.userid);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(err);
     });
 
-    user.on("successfulUserGetAll",function(result){
+    user.once("successfulUserGetAll",function(result){
       logger.emit("info", result.success.message,req.user.userid);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(result);
     });
     user.getAllUsers();
@@ -313,15 +322,15 @@ exports.getAllUser = function(req, res) {
 exports.forgotPassword = function(req, res) {
   var userdata=req.body.user
   var user=new User(userdata);
-  user.on("failedSendPasswordSetting",function(err){
+  user.once("failedSendPasswordSetting",function(err){
       logger.emit("error", err.error.message);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(err);
     });
 
-    user.on("successfulForgotPassword",function(result){
+    user.once("successfulForgotPassword",function(result){
       logger.emit("info", result.success.message);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(result);
     });
     user.sendPasswordSetting();
@@ -332,15 +341,15 @@ exports.recaptcha = function(req, res) {
   var user=new User();
   var recaptcha=req.body.recaptcha;
   var clientip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-  user.on("failedRecaptcha",function(err){
+  user.once("failedRecaptcha",function(err){
       logger.emit("error", err.error.message);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(err);
     });
 
-    user.on("successfulRecaptcha",function(result){
+    user.once("successfulRecaptcha",function(result){
       logger.emit("info", result.success.message);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(result);
     });
     user.reCaptcha(recaptcha,clientip);
@@ -351,15 +360,15 @@ exports.regenerateVerificationUrl = function(req, res) {
   var user=new User();
   var email=req.body.email;
 
-  user.on("failedRegenerateVerificationUrl",function(err){
+  user.once("failedRegenerateVerificationUrl",function(err){
       logger.emit("error", err.error.message);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(err);
     });
 
-  user.on("successfulregenerateVerificationUrl",function(result){
+  user.once("successfulregenerateVerificationUrl",function(result){
       logger.emit("info", result.success.message);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(result);
     });
 
@@ -372,15 +381,15 @@ exports.resetPassword=function(req,res){
   var user=new User(userdata);
   var userid=req.params.userid;
   var sessionuserid=req.user.userid;
-  user.on("failedUserResetPassword",function(err){
+  user.once("failedUserResetPassword",function(err){
       logger.emit("error", err.error.message,req.user.userid);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(err);
     });
 
-    user.on("successfulUserResetPassword",function(result){
+    user.once("successfulUserResetPassword",function(result){
       logger.emit("info", result.success.message,req.user.userid);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       res.send(result);
     });
    if(isAuthorizedUser(userid,sessionuserid)){
@@ -398,17 +407,17 @@ exports.signOutSessions=function(req,res){
 exports.isLoggedIn=function(req,res){
 
     var user=new User();
-    user.on("failedIsLoggedIn",function(err){
+    user.once("failedIsLoggedIn",function(err){
       
-      user.removeAllListeners("failedIsLoggedIn",function(stream){
+      //user.removeAllListeners("failedIsLoggedIn",function(stream){
         logger.emit("log","failedIsLoggedIn event removed");
       });
       res.send(err);
     });
 
-    user.on("successfulIsLoggedIn",function(result){
+    user.once("successfulIsLoggedIn",function(result){
       logger.emit("info", result.success.message,result.success.user.userid);
-      user.removeAllListeners();
+      //user.removeAllListeners();
       result.success.user.sessionid=req.sessionID;
       res.send(result);
     });

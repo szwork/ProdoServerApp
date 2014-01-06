@@ -22,10 +22,11 @@ var fs = require('fs');
 var FileUploadModel=require("./file-upload-model");
 var AWS = require('aws-sdk');
 var exec = require('child_process').exec;
+
 var path=require("path");
-var UserModel=require("../../user/js/user-model");
 var OrgModel=require("../../org/js/org-model");
 var ProductModel=require("../../product/js/product-model");
+var UserModel=require("../../user/js/user-model");
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.giantleapsystems.com", // hostname
     secureConnection: true, // use SSL
@@ -174,7 +175,7 @@ exports.uploadFiles=function(file,dirname,action,callback){
                          //ACL: 'public-read-write',
                          ContentType: file_type
                 };
-             userFileUpload(userid,params,function(err,imagelocation){
+             userFileUpload(action.user.userid,params,function(err,imagelocation){
               fs.close(fd, function() {
                  exec("rm -rf '"+fileName+"'");
                   console.log('File user saved successful!');
@@ -254,7 +255,7 @@ var userFileUpload=function(userid,awsparams,callback){
         }else{
           var newprofileurl=url;
           console.log("url"+newprofileurl);
-          userModel.update({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
+          UserModel.update({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
             if(err){
               callback(err);
             }else if(profilepicupdatestatus==1){

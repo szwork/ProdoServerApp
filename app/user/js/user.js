@@ -854,6 +854,7 @@ var _resetPassword=function(self,userid,userdata){
           			self.emit("failedUserResetPassword",{"error":{"code":"AU002","message":"Your current password is wrong"}});
     			}else{
           			user.password=newpassword;
+          			user.isOtpPassword=false;
           			user.save(function(err,user_data){
           				if(err){
           					self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to change the password"}});

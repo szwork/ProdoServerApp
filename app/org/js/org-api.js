@@ -43,17 +43,17 @@ exports.addOrganization = function(req,res){
   //var userdata=req.body.user;
   //logger.emit("userdata"+userdata);
   
-  organization.on("successfulOrgAdd",function(result){
+  organization.once("successfulOrgAdd",function(result){
     logger.emit("info",result.success.message);
     organization.removeAllListeners();
     res.send(result);
   });
-  organization.on("failedOrgAdd",function(err){
+  organization.once("failedOrgAdd",function(err){
     logger.emit("error",err.error.message,req.user.userid);
     organization.removeAllListeners();
     res.send(err);
   })
-  organization.on('sendinvitemail',function(userdata,emailtemplatedata,orgname,i){
+  organization.once('sendinvitemail',function(userdata,emailtemplatedata,orgname,i){
     var emailtemplate=S(emailtemplatedata.description);
     logger.emit("log",userdata);
     if(userdata.length>i){
@@ -108,15 +108,15 @@ exports.updateOrganization = function(req, res) {
   var orgdata=req.body.organization;
   var organization = new Organization(orgdata);
   var sessionuserid=req.user.userid;
-    organization.on("failedOrgUpdation",function(err){
+    organization.once("failedOrgUpdation",function(err){
       logger.emit("error", err.error.message,sessionuserid);
-      organization.removeAllListeners();
+      // organization.removeAllListeners();
       res.send(err);
     });
 
-    organization.on("successfulOrgUpdation",function(result){
+    organization.once("successfulOrgUpdation",function(result){
       logger.emit("info", result.success.message,sessionuserid);
-      organization.removeAllListeners();
+      // organization.removeAllListeners();
       res.send(result);
     });
     
@@ -133,15 +133,15 @@ exports.updateOrganization = function(req, res) {
   var orgid=req.params.orgid;
   var sessionuserid=req.user.userid;
   var organization=new Organization();
-      organization.on("failedOrgDeletion",function(err){
+      organization.once("failedOrgDeletion",function(err){
         logger.emit("error", err.error.message,req.user.userid);
-        organization.removeAllListeners();
+        // organization.removeAllListeners();
         res.send(err);
       });
 
-      organization.on("successfulOrgDeletion",function(result){
+      organization.once("successfulOrgDeletion",function(result){
         logger.emit("info", result.success.message);
-        organization.removeAllListeners();
+        // organization.removeAllListeners();
         res.send(result);
       });
      var isAdmin=false;
@@ -157,15 +157,15 @@ exports.getOrganization = function(req, res) {
   var orgid=req.params.orgid;
   var sessionuserid=req.user.userid;
   var organization=new Organization();
-  organization.on("failedOrganizationGet",function(err){
+  organization.once("failedOrganizationGet",function(err){
       logger.emit("error", err.error.message,req.user.userid);
-      organization.removeAllListeners();
+      // organization.removeAllListeners();
       res.send(err);
     });
 
-    organization.on("successfulOrganizationGet",function(result){
+    organization.once("successfulOrganizationGet",function(result){
       logger.emit("info", result.success.message);
-      organization.removeAllListeners();
+      // organization.removeAllListeners();
       res.send(result);
     });
     organization.getOrganization(orgid);
@@ -175,15 +175,15 @@ exports.getAllOrganization = function(req, res) {
   
   var sessionuserid=req.user.userid;
   var organization=new Organization();
-  organization.on("failedOrganizationGetAll",function(err){
+  organization.once("failedOrganizationGetAll",function(err){
       logger.emit("error", err.error.message,req.user.userid);
-      organization.removeAllListeners();
+      // organization.removeAllListeners();
       res.send(err);
     });
 
-    organization.on("successfulOrganizationGetAll",function(result){
+    organization.once("successfulOrganizationGetAll",function(result){
       logger.emit("info", result.success.message);
-      organization.removeAllListeners();
+      // organization.removeAllListeners();
       res.send(result);
     });
     organization.getAllOrganization();
