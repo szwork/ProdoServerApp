@@ -409,9 +409,9 @@ exports.isLoggedIn=function(req,res){
     var user=new User();
     user.once("failedIsLoggedIn",function(err){
       
-      //user.removeAllListeners("failedIsLoggedIn",function(stream){
-        logger.emit("log","failedIsLoggedIn event removed");
-      });
+      // //user.removeAllListeners("failedIsLoggedIn",function(stream){
+      //   logger.emit("log","failedIsLoggedIn event removed");
+      // });
       res.send(err);
     });
 

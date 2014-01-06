@@ -25,13 +25,13 @@ exports.addProduct=function(req,res){
     logger.emit("log","req product body"+JSON.stringify(req.body));
   	var product = new Product(productdata);
   	var sessionuserid=req.user.userid;
-    product.once("failedProductAdd",function(err){
+    product.on("failedProductAdd",function(err){
       logger.emit("error", err.error.message,sessionuserid);
       // product.removeAllListeners();
       res.send(err);
     });
 
-    product.once("successfulProductAdd",function(result){
+    product.on("successfulProductAdd",function(result){
       logger.emit("info", result.success.message,sessionuserid);
       // product.removeAllListeners();
       res.send(result);
@@ -55,14 +55,14 @@ exports.addProduct=function(req,res){
 //   //var userdata=commentdata.user;
 //   var sessionuserid=req.user.userid;
 //   var product = new Product();
-//   product.once("failedCommentToProduct",function(err){
+//   product.on("failedCommentToProduct",function(err){
 //     logger.emit("error", err.error.message,sessionuserid);
 //     logger.emit("log","error:"+err.error.message+":"+sessionuserid);
 //     logger.emit("log","//////End of commentToProduct//////");
 //     product.removeAllListeners();
 //     res.send(err);
 //   });
-//     product.once("successfulCommentToProduct",function(result){
+//     product.on("successfulCommentToProduct",function(result){
 //       logger.emit("log","success:"+result.success.message+":"+sessionuserid);
 //       logger.emit("info", result.success.message,sessionuserid);
 //       product.removeAllListeners();
@@ -79,14 +79,14 @@ exports.getProduct=function(req,res){
    var product= new Product();
      // product.setMaxListeners(0); 
 
-  product.once("failedGetProduct",function(err){
+  product.on("failedGetProduct",function(err){
     logger.emit("log","error:"+err.error.message+":"+sessionuserid);
     logger.emit("error", err.error.message,sessionuserid);
     // product.removeAllListeners();
     res.send(err);
      // eventEmitter.removeListener(this);
   });
-  product.once("successfulGetProduct",function(result){
+  product.on("successfulGetProduct",function(result){
     logger.emit("log","Getting Product details successfully");
     logger.emit("info", result.success.message,sessionuserid);
     // product.removeAllListeners();
@@ -104,14 +104,14 @@ exports.getAllProduct=function(req,res){
    
    var product = new Product();
    // product.setMaxListeners(0); 
-   product.once("failedGetAllProduct",function(err){
+   product.on("failedGetAllProduct",function(err){
       logger.emit("log","error:"+err.error.message+":"+sessionuserid);
       logger.emit("error", err.error.message,sessionuserid);
       // product.removeAllListeners();
       res.send(err);
 
     });
-    product.once("successfulGetAllProduct",function(result){
+    product.on("successfulGetAllProduct",function(result){
       logger.emit("info", result.success.message,sessionuserid);
       // product.removeAllListeners();
      // res.header('Cache-Control', 'no-cache');
@@ -128,16 +128,14 @@ exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
   logger.emit("log","req boyd comment"+JSON.stringify(req.body));
  
   var product = new Product();
-  product.once("failedCommentToProduct",function(err){
+  product.on("failedCommentToProduct",function(err){
     logger.emit("error", err.error.message);
     callback(err);
   });
-    product.once("successfulCommentToProduct",function(result){
-      logger.emit("info", result.success.message);
-      
-      callback(null,result);
-      
-    });
+  product.on("successfulCommentToProduct",function(result){
+    logger.emit("info", result.success.message);
+    callback(null,result);
+  });
   product.commentToProduct(sessionuserid,prodle,commentdata);
 }
 
