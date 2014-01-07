@@ -15,7 +15,7 @@ var mongoose = require('../../common/js/db');
 var ObjectId = mongoose.Schema.ObjectId;
 var mongooseRedisCache = require("mongoose-redis-cache");
 var shortId = require('shortid');
-
+var mongoShortId = require('mongoose-shortid');
 var UserGroupSchema = mongoose.Schema({     
       grpname:{type:String},
       /*role means:myaybe service engineers,marketing,production employee of particular organization*/
@@ -29,25 +29,25 @@ var UserGroupSchema = mongoose.Schema({
 	}
 );
 var LocationSchema = mongoose.Schema({
-      locationtype:{type:String},//location type means service centers,office address,
-		  geo:
-      {
-        latitude:{type:String},
-        longitude:{type:String}
-      },
-    	address:
-    	{
-    	 	address1:String,
-    		address2:String,
-    		address3:String,
-        zipcode:String,
-    		city:String,
-    		state:String,
-    		country:String
-    	},
-      contacts:[{customerhelpline:String}],
-    	region:{type:String},
-    	timezone:{type:String}
+  locationtype:{type:String},//location type means service centers,office address,
+  geo:
+  {
+    latitude:{type:String},
+    longitude:{type:String}
+  },
+	address:
+	{
+	 	address1:String,
+		address2:String,
+		address3:String,
+    zipcode:String,
+		city:String,
+		state:String,
+		country:String
+	},
+  contacts:[{customerhelpline:String}],
+	region:{type:String},
+	timezone:{type:String}
 });
 
 

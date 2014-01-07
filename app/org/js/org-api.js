@@ -168,7 +168,6 @@ exports.getOrganization = function(req, res) {
       res.send(err);
     });
   organization.removeAllListeners("successfulOrganizationGet");
-
   organization.on("successfulOrganizationGet",function(result){
     logger.emit("info", result.success.message);
       // organization.removeAllListeners();
@@ -196,9 +195,89 @@ exports.getAllOrganization = function(req, res) {
     organization.getAllOrganization();
 }
 
-
-
-
+///
+//
+exports.getOrgAddressByCriteria=function(req,res){
+  var OrgCriteriaData=req.query;
+  logger.emit("log","req query getOrgAddressByCriteria"+JSON.stringify(OrgCriteriaData));
+  var orgid=req.params.orgid;
+   
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedGetOrgAddressByCriteria");
+  organization.on("failedGetOrgAddressByCriteria",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulGetOrgAddressByCriteria");
+  organization.on("successfulGetOrgAddressByCriteria",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  // if(req.user.orgid==orgid){
+  //   organization.getOrgAddressByCriteria(OrgCriteriaData,orgid);  
+  // }
+  organization.getOrgAddressByCriteria(OrgCriteriaData,orgid);
+}
+exports.addOrgAddress=function(req,res){
+  var orgaddressdata=req.body.orgaddress;
+  logger.emit("log","req body addOrgAddress :\n"+JSON.stringify(orgaddressdata));
+  // orgaddressdata=orgaddressdata.orgaddress;  
+  var orgid=req.params.orgid;
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedaddOrgAddress");
+  organization.on("failedaddOrgAddress",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfuladdOrgAddress");
+  organization.on("successfuladdOrgAddress",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  if(req.user.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedaddOrgAddress",{"error":{"code":"EA001","message":"You have not authorized to add Organization Address"}});
+  }else if(req.user.isAdmin==false){
+    logger.emit("log","You are not an admin to add org");
+    organization.emit("failedaddOrgAddress",{"error":{"code":"EA001","message":"You have not authorized to add Organization Address"}}); 
+  }else{
+    /////////////////////////////////
+    organization.addOrgAddress(orgid,orgaddressdata);
+    //////////////////////////////// 
+  }
+}
+// exports.updateOrgAddress=function(req,res){
+//   var orgaddressdata=req.body.orgaddress;
+//   logger.emit("log","req body addOrgAddress :\n"+JSON.stringify(orgaddressdata));
+//   // orgaddressdata=orgaddressdata.orgaddress;  
+//   var orgid=req.params.orgid;
+//   var orgaddressid=req.params.orgaddressid;
+//   var sessionuserid=req.user.userid;
+//   var organization=new Organization();
+//   organization.removeAllListeners("failedUpdateAddress");
+//   organization.on("failedUpdateAddress",function(err){
+//     logger.emit("error", err.error.message,req.user.userid);
+//     res.send(err);
+//   });
+//   organization.removeAllListeners("successfulUpdateAddress");
+//   organization.on("successfulUpdateAddress",function(result){
+//     logger.emit("info", result.success.message);
+//     res.send(result);
+//   });
+//   if(req.user.orgid!=orgid){
+//     logger.emit("log","Given orgid is not match with session userid");
+//     organization.emit("failedUpdateAddress",{"error":{"code":"EA001","message":"You have not authorized to add Organization Address"}});
+//   }else if(req.user.isAdmin==false){
+//     logger.emit("log","You are not an admin to add org");
+//     organization.emit("failedUpdateAddress",{"error":{"code":"EA001","message":"You have not authorized to add Organization Address"}}); 
+//   }else{
+//     /////////////////////////////////
+//     organization.updateOrgAddress(orgid,orgaddressid,orgaddressdata);
+//     //////////////////////////////// 
+//   }
+// }
 
 //////////////////
 //old code
@@ -206,6 +285,7 @@ exports.getAllOrganization = function(req, res) {
 //invites to group members
 exports.invites = function(req,res) { 
   //value taking from parameters
+
   var orgid = req.params.orgid;
   var usergrp=req.body.usergrp;
   res.send(usergrp);

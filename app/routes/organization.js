@@ -25,8 +25,12 @@ exports.init = function (app) {
   app.get('/api/organization/:orgid',auth, api.orgapi.getOrganization);//read
  
   app.delete('/api/organization/:orgid',auth, api.orgapi.deleteOrganization);//delete
-
+  ///organization address
+  app.get("/api/orgaddress/:orgid",auth,api.orgapi.getOrgAddressByCriteria);
+  app.post("/api/orgaddress/:orgid",auth,api.orgapi.addOrgAddress);
+  
   //Access to ONLY prodonus Admin //set up admin  role
- 
-  app.post('/api/invites/:orgid', auth,api.orgapi.invites);
+ // app.put("/api/orgaddress/:orgid/:orgaddressid",auth,api.orgapi.updateOrgAddress);
+ // app.delete("/api/orgaddress/:orgid/:orgaddressid",auth,api.orgapi.deleteOrgAddress);
+ app.post('/api/invites/:orgid', auth,api.orgapi.invites);
 }

@@ -436,3 +436,167 @@ var _successfulOrganizationGetAll=function(self,organization){
 	logger.emit("log","_successfulOrganizationGetAll");
 	self.emit("successfulOrganizationGetAll", {"success":{"message":"Getting Organization details Successfully","organization":organization}});
 }
+Organization.prototype.getOrgAddressByCriteria = function(OrgCriteriaData,orgid) {
+	var self=this;
+	//////////////////
+	_splitOrgAddressCriteria(self,OrgCriteriaData,orgid);
+	///////////////////
+};
+var _splitOrgAddressCriteria=function(self,OrgCriteriaData,orgid){
+	var org_locationtype=[];
+	var org_city=[];
+	var org_country=[];
+	var org_region=[];
+	
+	var search_criteria={};
+	if(OrgCriteriaData.locationtype!=undefined){
+		if(S(OrgCriteriaData.locationtype).contains(",")){
+			locationtype=S(OrgCriteriaData.locationtype).split(",");
+		}else{
+			org_locationtype.push(OrgCriteriaData.locationtype);
+		}
+		// Org_criteriadata.org_locationtype=org_locationtype;
+		search_criteria["location.locationtype"]={$in:org_locationtype};
+	}
+	if(OrgCriteriaData.city!=undefined){
+		if(S(OrgCriteriaData.city).contains(",")){
+			org_city=S(OrgCriteriaData.city).split(",");
+		}else{
+			org_city.push(OrgCriteriaData.city);
+		}
+		search_criteria["location.address.city"]={$in:org_city};
+	}
+	if(OrgCriteriaData.country!=undefined){
+		if(S(OrgCriteriaData.country).contains(",")){
+			org_country=S(OrgCriteriaData.country).split(",");
+		}else{
+			org_country.push(OrgCriteriaData.country);
+		}
+		search_criteria["location.address.country"]={$in:org_country};
+	}
+	
+	if(OrgCriteriaData.region!=undefined){
+		if(S(OrgCriteriaData.region).contains(",")){
+			org_region=S(OrgCriteriaData.region).split(",");
+		}else{
+			org_region.push(OrgCriteriaData.region);
+		}
+		search_criteria["location.region"]={$in:org_region};
+	}
+	// console.log(Object.keys(OrgCriteriaData).length);
+	
+	
+	// OrgCriteriaData={org_locationtype:org_locationtype,org_city:org_city,org_country:org_country,org_region:org_region};
+	/////////////////////////
+  _getOrgAddressByCriteria(self,search_criteria,orgid);
+	//////////////////////
+}
+var _getOrgAddressByCriteria=function(self,search_criteria,orgid){
+  
+  console.log("orgid"+JSON.stringify(search_criteria));
+  orgModel.aggregate([{$match:{orgid:orgid}},{$unwind:"$location"},{$match:search_criteria},{$project:{location:1}}],function(err,orgaddress){
+		if(err){
+			logger.emit("error",err);
+			self.emit("failedGetOrgAddressByCriteria",{"error":{"code":"ED001","message":"Error in db  _getOrgAddressByCriteria to get address"}});
+		}else if(orgaddress.length==0){
+			self.emit("failedGetOrgAddressByCriteria",{"error":{"code":"A0003","message":"There is no organization address according to your criteria search"}});		
+		}else{
+			///////////////////////////////////////////////////
+			_successfulgetOrgAddressByCriteria(self,orgaddress);
+			//////////////////////////////////////////////////
+		}
+	
+	})
+}
+var _successfulgetOrgAddressByCriteria=function(self,orgaddress){
+	logger.emit("log","_successfulgetOrgAddressByCriteria");
+	self.emit("successfulGetOrgAddressByCriteria",{"success":{"message":"Organization address getting Successfully","orgaddress":orgaddress}});
+}
+Organization.prototype.addOrgAddress = function(orgid,orgaddress) {
+	var self=this;
+	// var orgaddress=self.orgaddress;
+	//////////////////////////////////////////////
+	_validateOrgAddressData(self,orgaddress,orgid);
+	//////////////////////////////////////////////
+};
+var _validateOrgAddressData=function(self,orgaddress,orgid){
+   
+	if(orgaddress==undefined){
+		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please pass orgaddress data to add"}}); 
+	}else if(orgaddress.locationtype==undefined){
+		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please pass locationtype"}}); 		
+	}else if(orgaddress.address==undefined){
+		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide address details"}}); 				
+	}else if(orgaddress.address.city==undefined){
+	 self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide orgaddress city"}}); 				
+	}else if(orgaddress.address.country==undefined){
+		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide coutry for orgaddress"}}); 				
+	}else if(orgaddress.address.state==undefined){
+		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide provinence details"}}); 					
+	}else{
+		///////////////////////////////////////
+     _addOrgAddress(self,orgaddress,orgid);
+		///////////////////////////////////////
+	}
+}
+var _addOrgAddress=function(self,orgaddress,orgid){
+	orgModel.update({orgid:orgid},{$push:{location:orgaddress}},function(err,orgaddstatus){
+		if(err){
+			self.emit("failedaddOrgAddress",{"error":{"code":"ED001","message":"Error in db to add organization address"}});
+		}else if(orgaddstatus!=1){
+			self.emit("failedaddOrgAddress",{"error":{"code":"AO002","message":"Provides userd is wrong to add organization address"}});			
+		}else{
+			///////////////////////////////
+			_successfulOrgAddressAdd(self)	
+			//////////////////////////////
+		}
+	})
+}
+var _successfulOrgAddressAdd=function(self){
+	logger.emit("log","_successfulOrgAddressAdd");
+	self.emit("successfuladdOrgAddress",{"success":{"message":"Organization Address Added Successfully"}});
+}
+// Organization.prototype.updateOrgAddress = function(orgid,orgaddressid,orgaddress) {
+// 	var self=this;
+// 	// var orgaddress=self.orgaddress;
+// 	//////////////////////////////////////////////
+// 	_validateUpdateOrgAddressData(self,orgid,orgaddressid,orgaddress);
+// 	//////////////////////////////////////////////
+// };
+// var _validateUpdateOrgAddressData=function(self,orgid,orgaddressid,orgaddress){
+   
+// 	if(orgaddress==undefined){
+// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please pass orgaddress data to add"}}); 
+// 	}else if(orgaddress.locationtype==undefined){
+// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please pass locationtype"}}); 		
+// 	}else if(orgaddress.address==undefined){
+// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide address details"}}); 				
+// 	}else if(orgaddress.address.city==undefined){
+// 	 self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide orgaddress city"}}); 				
+// 	}else if(orgaddress.address.country==undefined){
+// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide coutry for orgaddress"}}); 				
+// 	}else if(orgaddress.address.state==undefined){
+// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide provinence details"}}); 					
+// 	}else{
+// 		///////////////////////////////////////
+//      _addOrgAddress(self,orgaddress,orgid);
+// 		///////////////////////////////////////
+// 	}
+// }
+// var _addOrgAddress=function(self,orgaddress,orgid){
+// 	orgModel.update({orgid:orgid},{$pull{$push:{location:orgaddress}},function(err,orgaddstatus){
+// 		if(err){
+// 			self.emit("failedaddOrgAddress",{"error":{"code":"ED001","message":"Error in db to add organization address"}});
+// 		}else if(orgaddstatus!=1){
+// 			self.emit("failedaddOrgAddress",{"error":{"code":"AO002","message":"Provides userd is wrong to add organization address"}});			
+// 		}else{
+// 			///////////////////////////////
+// 			_successfulOrgAddressAdd(self)	
+// 			//////////////////////////////
+// 		}
+// 	})
+// }
+// var _successfulOrgAddressAdd=function(self){
+// 	logger.emit("log","_successfulOrgAddressAdd");
+// 	self.emit("successfuladdOrgAddress",{"success":{"message":"Organization Address Added Successfully"}});
+// }
