@@ -33,11 +33,11 @@ exports.deleteComment = function(req, res) {
   var commentid=req.params.commentid;
   var sessionuserid=req.user.userid;
   var comment=new Comment();
-    comment.on("failedCommentDeletion",function(err){
-      logger.emit("error", err.error.message,req.user.userid);
-    
-      res.send(err);
-    });
+  comment.removeAllListeners("failedCommentDeletion");
+  comment.on("failedCommentDeletion",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
 
     comment.on("successfulCommentDeletion",function(result){
       logger.emit("info", result.success.message);
@@ -50,31 +50,23 @@ exports.deleteComment = function(req, res) {
 exports.comment=function(io){ 
 io.sockets.on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
-    // console.log("passport sessiond"+socket.handshake.sessionID);
-    // console.log("sessionuserid"+sessionuserid)
     socket.on('addComment', function(prodle,commentdata) {
-      var comment = new Comment(commentdata);
-      comment.on("failedAddComment",function(err){
-        logger.emit("error", err.error.message);
-          // comment.removeAllListeners(); 
-        socket.emit("addcommentResponse",err);
-        comment.removeAllListeners("failedAddComment",function(stream){ 
-
-        })
-         // callback(err);
-      });
-      comment.on("successfulAddComment",function(result){
-        logger.emit("info", result.success.message);
-        comment.removeAllListeners("successfulAddComment",function(stream){ 
-
-        })
-        socket.emit("addcommentResponse",null,result);
-        if(result.success.product_comment.type=="product"){
-          socket.broadcast.emit("productcommentResponse",null,result);
-        }else{
-          socket.broadcast.emit("warrantycommentResponse",null,result);
-        }
-      });
+    var comment = new Comment(commentdata);
+    comment.removeAllListeners("failedAddComment");
+    comment.on("failedAddComment",function(err){
+      logger.emit("error", err.error.message);
+      socket.emit("addcommentResponse",err);
+    });
+    comment.removeAllListeners("successfulAddComment");
+    comment.on("successfulAddComment",function(result){
+      logger.emit("info", result.success.message);
+      socket.emit("addcommentResponse",null,result);
+      if(result.success.product_comment.type=="product"){
+        socket.broadcast.emit("productcommentResponse",null,result);
+      }else{
+        socket.broadcast.emit("warrantycommentResponse",null,result);
+      }
+    });
 
       comment.addComment(sessionuserid,prodle);
     });

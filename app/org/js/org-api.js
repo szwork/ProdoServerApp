@@ -42,18 +42,20 @@ exports.addOrganization = function(req,res){
   logger.emit("organization data"+organizationdata);
   //var userdata=req.body.user;
   //logger.emit("userdata"+userdata);
-  
-  organization.once("successfulOrgAdd",function(result){
+  organization.removeAllListeners("successfulOrgAdd");
+  organization.on("successfulOrgAdd",function(result){
     logger.emit("info",result.success.message);
     organization.removeAllListeners();
     res.send(result);
   });
-  organization.once("failedOrgAdd",function(err){
+  organization.removeAllListeners("failedOrgAdd");
+  organization.on("failedOrgAdd",function(err){
     logger.emit("error",err.error.message,req.user.userid);
     organization.removeAllListeners();
     res.send(err);
   })
-  organization.once('sendinvitemail',function(userdata,emailtemplatedata,orgname,i){
+  organization.removeAllListeners("sendinvitemail");
+  organization.on('sendinvitemail',function(userdata,emailtemplatedata,orgname,i){
     var emailtemplate=S(emailtemplatedata.description);
     logger.emit("log",userdata);
     if(userdata.length>i){
@@ -108,17 +110,18 @@ exports.updateOrganization = function(req, res) {
   var orgdata=req.body.organization;
   var organization = new Organization(orgdata);
   var sessionuserid=req.user.userid;
-    organization.once("failedOrgUpdation",function(err){
+  organization.removeAllListeners("failedOrgUpdation");
+    organization.on("failedOrgUpdation",function(err){
       logger.emit("error", err.error.message,sessionuserid);
       // organization.removeAllListeners();
       res.send(err);
     });
-
-    organization.once("successfulOrgUpdation",function(result){
-      logger.emit("info", result.success.message,sessionuserid);
-      // organization.removeAllListeners();
-      res.send(result);
-    });
+  organization.removeAllListeners("successfulOrgUpdation");
+  organization.on("successfulOrgUpdation",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // organization.removeAllListeners();
+    res.send(result);
+  });
     
     var isAdmin=false;
     if(req.user.orgid==orgid || isAdmin)
@@ -133,13 +136,14 @@ exports.updateOrganization = function(req, res) {
   var orgid=req.params.orgid;
   var sessionuserid=req.user.userid;
   var organization=new Organization();
-      organization.once("failedOrgDeletion",function(err){
+  organization.removeAllListeners("failedOrgDeletion");
+      organization.on("failedOrgDeletion",function(err){
         logger.emit("error", err.error.message,req.user.userid);
         // organization.removeAllListeners();
         res.send(err);
       });
-
-      organization.once("successfulOrgDeletion",function(result){
+     organization.removeAllListeners("successfulOrgDeletion");
+      organization.on("successfulOrgDeletion",function(result){
         logger.emit("info", result.success.message);
         // organization.removeAllListeners();
         res.send(result);
@@ -157,31 +161,34 @@ exports.getOrganization = function(req, res) {
   var orgid=req.params.orgid;
   var sessionuserid=req.user.userid;
   var organization=new Organization();
-  organization.once("failedOrganizationGet",function(err){
+  organization.removeAllListeners("failedOrganizationGet");
+  organization.on("failedOrganizationGet",function(err){
       logger.emit("error", err.error.message,req.user.userid);
       // organization.removeAllListeners();
       res.send(err);
     });
+  organization.removeAllListeners("successfulOrganizationGet");
 
-    organization.once("successfulOrganizationGet",function(result){
-      logger.emit("info", result.success.message);
+  organization.on("successfulOrganizationGet",function(result){
+    logger.emit("info", result.success.message);
       // organization.removeAllListeners();
-      res.send(result);
-    });
-    organization.getOrganization(orgid);
+    res.send(result);
+  });
+  organization.getOrganization(orgid);
 
 };
 exports.getAllOrganization = function(req, res) {
   
   var sessionuserid=req.user.userid;
   var organization=new Organization();
-  organization.once("failedOrganizationGetAll",function(err){
+  organization.removeAllListeners("failedOrganizationGetAll");
+  organization.on("failedOrganizationGetAll",function(err){
       logger.emit("error", err.error.message,req.user.userid);
       // organization.removeAllListeners();
       res.send(err);
     });
-
-    organization.once("successfulOrganizationGetAll",function(result){
+ organization.removeAllListeners("successfulOrganizationGetAll");
+    organization.on("successfulOrganizationGetAll",function(result){
       logger.emit("info", result.success.message);
       // organization.removeAllListeners();
       res.send(result);

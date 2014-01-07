@@ -44,14 +44,15 @@ var isAuthorizedUser=function(userid,sessionuserid){
 exports.addUser = function(req,res){
    var  userdata = req.body.user;
    var user = new User(userdata);
-    user.once("failedUserRegistration",function(err){
+   user.removeAllListeners("failedUserRegistration");
+    user.on("failedUserRegistration",function(err){
       console.log("failedUserRegistration"+err)
       logger.emit("error", err.error.message);
       // //user.removeAllListeners();
       res.send(err);
     });
-
-    user.once("successfulUserRegistration",function(result){
+ user.removeAllListeners("successfulUserRegistration");
+    user.on("successfulUserRegistration",function(result){
       logger.emit("info", result.success.message);
       // //user.removeAllListeners();
       res.send(result);
@@ -67,7 +68,8 @@ exports.activateAccount = function(req, res) {
 logger.emit("log","calling to activate Account");
   var user = new User();
   var html=S("<html><body><h1><font color=blue><a href='http://"+req.get("host")+"'>Prodonus</a></font></h1><br><message></body></html>");
-  user.once("failedUserActivation",function(err){
+   user.removeAllListeners("failedUserActivation");
+  user.on("failedUserActivation",function(err){
     console.log("failedUserActivation" + err)
     logger.emit("error", err.error.message);
     html=html.replaceAll("<message>",err.error.message).s;
@@ -77,8 +79,8 @@ logger.emit("log","calling to activate Account");
    // //user.removeAllListeners();
     res.send(html);
   });
-
-  user.once("successfullUserActivation",function(result){
+ user.removeAllListeners("successfullUserActivation");
+  user.on("successfullUserActivation",function(result){
     logger.emit("info", result.success.message);
    // this.removeListener('successfullUserActivation', function (stream) {
    //   logger.emit("log","successfullUserActivation event removed");
@@ -86,8 +88,8 @@ logger.emit("log","calling to activate Account");
   // //user.removeAllListeners();
     res.send(result);
   });
-
-  user.once("tokenredirect",function(redirecturl){
+ user.removeAllListeners("tokenredirect");
+  user.on("tokenredirect",function(redirecturl){
     logger.emit("log","calling to tokenredirect"+redirecturl);
  
   // commonapi.removeListner(user,function(result){
@@ -124,8 +126,8 @@ exports.signin = function(req, res) {
   logger.emit("log","req body"+userdata);
   var user = new User(userdata);
   //console.log("myvar"+myvar);
- 
-  user.once("failedUserSignin",function(err){
+  user.removeAllListeners("failedUserSignin");
+  user.on("failedUserSignin",function(err){
     logger.emit("log","///////End of signin//////////");
   
     if(err.error.user!=undefined){
@@ -139,10 +141,11 @@ exports.signin = function(req, res) {
     // //user.removeAllListeners("failedUserSignin",function(stream){
     //   logger.emit("log"," failedUserSignin emitter removed");
     // });
-    // res.send(err);
+    res.send(err);
   });
   //
-  user.once("successfulUserSignin",function(result)
+   user.removeAllListeners("successfulUserSignin");
+  user.on("successfulUserSignin",function(result)
   {
     logger.emit("log","Succesfull Signin")
     logger.emit("info", result.success.message);
@@ -155,10 +158,8 @@ exports.signin = function(req, res) {
     // });
     res.send(result);
   });
-   user.removeListener("passportauthenticate",function(stream){
-      logger.emit("log"," successfulUserSignin emitter removed");
-    });
-  user.once("passportauthenticate",function(userdata){
+   user.removeAllListeners("passportauthenticate");
+  user.on("passportauthenticate",function(userdata){
     var passportrequest={};
     passportrequest.body=userdata;
     passport.authenticate('local', function(err, userdata, info) {
@@ -236,14 +237,15 @@ exports.updateUser = function(req, res) {
 
   var user = new User(userdata);
   var sessionuserid=req.user.userid;
-    user.once("failedUserUpdation",function(err){
+   user.removeAllListeners("failedUserUpdation");
+    user.on("failedUserUpdation",function(err){
       logger.emit("log","failedUserRegistration"+JSON.stringify(err));
       logger.emit("error", err.error.message);
       // //user.removeAllListeners();
       res.send(err);
     });
-
-    user.once("successfulUserUpdation",function(result){
+    user.removeAllListeners("successfulUserUpdation");
+    user.on("successfulUserUpdation",function(result){
       logger.emit("info", result.success.message);
       // //user.removeAllListeners();
       res.send(result);
@@ -260,44 +262,46 @@ exports.updateUser = function(req, res) {
 }
 //delete user set status-deactive
 exports.deleteUser = function(req, res) {
-var userid=req.params.userid;
-var sessionuserid=req.user.userid;
-var user=new User();
-    user.once("failedUserDeletion",function(err){
-      logger.emit("error", err.error.message,req.user.userid);
-      // //user.removeAllListeners();
-      res.send(err);
-    });
+  var userid=req.params.userid;
+  var sessionuserid=req.user.userid;
+  var user=new User();
+  user.removeAllListeners("failedUserDeletion");
+  user.on("failedUserDeletion",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    // //user.removeAllListeners();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulUserDeletion");
+  user.on("successfulUserDeletion",function(result){
+    logger.emit("info", result.success.message);
+    // //user.removeAllListeners();
+    res.send(result);
+  });
 
-    user.once("successfulUserDeletion",function(result){
-      logger.emit("info", result.success.message);
-      // //user.removeAllListeners();
-      res.send(result);
-    });
-   
-    if(isAuthorizedUser(userid,sessionuserid)){
-       user.deleteUser(userid);
-    }else{
-      user.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
-    }
+  if(isAuthorizedUser(userid,sessionuserid)){
+     user.deleteUser(userid);
+  }else{
+    user.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+}
 }
 //get user details
 exports.getUser = function(req, res) {
   var userid=req.params.userid;
   var sessionuserid=req.user.userid;
   var user=new User();
-  user.once("failedUserGet",function(err){
-      logger.emit("error", err.error.message,req.user.userid);
-      //user.removeAllListeners();
-      res.send(err);
-    });
-
-    user.once("successfulUserGet",function(result){
-      logger.emit("info", result.success.message,req.user.userid);
-      //user.removeAllListeners();
-      res.send(result);
-    });
-    user.getUser(userid);
+  user.removeAllListeners("failedUserGet");
+  user.on("failedUserGet",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    //user.removeAllListeners();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulUserGet");
+  user.on("successfulUserGet",function(result){
+    logger.emit("info", result.success.message,req.user.userid);
+    //user.removeAllListeners();
+    res.send(result);
+  });
+  user.getUser(userid);
 
 };
 
@@ -306,34 +310,38 @@ exports.getAllUser = function(req, res) {
   
   var sessionuserid=req.user.userid;
   var user=new User();
-  user.once("failedUserGetAll",function(err){
-      logger.emit("error", err.error.message,req.user.userid);
-      //user.removeAllListeners();
-      res.send(err);
-    });
-
-    user.once("successfulUserGetAll",function(result){
-      logger.emit("info", result.success.message,req.user.userid);
-      //user.removeAllListeners();
-      res.send(result);
-    });
-    user.getAllUsers();
+  user.removeAllListeners("failedUserGetAll");
+  user.on("failedUserGetAll",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    //user.removeAllListeners();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulUserGetAll");
+  user.on("successfulUserGetAll",function(result){
+    logger.emit("info", result.success.message,req.user.userid);
+    //user.removeAllListeners();
+    res.send(result);
+  });
+  ///////////////////
+  user.getAllUsers();
+  /////////////////////
 }
 exports.forgotPassword = function(req, res) {
   var userdata=req.body.user
   var user=new User(userdata);
-  user.once("failedSendPasswordSetting",function(err){
-      logger.emit("error", err.error.message);
+  user.removeAllListeners("failedSendPasswordSetting");
+  user.on("failedSendPasswordSetting",function(err){
+    logger.emit("error", err.error.message);
       //user.removeAllListeners();
-      res.send(err);
-    });
-
-    user.once("successfulForgotPassword",function(result){
-      logger.emit("info", result.success.message);
-      //user.removeAllListeners();
-      res.send(result);
-    });
-    user.sendPasswordSetting();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulForgotPassword");
+  user.on("successfulForgotPassword",function(result){
+    logger.emit("info", result.success.message);
+    //user.removeAllListeners();
+    res.send(result);
+  });
+  user.sendPasswordSetting();
 
 }
 
@@ -341,32 +349,33 @@ exports.recaptcha = function(req, res) {
   var user=new User();
   var recaptcha=req.body.recaptcha;
   var clientip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-  user.once("failedRecaptcha",function(err){
-      logger.emit("error", err.error.message);
-      //user.removeAllListeners();
-      res.send(err);
-    });
-
-    user.once("successfulRecaptcha",function(result){
-      logger.emit("info", result.success.message);
-      //user.removeAllListeners();
-      res.send(result);
-    });
-    user.reCaptcha(recaptcha,clientip);
+  user.removeAllListeners("failedRecaptcha");
+  user.on("failedRecaptcha",function(err){
+    logger.emit("error", err.error.message);
+    //user.removeAllListeners();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulRecaptcha");
+  user.on("successfulRecaptcha",function(result){
+    logger.emit("info", result.success.message);
+    //user.removeAllListeners();
+    res.send(result);
+  });
+  user.reCaptcha(recaptcha,clientip);
 
 }
 
 exports.regenerateVerificationUrl = function(req, res) {
   var user=new User();
   var email=req.body.email;
-
-  user.once("failedRegenerateVerificationUrl",function(err){
+   user.removeAllListeners("failedRegenerateVerificationUrl");
+  user.on("failedRegenerateVerificationUrl",function(err){
       logger.emit("error", err.error.message);
       //user.removeAllListeners();
       res.send(err);
     });
-
-  user.once("successfulregenerateVerificationUrl",function(result){
+  user.removeAllListeners("successfulregenerateVerificationUrl");
+  user.on("successfulregenerateVerificationUrl",function(result){
       logger.emit("info", result.success.message);
       //user.removeAllListeners();
       res.send(result);
@@ -381,22 +390,23 @@ exports.resetPassword=function(req,res){
   var user=new User(userdata);
   var userid=req.params.userid;
   var sessionuserid=req.user.userid;
-  user.once("failedUserResetPassword",function(err){
-      logger.emit("error", err.error.message,req.user.userid);
-      //user.removeAllListeners();
-      res.send(err);
-    });
-
-    user.once("successfulUserResetPassword",function(result){
-      logger.emit("info", result.success.message,req.user.userid);
-      //user.removeAllListeners();
-      res.send(result);
-    });
-   if(isAuthorizedUser(userid,sessionuserid)){
-      user.resetPassword(userid);
-    }else{
-     user.emit("failedResetPassword",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
-    }
+   user.removeAllListeners("failedUserResetPassword");
+  user.on("failedUserResetPassword",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    //user.removeAllListeners();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulUserResetPassword");
+  user.on("successfulUserResetPassword",function(result){
+    logger.emit("info", result.success.message,req.user.userid);
+    //user.removeAllListeners();
+    res.send(result);
+  });
+  if(isAuthorizedUser(userid,sessionuserid)){
+    user.resetPassword(userid);
+  }else{
+   user.emit("failedResetPassword",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+  }
 }
 exports.signOutSessions=function(req,res){
     req.logout();
@@ -407,15 +417,16 @@ exports.signOutSessions=function(req,res){
 exports.isLoggedIn=function(req,res){
 
     var user=new User();
-    user.once("failedIsLoggedIn",function(err){
+    user.removeAllListeners("failedIsLoggedIn");
+    user.on("failedIsLoggedIn",function(err){
       
       // //user.removeAllListeners("failedIsLoggedIn",function(stream){
       //   logger.emit("log","failedIsLoggedIn event removed");
       // });
       res.send(err);
     });
-
-    user.once("successfulIsLoggedIn",function(result){
+    user.removeAllListeners("successfulIsLoggedIn");
+    user.on("successfulIsLoggedIn",function(result){
       logger.emit("info", result.success.message,result.success.user.userid);
       //user.removeAllListeners();
       result.success.user.sessionid=req.sessionID;
