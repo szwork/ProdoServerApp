@@ -150,7 +150,7 @@ Product.prototype.getProduct = function(orgid,prodle) {
 	////////////////////////
 };
 var _getProduct=function(self,orgid,prodle){
-	productModel.findOne({orgid:orgid,prodle:prodle,status:}).lean().exec(function(err,product){
+	productModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Error in db to find Product"}});
 		}else if(product){
@@ -174,7 +174,7 @@ Product.prototype.getAllProduct = function(orgid) {
 	///////////////////
 };
 var _getAllProduct=function(self,orgid){
-	productModel.find({orgid:orgid}).lean().exec(function(err,product){
+	productModel.find({orgid:orgid,status:{$ne:"deactive"}}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProduct",{"error":{"code":"ED001","message":"Error in db to find all product"}});
 		}else if(product.length==0){
