@@ -51,23 +51,22 @@ exports.comment=function(io){
 io.sockets.on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
     socket.on('addComment', function(prodle,commentdata) {
-    var comment = new Comment(commentdata);
-    comment.removeAllListeners("failedAddComment");
-    comment.on("failedAddComment",function(err){
-      logger.emit("error", err.error.message);
-      socket.emit("addcommentResponse",err);
-    });
-    comment.removeAllListeners("successfulAddComment");
-    comment.on("successfulAddComment",function(result){
-      logger.emit("info", result.success.message);
-      socket.emit("addcommentResponse",null,result);
-      if(result.success.product_comment.type=="product"){
-        socket.broadcast.emit("productcommentResponse",null,result);
-      }else{
-        socket.broadcast.emit("warrantycommentResponse",null,result);
-      }
-    });
-
+      var comment = new Comment(commentdata);
+      comment.removeAllListeners("failedAddComment");
+      comment.on("failedAddComment",function(err){
+        logger.emit("error", err.error.message);
+        socket.emit("addcommentResponse",err);
+      });
+      comment.removeAllListeners("successfulAddComment");
+      comment.on("successfulAddComment",function(result){
+        logger.emit("info", result.success.message);
+        socket.emit("addcommentResponse",null,result);
+        if(result.success.product_comment.type=="product"){
+          socket.broadcast.emit("productcommentResponse",null,result);
+        }else{
+          socket.broadcast.emit("warrantycommentResponse",null,result);
+        }
+      });
       comment.addComment(sessionuserid,prodle);
     });
   // socket.on('uploadFiles', function(file,action) {

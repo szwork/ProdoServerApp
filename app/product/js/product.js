@@ -143,20 +143,19 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 // 	logger.emit("log","_successfulcommentToProduct");
 // 	self.emit("successfulCommentToProduct",{"success":{"message":"Gave comment to product sucessfully","product_comment":newcomment}})
 // }
-Product.prototype.getProduct = function(prodle) {
+Product.prototype.getProduct = function(orgid,prodle) {
 	var self=this;
 	/////////////////////////
-	_getProduct(self,prodle);
+	_getProduct(self,orgid,prodle);
 	////////////////////////
 };
-var _getProduct=function(self,prodle){
-	productModel.findOne({prodle:prodle}).lean().exec(function(err,product){
+var _getProduct=function(self,orgid,prodle){
+	productModel.findOne({orgid:orgid,prodle:prodle,status:}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Error in db to find Product"}});
 		}else if(product){
 			 ////////////////////////////////
 			_successfulGetProduct(self,product);
-
 			//////////////////////////////////
 		}else{
 			
@@ -168,14 +167,14 @@ var _successfulGetProduct=function(self,product){
 	logger.emit("log","_successfulProductGet");
 	self.emit("successfulGetProduct", {"success":{"message":"Getting Product details Successfully","product":product}});
 }
-Product.prototype.getAllProduct = function() {
+Product.prototype.getAllProduct = function(orgid) {
 	var self=this;
 	//////////////////
-	_getAllProduct(self);
+	_getAllProduct(self,orgid);
 	///////////////////
 };
-var _getAllProduct=function(self){
-	productModel.find({}).lean().exec(function(err,product){
+var _getAllProduct=function(self,orgid){
+	productModel.find({orgid:orgid}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProduct",{"error":{"code":"ED001","message":"Error in db to find all product"}});
 		}else if(product.length==0){
@@ -192,3 +191,28 @@ var _successfulGetAllProduct=function(self,product){
 	logger.emit("log","successfulGetAllProduct");
 	self.emit("successfulGetAllProduct", {"success":{"message":"Getting All Product details Successfully","product":product}});
 }
+Product.prototype.deleteProduct = function(orgid,prodle) {
+	var self=this;
+	//////////////////
+	_deleteProduct(self,orgid,prodle);
+	///////////////////
+};
+var _deleteProduct=function(self,orgid,prodle){
+	productModel.update({orgid:orgid,prodle:prodle},{$set:{status:"deactive"}}).lean().exec(function(err,productdeletestatus){
+		if(err){
+			self.emit("failedDeleteProduct",{"error":{"code":"ED001","message":"Error in db to delete product"}});
+		}else if(productdeletestatus!=1){
+			self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"product id is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulDeleteProduct(self);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulDeleteProduct=function(self){
+	logger.emit("log","_successfulDeleteProduct");
+	self.emit("successfulDeleteProduct", {"success":{"message":"Delete Product Successfully"}});
+}
+

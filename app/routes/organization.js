@@ -30,7 +30,7 @@ exports.init = function (app) {
   app.post("/api/orgaddress/:orgid",auth,api.orgapi.addOrgAddress);
   
   //Access to ONLY prodonus Admin //set up admin  role
- // app.put("/api/orgaddress/:orgid/:orgaddressid",auth,api.orgapi.updateOrgAddress);
- // app.delete("/api/orgaddress/:orgid/:orgaddressid",auth,api.orgapi.deleteOrgAddress);
+ app.put("/api/orgaddress/:orgid/:orgaddressid",auth,api.orgapi.updateOrgAddress);
+ app.delete("/api/orgaddress/:orgid/:orgaddressid",auth,api.orgapi.deleteOrgAddress);
  app.post('/api/invites/:orgid', auth,api.orgapi.invites);
 }

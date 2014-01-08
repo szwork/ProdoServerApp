@@ -24,7 +24,10 @@ exports.addProduct=function(req,res){
   	var productdata=req.body.product;
     logger.emit("log","req product body"+JSON.stringify(req.body));
   	var product = new Product(productdata);
+
+  
   	var sessionuserid=req.user.userid;
+     logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
     product.removeAllListeners("failedProductAdd");
     product.on("failedProductAdd",function(err){
       logger.emit("error", err.error.message,sessionuserid);
@@ -38,14 +41,18 @@ exports.addProduct=function(req,res){
       res.send(result);
     });
     
-    var isAdmin=false;
+   
     logger.emit("log",productdata);
     
-    if(req.user.orgid==orgid)
-    {
-      product.addProduct(orgid,sessionuserid);
+    if(req.user.orgid!=orgid)
+    { 
+      logger.emit("error","You are not an organization user to add product",sessionuserid)
+      product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+    }else if(req.user.isAdmin!=true){
+      logger.emit("error","You are not an admin to add product",sessionuserid)
+      product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
     }else{
-       product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+      product.addProduct(orgid,sessionuserid);
     }
 }
 // exports.commentToProduct=function(req,res){
@@ -77,6 +84,8 @@ exports.getProduct=function(req,res){
   logger.emit("log","///////Calling to Get Products///////");
   var sessionuserid=req.user.userid;
   var prodle=req.params.prodle;
+  var orgid=req.params.orgid;
+  logger.emit("log","prodle"+prodle+"\norgid:"+orgid+"\nsessionid:"+sessionuserid);
    var product= new Product();
      // product.setMaxListeners(0); 
   product.removeAllListeners("failedGetProduct");
@@ -97,13 +106,15 @@ exports.getProduct=function(req,res){
     // eventEmitter.removeListener(this);
   });
  
-  product.getProduct(prodle);
+  product.getProduct(orgid,prodle);
 }
 exports.getAllProduct=function(req,res){
     // req.setMaxListeners(0); 
-
-   var sessionuserid=req.user.userid;
    
+   var sessionuserid=req.user.userid;
+   var orgid=req.params.orgid;
+   logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
+  
    var product = new Product();
    // product.setMaxListeners(0);
    product.removeAllListeners("failedGetAllProduct"); 
@@ -124,7 +135,7 @@ exports.getAllProduct=function(req,res){
        //  logger.log("listner "+this+"removed");
        // });
     });
-    product.getAllProduct();
+    product.getAllProduct(orgid);
     
 }
 exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
@@ -143,5 +154,43 @@ exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
     callback(null,result);
   });
   product.commentToProduct(sessionuserid,prodle,commentdata);
+}
+exports.deleteProduct=function(req,res){
+  logger.emit("log","///////Calling to delete Products///////");
+  var sessionuserid=req.user.userid;
+  var prodle=req.params.prodle;
+  var orgid=req.params.orgid;
+  logger.emit("log","prodle"+prodle+"\norgid:"+orgid+"\nsessionid:"+sessionuserid);
+  
+  var product= new Product();
+     // product.setMaxListeners(0); 
+  product.removeAllListeners("failedDeleteProduct");
+  product.on("failedDeleteProduct",function(err){
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  product.removeAllListeners("successfulDeleteProduct");
+  product.on("successfulDeleteProduct",function(result){
+    //logger.emit("log","Getting Product details successfully");
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  });
+   if(req.user.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}});
+  }else if(req.user.isAdmin==false){
+    logger.emit("log","You are not an admin to delete product");
+    product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}}); 
+  }else{
+    /////////////////////////////////
+    product.deleteProduct(orgid,prodle);
+    //////////////////////////////// 
+  }
 }
 

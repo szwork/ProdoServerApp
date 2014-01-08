@@ -738,7 +738,7 @@ User.prototype.regenerateVerificationUrl = function(email,host){
 	}
 };
 var _isValidUserToRegenerateToken=function(self,email,host){
-	userModel.findOne({email:email},function(err,user){
+	userModel.findOne({email:email,verified:false},function(err,user){
 		if(err){
 			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"ED001","message":"Error in db to find user"}});
 		}else if(user){
@@ -746,15 +746,14 @@ var _isValidUserToRegenerateToken=function(self,email,host){
 		       _regenerateVerificationToken(self,user,host);
 		     	/////////////////////////////////////
 		}else{
-			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AU005","message":"User does't exists"}});
+			self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AU005","message":"User does't exists or It is already verified mail"}});
 		}
 	})
 }
 var _regenerateVerificationToken=function(self,user,host){
 	var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"user"});
         verificationToken.createVerificationToken(function (err, token) {
-        	
-          if (err){  
+         if (err){  
             self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AT001","message":"Error in db to create verificationToken"}});
           }else{
           	

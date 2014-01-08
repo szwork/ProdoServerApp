@@ -33,3 +33,5 @@ AO002-Provided orgid does'nt exists
 //////////product////////////
 AP001-prodct id is wrong or prodct doesn't exist
 AP002-No product exists
+/////////////////organization address////////////
+AO003-There is no Organization address exists

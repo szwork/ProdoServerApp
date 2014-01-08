@@ -29,6 +29,7 @@ var UserGroupSchema = mongoose.Schema({
 	}
 );
 var LocationSchema = mongoose.Schema({
+
   locationtype:{type:String},//location type means service centers,office address,
   geo:
   {

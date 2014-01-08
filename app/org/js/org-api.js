@@ -220,7 +220,7 @@ exports.getOrgAddressByCriteria=function(req,res){
   organization.getOrgAddressByCriteria(OrgCriteriaData,orgid);
 }
 exports.addOrgAddress=function(req,res){
-  var orgaddressdata=req.body.orgaddress;
+  var orgaddressdata=req.body.location;
   logger.emit("log","req body addOrgAddress :\n"+JSON.stringify(orgaddressdata));
   // orgaddressdata=orgaddressdata.orgaddress;  
   var orgid=req.params.orgid;
@@ -248,37 +248,66 @@ exports.addOrgAddress=function(req,res){
     //////////////////////////////// 
   }
 }
-// exports.updateOrgAddress=function(req,res){
-//   var orgaddressdata=req.body.orgaddress;
-//   logger.emit("log","req body addOrgAddress :\n"+JSON.stringify(orgaddressdata));
-//   // orgaddressdata=orgaddressdata.orgaddress;  
-//   var orgid=req.params.orgid;
-//   var orgaddressid=req.params.orgaddressid;
-//   var sessionuserid=req.user.userid;
-//   var organization=new Organization();
-//   organization.removeAllListeners("failedUpdateAddress");
-//   organization.on("failedUpdateAddress",function(err){
-//     logger.emit("error", err.error.message,req.user.userid);
-//     res.send(err);
-//   });
-//   organization.removeAllListeners("successfulUpdateAddress");
-//   organization.on("successfulUpdateAddress",function(result){
-//     logger.emit("info", result.success.message);
-//     res.send(result);
-//   });
-//   if(req.user.orgid!=orgid){
-//     logger.emit("log","Given orgid is not match with session userid");
-//     organization.emit("failedUpdateAddress",{"error":{"code":"EA001","message":"You have not authorized to add Organization Address"}});
-//   }else if(req.user.isAdmin==false){
-//     logger.emit("log","You are not an admin to add org");
-//     organization.emit("failedUpdateAddress",{"error":{"code":"EA001","message":"You have not authorized to add Organization Address"}}); 
-//   }else{
-//     /////////////////////////////////
-//     organization.updateOrgAddress(orgid,orgaddressid,orgaddressdata);
-//     //////////////////////////////// 
-//   }
-// }
-
+exports.updateOrgAddress=function(req,res){
+  var orgaddressdata=req.body.location;
+  logger.emit("log","req body updateOrgAddress :\n"+JSON.stringify(orgaddressdata));
+  // orgaddressdata=orgaddressdata.orgaddress;  
+  var orgid=req.params.orgid;
+  var orgaddressid=req.params.orgaddressid;
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedUpdateAddress");
+  organization.on("failedUpdateAddress",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulUpdateAddress");
+  organization.on("successfulUpdateAddress",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  if(req.user.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedUpdateAddress",{"error":{"code":"EA001","message":"You have not authorized to update Organization Address"}});
+  }else if(req.user.isAdmin==false){
+    logger.emit("log","You are not an admin to add org");
+    organization.emit("failedUpdateAddress",{"error":{"code":"EA001","message":"You have not authorized to update Organization Address"}}); 
+  }else{
+    /////////////////////////////////
+    organization.updateOrgAddress(orgid,orgaddressid,orgaddressdata);
+    //////////////////////////////// 
+  }
+}
+exports.deleteOrgAddress=function(req,res){
+  
+  
+  // orgaddressdata=orgaddressdata.orgaddress;  
+  var orgid=req.params.orgid;
+  var orgaddressid=req.params.orgaddressid;
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedDeleteOrgAddress");
+  organization.on("failedDeleteOrgAddress",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulDeleteOrgAddress");
+  organization.on("successfulDeleteOrgAddress",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  if(req.user.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedDeleteOrgAddress",{"error":{"code":"EA001","message":"You have not authorized to delete Organization Address"}});
+  }else if(req.user.isAdmin==false){
+    logger.emit("log","You are not an admin to add org");
+    organization.emit("failedDeleteOrgAddress",{"error":{"code":"EA001","message":"You have not authorized to delete Organization Address"}}); 
+  }else{
+    /////////////////////////////////
+    organization.deleteOrgAddress(orgid,orgaddressid);
+    //////////////////////////////// 
+  }
+}
 //////////////////
 //old code
 ///////////////

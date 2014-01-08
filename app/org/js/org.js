@@ -6,6 +6,7 @@ var logger=require("../../common/js/logger");
 var S=require("string");
 var EmailTemplateModel=require('../../common/js/email-template-model');
 var orgHistoryModel=require("./org-history-model");
+
 var verificationTokenModel = require('../../common/js/verification-token-model');
 var Organization = function(organizationdata) {
 	this.organization=organizationdata;
@@ -494,8 +495,8 @@ var _splitOrgAddressCriteria=function(self,OrgCriteriaData,orgid){
 var _getOrgAddressByCriteria=function(self,search_criteria,orgid){
   
   console.log("orgid"+JSON.stringify(search_criteria));
-  orgModel.aggregate([{$match:{orgid:orgid}},{$unwind:"$location"},{$match:search_criteria},{$project:{location:1}}],function(err,orgaddress){
-		if(err){
+   orgModel.aggregate([{$match:{orgid:orgid}},{$unwind:"$location"},{$match:search_criteria},{$group:{_id:"$location.locationtype",location:{$addToSet:"$location"}}}],function(err,orgaddress){
+	if(err){
 			logger.emit("error",err);
 			self.emit("failedGetOrgAddressByCriteria",{"error":{"code":"ED001","message":"Error in db  _getOrgAddressByCriteria to get address"}});
 		}else if(orgaddress.length==0){
@@ -556,47 +557,79 @@ var _successfulOrgAddressAdd=function(self){
 	logger.emit("log","_successfulOrgAddressAdd");
 	self.emit("successfuladdOrgAddress",{"success":{"message":"Organization Address Added Successfully"}});
 }
-// Organization.prototype.updateOrgAddress = function(orgid,orgaddressid,orgaddress) {
-// 	var self=this;
-// 	// var orgaddress=self.orgaddress;
-// 	//////////////////////////////////////////////
-// 	_validateUpdateOrgAddressData(self,orgid,orgaddressid,orgaddress);
-// 	//////////////////////////////////////////////
-// };
-// var _validateUpdateOrgAddressData=function(self,orgid,orgaddressid,orgaddress){
+Organization.prototype.updateOrgAddress = function(orgid,orgaddressid,orgaddress) {
+	var self=this;
+	// var orgaddress=self.orgaddress;
+	//////////////////////////////////////////////
+	_validateUpdateOrgAddressData(self,orgid,orgaddressid,orgaddress);
+	//////////////////////////////////////////////
+};
+var _validateUpdateOrgAddressData=function(self,orgid,orgaddressid,orgaddress){
    
-// 	if(orgaddress==undefined){
-// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please pass orgaddress data to add"}}); 
-// 	}else if(orgaddress.locationtype==undefined){
-// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please pass locationtype"}}); 		
-// 	}else if(orgaddress.address==undefined){
-// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide address details"}}); 				
-// 	}else if(orgaddress.address.city==undefined){
-// 	 self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide orgaddress city"}}); 				
-// 	}else if(orgaddress.address.country==undefined){
-// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide coutry for orgaddress"}}); 				
-// 	}else if(orgaddress.address.state==undefined){
-// 		self.emit("failedaddOrgAddress",{"error":{"code":"AV001","message":"Please provide provinence details"}}); 					
-// 	}else{
-// 		///////////////////////////////////////
-//      _addOrgAddress(self,orgaddress,orgid);
-// 		///////////////////////////////////////
-// 	}
-// }
-// var _addOrgAddress=function(self,orgaddress,orgid){
-// 	orgModel.update({orgid:orgid},{$pull{$push:{location:orgaddress}},function(err,orgaddstatus){
-// 		if(err){
-// 			self.emit("failedaddOrgAddress",{"error":{"code":"ED001","message":"Error in db to add organization address"}});
-// 		}else if(orgaddstatus!=1){
-// 			self.emit("failedaddOrgAddress",{"error":{"code":"AO002","message":"Provides userd is wrong to add organization address"}});			
-// 		}else{
-// 			///////////////////////////////
-// 			_successfulOrgAddressAdd(self)	
-// 			//////////////////////////////
-// 		}
-// 	})
-// }
-// var _successfulOrgAddressAdd=function(self){
-// 	logger.emit("log","_successfulOrgAddressAdd");
-// 	self.emit("successfuladdOrgAddress",{"success":{"message":"Organization Address Added Successfully"}});
-// }
+	if(orgaddress==undefined){
+		self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please pass orgaddress data to add"}}); 
+	}else if(orgaddress.locationtype==undefined){
+		self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please pass locationtype"}}); 		
+	}else if(orgaddress.address==undefined){
+		self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please provide address details"}}); 				
+	}else if(orgaddress.address.city==undefined){
+	 self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please provide orgaddress city"}}); 				
+	}else if(orgaddress.address.country==undefined){
+		self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please provide coutry for orgaddress"}}); 				
+	}else if(orgaddress.address.state==undefined){
+		self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please provide provinence details"}}); 					
+	}else{
+		///////////////////////////////////////
+    	_updateOrgAddress(self,orgaddress,orgid,orgaddressid);
+		///////////////////////////////////////
+	}
+}
+var _updateOrgAddress=function(self,orgaddress,orgid,orgaddressid){
+	orgModel.update({orgid:orgid,"location._id":orgaddressid},{$pull:{location:{_id:orgaddressid}}},function(err,orgaddrespullstatus){
+		if(err){
+			self.emit("failedUpdateAddress",{"error":{"code":"ED001","message":"Error in db to update organization address"}});
+		}else if(orgaddrespullstatus!=1){
+			self.emit("failedUpdateAddress",{"error":{"code":"AO002","message":"Provides orgid or orgaddress id is wrong to update organization address"}});			
+		}else{
+			orgModel.update({orgid:orgid},{$push:{location:orgaddress}},function(err,orgaddrespushstatus){
+				if(err){
+					self.emit("failedUpdateAddress",{"error":{"code":"ED001","message":"Error in db to update organization address"}});		
+				}else if(orgaddrespushstatus!=1){
+					self.emit("failedUpdateAddress",{"error":{"code":"AO002","message":"Provides orgid or orgaddress id is wrong to update organization address"}});				
+				}else{
+					///////////////////////////
+					_successfulOrgUpdateressAdd(self)
+					//////////////////////////
+				}
+			})
+		}
+	})
+}
+var _successfulOrgUpdateressAdd=function(self){
+	logger.emit("log","successfulUpdateAddress");
+	self.emit("successfulUpdateAddress",{"success":{"message":"Organization Address Updated Successfully"}});
+}
+Organization.prototype.deleteOrgAddress = function(orgid,orgaddressid) {
+	var self=this;
+	// var orgaddress=self.orgaddress;
+	//////////////////////////////////////////////
+	_deleteOrgAddress(self,orgid,orgaddressid);
+	//////////////////////////////////////////////
+};
+var _deleteOrgAddress=function(self,orgid,orgaddressid){
+	orgModel.update({orgid:orgid,"location._id":orgaddressid},{$pull:{location:{_id:orgaddressid}}},function(err,orgaddrespullstatus){
+		if(err){
+			self.emit("failedDeleteOrgAddress",{"error":{"code":"ED001","message":"Error in db to delete organization address"}});
+		}else if(orgaddrespullstatus!=1){
+			self.emit("failedDeleteOrgAddress",{"error":{"code":"AO002","message":"Provides orgid or orgaddressid is wrong to delete organization address"}});			
+		}else{
+			////////////////////////////////
+			_successfulDeleteAddress(self);
+			/////////////////////////////////
+		}
+	})
+}
+var _successfulDeleteAddress=function(self){
+	logger.emit("log","successfulDeleteAddress");
+	self.emit("successfulDeleteOrgAddress",{"success":{"message":"Organization Address Deleted Successfully"}});
+}

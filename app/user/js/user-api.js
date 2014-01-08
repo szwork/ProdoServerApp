@@ -144,7 +144,7 @@ exports.signin = function(req, res) {
     res.send(err);
   });
   //
-   user.removeAllListeners("successfulUserSignin");
+  user.removeAllListeners("successfulUserSignin");
   user.on("successfulUserSignin",function(result)
   {
     logger.emit("log","Succesfull Signin")
