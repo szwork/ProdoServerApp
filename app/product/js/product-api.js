@@ -21,6 +21,7 @@ var Product=require("./product");
 
 exports.addProduct=function(req,res){
 	  var orgid=req.params.orgid;
+    var sessionorgid=req.user.orgid;
   	var productdata=req.body.product;
     logger.emit("log","req product body"+JSON.stringify(req.body));
   	var product = new Product(productdata);
@@ -43,14 +44,14 @@ exports.addProduct=function(req,res){
     
    
     logger.emit("log",productdata);
-    
-    if(req.user.orgid!=orgid)
+    logger.emit("log","hi"+orgid +":"+req.user.orgid);
+    if(sessionorgid!=orgid)
     { 
       logger.emit("error","You are not an organization user to add product",sessionuserid)
-      product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+      product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to add product"}})
     }else if(req.user.isAdmin!=true){
       logger.emit("error","You are not an admin to add product",sessionuserid)
-      product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+      product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to add product"}})
     }else{
       product.addProduct(orgid,sessionuserid);
     }
@@ -191,6 +192,42 @@ exports.deleteProduct=function(req,res){
     /////////////////////////////////
     product.deleteProduct(orgid,prodle);
     //////////////////////////////// 
+  }
+}
+exports.deleteProductImage=function(req,res){
+  logger.emit("log","///////Calling to delete Products///////");
+  var sessionuserid=req.user.userid;
+  var prodle=req.params.prodle;
+  var prodleimageid=req.params.imageid;
+  
+  logger.emit("log","prodle"+prodle+"\n"+sessionuserid);
+  
+  var product= new Product();
+     // product.setMaxListeners(0); 
+  product.removeAllListeners("failedDeleteProductImage");
+  product.on("failedDeleteProductImage",function(err){
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  product.removeAllListeners("successfulDeleteProductImage");
+  product.on("successfulDeleteProductImage",function(result){
+    //logger.emit("log","Getting Product details successfully");
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  });
+   if(req.user.isAdmin==false){
+    logger.emit("log","You are not an admin to delete product image");
+    product.emit("failedDeleteProductImage",{"error":{"code":"EA001","message":"You have not authorized to delete product image"}}); 
+  }else{
+    ////////////////////////////////////////////////////////////
+    product.deleteProductImage(prodleimageid,prodle,req.user.orgid);
+    //////////////////////////////////////////////// ///////////
   }
 }
 

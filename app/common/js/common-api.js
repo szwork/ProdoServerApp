@@ -27,14 +27,18 @@ var path=require("path");
 var OrgModel=require("../../org/js/org-model");
 var ProductModel=require("../../product/js/product-model");
 var UserModel=require("../../user/js/user-model");
-var smtpTransport = nodemailer.createTransport("SMTP", {
-    host: "smtp.giantleapsystems.com", // hostname
-    secureConnection: true, // use SSL
-    port: 465, // port for secure SMTP
-    auth: {
-        user: "sunil@giantleapsystems.com",
-        pass: "Sunil12345"
-      }
+// var smtpTransport = nodemailer.createTransport("SMTP", {
+//     host: "smtp.giantleapsystems.com", // hostname
+//     secureConnection: true, // use SSL
+//     port: 465, // port for secure SMTP
+//     auth: {
+//         user: "sunil@giantleapsystems.com",
+//         pass: "Sunil12345"
+//       }
+// });
+var smtpTransport = nodemailer.createTransport("SES", {
+    AWSAccessKeyID: "AKIAJ2BXGCZW2235YKYA",
+    AWSSecretKey: "AsgYdCF/B5jGGyXezogxbrrbOZMgK4WAwuxJyj+tf8G/"
 });
 // AWS.config.region = 'ap-southeast-1';
 // AWS.config.AWS_ACCESS_KEY_ID = "AKIAJOGXRBMWHVXPSC7Q";
@@ -143,7 +147,42 @@ exports.getNextSequnce=function(name,callback)
   // console.log("return sequence data"+ret);
   
 }
-exports.uploadFiles=function(file,dirname,action,callback){
+exports.uploadFiles=function(io,__dirname){
+  io.of('/prodoupload').on('connection', function(socket) {
+    var sessionuserid=socket.handshake.user.userid;
+    ///action for user profile update
+     //action:{user:{userid:}}
+     //action for org images upload
+     //action:{org:{userid:,orgid:}}
+     //action for product images upload
+     //action:{product:{userid:,orgid:,prodle:}}
+    
+    socket.on('uploadFiles', function(file,action) {
+      console.log("calling to Upload files");
+      ///////////////
+      uploadFile(file,__dirname,action,function(uploadresult){
+        if(uploadresult.error!=undefined){
+           if(uploadresult.error.user!=undefined){
+              socket.emit("userUploadResponse","");
+           }else if(uploadresult.error.org!=undefined){
+               socket.emit("orgUploadResponse","");
+           }else{
+              socket.emit("productUploadResponse","");
+           }
+        }else{
+          if(uploadresult.success.user!=undefined){
+            socket.emit("userUploadResponse",null,uploadresult.success.imageurl);
+           }else if(uploadresult.success.org!=undefined){
+            socket.emit("orgUploadResponse",null,uploadresult.success.imageurl);
+           }else{
+            socket.emit("productUploadResponse",null,uploadresult.success.imageurl);
+           }
+        }
+    })
+  })
+})
+}
+uploadFile=function(file,dirname,action,callback){
   var file_name=file.filename;
   var file_buffer=file.filebuffer;
   var file_length=file.filelength;  
@@ -181,9 +220,9 @@ exports.uploadFiles=function(file,dirname,action,callback){
                   console.log('File user saved successful!');
                });
               if(err){
-                callback(err);
+                callback({error:{user:err}});
               }else{
-                callback(null,imagelocation);
+                callback({success:{user:"User Pic Added Successfully",imageurl:imagelocation}});
               }
             })
           }else if(action.org!=undefined){//organization upload
@@ -201,9 +240,9 @@ exports.uploadFiles=function(file,dirname,action,callback){
              orgFileUpload(action.org.orgid,params,function(err,imagelocation){
                 if(err){
                   console.log("org upload error"+err);
-                   callback(err);
+                  callback({error:{org:err}});
                 }else{
-                  callback(null,imagelocation);
+                  callback({success:{org:"Org Image Uploaded Successfully",imageurl:imagelocation}});
                 }
                 fs.close(fd, function() {
                   exec("rm -rf '"+fileName+"'");
@@ -222,9 +261,9 @@ exports.uploadFiles=function(file,dirname,action,callback){
              productFileUpload(action.product.prodle,params,function(err,imagelocation){
               if(err){
                 console.log("product fileupload error"+err);
-                callback(err);
+                callback({error:{product:err}});
               }else{
-                callback(null,imagelocation);
+                callback({success:{product:"Proudct Upload Successfully",imageurl:imagelocation}});
               }
               fs.close(fd, function() {
                  exec("rm -rf '"+fileName+"'");

@@ -4,10 +4,13 @@ var auth=require('../common/js/security');
 // product - REST apis
 exports.init = function (app) {
   //product CRUD
-  app.post('/api/product/:orgid',auth,api.productapi.addProduct);//add new product
+  app.post("/api/product/:orgid",auth,api.productapi.addProduct);//add new product
  
   app.get("/api/product/:orgid",auth,api.productapi.getAllProduct);//get all product data
-  app.get("/api/product/:orgid:/:prodle",auth,api.productapi.getProduct);//get single product data
+  app.get("/api/product/:orgid/:prodle",auth,api.productapi.getProduct);//get single product data
   //app.put("/api/product/:prodle",auth,api.productapi.updateProduct);//update the product data
   app.delete("/api/product/:orgid/:prodle",auth,api.productapi.deleteProduct);//delete product
+ //delete product image
+ app.delete("api/product/image/:imageid",auth,api.productapi.deleteProductImage);
+
 }

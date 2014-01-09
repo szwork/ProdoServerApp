@@ -312,9 +312,9 @@ exports.deleteOrgAddress=function(req,res){
 //old code
 ///////////////
 //invites to group members
-exports.invites = function(req,res) { 
+exports.orginvites = function(req,res) { 
   //value taking from parameters
-
+  
   var orgid = req.params.orgid;
   var usergrp=req.body.usergrp;
   res.send(usergrp);

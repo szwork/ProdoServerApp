@@ -118,50 +118,7 @@ app.get("/api",function(req,res){
 	res.send("Welcome to Prodonus");
 })
 // var log = new Log();
-io.on('connection', function(socket) {
-    var sessionuserid=socket.handshake.user.userid;
-    // console.log("passport sessiond"+socket.handshake.sessionID);
-    // console.log("sessionuserid"+sessionuserid)
-  //   socket.on('addComment', function(prodle,commentdata) {
-  //      logger.emit("log","calling to addcoment server socket by"+sessionuserid);
-  //      api.commentapi.addCommentBySocket(sessionuserid,prodle,commentdata,function(err,result){
-  //      if(err){
-  //         socket.emit("addcommentResponse",err,null);
-  //     	}else{
-  //         socket.emit("addcommentResponse",null,{"success":{"message":"Comment Added Successfully"}});
-  //          if(commentdata.type=="product"){
-  //           socket.broadcast.emit("productcommentResponse",null,result);
-  //          }else{
-  //           socket.broadcast.emit("warrantycommentResponse",null,result);
-  //          }
-  //    		}
-  //       socket.removeListener('addComment',function(stream){
-  //         console.log("addcoment removed");  
-  //       });
-  //     	})  
-  //       //socket.emit("send-file","");
-  // });
-  socket.on('uploadFiles', function(file,action) {
-    ///action for user profile update
-     //action:{user:{userid:}}
-     //action for org images upload
-     //action:{org:{userid:,orgid:}}
-     //action for product images upload
-     //action:{product:{userid:,orgid:,prodle:}}
-      
-    console.log("calling to Upload files");
-    ///////////////
-    api.commonapi.uploadFiles(file,__dirname,action,function(err,url){
-      if(err){
-        console.log("error in uploadFiles"+err);
-        // socket.emit("uploadFileResponse",)
-        logger.emit("log","Error in upload "+action);
-      }else{
-        socket.emit("uploadFileResponse",url);
-      }
-    })
-  })
-})
+
 
 
 // // defines app settings with default values for Prodonus
@@ -170,7 +127,8 @@ io.on('connection', function(socket) {
 // app.set('session age', process.env.PRODONUS_SESSION_AGE || 3600);
 app.set('port', process.env.PRODONUS_PORT || 8000);
 
- // api.commentapi.comment(io);
+ api.commentapi.comment(io);
+ api.commonapi.uploadFiles(io,__dirname);
 // 
 // // configures default logger available for middleware and requests
 // app.use(function (req, res, next) {

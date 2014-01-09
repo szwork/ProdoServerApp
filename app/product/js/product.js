@@ -215,4 +215,33 @@ var _successfulDeleteProduct=function(self){
 	logger.emit("log","_successfulDeleteProduct");
 	self.emit("successfulDeleteProduct", {"success":{"message":"Delete Product Successfully"}});
 }
+Product.prototype.deleteProductImage = function(prodleimageid,prodle,orgid) {
+	var self=this;
+	///////////////////////////////////////////////////////////////////
+	_isOrganizationUserToDeleteProduct(self,prodleimageid,prodle,orgid);
+	/////////////////////////////////////////////////////////////////
+};
+var _isOrganizationUserToDeleteProduct=function(self,prodleimageid,prodle,orgid){
+	
+}
+var _deleteProduct=function(self,prodleimageid,prodle,orgid){
+	productModel.update({orgid:orgid,prodle:prodle},{$set:{status:"deactive"}}).lean().exec(function(err,productdeletestatus){
+		if(err){
+			self.emit("failedDeleteProduct",{"error":{"code":"ED001","message":"Error in db to delete product"}});
+		}else if(productdeletestatus!=1){
+			self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"product id is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulDeleteProduct(self);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulDeleteProduct=function(self){
+	logger.emit("log","_successfulDeleteProduct");
+	self.emit("successfulDeleteProduct", {"success":{"message":"Delete Product Successfully"}});
+}
+
+
 

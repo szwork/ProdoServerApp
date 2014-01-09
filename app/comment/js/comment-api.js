@@ -48,7 +48,7 @@ exports.deleteComment = function(req, res) {
     
 }
 exports.comment=function(io){ 
-io.sockets.on('connection', function(socket) {
+io.of('/prodoapp').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
     socket.on('addComment', function(prodle,commentdata) {
       var comment = new Comment(commentdata);

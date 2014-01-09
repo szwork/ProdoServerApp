@@ -9,7 +9,7 @@ var generateId = require('time-uuid');
 
 
 var updateLatestProductComment=function(prodle){
-	CommentModel.find({type:"product",status:"active"},{prodle:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
+	CommentModel.find({type:"product",status:"active",prodle:prodle},{prodle:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
 		if(err){
 			logger.emit("log","Error in updation latest 5 product comment");
 		}else if(comment.length!=0){
