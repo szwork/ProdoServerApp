@@ -61,9 +61,9 @@ exports.addOrganization = function(req,res){
     if(userdata.length>i){
       userModel.findOne({email:userdata[i].email},{userid:1},function(err,user){
         if(err){
-            logger.emit("error","error in db to find users",req.user.userid);
+          logger.emit("error","error in db to find users",req.user.userid);
         }else if(!user){
-            logger.emit("error","user does'nt exists",req.user.userid);
+          logger.emit("error","user does'nt exists",req.user.userid);
         }else{
           var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"user"});
           verificationToken.createVerificationToken(function (err, token) {
@@ -314,10 +314,80 @@ exports.deleteOrgAddress=function(req,res){
 //invites to group members
 exports.orginvites = function(req,res) { 
   //value taking from parameters
-  
-  var orgid = req.params.orgid;
   var usergrp=req.body.usergrp;
-  res.send(usergrp);
+  var orgid=req.params.orgid;
+  var orgaddressid=req.params.orgaddressid;
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedOrgInvites");
+  organization.on("failedOrgInvites",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulOrgInvites");
+  organization.on("successfulOrgInvites",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  organization.removeAllListeners("sendEmailToInvitees");
+  organization.on('sendEmailToInvitees',function(userdata,emailtemplatedata,orgname,i){
+    var emailtemplate=S(emailtemplatedata.description);
+    logger.emit("log",userdata);
+    if(userdata.length>i){
+      userModel.findOne({email:userdata[i].email},{userid:1},function(err,user){
+        if(err){
+          logger.emit("error","error in db to find users",req.user.userid);
+        }else if(!user){
+          logger.emit("error","user does'nt exists",req.user.userid);
+        }else{
+          var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"user"});
+          verificationToken.createVerificationToken(function (err, token) {
+            if (err){  
+                logger.emit("error","Error in crating verification token for"+user.userid,req.user.userid);
+            }else{
+                var html=S(emailtemplate); 
+                var url = "http://"+req.get("host")+"/api/verify/"+token;
+                html=emailtemplate.replaceAll("<email>",user.email);
+                html=emailtemplate.replaceAll("<url>",url);
+                
+               var message = {
+                  from: "Prodonus  <noreply@prodonus.com>", // sender address
+                  to: userdata[i].email, // list of receivers
+                  subject:emailtemplatedata.subject, // Subject line
+                  html: html.s // html body
+              };
+              commonapi.sendMail(message,function(result){
+                if (result == "failure") {
+                   logger.emit("error","Error in sending invite mail to "+userdata[i].email,req.user.userid);
+                  
+                   organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+                   //i+=1;
+                   //organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+                } else {
+                   i+=1;
+                   organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+                  }
+              })
+            }
+          })
+        }
+      })
+    } else {
+      logger.emit("log","successfully sent invite email");
+    }
+  });
+  if(orgaddressid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}});
+  }else if(req.user.isAdmin==false){
+    logger.emit("log","You are not an admin to add org");
+    organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}}); 
+  }else{
+    //////////////////////////////////////
+    organization.orgInvites(orgid,usergrp);
+    ////////////////////////////////////// 
+  }
+  
 };//end of invites method
 
 

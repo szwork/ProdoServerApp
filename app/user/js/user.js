@@ -13,6 +13,16 @@ var LocalStrategy = require('passport-local').Strategy;
 var qs = require('querystring');
 var request=require("request");
 var orgModel=require("../../org/js/org-model");
+var nodemailer=require("nodemailer");
+var smtpTransport = nodemailer.createTransport("SMTP", {
+    host: "smtp.ipage.com", // hostname
+    secureConnection: true, // use SSL
+    port: 465, // port for secure SMTP
+    auth: {
+        user: "sunil@giantleapsystems.com",
+        pass: "Sunil12345"
+    }
+});
 var User = function(userdata) {
 	this.user=userdata;
 };
@@ -132,13 +142,13 @@ var _validateRegisterUser = function(self,userdata,host) {
 	            html=html.replaceAll("<name>",user.fullname);
 	            html=html.replaceAll("<url>",url);
 	          	var message = {
-	                from: "Prodonus  <noreply@prodonus.com>", // sender address
+	                from: "Prodonus <sunil@giantleapsystems.com>", // sender address
 	                to: user.email, // list of receivers
 	                subject:emailtemplate.subject, // Subject line
 	                html: html.s // html body
 	              };
-	            
-	            //calling to sendmail method
+	            logger.emit("log",JSON.stringify(message));
+	 			 // calling to sendmail method
 	            commonapi.sendMail(message, function (result){
 	            	if(result=="failure"){
 	            		self.emit("failedUserRegistration",{"error":{"code":"AT001","message":"Error to send verification email"}});

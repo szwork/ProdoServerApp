@@ -32,6 +32,7 @@ exports.init = function (app) {
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
   app.get("/api/isloggedin",api.userapi.isLoggedIn);
+  app.get("/api/sendtestmail",api.commonapi.sendTestMail);
   // function(req,res){
   //   if (req.isAuthenticated()){
   //     res.send({status:true,sessionid:req.sessionID,userid:req.user.userid});

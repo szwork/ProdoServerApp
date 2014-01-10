@@ -57,9 +57,7 @@ exports.addUser = function(req,res){
       // //user.removeAllListeners();
       res.send(result);
     });
-
-  
-     user.registerUser(req.get("host"));
+user.registerUser(req.get("host"));
 }
 
 

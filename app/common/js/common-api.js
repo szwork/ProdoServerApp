@@ -27,19 +27,19 @@ var path=require("path");
 var OrgModel=require("../../org/js/org-model");
 var ProductModel=require("../../product/js/product-model");
 var UserModel=require("../../user/js/user-model");
-// var smtpTransport = nodemailer.createTransport("SMTP", {
-//     host: "smtp.giantleapsystems.com", // hostname
-//     secureConnection: true, // use SSL
-//     port: 465, // port for secure SMTP
-//     auth: {
-//         user: "sunil@giantleapsystems.com",
-//         pass: "Sunil12345"
-//       }
-// });
-var smtpTransport = nodemailer.createTransport("SES", {
-    AWSAccessKeyID: "AKIAJ2BXGCZW2235YKYA",
-    AWSSecretKey: "AsgYdCF/B5jGGyXezogxbrrbOZMgK4WAwuxJyj+tf8G/"
+var smtpTransport = nodemailer.createTransport("SMTP", {
+    host: "smtp.ipage.com", // hostname
+    secureConnection: true, // use SSL
+    port: 465, // port for secure SMTP
+    auth: {
+        user: "sunil@giantleapsystems.com",
+        pass: "Sunil12345"
+    }
 });
+// var smtpTransport = nodemailer.createTransport("SES", {
+//     AWSAccessKeyID: "AKIAJ2BXGCZW2235YKYA",
+//     AWSSecretKey: "AsgYdCF/B5jGGyXezogxbrrbOZMgK4WAwuxJyj+tf8G/"
+// });
 // AWS.config.region = 'ap-southeast-1';
 // AWS.config.AWS_ACCESS_KEY_ID = "AKIAJOGXRBMWHVXPSC7Q";
 // AWS.config.AWS_SECRET_ACCESS_KEY = '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';
@@ -52,6 +52,28 @@ exports.removeListner=function(emitter){
                 console.log('removing "message" listener');
         });
 
+}
+exports.sendTestMail=function(req,res){
+   var message = {
+      from: "Sunil More  <sunil@giantleapsystems.com>", // sender address
+      to: "sunilmore690@gmail.com, sunilmore6490@gmail.com", // list of receivers
+      subject: "Hello ", // Subject line
+      // text: "Hello world ", // plaintext body
+      html: "<b>Hello world </b>" // html body
+    }
+    smtpTransport.sendMail(message, 
+    function (error, success) {
+      if (error){
+        // not much point in attempting to send again, so we give up
+        // will need to give the user a mechanism to resend verification
+        logger.error("Unable to send via Prodonus: " + error.message);
+        //callback("failure");
+        res.send(error);
+      }else{
+        res.send(success);
+      }
+      //sending succussful then success
+    });
 }
 exports.loadsequences=function(req,res){
   var sequencedata=[{
@@ -111,6 +133,7 @@ exports.getbcrypstring=function(data,callback){
 }
 //send an email
 exports.sendMail = function(message,callback){
+  console.log("message format"+JSON.stringify(message));
   smtpTransport.sendMail(message, 
  	  function (error, success) {
       if (error){
@@ -119,7 +142,7 @@ exports.sendMail = function(message,callback){
         logger.error("Unable to send via Prodonus: " + error.message);
         callback("failure");
       }else{
-        callback("success"); 
+       callback("success"); 
       }
       //sending succussful then success
       
@@ -163,11 +186,11 @@ exports.uploadFiles=function(io,__dirname){
       uploadFile(file,__dirname,action,function(uploadresult){
         if(uploadresult.error!=undefined){
            if(uploadresult.error.user!=undefined){
-              socket.emit("userUploadResponse","");
+            socket.emit("userUploadResponse","");
            }else if(uploadresult.error.org!=undefined){
-               socket.emit("orgUploadResponse","");
+            socket.emit("orgUploadResponse","");
            }else{
-              socket.emit("productUploadResponse","");
+            socket.emit("productUploadResponse","");
            }
         }else{
           if(uploadresult.success.user!=undefined){
