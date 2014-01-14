@@ -63,7 +63,7 @@ user.registerUser(req.get("host"));
 
 
 exports.activateAccount = function(req, res) {
-logger.emit("log","calling to activate Account");
+  logger.emit("log","calling to activate Account");
   var user = new User();
   var html=S("<html><body><h1><font color=blue><a href='http://"+req.get("host")+"'>Prodonus</a></font></h1><br><message></body></html>");
    user.removeAllListeners("failedUserActivation");
@@ -148,7 +148,7 @@ exports.signin = function(req, res) {
     logger.emit("log","Succesfull Signin")
     logger.emit("info", result.success.message);
     //user.removeAllListeners();
-    result=JSON.parse(result);
+    // result=JSON.parse(result);
     result.success.user.sessionid=req.sessionID;
 
     // //user.removeAllListeners("successfulUserSigninsuccessfulUserSignin",function(stream){

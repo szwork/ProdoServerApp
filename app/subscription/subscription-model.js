@@ -13,19 +13,27 @@
 */
 
 var mongoose = require('../common/js/db');
-var commitment=mongoose.Schema({
+var shortId = require('shortid');
+var generateId = require('time-uuid');
+var subscriptionSchema = mongoose.Schema({
+  planid: {type:String,unique:true},
+  plantype:{type:String},//for an individual,company,manufacturers and custom type
+  planpaymentcommitment:{
       commitmenttype:String,
       amount:Number,
       currency:String
-    });
-var subscriptionSchema = mongoose.Schema({
-  //planid: { type: String },//
-  plantype:{type:String},//for an individual,company,manufacturers and custom type
-  planpaymentcommitment:[commitment],//monthly quarterly yearly
+    },//monthly quarterly yearly
   planstartdate:{type:Date,default:Date.now()},
   status:{type:String,default:"active"},
   
 });
+subscriptionSchema.pre('save', function(next) {
+	var subscription = this;
+	subscription.planid=generateId();
+	next();
+});
+
+
 
 var SubscriptionModel = mongoose.model('subscription', subscriptionSchema);
 

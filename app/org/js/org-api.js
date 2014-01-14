@@ -39,7 +39,7 @@ exports.addOrganization = function(req,res){
   
   var organizationdata=req.body.organization;
   var organization=new Organization(organizationdata);
-  logger.emit("organization data"+organizationdata);
+  logger.emit("log","organization data"+JSON.stringify(req.body));
   //var userdata=req.body.user;
   //logger.emit("userdata"+userdata);
   organization.removeAllListeners("successfulOrgAdd");

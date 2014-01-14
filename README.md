@@ -35,3 +35,6 @@ AP001-prodct id is wrong or prodct doesn't exist
 AP002-No product exists
 /////////////////organization address////////////
 AO003-There is no Organization address exists
+
+/////////subscription plan////////////
+AS001-subscription plan does'nt exists

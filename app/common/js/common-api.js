@@ -27,6 +27,15 @@ var path=require("path");
 var OrgModel=require("../../org/js/org-model");
 var ProductModel=require("../../product/js/product-model");
 var UserModel=require("../../user/js/user-model");
+// var smtpTransport = nodemailer.createTransport("SMTP", {
+//     host: "smtp.ipage.com", // hostname
+//     secureConnection: false, // use SSL
+//     port: 587, // port for secure SMTP
+//     auth: {
+//         user: "app@prodonus.com",
+//         pass: "App12345$"
+//     }
+// });
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.ipage.com", // hostname
     secureConnection: true, // use SSL
@@ -183,7 +192,10 @@ exports.uploadFiles=function(io,__dirname){
     socket.on('uploadFiles', function(file,action) {
       console.log("calling to Upload files");
       ///////////////
-      uploadFile(file,__dirname,action,function(uploadresult){
+      if(!fille && !action){
+        
+      }else{
+        uploadFile(file,__dirname,action,function(uploadresult){
         if(uploadresult.error!=undefined){
            if(uploadresult.error.user!=undefined){
             socket.emit("userUploadResponse","");
@@ -202,6 +214,8 @@ exports.uploadFiles=function(io,__dirname){
            }
         }
     })
+      }
+      
   })
 })
 }

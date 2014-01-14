@@ -32,7 +32,7 @@ var app = express();
 var redis = require("redis").createClient();
 var RedisStore = require('connect-redis')(express);
 
-var redisstore =new RedisStore({ host: 'localhost', port: 5000, client: redis });
+var redisstore =new RedisStore({ host: 'localhost', port: 5000, client: redis,ttl:900});
 // app.use(function(req, res, next) {
   
 //   res.on('header', function() {

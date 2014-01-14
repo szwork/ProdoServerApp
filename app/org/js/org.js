@@ -65,14 +65,15 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	    }else{  
 	    	logger.emit("log","_addOrganization");
 	    	//////////////////////////////////////////////
-		    _addUserToOrg(self,organization,sessionuserid);
+		    _addOrgDetailsToUser(self,organization,sessionuserid);
 		    /////////////////////////////////////////////      
 	     }
 	  })
 	};
 
-	var _addUserToOrg = function(self,organization,sessionuserid) {
-		userModel.update({userid:sessionuserid},{$set:{orgid:organization.orgid,isAdmin:true}},function(err,userupdatestatus){
+    
+	var _addOrgDetailsToUser = function(self,organization,sessionuserid) {
+		userModel.update({userid:sessionuserid},{$set:{org:{orgid:organization.orgid,isAdmin:true,orgtype:organization.orgtype}}},function(err,userupdatestatus){
 	 	  if(err){
 	   	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to update user"}});
 	  	}else if(userupdatestatus!=1){
@@ -96,10 +97,11 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	      }else{
 	      	var organizationdata=self.organization;
 	      	var invites="";
-	      	for(var i=0;i<organizationdata.usergrp.length;i++){
-
-	      		invites+=organizationdata.usergrp[0].invites;
-	      	}
+	      	if(organizationdata.usergrp!=undefined){
+						for(var i=0;i<organizationdata.usergrp.length;i++){
+							invites+=organizationdata.usergrp[0].invites;
+						}
+	    		}
 	      	if(invites.trim().length==0){
 		      	logger.emit("log","there is not ivtitee");
 		      	////////////////////////////////
@@ -160,7 +162,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	      var userdata=[];
 	      for(var i=0;i<invitees.length;i++)
 	      {
-	        userdata[i]={email:invitees[i],orgid:organization.orgid}
+	        userdata[i]={email:invitees[i],org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false}};
 	      }
 	      if(userdata.length>0){
 	        userModel.create(userdata,function(err,inviteuserdata){
@@ -177,15 +179,11 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	      }else{
 	      	logger.emit("log","emails privided aleready exists");
 	        //callback(null,userdata);
-	        ////////////////////////////////
-	      	_successfulOrgAdd(self);
-	      	///////////////////////////////
-	      }
+	        self.emit("failedOrgAdd",{"error":{"message":"Email Privided is already registerd with the prodonus"}})
 	    }
-  	})
-
-		
-	};
+	  }
+  })
+};
 
 	var _sendEmailToInvitees = function(self,organization,userdata) {
 		//validate the org data
@@ -200,7 +198,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
 					////////////////////////////////////////////////////////////////////////////////
 
 					/////////////////////////////////////////
-					_addInviteeGroupMembers(self,organization);
+					_addInviteUserToGroup(self,organization);
 					///////////////////////////////////////
 		    }else{
 		  		self.emit("failedOrgAdd",{"error":{"code":"ED002","message":"Server setup template issue"}});
@@ -208,7 +206,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
 		})
 	}
 
-	var _addInviteeGroupMembers = function(self,organization) {
+	var _addInviteUserToGroup = function(self,organization) {
 		var organizationdata=self.organization;
 		var usergrpdata=organizationdata.usergrp;
 		var usergrp=[];
@@ -637,16 +635,17 @@ exports.orgInvites=function(orgid,usergrp){
 	var self=this;
 	/////////////////////
 	_validateOrgInvites(self,orgid,usergrp);
-	///////////////////
-	////////////////////
-	_addOrgInvites(self,orgid,usergrp);
-	//////////////////
+
 }
 var _validateOrgInvites=function(self,orgid,usergrp){
 
 	if(usergrp==undefined){
 
-	}else if(usergrp.length==0){
+	}else if(usergrp.grpname==undefined){
+
+	}else if(usergrp.invites==undefined){
+
+	}else if(usergrp.invites.trim().length==0){
 
 	}else{
 		//////////////////
@@ -655,172 +654,87 @@ var _validateOrgInvites=function(self,orgid,usergrp){
 	}
 
 }
-var _addOrgInvitees = function(self,orgid,usergrp) {
-	var invitees=[];
-	var j=0;
-	//to add invtiees email into array group by grpname
-	for(var i=0;i<usergrp.length;i++){
-		var invites=S(usergrp[i].invites);
-		while(invites.length>0)
-		{
-			if(invites.contains(',')){
-		    var pos=invites.indexOf(',');
-			  if(invites.substring(0,pos).trim().length!=0){
-			    invitees[j]=invites.substring(0,pos).trim().s;
-			    j++;
-			  }
-			  invites=invites.substring(pos+1);
-			} else{
-			  if(invites.trim().length!=0){
-			    invitees[j]=invites.trim().s;
-			    j++;
-			  }
-			  invites="";
-			}
-		}
-	};
-	console.log("invitee"+invitees);
-	logger.emit("log","invitee"+invitees);
-	userModel.find({email:{$in:invitees}},{email:1}).lean().exec(function(err,user){
-	  if(err){
-    	self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find users"+err}});
-    }else if(user.length>0){
-      for(var i=0;i<user.length;i++)
-      {
-        for(var j=0;j<invitees.length;j++)
-        {
-          if(invitees[j]==user[i].email){
-            invitees.splice(j,1);
-          }
-        }
-      }
-      var userdata=[];
-      for(var i=0;i<invitees.length;i++)
-      {
-        userdata[i]={email:invitees[i],orgid:orgid}
-      }
-   	 userModel.create(userdata,function(err,inviteuserdata){
-				if(err){
-				  self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to create invite users"+err}});
-				}else if(inviteuserdata){
-					logger.emit("log",inviteuserdata);
-					var inviteusers=userdata;
-					/////////////////////////////////////////////////
-				 _sendInviteEmailToOrgInvitees(self,orgid,userdata);
-				  /////////////////////////////////////////////////
-				}
-			})
-    }else{
-  		self.emit("failedOrgInvites",{"error":{"code":"","message":"Provided orginvites already registered"}});  	
-    }
-	})
-};
+// var _addOrgInvitees = function(self,orgid,usergrp) {
+// 	var invitees=[]
+// 	var j=0;
+// 	//to add invtiees email into array group by grpname
+// 	var invites=S(usergrp.invites);
+// 	if(invites.contains(",")){
+// 		invitees=invitees.split(",");
+// 	}else{
+// 		invitees.push(invites.s);
+// 	}
+// 	console.log("invitee"+invitees);
+// 	logger.emit("log","invitee"+invitees);
+// 	userModel.find({email:{$in:invitees}},{email:1}).lean().exec(function(err,user){
+// 	  if(err){
+//     	self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find users"+err}});
+//     }else {
+//     		if(user.length>0){//if one email id already exist in database
+//     			var user_exist_invitees=[];
+//       		for(var i=0;i<user.length;i++)
+//       		{
+//         		for(var j=0;j<invitees.length;j++)
+//         		{
+//           		if(invitees[j]==user[i].email){
+//             		invitees.splice(j,1);
+//           		}
+//         		}
+//         		user_exist_invitees.push(user[i].email);
+//       		}
+//       	}
+//       	////////////////////////////////
+        
+//       	//////////////////////////////
+//       //invitees only contain user not exist in database
+//       var userdata=[];
+//       for(var i=0;i<invitees.length;i++)
+//       {
+//         userdata[i]={email:invitees[i],orgid:orgid}
+//       }
+//    	 userModel.create(userdata,function(err,inviteuserdata){
+// 				if(err){
+// 				  self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to create invite users"+err}});
+// 				}else if(inviteuserdata){
+// 					logger.emit("log",inviteuserdata);
+// 					var inviteusers=userdata;
+// 					/////////////////////////////////////////////////
+// 				 _sendInviteEmailToOrgInvitees(self,orgid,userdata);
+// 				  /////////////////////////////////////////////////
+// 				}
+// 			})
+//     }
+// 	})
+// };
 
-	var _sendInviteEmailToOrgInvitees = function(self,orgid,userdata) {
-		//validate the org data
-		var initialvalue=0;
-		orgModel.findOne({orgid:orgid},function(err,organization){
-			if(err){
-				self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
-			}else if(!organization){
+// 	var _sendInviteEmailToOrgInvitees = function(self,orgid,userdata) {
+// 		//validate the org data
+// 		var initialvalue=0;
+// 		orgModel.findOne({orgid:orgid},function(err,organization){
+// 			if(err){
+// 				self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
+// 			}else if(!organization){
+// 				self.emit("failedOrgInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
+// 			}else{
+// 				EmailTemplateModel.findOne({templatetype:"invite"}).lean().exec(function(err,emailtemplate){
+// 				  if(err){
+// 				    self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
+// 				  }else if(emailtemplate){
+// 				  	logger.emit("log","calling to sendinvitemail");
+// 						/////////////////////////////////////////////////////////////////////////////////
+// 						self.emit("sendEmailToInvitees", userdata,emailtemplate,organization.name,initialvalue);
+// 						////////////////////////////////////////////////////////////////////////////////
 
-			}else{
-				EmailTemplateModel.findOne({templatetype:"invite"}).lean().exec(function(err,emailtemplate){
-				  if(err){
-				    self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
-				  }else if(emailtemplate){
-				  	logger.emit("log","calling to sendinvitemail");
-						/////////////////////////////////////////////////////////////////////////////////
-						self.emit("sendEmailToInvitees", userdata,emailtemplate,organization.name,initialvalue);
-						////////////////////////////////////////////////////////////////////////////////
+// 							/////////////////////////////////////////
+// 							_addInviteeGroupMembers(self,organization);
+// 							///////////////////////////////////////
+// 				    }else{
+// 				  		self.emit("failedOrgAdd",{"error":{"code":"ED002","message":"Server setup template issue"}});
+// 				  	}
+// 				})
+// 			}
+// 		})
+// }
 
-							/////////////////////////////////////////
-							_addInviteeGroupMembers(self,organization);
-							///////////////////////////////////////
-				    }else{
-				  		self.emit("failedOrgAdd",{"error":{"code":"ED002","message":"Server setup template issue"}});
-				  	}
-				})
-			}
-		})
-}
-
-	var _addInviteeGroupMembers = function(self,organization) {
-		var organizationdata=self.organization;
-		var usergrpdata=organizationdata.usergrp;
-		var usergrp=[];
-		var invitees=[];
-		console.log("usergroup data"+JSON.stringify(self.organization));
-		for(var i=0;i<usergrpdata.length;i++)
-		{	
-			var j=0;
-
-			var invites=S(usergrpdata[i].invites);
-			while(invites.length>0)
-			{
-				if(invites.contains(',')){
-		      var pos=invites.indexOf(',');
-			    if(invites.substring(0,pos).trim().length!=0){
-			      invitees[j]=invites.substring(0,pos).trim().s;
-			      j++;
-			    }
-			   	invites=invites.substring(pos+1);
-				} else  {
-			  	if(invites.trim().length!=0){
-			         invitees[j]=invites.trim().s;
-			         j++;
-			    }
-			   	invites="";
-			  }
-
-			}
-
-			usergrp[i]={grpname:usergrpdata[i].grpname,grpinvites:invitees};
-			invitees=[];
-		}
-		////////////////////////////////////////
-		addgrpmember(self,organization,usergrp,0);
-		////////////////////////////////////////
-	};
-	var addgrpmember=function(self,organization,usergrp,i){
-
-		if(usergrp.length>i){ 
-      
-      userModel.find({ email:{ $in :usergrp[i].grpinvites }},{userid:1}).lean().exec(function(err,user){
-        if( err ){
-          self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find user"}});
-        }else if( user.length==0 ){
-        	self.emit("failedOrgAdd",{"error":{"code":"AU003","message":"No user exists"}});
-				}else{ //add the userid into respective group
-          var newuser=[];
-          for(var p=0;p<user.length;p++)
-          {
-            newuser[p]=user[p].userid;
-            logger.emit("log","newuser["+p+"]"+user[p].userid);
-          }
-          orgModel.update({ orgid :organization.orgid,"usergrp.grpname":usergrp[i].grpname},{$pushAll:{"usergrp.$.grpmembers":newuser},$set:{"usergrp.$.invites":""}},function(err,status){
-            if( err ){
-            self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to update org to add grpmembers"}});
-            }else if(status==1){
-              // callback("success");
-            	i+=1;
-					    ////////////////////////////////////////
-							addgrpmember(self,organization,usergrp,i);
-							////////////////////////////////////////
-            }else {
-           		i+=1;
-           		logger.emit("error","Provided orgid doesnt exists");
-              ////////////////////////////////////////
-							addgrpmember(self,organization,usergrp,i);
-							////////////////////////////////////////
-          }
-          });//end of orgmodel update
-        }
-      })
-    } else {
-    	//////////////////////
-     _successfulOrgAdd(self);
-     ///////////////////////
-    }
-	}
-
+	
+	

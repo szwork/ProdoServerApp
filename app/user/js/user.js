@@ -237,7 +237,7 @@ var _sendWelcomeInviteEmail = function (self,user) {
 			      		html=html.replaceAll("<orgname>",user.orgid);
 			      		html=html.replaceAll("<password>",otp);
 			      		var message = {
-					        from: "Prodonus  <noreply@prodonus.com>", // sender address
+					        from: "Prodonus  <sunil@giantleapsystems.com>", // sender address
 					        to: user.email, // list of receivers
 					        subject:emailtemplate.subject, // Subject line
 					        html: html+"" // html body
@@ -339,9 +339,9 @@ _isOTPUser(self,user);
 /////////////////////
 };
 var _isOrganizationUser=function(user,callback){
-	if(user.orgid!=undefined){
+	if(user.org!=undefined){
 		//console.log("organization user");
-		orgModel.findOne({orgid:user.orgid},{name:1,usergrp:1,orgtype:1}).lean().exec(function(err,organization){
+		orgModel.findOne({orgid:user.org.orgid},{name:1,usergrp:1,orgtype:1}).lean().exec(function(err,organization){
             if(err){
 
             }else if(organization){
@@ -359,11 +359,11 @@ var _isOrganizationUser=function(user,callback){
               //user=JSON.stringify(user);
               var userdata=JSON.stringify(user);
               userdata=JSON.parse(userdata);
-              userdata.orgname=organization.name;
+              userdata.org.orgname=organization.name;
             
 
-              userdata.grpname=grpname;
-              console.log("user"+userdata.orgname);
+              userdata.org.grpname=grpname;
+              console.log("user"+grpname);
 
               console.log("user in org"+userdata+"organization name"+organization.name+"grpname"+grpname);
               
@@ -371,7 +371,7 @@ var _isOrganizationUser=function(user,callback){
 				callback(userdata);
 				/////////////////////////
 			}else{
-
+        logger.emit("log","hi");
             }
          }); 
 	}else{
@@ -382,22 +382,31 @@ var _isOrganizationUser=function(user,callback){
 }
 var getUserRequiredData=function(user,callback){
 
-	var user_senddata={userid:user.userid,fullname:user.fullname,products_followed:user.products_followed,isAdmin:user.isAdmin,isOtpPassword:user.isOtpPassword};
-	if(user.orgid!=undefined){
-		user_senddata.orgid=user.orgid;
+	var user_senddata={userid:user.userid,fullname:user.fullname,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword};
+	// user=JSON.stringify(user);
+	// user=JSON.parse(user);
+	console.log("log","user"+user);
+  // user=JSON.stringify(user);
+  console.log("org length"+Object.keys(user.org).length)
+		
+	if(Object.keys(user.org).length!==0){
+		user_senddata.org=user.org;
 	}
-	 console.log(user);
+	logger.emit("log","user___"+JSON.stringify(user_senddata));
 	_isOrganizationUser(user_senddata,function(user_senddata){
-		if(user.subscription.planid==undefined){
+		console.log("subscription length"+Object.keys(user.subscription).length)
+				
+		if(Object.keys(user.subscription).length===0){
 			user_senddata.isSubscribed=false;
-		}else {
+		}else{
 			user_senddata.isSubscribed=true;
 			if(new Date(user.subscription.planexpirydate)<new Date()){//subscription expired
 				user_senddata.subscriptionExpired=true;
 			}else{
 				user_senddata.subscriptionExpired=false;
-				console.log(""+user.payment);
-				if(user.payment.paymentid==undefined){
+				// console.log("hit"+user.payment);
+        console.log("payment length"+Object.keys(user.payment).length)
+				if(Object.keys(user.payment).length===0){
 					user_senddata.hasDonePayment=false;
 				}else{
 					user_senddata.hasDonePayment=true;

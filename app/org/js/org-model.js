@@ -48,7 +48,8 @@ var LocationSchema = mongoose.Schema({
 	},
   contacts:[{customerhelpline:String}],
 	region:{type:String},
-	timezone:{type:String}
+	timezone:{type:String},
+  contactemail:{type:String}//contact emails
 });
 
 
@@ -69,7 +70,7 @@ var OrganizationSchema = mongoose.Schema({
     contractid:{type:String},
     subscription:{
       planid:{type:ObjectId,ref:"Subscription"} ,//individdual
-      planstartdate:{type:Date,default:Date.now()}, 
+      planstartdate:{type:Date}, 
       planexpirydate:Date
     },
     org_images:[{image:{type:String}}],
