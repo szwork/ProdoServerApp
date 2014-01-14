@@ -381,7 +381,7 @@ var _isOrganizationUser=function(user,callback){
 	}
 }
 var getUserRequiredData=function(user,callback){
-
+    
 	var user_senddata={userid:user.userid,fullname:user.fullname,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
@@ -389,36 +389,40 @@ var getUserRequiredData=function(user,callback){
   // user=JSON.stringify(user);
   console.log("org length"+Object.keys(user.org).length)
 		
-	if(Object.keys(user.org).length!==0){
+	if(user.org.orgid!=null && user.org.isAdmin!=null){
 		user_senddata.org=user.org;
 	}
 	logger.emit("log","user___"+JSON.stringify(user_senddata));
 	_isOrganizationUser(user_senddata,function(user_senddata){
 		console.log("subscription length"+Object.keys(user.subscription).length)
 				
-		if(Object.keys(user.subscription).length===0){
+		if(user.subscription.planid==null){
 			user_senddata.isSubscribed=false;
 		}else{
 			user_senddata.isSubscribed=true;
-			if(new Date(user.subscription.planexpirydate)<new Date()){//subscription expired
+			if(user.subscription.planexpirydate==null){
 				user_senddata.subscriptionExpired=true;
 			}else{
-				user_senddata.subscriptionExpired=false;
-				// console.log("hit"+user.payment);
-        console.log("payment length"+Object.keys(user.payment).length)
-				if(Object.keys(user.payment).length===0){
-					user_senddata.hasDonePayment=false;
+				if(new Date(user.subscription.planexpirydate)<new Date()){//subscription expired
+					user_senddata.subscriptionExpired=true;
 				}else{
-					user_senddata.hasDonePayment=true;
-				}
-			}	
+					user_senddata.subscriptionExpired=false;
+					// console.log("hit"+user.payment);
+	        		console.log("payment length"+Object.keys(user.payment).length)
+					if(user.payment.paymentid==null){
+						user_senddata.hasDonePayment=false;
+					}else{
+						user_senddata.hasDonePayment=true;
+					}
+				}	
+			}
 		}
 		callback(user_senddata);
 
 	})
 }
 var _isOTPUser=function(self,user){
-	
+	logger.emit("log","_isOTPUser user"+user);
 	getUserRequiredData(user,function(userdata){
 			if(userdata.isOtpPassword==true){
 				self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 

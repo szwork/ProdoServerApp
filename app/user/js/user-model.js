@@ -24,34 +24,34 @@ var userSchema = mongoose.Schema({
   fullname:{type:String},
   firstname: { type: String },
   lastname:{type:String},
-  dob:{type:Date},
-  gender:{type:String},
-  phone:{type:String},
-  mobile:{type:String},
+  dob:{type:Date,default:null},
+  gender:{type:String,default:null},
+  phone:{type:String,default:null},
+  mobile:{type:String,default:null},
   email: { type: String, required: true, unique: true },
   password: { type: String},
   isOtpPassword:{type:Boolean,default:false},
   verified: { type:Boolean, default:false },//after verifying email sets true
   address:{
-  	address1:{type:String},
-    address2:{type:String},
-  	address3:{type:String},
-  	city:{type:String},
-  	state:{type:String},
-  	country:{type:String},
-  	zipcode:{type:String}
+  	address1:{type:String,default:null},
+    address2:{type:String,default:null},
+  	address3:{type:String,default:null},
+  	city:{type:String,default:null},
+  	state:{type:String,default:null},
+  	country:{type:String,default:null},
+  	zipcode:{type:String,default:null}
    },
-  org:{orgid:{type:String},orgtype:{type:String},isAdmin:{type:Boolean}},
+  org:{orgid:{type:String,default:null},orgtype:{type:String,default:null},isAdmin:{type:Boolean,default:null}},
   // orgid: { type:String, ref: 'Organization'},
   // isAdmin:{type:Boolean,default:false},
   subscription:{
-    planid:{type:ObjectId,ref:"Subscription"} ,//referencing from Subscription 
-    planstartdate:{type:Date} , 
-    planexpirydate:{type:Date},
-    discountcode:{type:String,ref:"discount"}
+    planid:{type:ObjectId,ref:"Subscription",default:null} ,//referencing from Subscription 
+    planstartdate:{type:Date,default:null} , 
+    planexpirydate:{type:Date,default:null},
+    discountcode:{type:String,ref:"discount",default:null}
   },
-  payment:{paymentid:{type:String,ref:"payment"}},
-  payment_history:{paymentid:{type:String,ref:"payment"}},
+  payment:{paymentid:{type:String,ref:"payment",default:null}},
+  payment_history:[{paymentid:{type:String,ref:"payment"}}],
   products_followed: [{prodle:{type:String,ref:"product"}}], //list of prodle - product ids handles #12934xyz
   products_recommends:[{prodle:{type:String,ref:"product"} , rating:{type:String} ,repeat_value:{type:String}}], //list of prodles
   status:{type:String,default:"active"},
@@ -59,7 +59,7 @@ var userSchema = mongoose.Schema({
   adddate:{ type:Date,default:Date.now },
   updatedate:{ type:Date},
   removedate:{ type:Date},
-  profile_pic:{type:String}
+  profile_pic:{type:String,default:null}
 });
 
 //Encrypt the password and generate the idwhen you save.
