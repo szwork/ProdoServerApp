@@ -1,96 +1,123 @@
 var SubscriptionModel=require('./subscription-model'); 
-
+var generateId = require('time-uuid');
 exports.loadsubscriptiondata=function(req,res)
 {
 var subscriptionarray=
 [
 	{
+		planid:generateId(),
 		plantype:"individual",
+		plandescription:"Individual Monthly Plan",
 		planpaymentcommitment:
 		{
-			committype:"monthly",
+			commitmenttype:"monthly",
 			amount:5,
 			currency:"dollar"
 		}
 	},
-	{	plantype:"individual",
+	{	
+		planid:generateId(),
+		plantype:"individual",
+		plandescription:"Individual Quarterly Plan",
 		planpaymentcommitment:
 		{
-			committype:"quarterly",
+			commitmenttype:"quarterly",
 			amount:10,
 			currency:"dollar"
 		}
 	},
-	{   plantype:"individual",
+	{ 
+		planid:generateId(),
+		plantype:"individual",
+		plandescription:"Individual Yearly Plan",
 		planpaymentcommitment:
 		{
-			committype:"yearly",
+			commitmenttype:"yearly",
 			amount:50,
 			currency:"dollar"
 		}
 	},
-	{
+	{ planid:generateId(),
 		plantype:"company",
+		// plandescription:"Individual Quarterly Plan",
+		plandescription:"Company Monthly Plan",
+		planpaymentcommitment:
 		planpaymentcommitment:
 		{
-			committype:"monthly",
+			commitmenttype:"monthly",
 			amount:10,
 			currency:"dollar"
 		}
 	},
-	{	plantype:"company",
+	{	planid:generateId(),
+		plantype:"company",
+		plandescription:"Company Quarterly Plan",
 		planpaymentcommitment:
 		{
-			committype:"quarterly",
+			commitmenttype:"quarterly",
 			amount:25,
 			currency:"dollar"
 		}
 	},
-	{	plantype:"company",
+	{	planid:generateId(),
+		plantype:"company",
+		plandescription:"Company Yearly Plan",
 		planpaymentcommitment:
 		{
-			committype:"yearly",
+			commitmenttype:"yearly",
 			amount:100,
 			currency:"dollar"
 		}
 	},
 	{
+		planid:generateId(),
 		plantype:"manufacturer",
+		plandescription:"Manufacturer Monthly Plan",
 		planpaymentcommitment:
 		{
-			committype:"monthly",
+			commitmenttype:"monthly",
 			amount:20,
 			currency:"dollar"
 		}
 	},
-	{	plantype:"manufacturer",
+	{	
+		planid:generateId(),
+		plantype:"manufacturer",
+		plandescription:"Manufacturer Quarterly Plan",
 		planpaymentcommitment:
 		{
-			committype:"quarterly",
+			commitmenttype:"quarterly",
 			amount:50,
 			currency:"dollar"
 		}
 	},
-	{	plantype:"manufacturer",
+	{ 
+		planid:generateId(),
+		plantype:"manufacturer",
+		plandescription:"Manufacturer Yearly Plan",
 		planpaymentcommitment:
 		{
-			committype:"yearly",
+			commitmenttype:"yearly",
 			amount:180,
 			currency:"dollar"
 		}
 	}
 ];
-SubscriptionModel.create(subscriptionarray,function(err,docs)
-{
-	if(err)
-	{
-		console.log("error in creating default subscription model");
+for(var i=0;i<subscriptionarray.length;i++){
+
+		SubscriptionModel.update({plandescription:subscriptionarray[i].plandescription},{$set:subscriptionarray[i]},{upsert:true},function(err,langcodeupdatestatus){
+			if(err){
+				//res.send("error in db ")
+				logger.error("error in db");
+			}else if(langcodeupdatestatus==1){
+				//res.send("Workcategory uploaed");
+				logger.log("log","subscriptionarray loaded loaded");
+			}else{
+				//res.send("");
+				logger.error("log","ssssssss");
+			}
+		})
 	}
-	else
-	{
-		res.send({"success":"subscription default records insertd"});	
-	}
-})
 };
 exports.getAllSubscriptionPlan=function(req,res)
 {

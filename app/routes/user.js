@@ -48,6 +48,7 @@ exports.init = function (app) {
    app.get('/api/subscription',auth,api.subscriptionapi.getAllSubscriptionPlan);
    app.get("/api/loaddiscount",auth,api.discountapi.loaddiscount);
    app.get("/api/discount",auth,api.discountapi.getDiscountCode);
+   app.post("/api/makepayment",auth,api.userapi.makePayment);
    
   // app.post('/api/loademailtemplate',api.emailtemplateapi.loadEmailTemplate);
   // app.post('/api/loadsequence',api.commonapi.loadsequences);

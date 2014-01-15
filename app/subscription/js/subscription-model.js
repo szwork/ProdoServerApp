@@ -12,14 +12,12 @@
 * 09-10-2013|Sunil|add subcription model 
 */
 
-var mongoose = require('../common/js/db');
+var mongoose = require('../../common/js/db');
 var shortId = require('shortid');
 var generateId = require('time-uuid');
 var subscriptionSchema = mongoose.Schema({
   planid: {type:String,unique:true},
   plantype:{type:String},//for an individual,company,manufacturers and custom type
-  // planname:{type:String},//monthly,querterly,yearly
-  plandescription:{type:String},//plan description
   planpaymentcommitment:{
       commitmenttype:String,
       amount:Number,

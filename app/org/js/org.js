@@ -42,7 +42,7 @@ Organization.prototype.addOrganization=function(sessionuserid){
    
 	};
 	var _hasAlreadyOrganization=function(self,organizationdata,sessionuserid){
-		userModel.findOne({userid:sessionuserid,orgid:null},{userid:1}).lean().exec(function(err,user){
+		userModel.findOne({userid:sessionuserid,"org.orgid":null},{userid:1}).lean().exec(function(err,user){
 			if(err){
 					self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find user"}});
 				}else if(user){

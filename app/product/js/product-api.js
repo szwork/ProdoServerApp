@@ -21,7 +21,7 @@ var Product=require("./product");
 
 exports.addProduct=function(req,res){
 	  var orgid=req.params.orgid;
-    var sessionorgid=req.user.orgid;
+    var sessionorgid=req.user.org.orgid;
   	var productdata=req.body.product;
     logger.emit("log","req product body"+JSON.stringify(req.body));
   	var product = new Product(productdata);
@@ -44,12 +44,12 @@ exports.addProduct=function(req,res){
     
    
     logger.emit("log",productdata);
-    logger.emit("log","hi"+orgid +":"+req.user.orgid);
-    if(sessionorgid!=orgid)
+    logger.emit("log","hi"+orgid +":"+req.user.org.orgid);
+    if(sessionorgid==orgid)
     { 
       logger.emit("error","You are not an organization user to add product",sessionuserid)
       product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to add product"}})
-    }else if(req.user.isAdmin!=true){
+    }else if(req.user.org.isAdmin!=true){
       logger.emit("error","You are not an admin to add product",sessionuserid)
       product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to add product"}})
     }else{
@@ -182,10 +182,10 @@ exports.deleteProduct=function(req,res){
     res.send(result);
     // eventEmitter.removeListener(this);
   });
-   if(req.user.orgid!=orgid){
+   if(req.user.org.orgid!=orgid){
     logger.emit("log","Given orgid is not match with session userid");
     product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}});
-  }else if(req.user.isAdmin==false){
+  }else if(req.user.org.isAdmin==false){
     logger.emit("log","You are not an admin to delete product");
     product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}}); 
   }else{

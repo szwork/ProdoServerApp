@@ -45,7 +45,7 @@ var userSchema = mongoose.Schema({
   // orgid: { type:String, ref: 'Organization'},
   // isAdmin:{type:Boolean,default:false},
   subscription:{
-    planid:{type:ObjectId,ref:"Subscription",default:null} ,//referencing from Subscription 
+    planid:{type:String,ref:"Subscription",default:null} ,//referencing from Subscription 
     planstartdate:{type:Date,default:null} , 
     planexpirydate:{type:Date,default:null},
     discountcode:{type:String,ref:"discount",default:null}

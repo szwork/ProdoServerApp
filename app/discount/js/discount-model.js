@@ -28,7 +28,7 @@ var discountSchema = mongoose.Schema({
 discountSchema.pre('save', function(next) {
 	var discount = this;
 	discount.discountid=generateId();
-	discount,discountcode=generateId();
+	discount.discountcode=generateId();
 	next();
 });
 

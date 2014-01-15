@@ -38,3 +38,8 @@ AO003-There is no Organization address exists
 
 /////////subscription plan////////////
 AS001-subscription plan does'nt exists
+AS002-planid is wrong
+
+
+///////discount code/////////////
+AD001-DISCOUNT CODE IS WRONG

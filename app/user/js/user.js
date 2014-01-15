@@ -14,6 +14,9 @@ var qs = require('querystring');
 var request=require("request");
 var orgModel=require("../../org/js/org-model");
 var nodemailer=require("nodemailer");
+var DiscountModel=require("../../discount/js/discount-model");
+var PaymentModel=require("../../subscription/js/payment-model");
+var SubscriptionModel=require("../../subscription/js/subscription-model");
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.ipage.com", // hostname
     secureConnection: true, // use SSL
@@ -915,5 +918,147 @@ var _isLoogedIn=function(self,user){
 var _successfulIsLoggedIn=function(self,user){
 	logger.emit("log","_successfulIsLoggedIn");
 	self.emit("successfulIsLoggedIn", {success:{message:"Getting User details Successfully",user:user}});
-}       
-              
+} 
+User.prototype.makePayment = function(user,paymentdata) {
+	var self=this;
+	_validatePaymentData(self,user,paymentdata);
+};
+var _validatePaymentData=function(self,user,paymentdata){
+	if(paymentdata==undefined){
+		self.emit("failedMakePayment",{"error":{"code":"EV001","message":"Please Provide paymentdata"}});
+	}else if(paymentdata.usertype==undefined){
+		self.emit("failedMakePayment",{"error":{"code":"EV001","message":"Please Provide usertype"}});
+	}else if(paymentdata.planid==undefined){
+		self.emit("failedMakePayment",{"error":{"code":"EV001","message":"Please Provide planid"}});
+	}else if(paymentdata.discountcode==undefined){ 
+		self.emit("failedMakePayment",{"error":{"code":"EV001","message":"Please Provide discount "}});
+	}else{
+		///////////////////////
+		_checkDiscountCodeValid(self,user,paymentdata);
+		/////////////////////////
+	}
+}
+var _checkDiscountCodeValid=function(self,user,paymentdata){
+	if(paymentdata.discountcode.trim().length==0){
+		logger.emit("log","User has no discount code");
+		///////////////////////////////////////////////
+		_applyPlanToUser(self,user,paymentdata);
+		//////////////////////////////////////////////
+	}else{
+		DiscountModel.findOne({discountcode:paymentdata.discountcode},function(err,discount){
+			if(err){
+				self.emit("failedMakePayment",{"error":{"code":"ED001","message":"Error in db to find discountcode"}});
+			}else if(!discount){
+				self.emit("failedMakePayment",{"error":{"code":"AD001","message":"Provided discount code is wrong"}});	
+			}else{
+				/////////////////////////////////////////////
+				_checkPlanIsValid(self,user,paymentdata,discount);
+				///////////////////////////////////////////
+				
+			}
+		})
+	}
+}
+var _checkPlanIsValid=function(self,user,paymentdata,discount){
+	SubscriptionModel.findOne({planid:paymentdata.planid},function(err,subscription){
+		if(err){
+			self.emit("failedMakePayment",{"error":{"code":"ED001","message":"Error in db to find subscription plan"}});
+		}else if(!subscription){
+			self.emit("failedMakePayment",{"error":{"code":"AD001","message":"Provided subscription planid   is wrong"}});	
+		}else{
+			//////////////////////////////////
+			_applyDiscountCodeToPlan(self,user,paymentdata,discount,subscription);
+			///////////////////////////////
+
+		}
+	})
+}
+var _applyDiscountCodeToPlan=function(self,user,paymentdata,discount,subscription){
+	if(paymentdata.usertype=="individual"){
+		///////////////////////////
+		_applyIndividualPlanToUser(self,user,paymentdata,discount,subscription);
+		///////////////////////////
+	}else if(paymentdata.usertype=="company" || paymentdata.usertype=="manufacturer"){
+		/////////////////////////////////////////
+		_applyOrganizatioPlanToUser(self,user,paymentdata,discount,subscription);
+		///////////////////////////////////////
+	}else{
+		self.emit("failedMakePayment",{"error":{"message":"Provided usertype does'nt exists"}});		
+	}
+
+}
+var _applyIndividualPlanToUser=function(self,user,paymentdata,discount,subscription){
+	if(subscription.plantype!=paymentdata.usertype){
+		self.emit("failedMakePayment",{"error":{"message":"Your plantype doesn't match with usertype"}});			
+	}else{
+		logger.emit("log","discount imapct:"+discount.impact)
+		var currentdate=new Date();
+		var expirydate=new Date(currentdate.setDate(currentdate.getDate()+discount.impact.timeperiod));
+		var subscription_set={planid:subscription.planid,planstartdate:currentdate,planexpirydate:expirydate,discountcode:discount.discountcode};
+		var payment_data=new PaymentModel({userid:user.userid,price:0});
+		payment_data.save(function(err,payment){
+			if(err){
+				self.emit("failedMakePayment",{"error":{"message":"Error in db to save new payment"}});				
+			}else{
+				userModel.update({userid:user.userid},{$set:{subscription:subscription_set,payment:{paymentid:payment.paymentid}}},function(err,userpaymentupdate){
+					if(err){
+						self.emit("failedMakePayment",{"error":{"message":"Error in db to update user payment details"+err}});				
+					}else if(userpaymentupdate==0){
+						self.emit("failedMakePayment",{"error":{"message":"Userid is wrong"}});					
+					}else{
+						/////////////////////////////////////
+                         _successfullMakePayment(self);
+						///////////////////////////
+					}
+				})
+			}
+		})
+	}
+
+}
+var _applyOrganizatioPlanToUser=function(self,user,paymentdata,discount,subscription){
+	if(subscription.plantype!=paymentdata.usertype){
+		self.emit("failedMakePayment",{"error":{"message":"Your plantype doesn't match with usertype"}});			
+	}else{
+		logger.emit("log","discount imapct:"+discount.impact)
+		var currentdate=new Date();
+		var expirydate=new Date(currentdate.setDate(currentdate.getDate()+discount.impact.timeperiod));
+		var subscription_set={planid:subscription.planid,planstartdate:currentdate,planexpirydate:expirydate,discountcode:discount.discountcode};
+		var payment_data=new PaymentModel({userid:user.userid,price:0});
+
+		payment_data.save(function(err,payment){
+			if(err){
+				self.emit("failedMakePayment",{"error":{"message":"Error in db to save new payment"}});				
+			}else{
+  				var user_updatedata={subscription:subscription_set,payment:{paymentid:payment.paymentid}};
+  				org_updatedata=user_updatedata;
+  				
+			    orgModel.update({orgid:user.org.orgid},{$set:org_updatedata},function(err,orgpaymentupdate){
+			    	if(err){
+			    		self.emit("failedMakePayment",{"error":{"message":"Error in db to update org payment details"}});				
+			    	}else if(orgpaymentupdate==0){
+			    		self.emit("failedMakePayment",{"error":{"code":"AO002","message":"Orgid is worng"}});					
+			    	}else{
+                //set payment to user organization
+				    	userModel.update({"org.orgid":user.org.orgid},{$set:user_updatedata},{mutli:true},function(err,userpaymentupdate){
+							if(err){
+								self.emit("failedMakePayment",{"error":{"message":"Error in db to update user payment details"+err}});				
+							}else if(userpaymentupdate==0){
+								self.emit("failedMakePayment",{"error":{"message":"Userid is wrong"}});					
+							}else{
+								/////////////////////////////////////
+		                         _successfullMakePayment(self);
+								///////////////////////////
+							}
+						})	
+					}
+				})
+			}
+		})	
+	}
+}
+var _successfullMakePayment=function(self){
+	logger.emit("log","_successfullMakePayment");
+	self.emit("successfulMakePayment",{"success":{"message":"You have successfully made an payment"}})
+}
+    

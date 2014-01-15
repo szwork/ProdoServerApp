@@ -192,7 +192,7 @@ exports.uploadFiles=function(io,__dirname){
     socket.on('uploadFiles', function(file,action) {
       console.log("calling to Upload files");
       ///////////////
-      if(!fille && !action){
+      if(!file && !action){
         
       }else{
         uploadFile(file,__dirname,action,function(uploadresult){

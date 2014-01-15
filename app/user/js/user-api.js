@@ -436,3 +436,27 @@ exports.isLoggedIn=function(req,res){
        user.emit("failedIsLoggedIn",{"error":{"code":"AL001","message":"User Session expired"}});
     }
 }
+exports.makePayment=function(req,res){
+    var user=new User();
+    var sessionuserid=req.user.userid;
+    var paymentdata=req.body.payment;
+    logger.emit("log","req payment data"+JSON.stringify(req.body));
+    user.removeAllListeners("failedMakePayment");
+    user.on("failedMakePayment",function(err){
+      
+      // //user.removeAllListeners("failedIsLoggedIn",function(stream){
+      //   logger.emit("log","failedIsLoggedIn event removed");
+      // });
+      res.send(err);
+    });
+    user.removeAllListeners("successfulMakePayment");
+    user.on("successfulMakePayment",function(result){
+      // logger.emit("info", );
+      //user.removeAllListeners();
+      // result.success.user.sessionid=req.sessionID;
+      res.send(result);
+    });
+    user.makePayment(req.user,paymentdata);   
+
+
+}
