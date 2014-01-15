@@ -14,14 +14,11 @@ var qs = require('querystring');
 var request=require("request");
 var orgModel=require("../../org/js/org-model");
 var nodemailer=require("nodemailer");
-<<<<<<< HEAD
 var DiscountModel=require("../../discount/js/discount-model");
 var PaymentModel=require("../../subscription/js/payment-model");
 var SubscriptionModel=require("../../subscription/js/subscription-model");
-=======
 var productModel=require("../../product/js/product-model");
 var Product=require("../../product/js/product");
->>>>>>> 142d2414191c603e348c5ebd12c26f10b5d58495
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.ipage.com", // hostname
     secureConnection: true, // use SSL
