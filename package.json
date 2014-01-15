@@ -27,7 +27,6 @@
     "querystring":"*",
     "socket.io":"*",
     "aws-sdk":"*",
-    "fs":"*",
     "passport.socketio":"*",
     "connect":"*",
     "connect-redis":"*",
