@@ -57,8 +57,10 @@ exports.addOrganization = function(req,res){
   organization.removeAllListeners("sendinvitemail");
   organization.on('sendinvitemail',function(userdata,emailtemplatedata,orgname,i){
     var emailtemplate=S(emailtemplatedata.description);
-    logger.emit("log",userdata);
-    if(userdata.length>i){
+    logger.emit("log","calling to sendinvitemail"+i);
+    // logger.emit("log")
+    logger.emit("log","userdata"+JSON.stringify(userdata));
+    // if(userdata.length>i){
       userModel.findOne({email:userdata[i].email},{userid:1},function(err,user){
         if(err){
           logger.emit("error","error in db to find users",req.user.userid);
@@ -70,36 +72,42 @@ exports.addOrganization = function(req,res){
             if (err){  
                 logger.emit("error","Error in crating verification token for"+user.userid,req.user.userid);
             }else{
-                var html=S(emailtemplate); 
-                var url = "http://"+req.get("host")+"/api/verify/"+token;
-                html=emailtemplate.replaceAll("<email>",user.email);
-                html=emailtemplate.replaceAll("<url>",url);
                 
+                var html=S(emailtemplate);
+                logger.emit("log",""+html);
+                var url = "http://"+req.get("host")+"/api/verify/"+token;
+                html=html.replaceAll("<email>",user.email);
+                html=html.replaceAll("<url>",url);
+                var subject=S(emailtemplatedata.subject);
+                subject=subject.replaceAll("<companyname>",orgname);
                var message = {
-                  from: "Prodonus  <noreply@prodonus.com>", // sender address
+                  from: "Prodonus  <sunil@giantleapsystems.com>", // sender address
                   to: userdata[i].email, // list of receivers
-                  subject:emailtemplatedata.subject, // Subject line
+                  subject:subject.s, // Subject line
                   html: html.s // html body
               };
+              logger.emit("log","message:"+JSON.stringify(message)+"\n email:"+userdata[i].email);
               commonapi.sendMail(message,function(result){
                 if (result == "failure") {
-                   logger.emit("error","Error in sending invite mail to "+userdata[i].email,req.user.userid);
+                 logger.emit("error","Error in sending invite mail to "+userdata[i].email,req.user.userid);
+                 
+                 logger.emit("log","message not sent to :"+userdata[i].email);
+                 // organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+                 //i+=1;
+                 //organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+              } else {
                   
-                   organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-                   //i+=1;
-                   //organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-                } else {
-                   i+=1;
-                   organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
+                    logger.emit("log","message  sent to :"+userdata[i].email);
+                   // organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
                   }
               })
             }
           })
         }
       })
-    } else {
-      logger.emit("log","successfully sent invite email");
-    }
+    // } else {
+    //   logger.emit("log","successfully sent invite email");
+    // }
   });
   var sessionuserid=req.user.userid;
   organization.addOrganization(sessionuserid);

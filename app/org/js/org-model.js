@@ -69,10 +69,11 @@ var OrganizationSchema = mongoose.Schema({
     status: { type:String,default:"active"},/*wheather organization is active(1) or deactive(0)*/
     contractid:{type:String},
     subscription:{
-      planid:{type:ObjectId,ref:"Subscription"} ,//individdual
+      planid:{type:String,ref:"Subscription"} ,//individdual
       planstartdate:{type:Date}, 
       planexpirydate:Date
     },
+    payment:{paymentid:{type:String,default:"payment"}},
     org_images:[{image:{type:String}}],
     orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
     terms:{type:Boolean}

@@ -18,6 +18,7 @@ var generateId = require('time-uuid');
 var subscriptionSchema = mongoose.Schema({
   planid: {type:String,unique:true},
   plantype:{type:String},//for an individual,company,manufacturers and custom type
+  plandescription:{type:String},
   planpaymentcommitment:{
       commitmenttype:String,
       amount:Number,

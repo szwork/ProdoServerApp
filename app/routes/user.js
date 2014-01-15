@@ -44,7 +44,7 @@ exports.init = function (app) {
   // app.get("/api/forgotpassword/:token",api.userapi.forgotpasswordurlaction);
   // app.post("/api/resetpassword", auth,api.userapi.resetpassword);
   // app.get('/api/emailtemplate',api.emailtemplateapi.getAllEmailTemplate);
-   app.post('/api/loadsubscription',api.subscriptionapi.loadsubscriptiondata);
+   app.get('/api/loadsubscription',auth,api.subscriptionapi.loadsubscriptiondata);
    app.get('/api/subscription',auth,api.subscriptionapi.getAllSubscriptionPlan);
    app.get("/api/loaddiscount",auth,api.discountapi.loaddiscount);
    app.get("/api/discount",auth,api.discountapi.getDiscountCode);

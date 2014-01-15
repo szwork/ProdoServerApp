@@ -151,6 +151,7 @@ exports.sendMail = function(message,callback){
         logger.error("Unable to send via Prodonus: " + error.message);
         callback("failure");
       }else{
+        logger.emit("log","email sent");
        callback("success"); 
       }
       //sending succussful then success

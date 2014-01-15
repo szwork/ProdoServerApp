@@ -192,10 +192,15 @@ Organization.prototype.addOrganization=function(sessionuserid){
 		  	if(err){
 		    	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
 		  	}else if(emailtemplate){
-		  		logger.emit("log","calling to sendinvitemail");
-					/////////////////////////////////////////////////////////////////////////////////
-					self.emit("sendinvitemail", userdata,emailtemplate,organization.name,initialvalue);
-					////////////////////////////////////////////////////////////////////////////////
+		  		// logger.emit("log","calling to sendinvitemail");
+          for(var i=0;i<userdata.length;i++){
+          	self.emit("sendinvitemail", userdata,emailtemplate,organization.name,i);
+          }
+					// /////////////////////////////////////////////////////////////////////////////////
+					// self.emit("sendinvitemail", userdata,emailtemplate,organization.name,0);
+					// self.emit("sendinvitemail", userdata,emailtemplate,organization.name,1);
+					
+					// ////////////////////////////////////////////////////////////////////////////////
 
 					/////////////////////////////////////////
 					_addInviteUserToGroup(self,organization);
