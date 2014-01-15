@@ -436,3 +436,27 @@ exports.isLoggedIn=function(req,res){
        user.emit("failedIsLoggedIn",{"error":{"code":"AL001","message":"User Session expired"}});
     }
 }
+
+exports.followunfollowproduct=function(req,res){
+  var userdata=req.body.user;
+  var user=new User(userdata);
+
+  var sessionuserid=req.user.userid;
+  var prodle=req.params.prodle;
+  var orgid=req.params.orgid;
+  logger.emit("log","prodle"+prodle+"\norgid:"+orgid+"\nsessionid:"+sessionuserid);
+  // var product= new Product();
+  user.removeAllListeners("failedFollowUnFollowProduct");
+  user.on("failedFollowUnFollowProduct",function(err){
+    logger.emit("error", err.error.message,req.user.email);
+    res.send(err);
+  });
+  user.removeAllListeners("successfulFollowUnFollowProduct");
+  user.on("successfulFollowUnFollowProduct",function(result){
+    logger.emit("info", result.success.message.req.user.email);
+    // callback(null,result);
+    res.send(result);
+  });
+    
+ user.followunfollowproduct(prodle,sessionuserid);
+}

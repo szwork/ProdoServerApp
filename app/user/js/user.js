@@ -14,6 +14,8 @@ var qs = require('querystring');
 var request=require("request");
 var orgModel=require("../../org/js/org-model");
 var nodemailer=require("nodemailer");
+var productModel=require("../../product/js/product-model");
+var Product=require("../../product/js/product");
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.ipage.com", // hostname
     secureConnection: true, // use SSL
@@ -917,3 +919,66 @@ var _successfulIsLoggedIn=function(self,user){
 	self.emit("successfulIsLoggedIn", {success:{message:"Getting User details Successfully",user:user}});
 }       
               
+User.prototype.followunfollowproduct=function(prodle,sessionuserid){
+	var self=this;
+	_checkprodle(self,prodle,sessionuserid);
+	// _followunfollowproduct(self,prodle,sessionuserid);
+}
+var _checkprodle=function(self,prodle,sessionuserid){
+	productModel.findOne({prodle:prodle},function(err,checkprodlestatus){
+		if(err){
+			logger.emit("log","failed to connect to database");
+			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
+		}else if(checkprodlestatus){
+			_followunfollowproduct(self,prodle,sessionuserid);			
+		}else{
+			logger.emit("log","Incorrect prodle");
+			self.emit("failedFollowUnFollowProduct",{"error":{"message":"Incorrect prodle","prodle":prodle}});
+		}
+	})
+}
+
+var _followunfollowproduct=function(self,prodle,sessionuserid){
+
+	userModel.findOne({userid:sessionuserid,products_followed:prodle},function(err,userdata){
+		if(err){
+			logger.emit("log","failed to connect to database");
+			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
+		}else if(!userdata){
+			_followproduct(self,prodle,sessionuserid);				
+		}else{
+			_unfollowproduct(self,prodle,sessionuserid);
+		}
+	})
+}
+
+var _followproduct=function(self,prodle,sessionuserid){
+	userModel.update({userid:sessionuserid},{$push:{products_followed:prodle}},function(err,followprodstatus){
+			// userModel.push({"products_followed":prodle},function(err,followprodstatus){
+		if(err){
+			logger.emit("log","failed to connect to database");
+			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
+		}else if(followprodstatus){
+			logger.emit("log","successfulFollowProduct");
+			self.emit("successfulFollowUnFollowProduct",{"success":{"message":"Following product"}});
+		}
+		else{
+			logger.emit("log","Failure in following the product");
+			self.emit("failedFollowUnFollowProduct",{"error":{"code":"F001","message":"Failed to follow the product"}});
+		}
+	});
+}
+var _unfollowproduct=function(self,prodle,sessionuserid){
+	userModel.update({userid:sessionuserid},{$pull:{"products_followed":prodle}},function(err,unfollowprodstatus){
+		if(err){
+			logger.emit("log","failed to connect to database");
+			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
+		}else if(unfollowprodstatus){
+			logger.emit("log","successfully unfollowed");
+			self.emit("successfulFollowUnFollowProduct",{"success":{"message":"Unfollowing product"}});
+		}else{
+			logger.emit("log","Failure in unfollowing the product");
+			self.emit("failedFollowUnFollowProduct",{"error":{"code":"F001","message":"Failed to Unfollow the product"}});
+		}
+	})
+}
