@@ -22,7 +22,7 @@ var fs = require('fs');
 var FileUploadModel=require("./file-upload-model");
 var AWS = require('aws-sdk');
 var exec = require('child_process').exec;
-
+var generateId = require('time-uuid');
 var path=require("path");
 var OrgModel=require("../../org/js/org-model");
 var ProductModel=require("../../product/js/product-model");
@@ -360,7 +360,8 @@ var orgFileUpload=function(orgid,awsparams,callback){
           callback(err);
         }else{
          // var newprofileurl=url;
-          OrgModel.update({orgid:orgid},{$push:{org_images:{image:url}}},function(err,orguploadstatus){
+         var image_data={image:url,imageid:generateId()}
+          OrgModel.update({orgid:orgid},{$push:{org_images:image_data}},function(err,orguploadstatus){
             if(err){
               logger.emit("log","Error in updatin"+err);
               callback(err);
@@ -389,8 +390,8 @@ var productFileUpload=function(prodle,awsparams,callback){
           callback(err);
         }else{
           // var newprofileurl=url;
-
-          ProductModel.update({prodle:prodle},{$push:{product_images:{image:url}}},function(err,productuploadstatus){
+          var image_data={image:url,imageid:generateId()}
+          ProductModel.update({prodle:prodle},{$push:{product_images:image_data}},function(err,productuploadstatus){
             if(err){
               callback(err);
             }else if(productuploadstatus==1){

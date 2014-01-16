@@ -46,10 +46,10 @@ var LocationSchema = mongoose.Schema({
 		state:String,
 		country:String
 	},
-  contacts:[{customerhelpline:String}],
+  contacts:[{customerhelpline:String,contactemail:String}],
 	region:{type:String},
 	timezone:{type:String},
-  contactemail:{type:String}//contact emails
+  // contactemail:{type:String}//contact emails
 });
 
 
@@ -74,7 +74,7 @@ var OrganizationSchema = mongoose.Schema({
       planexpirydate:Date
     },
     payment:{paymentid:{type:String,default:"payment"}},
-    org_images:[{image:{type:String}}],
+    org_images:[{image:{type:String},imageid:{type:String}}], 
     orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
     terms:{type:Boolean}
 

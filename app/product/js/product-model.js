@@ -38,10 +38,7 @@ var commentSchema = mongoose.Schema({
   dateremoved:{type:Date},   
   commenttext:{type:String},   
   tags:[{type:String,ref:"Tags"}], 
-  
-  
-  
-
+  comment_image:[{imageid:{type:String},image:{type:String}}]
 });
 
 ////////////
@@ -60,7 +57,7 @@ var productSchema = mongoose.Schema({
   sale_discontinuation_date:{type:Date},
   support_discontinuation_date: { type:Date },
   banneddate: { type: Date },
-  product_images: [{image:{type:String}}], 
+  product_images: [{image:{type:String},imageid:{type:String}}], 
   category: [{prodle:{type:String,ref:"product"}}], 
   features: [productFeatureSchema], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 

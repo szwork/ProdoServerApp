@@ -928,7 +928,7 @@ User.prototype.makePayment = function(user,paymentdata) {
 };
 var _validatePaymentData=function(self,user,paymentdata){
 	if(paymentdata==undefined){
-		self.emit("failedMakePayment",{"error":{"code":"EV001","message":"Please Provide paymentdata"}});
+		self.emit("failedMakePayment",{"error":{"code":"AV001","message":"Please Provide paymentdata"}});
 	}else if(paymentdata.usertype==undefined){
 		self.emit("failedMakePayment",{"error":{"code":"EV001","message":"Please Provide usertype"}});
 	}else if(paymentdata.planid==undefined){

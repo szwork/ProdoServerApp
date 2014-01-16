@@ -215,33 +215,35 @@ var _successfulDeleteProduct=function(self){
 	logger.emit("log","_successfulDeleteProduct");
 	self.emit("successfulDeleteProduct", {"success":{"message":"Delete Product Successfully"}});
 }
-Product.prototype.deleteProductImage = function(prodleimageid,prodle,orgid) {
+Product.prototype.deleteProductImage = function(prodleimageids,prodle,orgid) {
 	var self=this;
-	///////////////////////////////////////////////////////////////////
-	_isOrganizationUserToDeleteProduct(self,prodleimageid,prodle,orgid);
-	/////////////////////////////////////////////////////////////////
-};
-var _isOrganizationUserToDeleteProduct=function(self,prodleimageid,prodle,orgid){
+	if(prodleimageids.length==0){
+		self.emit("failedDeleteProductImage",{"error":{"message":"Given prodleimageids is empty "}});
+	}else{
+		///////////////////////////////////////////////////////////////////
+	_deleteProductImage(self,prodleimageids,prodle,orgid);
+	/////////////////////////////////////////////////////////////////	
+	}
 	
-}
-var _deleteProduct=function(self,prodleimageid,prodle,orgid){
-	productModel.update({orgid:orgid,prodle:prodle},{$set:{status:"deactive"}}).lean().exec(function(err,productdeletestatus){
+};
+var _deleteProductImage=function(self,prodleimageids,prodle,orgid){
+	var prodle_imagearray=[];
+	for(var i=0;i<prodleimageids.length;i++){
+		prodle_imagearray.psuh({imageid:prodleimageids[i]});
+	}
+	productModel.update({orgid:orgid,prodle:prodle,product_images:{$in:prodle_imagearray}},{$pullAll:{product_images:prodle_imagearray}},function(err,deleteimagestatus){
 		if(err){
-			self.emit("failedDeleteProduct",{"error":{"code":"ED001","message":"Error in db to delete product"}});
-		}else if(productdeletestatus!=1){
-			self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"product id is wrong"}});
+			self.emit("failedDeleteProductImage",{"error":{"code":"ED001","message":"function:_deleteProductImage\nError in db to "}});
+		}else if(deleteimagestatus==0){
+			self.emit("failedDeleteProductImage",{"error":{"code":"ED001","message":"orgid or prodle or given prodleimageids is wrong "}});
 		}else{
-			////////////////////////////////
-			_successfulDeleteProduct(self);
 			//////////////////////////////////
+			_successfulDeleteProductImage(self);
+			/////////////////////////////////////
 		}
 	})
-};
-
-var _successfulDeleteProduct=function(self){
-	logger.emit("log","_successfulDeleteProduct");
-	self.emit("successfulDeleteProduct", {"success":{"message":"Delete Product Successfully"}});
 }
-
-
-
+var _successfulDeleteProductImage=function(self){
+	logger.emit("log","_successfulDeleteProductImage");
+	self.emit("successfulDeleteProductImage",{"success":{"message":"Delete Product Images Successfully"}});
+}

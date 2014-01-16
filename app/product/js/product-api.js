@@ -198,9 +198,9 @@ exports.deleteProductImage=function(req,res){
   logger.emit("log","///////Calling to delete Products///////");
   var sessionuserid=req.user.userid;
   var prodle=req.params.prodle;
-  var prodleimageid=req.params.imageid;
-  
-  logger.emit("log","prodle"+prodle+"\n"+sessionuserid);
+  var prodleimageids=req.body.prodleimageids;
+  var orgid=req.params.orgid;
+  logger.emit("log","prodle"+prodle+"\nsessionuserid"+sessionuserid+" prodleimageid:"+prodleimageid+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(prodleimageids));
   
   var product= new Product();
      // product.setMaxListeners(0); 
@@ -221,12 +221,15 @@ exports.deleteProductImage=function(req,res){
     res.send(result);
     // eventEmitter.removeListener(this);
   });
-   if(req.user.isAdmin==false){
+   if(req.user.org.orgid!=orgid){
+    logger.emit("error","given orgid does not match with session orgid");
+    product.emit("failedDeleteProductImage",{"error":{"code":"EA001","message":"You have not authorized to delete product image"}}); 
+   }else if(req.user.org.isAdmin==false){
     logger.emit("log","You are not an admin to delete product image");
     product.emit("failedDeleteProductImage",{"error":{"code":"EA001","message":"You have not authorized to delete product image"}}); 
   }else{
     ////////////////////////////////////////////////////////////
-    product.deleteProductImage(prodleimageid,prodle,req.user.orgid);
+    product.deleteProductImage(prodleimageids,prodle,req.user.org.orgid);
     //////////////////////////////////////////////// ///////////
   }
 }

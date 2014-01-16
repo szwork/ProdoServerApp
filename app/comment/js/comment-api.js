@@ -47,11 +47,12 @@ exports.deleteComment = function(req, res) {
   comment.deleteComment(sessionuserid,commentid);
     
 }
-exports.comment=function(io){ 
+exports.comment=function(io,__dirname){ 
 io.of('/prodoapp').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
     socket.on('addComment', function(prodle,commentdata) {
       var comment = new Comment(commentdata);
+      logger.emit("log",prodle+""+JSON.stringify(commentdata));
       comment.removeAllListeners("failedAddComment");
       comment.on("failedAddComment",function(err){
         logger.emit("error", err.error.message);
@@ -67,7 +68,7 @@ io.of('/prodoapp').on('connection', function(socket) {
           socket.broadcast.emit("warrantycommentResponse",null,result);
         }
       });
-      comment.addComment(sessionuserid,prodle);
+      comment.addComment(sessionuserid,prodle,__dirname);
     });
   // socket.on('uploadFiles', function(file,action) {
   //   ///action for user profile update

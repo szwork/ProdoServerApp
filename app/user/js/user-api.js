@@ -457,16 +457,17 @@ exports.makePayment=function(req,res){
       res.send(result);
     });
     user.makePayment(req.user,paymentdata);   
+}
 
 
 exports.followunfollowproduct=function(req,res){
-  var userdata=req.body.user;
-  var user=new User(userdata);
+  // var userdata=req.body.user;
+  var user=new User();
 
   var sessionuserid=req.user.userid;
   var prodle=req.params.prodle;
-  var orgid=req.params.orgid;
-  logger.emit("log","prodle"+prodle+"\norgid:"+orgid+"\nsessionid:"+sessionuserid);
+  // var orgid=req.params.orgid;
+  logger.emit("log","prodle"+prodle+"\no\nsessionid:"+sessionuserid);
   // var product= new Product();
   user.removeAllListeners("failedFollowUnFollowProduct");
   user.on("failedFollowUnFollowProduct",function(err){
@@ -475,7 +476,7 @@ exports.followunfollowproduct=function(req,res){
   });
   user.removeAllListeners("successfulFollowUnFollowProduct");
   user.on("successfulFollowUnFollowProduct",function(result){
-    logger.emit("info", result.success.message.req.user.email);
+    logger.emit("info", result.success.message,req.user.email);
     // callback(null,result);
     res.send(result);
   });

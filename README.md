@@ -43,3 +43,4 @@ AS002-planid is wrong
 
 ///////discount code/////////////
 AD001-DISCOUNT CODE IS WRONG
+AD002-PLANID IS WRONG
