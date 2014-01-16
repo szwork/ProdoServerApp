@@ -11,7 +11,7 @@ exports.init = function (app) {
   //app.put("/api/product/:prodle",auth,api.productapi.updateProduct);//update the product data
   app.delete("/api/product/:orgid/:prodle",auth,api.productapi.deleteProduct);//delete product
  //delete product image
- app.delete("api/image/product/:orgid/:prodle/",auth,api.productapi.deleteProductImage);
+ app.delete("/api/image/product/:orgid/:prodle",auth,api.productapi.deleteProductImage);
 
 
 }

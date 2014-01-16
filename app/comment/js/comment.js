@@ -96,7 +96,7 @@ var __checkCommentImageExists=function(self,prodle,commentdata,product,__dirname
 	commentdata.datecreated=new Date();
 	commentdata.prodle=prodle;
 
-	if(commentdata.comment_image==undefined){
+	if(commentdata.comment_image==undefined || commentdata.comment_image.trim()==""){
 		//////////////////////////////
         _addComment(slef,prodle,commentdata,product);
 		///////////////////////////////
@@ -117,21 +117,26 @@ var _readCommentImage=function(self,prodle,commentdata,product,dirname){
 /*
 var commentdata={type:"product",comment_image:{filetype:filedata.type,filename:filedata.name,filebuffer:buffer},user:{userid:"ulksGOKEoS",fullname:"Sunil More",orgname:"Giant Leap Systems",grpname:"admin"},commenttext:"sssssssssssssssssssssssss"};
 
-
-
-
-*/
-////////////////////
-	if(file_buffer.size==undefined){
+*/////////////////////
+	var ext = path.extname(fileName||'').split('.');
+	ext=ext[ext.length - 1];
+  if(file_name==undefined){
+  	self.emit("failedAddComment",{"error":{"message":"Please provide comment image file_name"}});
+  }else if(file_buffer==undefined){
+  	self.emit("failedAddComment",{"error":{"message":"Please provide comment image file_buffer"}});
+	}else if(file_type==undefined){
+		self.emit("failedAddComment",{"error":{"message":"Please provide comment image file_type"}});
+	}else if(file_buffer.size==undefined){
 		self.emit("failedAddComment",{"error":{"message":"Provided  file_buffer data is not Binary buffer"}});
+	}else if(ext=="jpeg" || ext=="jpg" || ext=="png" || ext="gif"){
+				self.emit("failedAddComment",{"error":{"message":"You can add only image of type jpeg,jpg,gif,png"}});
 	}else{
 			var fileName = dirname + '/tmp/uploads/' + file_name;
 			fs.open(fileName, 'a', 0755, function(err, fd) {
 	    if (err) {
 	      self.emit("failedAddComment",{"error":{"message":" function:_readCommentImage \nError in open image "+err}})
 	    }else{
-	      var ext = path.extname(fileName||'').split('.');
-	      ext=ext[ext.length - 1];
+	      
 	      console.log("buffer size"+file_buffer.size);
 	      console.log("file extension"+ext);
 	      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {

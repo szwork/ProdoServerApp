@@ -1024,7 +1024,7 @@ var _applyOrganizatioPlanToUser=function(self,user,paymentdata,discount,subscrip
 	if(subscription.plantype!=paymentdata.usertype){
 		self.emit("failedMakePayment",{"error":{"message":"Your plantype doesn't match with usertype"}});			
 	}else{
-		if(user.org.isAdmin!=false){
+		if(user.org.isAdmin==false){
 			self.emit("failedMakePayment",{"error":{"message":"Only Admin can make payment"}});			
 		}else{
 			logger.emit("log","discount imapct:"+discount.impact)
