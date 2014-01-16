@@ -45,7 +45,7 @@ exports.addProduct=function(req,res){
    
     logger.emit("log",productdata);
     logger.emit("log","hi"+orgid +":"+req.user.org.orgid);
-    if(sessionorgid==orgid)
+    if(sessionorgid!=orgid)
     { 
       logger.emit("error","You are not an organization user to add product",sessionuserid)
       product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to add product"}})

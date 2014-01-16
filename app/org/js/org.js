@@ -162,7 +162,8 @@ Organization.prototype.addOrganization=function(sessionuserid){
 	      var userdata=[];
 	      for(var i=0;i<invitees.length;i++)
 	      {
-	        userdata[i]={email:invitees[i],org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false}};
+
+	        userdata[i]={email:invitees[i],username:invitees[i],org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false}};
 	      }
 	      if(userdata.length>0){
 	        userModel.create(userdata,function(err,inviteuserdata){

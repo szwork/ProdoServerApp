@@ -96,7 +96,7 @@ var __checkCommentImageExists=function(self,prodle,commentdata,product,__dirname
 	commentdata.datecreated=new Date();
 	commentdata.prodle=prodle;
 
-	if(commentdata.comment_image==undefined || commentdata.comment_image.trim()==""){
+	if(commentdata.comment_image==undefined || commentdata.comment_image==""){
 		//////////////////////////////
         _addComment(slef,prodle,commentdata,product);
 		///////////////////////////////
@@ -126,9 +126,7 @@ var commentdata={type:"product",comment_image:{filetype:filedata.type,filename:f
   	self.emit("failedAddComment",{"error":{"message":"Please provide comment image file_buffer"}});
 	}else if(file_type==undefined){
 		self.emit("failedAddComment",{"error":{"message":"Please provide comment image file_type"}});
-	}else if(file_buffer.size==undefined){
-		self.emit("failedAddComment",{"error":{"message":"Provided  file_buffer data is not Binary buffer"}});
-	}else if(ext=="jpeg" || ext=="jpg" || ext=="png" || ext="gif"){
+	}else if(ext=="jpeg" || ext=="jpg" || ext=="png" || ext=="gif"){
 				self.emit("failedAddComment",{"error":{"message":"You can add only image of type jpeg,jpg,gif,png"}});
 	}else{
 			var fileName = dirname + '/tmp/uploads/' + file_name;
