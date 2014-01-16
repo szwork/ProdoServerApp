@@ -96,7 +96,7 @@ var __checkCommentImageExists=function(self,prodle,commentdata,product,__dirname
 	commentdata.datecreated=new Date();
 	commentdata.prodle=prodle;
 
-	if(commentdata.comment_image==undefined && commentdata.comment_image.file_buffer.size==undefined){
+	if(commentdata.comment_image==undefined){
 		//////////////////////////////
         _addComment(slef,prodle,commentdata,product);
 		///////////////////////////////
@@ -122,38 +122,42 @@ var commentdata={type:"product",comment_image:{filetype:filedata.type,filename:f
 
 */
 ////////////////////
-var fileName = dirname + '/tmp/uploads/' + file_name;
-  fs.open(fileName, 'a', 0755, function(err, fd) {
-    if (err) {
-      self.emit("failedAddComment",{"error":{"message":" function:_readCommentImage \nError in open image "+err}})
-    }else{
-      var ext = path.extname(fileName||'').split('.');
-      ext=ext[ext.length - 1];
-      console.log("buffer size"+file_buffer.size);
-      console.log("file extension"+ext);
-      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
-        if(err){
-       		self.emit("failedAddComment",{"error":{"message":" function:_readCommentImage \nError in write image "+err}})   
-        }else{
-					var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-			    var bucketFolder;
-			    var params;
-			    bucketFolder="prodonus/org/"+product.orgid+"/product"+product.prodle+"/comment";
-	      	 params = {
-	             Bucket: bucketFolder,
-	             Key: product.orgid+product.prodle+s3filekey,
-	             Body: writebuffer,
-	             //ACL: 'public-read-write',
-	             ContentType: file_type
-	          };
+	if(file_buffer.size==undefined){
+		self.emit("failedAddComment",{"error":{"message":"Provided  file_buffer data is not Binary buffer"}});
+	}else{
+			var fileName = dirname + '/tmp/uploads/' + file_name;
+			fs.open(fileName, 'a', 0755, function(err, fd) {
+	    if (err) {
+	      self.emit("failedAddComment",{"error":{"message":" function:_readCommentImage \nError in open image "+err}})
+	    }else{
+	      var ext = path.extname(fileName||'').split('.');
+	      ext=ext[ext.length - 1];
+	      console.log("buffer size"+file_buffer.size);
+	      console.log("file extension"+ext);
+	      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+	        if(err){
+	       		self.emit("failedAddComment",{"error":{"message":" function:_readCommentImage \nError in write image "+err}})   
+	        }else{
+						var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+				    var bucketFolder;
+				    var params;
+				    bucketFolder="prodonus/org/"+product.orgid+"/product"+product.prodle+"/comment";
+		      	 params = {
+		             Bucket: bucketFolder,
+		             Key: product.orgid+product.prodle+s3filekey,
+		             Body: writebuffer,
+		             //ACL: 'public-read-write',
+		             ContentType: file_type
+		          };
 
-	          ////////////////////////////////////////
-	          _commentImageUpload(self,commentdata,product,params);
-	          //////////////////////////////////////
-     		}
-     	})
-    }
-  })
+		          ////////////////////////////////////////
+		          _commentImageUpload(self,commentdata,product,params);
+		          //////////////////////////////////////
+	     		}
+	     	})
+	    }
+	  })
+	}
 }
 var _commentImageUpload=function(self,commentdata,product,awsparams){
 	s3bucket.putObject(awsparams, function(err, data) {

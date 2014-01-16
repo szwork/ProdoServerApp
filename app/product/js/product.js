@@ -217,7 +217,9 @@ var _successfulDeleteProduct=function(self){
 }
 Product.prototype.deleteProductImage = function(prodleimageids,prodle,orgid) {
 	var self=this;
-	if(prodleimageids.length==0){
+	if(prodleimageids==undefined){
+		self.emit("failedDeleteProductImage",{"error":{"code":"AV001","message":"Please provide prodleimageids "}});
+	}else if(prodleimageids.length==0){
 		self.emit("failedDeleteProductImage",{"error":{"message":"Given prodleimageids is empty "}});
 	}else{
 		///////////////////////////////////////////////////////////////////
@@ -228,14 +230,14 @@ Product.prototype.deleteProductImage = function(prodleimageids,prodle,orgid) {
 };
 var _deleteProductImage=function(self,prodleimageids,prodle,orgid){
 	var prodle_imagearray=[];
-	for(var i=0;i<prodleimageids.length;i++){
-		prodle_imagearray.psuh({imageid:prodleimageids[i]});
-	}
-	productModel.update({orgid:orgid,prodle:prodle,product_images:{$in:prodle_imagearray}},{$pullAll:{product_images:prodle_imagearray}},function(err,deleteimagestatus){
+	
+	//db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
+
+	productModel.update({orgid:orgid,prodle:prodle,"product_images.imageid":{$in:prodleimageids}},{$pull:{product_images:{imageid:{$in:prodleimageids}}}},function(err,deleteimagestatus){
 		if(err){
 			self.emit("failedDeleteProductImage",{"error":{"code":"ED001","message":"function:_deleteProductImage\nError in db to "}});
 		}else if(deleteimagestatus==0){
-			self.emit("failedDeleteProductImage",{"error":{"code":"ED001","message":"orgid or prodle or given prodleimageids is wrong "}});
+			self.emit("failedDeleteProductImage",{"error":{"message":"orgid or prodle or given prodleimageids is wrong "}});
 		}else{
 			//////////////////////////////////
 			_successfulDeleteProductImage(self);

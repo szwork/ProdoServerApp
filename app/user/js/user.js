@@ -61,37 +61,38 @@ var isValidEmail=function(email){
 var _validateRegisterUser = function(self,userdata,host) {
 		//check if user exist in database
 		//abc(err,userdata,this)
-	userModel.findOne({email:userdata.email},{email:1}).lean().exec(function(err,user){
-		if(err){
-			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
-		}else if(user){
-			// console.log("userData777"+userdata);
-			self.emit("failedUserRegistration",{"error":{"code":"AU001","message":"Email already exist"}});
-		}else{
+	if(userdata==undefined){
+		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please provide userdata"}});
+	}else if(userdata.username==undefined){
+		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please provide username"}});
+	} else if(userdata.username.length<6 || userdata.username.length>15){
+		self.emit("failedUserRegistration",{"error":{"message":"Username should greater than 6 and less than 15 chars"}});
+	}else if(isValidEmail(userdata.email).error!=undefined){
+	    self.emit("failedUserRegistration",isValidEmail(userdata.email));
+	 }else if(userdata.password==undefined){
+  		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please enter passsword"}});
+	 } else if(userdata.password.length<5){
+	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword minimum length should be 6"}});
+  	 }	else if(userdata.terms==false){
+	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
+	  }else{
+	  	userModel.findOne({email:userdata.email,username:userdata.username},{email:1}).lean().exec(function(err,user){
+			if(err){
+				self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
+			}else if(user){
+				// console.log("userData777"+userdata);
+				self.emit("failedUserRegistration",{"error":{"code":"AU001","message":"Email already exist or Username already exists"}});
+			}else{
 		// validate the new user data
 			
-
-	 	  if( userdata.fullname==undefined){
-		  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please enter fullname"}});
-	 	  } else if(isValidEmail(userdata.email).error!=undefined){
-	 	    self.emit("failedUserRegistration",isValidEmail(userdata.email));
-		  }else if(userdata.password==undefined){
-		  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please enter passsword"}});
-	 	  } else if(userdata.password.length<5){
-	 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword minimum length should be 6"}});
-		  // }else if(passwordformatvalidtion){//to be done later
-	 	 //  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword maximum length should be 8"}});
-	 	  }	else if(userdata.terms==false){
-	 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
-	 	  }else{
 	 	    	logger.emit("log","_validated");
 
 	 	    	///////////////////////
-	 			  _addUser(self,userdata,host);
-	 			  ///////////////////////
+	 			 _addUser(self,userdata,host);
+	 			 ///////////////////////
 	 	  }
-		}
-	})
+		})
+	}
 };
    var _addUser = function(self,userdata,host) {
 		//adding user
@@ -1132,7 +1133,38 @@ var _unfollowproduct=function(self,prodle,sessionuserid){
 			self.emit("successfulFollowUnFollowProduct",{"success":{"message":"Unfollowing product"}});
 		}else{
 			logger.emit("log","Failure in unfollowing the product");
-			self.emit("failedFollowUnFollowProduct",{"error":{"code":"F001","message":"Failed to Unfollow the product"}});
+			self.emit("failedFollowUnFollowProduct",{"error":{"code":"AF001","message":"Failed to Unfollow the product"}});
+		}
+	})
+}
+              
+User.prototype.checkUsernameExists=function(username){
+	var self=this;
+	/////////////////////////////////////
+	_validateCheckUsernameExists(self,username);
+	//////////////////////////////////////
+	// _followunfollowproduct(self,prodle,sessionuserid);
+}
+var _validateCheckUsernameExists=function(self,username){
+	if(username==undefined){
+		self.emit("failedCheckUsernameExists",{"error":{"code":"AV001","message":"please provide username"}});
+	}else if(username.trim().length<6 || username.length>15 ){
+		self.emit("failedCheckUsernameExists",{"error":{"code":"AV001","message":"username length should be greater than 6 and less than 15"}});
+	}else{
+		username=username.trim();
+		///////////////////////////////////////////////////////
+		_checkUsernameExist(self,username)
+		////////////////////////////////////////////////////
+	}
+}
+var _checkUsernameExist=function(self,username){
+	userModel.findOne({username:username},{username:1},function(err,usernamedata){
+		if(err){
+		 self.emit("failedCheckUsernameExists",{"error":{"code":"ED001","message":"function:_successfullValidateCheckUsernameExists\n "}});
+		}else if(usernamedata){
+			self.emit("failedCheckUsernameExists",{"error":{"message":" Username Already exists"}});
+		}else{
+			self.emit("successfulCheckUsernameExists",{"success":{"message":" Username Available"}});
 		}
 	})
 }

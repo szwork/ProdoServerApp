@@ -22,6 +22,7 @@ var userSchema = mongoose.Schema({
   userid:{type:String},
   usertype:{type:String},//type many be individual,company or manufacturer
   fullname:{type:String},
+  username:{type:String,required: true, unique: true},
   firstname: { type: String },
   lastname:{type:String},
   dob:{type:Date,default:null},

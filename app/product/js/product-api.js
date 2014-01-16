@@ -200,7 +200,7 @@ exports.deleteProductImage=function(req,res){
   var prodle=req.params.prodle;
   var prodleimageids=req.body.prodleimageids;
   var orgid=req.params.orgid;
-  logger.emit("log","prodle"+prodle+"\nsessionuserid"+sessionuserid+" prodleimageid:"+prodleimageid+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(prodleimageids));
+  logger.emit("log","prodle"+prodle+"\nsessionuserid"+sessionuserid+" prodleimageid:"+prodleimageids+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(prodleimageids));
   
   var product= new Product();
      // product.setMaxListeners(0); 

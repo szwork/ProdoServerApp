@@ -484,3 +484,26 @@ exports.followunfollowproduct=function(req,res){
  user.followunfollowproduct(prodle,sessionuserid);
 
 }
+exports.checkUsernameExists=function(req,res){
+  // var userdata=req.body.user;
+  var user=new User();
+
+ 
+  var username=req.params.username;
+  // var orgid=req.params.orgid;
+  
+  // var product= new Product();
+  user.removeAllListeners("failedCheckUsernameExists");
+  user.on("failedCheckUsernameExists",function(err){
+    logger.emit("error", err.error.message);
+    res.send(err);
+  });
+  user.removeAllListeners("successfulCheckUsernameExists");
+  user.on("successfulCheckUsernameExists",function(result){
+    logger.emit("info", result.success.message);
+    // callback(null,result);
+    res.send(result);
+  });
+  user.checkUsernameExists(username);
+
+}
