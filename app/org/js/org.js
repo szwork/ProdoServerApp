@@ -660,6 +660,41 @@ var _validateOrgInvites=function(self,orgid,usergrp){
 	}
 
 }
+Organization.prototype.deleteOrgImage = function(orgimageids,orgid) {
+	var self=this;
+	if(orgimageids==undefined){
+		self.emit("failedDeleteOrgImage",{"error":{"code":"AV001","message":"Please provide orgimageids "}});
+	}else if(orgimageids.length==0){
+		self.emit("failedDeleteOrgImage",{"error":{"message":"Given orgimageids is empty "}});
+	}else{
+		///////////////////////////////////////////////////////////////////
+	_deleteOrgImage(self,orgimageids,orgid);
+	/////////////////////////////////////////////////////////////////	
+	}
+	
+};
+var _deleteOrgImage=function(self,orgimageids,orgid){
+	// var org_imagearray=[];
+	
+	//db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
+
+	orgModel.update({orgid:orgid,"org_images.imageid":{$in:orgimageids}},{$pull:{org_images:{imageid:{$in:orgimageids}}}},function(err,deleteimagestatus){
+		if(err){
+			self.emit("failedDeleteOrgImage",{"error":{"code":"ED001","message":"function:_deleteOrgImage\nError in db to "}});
+		}else if(deleteimagestatus==0){
+			self.emit("failedDeleteOrgImage",{"error":{"message":"orgid or given orgimageids is wrong "}});
+		}else{
+			//////////////////////////////////
+			_successfulDeleteOrgImage(self);
+			/////////////////////////////////////
+		}
+	})
+}
+var _successfulDeleteOrgImage=function(self){
+	logger.emit("log","_successfulDeleteOrgImage");
+	self.emit("successfulDeleteOrgImage",{"success":{"message":"Delete Organizations Images Successfully"}});
+}
+
 // var _addOrgInvitees = function(self,orgid,usergrp) {
 // 	var invitees=[]
 // 	var j=0;

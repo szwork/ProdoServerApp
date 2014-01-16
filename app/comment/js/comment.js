@@ -98,7 +98,7 @@ var __checkCommentImageExists=function(self,prodle,commentdata,product,__dirname
 
 	if(commentdata.comment_image==undefined || commentdata.comment_image==""){
 		//////////////////////////////
-        _addComment(slef,prodle,commentdata,product);
+        _addComment(self,prodle,commentdata,product);
 		///////////////////////////////
 	}else{
 		///////////////////////////////////

@@ -404,3 +404,42 @@ exports.orginvites = function(req,res) {
 
 //delete a particular organization
 
+exports.deleteOrgImage=function(req,res){
+ 
+  var sessionuserid=req.user.userid;
+  
+  var orgimageids=req.body.orgimageids;
+  var orgid=req.params.orgid;
+  logger.emit("log","prodle\nsessionuserid"+sessionuserid+" prodleimageid:"+orgimageids+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(orgimageids));
+  
+  var organization= new Organization();
+     // product.setMaxListeners(0); 
+  organization.removeAllListeners("failedDeleteOrgImage");
+  organization.on("failedDeleteOrgImage",function(err){
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  organization.removeAllListeners("successfulDeleteOrgImage");
+  organization.on("successfulDeleteOrgImage",function(result){
+    //logger.emit("log","Getting Product details successfully");
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  });
+   if(req.user.org.orgid!=orgid){
+    logger.emit("error","given orgid does not match with session orgid");
+    organization.emit("failedDeleteOrgImage",{"error":{"code":"EA001","message":"You have not authorized to delete Org image"}}); 
+   }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to delete product image");
+    organization.emit("failedDeleteOrgImage",{"error":{"code":"EA001","message":"You have not authorized to delete Org image"}}); 
+  }else{
+    ////////////////////////////////////////////////////////////
+    organization.deleteOrgImage(orgimageids,req.user.org.orgid);
+    //////////////////////////////////////////////// ///////////
+  }
+}
