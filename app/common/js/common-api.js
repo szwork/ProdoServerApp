@@ -26,6 +26,7 @@ var generateId = require('time-uuid');
 var path=require("path");
 var OrgModel=require("../../org/js/org-model");
 var ProductModel=require("../../product/js/product-model");
+var CONFIG = require('config').Prodonus;
 var UserModel=require("../../user/js/user-model");
 // var smtpTransport = nodemailer.createTransport("SMTP", {
 //     host: "smtp.ipage.com", // hostname
@@ -37,13 +38,10 @@ var UserModel=require("../../user/js/user-model");
 //     }
 // });
 var smtpTransport = nodemailer.createTransport("SMTP", {
-    host: "smtp.ipage.com", // hostname
+    host: CONFIG.mailhost, // hostname
     secureConnection: true, // use SSL
     port: 465, // port for secure SMTP
-    auth: {
-        user: "sunil@giantleapsystems.com",
-        pass: "Sunil12345"
-    }
+    auth:CONFIG.mailauth
 });
 // var smtpTransport = nodemailer.createTransport("SES", {
 //     AWSAccessKeyID: "AKIAJ2BXGCZW2235YKYA",
