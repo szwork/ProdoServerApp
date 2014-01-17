@@ -654,11 +654,15 @@ Organization.prototype.deleteOrgImage = function(orgimageids,orgid) {
 	
 };
 var _deleteOrgImage=function(self,orgimageids,orgid){
-	// var org_imagearray=[];
-	
+	 var org_imagearray=[];
+	orgimageids=S(orgimageids);
 	//db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
-
-	orgModel.update({orgid:orgid,"org_images.imageid":{$in:orgimageids}},{$pull:{org_images:{imageid:{$in:orgimageids}}}},function(err,deleteimagestatus){
+   if(orgimageids.contains(",")){
+   		org_imagearray=orgimageids.split(",");
+   }else{
+   		org_imagearray.push(orgimageids.s);
+   }
+	orgModel.update({orgid:orgid,"org_images.imageid":{$in:org_imagearray}},{$pull:{org_images:{imageid:{$in:org_imagearray}}}},function(err,deleteimagestatus){
 		if(err){
 			self.emit("failedDeleteOrgImage",{"error":{"code":"ED001","message":"function:_deleteOrgImage\nError in db to "}});
 		}else if(deleteimagestatus==0){

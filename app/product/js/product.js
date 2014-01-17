@@ -18,6 +18,7 @@ var productModel = require("./product-model");
 var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var shortId = require('shortid');
+var S=require('string');
 // var CommentModel=require("./comment-model");
 
 var Product = function(productdata) {
@@ -235,7 +236,7 @@ var _deleteProductImage=function(self,prodleimageids,prodle,orgid){
 	 prodleimageids=S(prodleimageids);
 
      if(prodleimageids.contains(",")){
-     	prodle_imagearray.split(",");
+     	prodle_imagearray=prodleimageids.split(",");
      }else{
      	prodle_imagearray.push(prodleimageids.s)
      }

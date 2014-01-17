@@ -404,7 +404,7 @@ exports.deleteOrgImage=function(req,res){s
  
   var sessionuserid=req.user.userid;
   
-  var orgimageids=req.body.orgimageids;
+  var orgimageids=req.params.orgimageids;
   var orgid=req.params.orgid;
   logger.emit("log","prodle\nsessionuserid"+sessionuserid+" prodleimageid:"+orgimageids+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(orgimageids));
   
