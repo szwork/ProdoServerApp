@@ -1,4 +1,4 @@
-
+	
 var util = require("util");
 var events = require("events");
 var logger=require("../../common/js/logger");
@@ -388,7 +388,7 @@ var _isOrganizationUser=function(user,callback){
 }
 var getUserRequiredData=function(user,callback){
     
-	var user_senddata={userid:user.userid,fullname:user.fullname,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword};
+	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	console.log("log","user"+user);

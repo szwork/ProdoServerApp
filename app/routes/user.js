@@ -35,6 +35,7 @@ exports.init = function (app) {
   app.get("/api/sendtestmail",api.commonapi.sendTestMail);
   app.get("/api/user/followun/:prodle",auth, api.userapi.followunfollowproduct);
   app.get('/api/subscription/:plantype',api.subscriptionapi.getSubscriptionPlanbyType);
+  // app.post("/api/userinvites/:userid",auth,api.userapi.userInvites);
   // function(req,res){
   //   if (req.isAuthenticated()){
   //     res.send({status:true,sessionid:req.sessionID,userid:req.user.userid});
