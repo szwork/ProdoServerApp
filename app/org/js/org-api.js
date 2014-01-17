@@ -400,7 +400,7 @@ exports.orginvites = function(req,res) {
 
 //delete a particular organization
 
-exports.deleteOrgImage=function(req,res){
+exports.deleteOrgImage=function(req,res){s
  
   var sessionuserid=req.user.userid;
   

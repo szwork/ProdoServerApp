@@ -137,3 +137,17 @@ exports.getAllSubscriptionPlan=function(req,res)
 		}
 	})
 }
+exports.getSubscriptionPlanbyType=function(req,res){
+	var plantype=req.params.plantype.trim();
+	SubscriptionModel.find({plantype:plantype},function(err,subscription){
+		if(err){
+			// logger.emit("error","DBERROR:getSubscriptionPlanbyType \nerror message:"+err)
+		 	res.send({"error":{"message":"Database Server Issuce","code":"ED001"}}) 
+		 }else if(subscription.length==0){
+		 
+		 	res.send({"error":{"message":"No subscription plan exists","code":"AS001"}}) 
+		 }else{
+		 	res.send({"success":{"message":"Get "+plantype+" Subscription plans Successfully","subscription":subscription}});
+		 }
+	})
+}
