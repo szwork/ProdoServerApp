@@ -500,7 +500,8 @@ var _splitOrgAddressCriteria=function(self,OrgCriteriaData,orgid){
 var _getOrgAddressByCriteria=function(self,search_criteria,orgid){
   
   console.log("orgid"+JSON.stringify(search_criteria));
-   orgModel.aggregate([{$match:{orgid:orgid}},{$unwind:"$location"},{$match:search_criteria},{$group:{_id:"$location.locationtype",location:{$addToSet:"$location"}}}],function(err,orgaddress){
+  orgModel.aggregate([{$match:{orgid:orgid}},{$unwind:"$location"},{$group:{_id:"$location.locationtype",location:{$push:{locid:"$location._id",contacts:"$location.contacts",address:"$location.address",geo:"$location.geo",region:"$location.region",timezone:"$location.timezone"}}}},{$project:{loctype:"$_id",location:1,_id:0}}]
+,function(err,orgaddress){
 	if(err){
 			logger.emit("error",err);
 			self.emit("failedGetOrgAddressByCriteria",{"error":{"code":"ED001","message":"Error in db  _getOrgAddressByCriteria to get address"}});
