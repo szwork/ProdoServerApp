@@ -198,7 +198,7 @@ exports.deleteProductImage=function(req,res){
   logger.emit("log","///////Calling to delete Products///////");
   var sessionuserid=req.user.userid;
   var prodle=req.params.prodle;
-  var prodleimageids=req.body.prodleimageids;
+  var prodleimageids=req.query.prodleimageids;
   var orgid=req.params.orgid;
   logger.emit("log","prodle"+prodle+"\nsessionuserid"+sessionuserid+" prodleimageid:"+prodleimageids+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(prodleimageids));
   

@@ -6,6 +6,11 @@ module.exports = {
       debug:false,
       serverName:"www.prodonus.com",
       recaptchaPrivateKey:"6LdDj-oSAAAAAJcAYticzZ4NSZ4KzQc9ZbamEHUL",
-      recaptchaUrl:"http://www.google.com/recaptcha/api/verify"
+      recaptchaUrl:"http://www.google.com/recaptcha/api/verify",
+      mailhost:"smtp.ipage.com",
+      mailauth:{
+        user: "sunil@giantleapsystems.com",
+        pass: "Sunil12345"
     }
   }
+}

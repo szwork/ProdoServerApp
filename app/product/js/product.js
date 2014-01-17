@@ -232,8 +232,14 @@ var _deleteProductImage=function(self,prodleimageids,prodle,orgid){
 	var prodle_imagearray=[];
 	
 	//db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
+	 prodleimageids=S(prodleimageids);
 
-	productModel.update({orgid:orgid,prodle:prodle,"product_images.imageid":{$in:prodleimageids}},{$pull:{product_images:{imageid:{$in:prodleimageids}}}},function(err,deleteimagestatus){
+     if(prodleimageids.contains(",")){
+     	prodle_imagearray.split(",");
+     }else{
+     	prodle_imagearray.push(prodleimageids.s)
+     }
+	productModel.update({orgid:orgid,prodle:prodle,"product_images.imageid":{$in:prodle_imagearray}},{$pull:{product_images:{imageid:{$in:prodle_imagearray}}}},function(err,deleteimagestatus){
 		if(err){
 			self.emit("failedDeleteProductImage",{"error":{"code":"ED001","message":"function:_deleteProductImage\nError in db to "}});
 		}else if(deleteimagestatus==0){

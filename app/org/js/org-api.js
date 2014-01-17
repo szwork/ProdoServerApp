@@ -324,7 +324,8 @@ exports.orginvites = function(req,res) {
   //value taking from parameters
   var usergrp=req.body.usergrp;
   var orgid=req.params.orgid;
-  var orgaddressid=req.params.orgaddressid;
+  logger.emit("log","REQ BODY orgInvites: "+JSON.stringify(req.body));
+  
   var sessionuserid=req.user.userid;
   var organization=new Organization();
   organization.removeAllListeners("failedOrgInvites");
@@ -338,11 +339,11 @@ exports.orginvites = function(req,res) {
     res.send(result);
   });
   organization.removeAllListeners("sendEmailToInvitees");
-  organization.on('sendEmailToInvitees',function(userdata,emailtemplatedata,orgname,i){
-    var emailtemplate=S(emailtemplatedata.description);
-    logger.emit("log",userdata);
-    if(userdata.length>i){
-      userModel.findOne({email:userdata[i].email},{userid:1},function(err,user){
+  organization.on('sendEmailToInvitees',function(email,emailtemplate,orgname,grpname){
+    var template_description=emailtemplate.description;
+    
+    
+      userModel.findOne({email:email},{userid:1,email:1},function(err,user){
         if(err){
           logger.emit("error","error in db to find users",req.user.userid);
         }else if(!user){
@@ -353,38 +354,33 @@ exports.orginvites = function(req,res) {
             if (err){  
                 logger.emit("error","Error in crating verification token for"+user.userid,req.user.userid);
             }else{
-                var html=S(emailtemplate); 
+                var html=S(template_description); 
                 var url = "http://"+req.get("host")+"/api/verify/"+token;
-                html=emailtemplate.replaceAll("<email>",user.email);
-                html=emailtemplate.replaceAll("<url>",url);
+                html=html.replaceAll("<email>",user.email);
+                html=html.replaceAll("<url>",url);
+                html=html.replaceAll("<orgname>",orgname);
+                html=html.replaceAll("<grpname",grpname);
                 
                var message = {
                   from: "Prodonus  <noreply@prodonus.com>", // sender address
-                  to: userdata[i].email, // list of receivers
-                  subject:emailtemplatedata.subject, // Subject line
+                  to: user.email, // list of receivers
+                  subject:emailtemplate.subject, // Subject line
                   html: html.s // html body
               };
               commonapi.sendMail(message,function(result){
                 if (result == "failure") {
-                   logger.emit("error","Error in sending invite mail to "+userdata[i].email,req.user.userid);
-                  
-                   organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-                   //i+=1;
-                   //organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-                } else {
-                   i+=1;
-                   organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-                  }
+                   logger.emit("error","Error in sending invite mail to "+email,req.user.userid);
+                }else {
+                  logger.emit("log","invite sent to"+email); 
+                }
               })
             }
           })
         }
       })
-    } else {
-      logger.emit("log","successfully sent invite email");
-    }
+    
   });
-  if(orgaddressid!=orgid){
+  if(req.user.org.orgid!=orgid){
     logger.emit("log","Given orgid is not match with session userid");
     organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}});
   }else if(req.user.org.isAdmin==false){
