@@ -98,7 +98,7 @@ function onAuthorizeSuccess(data, accept){
 
 function onAuthorizeFail(data, message, error, accept){
   if(error)
-    console.log("redis server not  stared");
+    console.log("redis server not  stared"+error);
     console.log('failed connection to socket.io:', message);
 
   // We use this callback to log all of our failed connections.

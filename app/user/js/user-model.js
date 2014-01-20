@@ -65,6 +65,7 @@ var userSchema = mongoose.Schema({
 
 //Encrypt the password and generate the idwhen you save.
 userSchema.pre('save', function(next) {
+  console.log("calling to user save pre");  
 	var user = this;
 	logger.emit("log","userdata in pre"+user);
 	user.userid="u"+shortId.generate();
@@ -86,7 +87,7 @@ userSchema.pre('save', function(next) {
   }else{
     next();
   }
-		
+	
 });
 	
 

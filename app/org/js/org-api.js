@@ -38,6 +38,7 @@ exports.addOrganization = function(req,res){
  
   
   var organizationdata=req.body.organization;
+  var subscriptiondata=req.body.subscription;
   var organization=new Organization(organizationdata);
   logger.emit("log","organization data"+JSON.stringify(req.body));
   //var userdata=req.body.user;
@@ -110,7 +111,7 @@ exports.addOrganization = function(req,res){
     // }
   });
   var sessionuserid=req.user.userid;
-  organization.addOrganization(sessionuserid);
+  organization.addOrganization(sessionuserid,subscriptiondata);
 }
  //to update an existing organization
 exports.updateOrganization = function(req, res) {
