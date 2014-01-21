@@ -56,59 +56,46 @@ exports.addOrganization = function(req,res){
     res.send(err);
   })
   organization.removeAllListeners("sendinvitemail");
-  organization.on('sendinvitemail',function(userdata,emailtemplatedata,orgname,i){
-    var emailtemplate=S(emailtemplatedata.description);
-    logger.emit("log","calling to sendinvitemail"+i);
-    // logger.emit("log")
-    logger.emit("log","userdata"+JSON.stringify(userdata));
-    // if(userdata.length>i){
-      userModel.findOne({email:userdata[i].email},{userid:1},function(err,user){
-        if(err){
-          logger.emit("error","error in db to find users",req.user.userid);
-        }else if(!user){
-          logger.emit("error","user does'nt exists",req.user.userid);
-        }else{
-          var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"user"});
-          verificationToken.createVerificationToken(function (err, token) {
-            if (err){  
-                logger.emit("error","Error in crating verification token for"+user.userid,req.user.userid);
-            }else{
-                
-                var html=S(emailtemplate);
-                logger.emit("log",""+html);
-                var url = "http://"+req.get("host")+"/api/verify/"+token;
-                html=html.replaceAll("<email>",user.email);
-                html=html.replaceAll("<url>",url);
-                var subject=S(emailtemplatedata.subject);
-                subject=subject.replaceAll("<companyname>",orgname);
-               var message = {
-                  from: "Prodonus  <sunil@giantleapsystems.com>", // sender address
-                  to: userdata[i].email, // list of receivers
-                  subject:subject.s, // Subject line
-                  html: html.s // html body
-              };
-              logger.emit("log","message:"+JSON.stringify(message)+"\n email:"+userdata[i].email);
-              commonapi.sendMail(message,function(result){
-                if (result == "failure") {
-                 logger.emit("error","Error in sending invite mail to "+userdata[i].email,req.user.userid);
-                 
-                 logger.emit("log","message not sent to :"+userdata[i].email);
-                 // organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-                 //i+=1;
-                 //organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-              } else {
-                  
-                    logger.emit("log","message  sent to :"+userdata[i].email);
-                   // organization.emit("sendinvitemail",userdata,emailtemplatedata,orgname,i);
-                  }
-              })
-            }
-          })
-        }
-      })
-    // } else {
-    //   logger.emit("log","successfully sent invite email");
-    // }
+  organization.on('sendinvitemail',function(email,emailtemplate,orgname,grpname){
+    var template_description=emailtemplate.description;
+    userModel.findOne({email:email},{userid:1,email:1},function(err,user){
+      if(err){
+        logger.emit("error","error in db to find users",req.user.userid);
+      }else if(!user){
+        logger.emit("error","user does'nt exists",req.user.userid);
+      }else{
+        var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"user"});
+        verificationToken.createVerificationToken(function (err, token) {
+          if (err){  
+            logger.emit("error","Error in crating verification token for"+user.userid,req.user.userid);
+          }else{
+            var html=S(template_description); 
+            var url = "http://"+req.get("host")+"/api/verify/"+token;
+            html=html.replaceAll("<email>",user.email);
+            html=html.replaceAll("<url>",url);
+            html=html.replaceAll("<orgname>",orgname);
+            html=html.replaceAll("<grpname",grpname);
+            var subject=S(emailtemplate.subject); 
+            subject=subject.replaceAll("<orgname>",orgname);
+            subject=subject.replaceAll("<grpname>",grpname);
+            
+            var message = {
+              from: "Prodonus  <noreply@prodonus.com>", // sender address
+              to: user.email, // list of receivers
+              subject:subject.s, // Subject line
+              html: html.s // html body
+            };
+            commonapi.sendMail(message,function(result){
+              if (result == "failure") {
+               logger.emit("error","Error in sending invite mail to "+email,req.user.userid);
+              }else {
+                logger.emit("log","invite sent to"+email); 
+              }
+            })
+          }
+        })
+      }
+    })
   });
   var sessionuserid=req.user.userid;
   organization.addOrganization(sessionuserid,subscriptiondata);
@@ -361,11 +348,13 @@ exports.orginvites = function(req,res) {
                 html=html.replaceAll("<url>",url);
                 html=html.replaceAll("<orgname>",orgname);
                 html=html.replaceAll("<grpname",grpname);
-                
+                var subjecsubjectt=S(emailtemplate.subject);
+                subject=subject.replaceAll("<orgname>",orgname);
+                subject=subject.replaceAll("<grpname",grpname);
                var message = {
                   from: "Prodonus  <noreply@prodonus.com>", // sender address
                   to: user.email, // list of receivers
-                  subject:emailtemplate.subject, // Subject line
+                  subject:subject.s, // Subject line
                   html: html.s // html body
               };
               commonapi.sendMail(message,function(result){
