@@ -179,7 +179,7 @@ exports.getNextSequnce=function(name,callback)
   
 }
 exports.uploadFiles=function(io,__dirname){
-  io.of('/prodoupload').on('connection', function(socket) {
+  io.of('/api/prodoupload').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
     ///action for user profile update
      //action:{user:{userid:}}
@@ -192,32 +192,39 @@ exports.uploadFiles=function(io,__dirname){
       console.log("calling to Upload files");
       ///////////////
       if(!file && !action){
-        
-      }else{
-        uploadFile(file,__dirname,action,function(uploadresult){
-        if(uploadresult.error!=undefined){
-           if(uploadresult.error.user!=undefined){
-            socket.emit("userUploadResponse","");
-           }else if(uploadresult.error.org!=undefined){
-            socket.emit("orgUploadResponse","");
-           }else{
-            socket.emit("productUploadResponse","");
-           }
+        if(action.user!=undefined){
+          socket.emit("userUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+        }else if(action.org!=undefined){
+          socket.emit("orgUploadResponse",{"error":{"message":"Please pass file details or action details"}});
         }else{
-          if(uploadresult.success.user!=undefined){
-            socket.emit("userUploadResponse",null,uploadresult.success.imageurl);
-           }else if(uploadresult.success.org!=undefined){
-            socket.emit("orgUploadResponse",null,uploadresult.success.imageurl);
-           }else{
-            socket.emit("productUploadResponse",null,uploadresult.success.imageurl);
-           }
+          socket.emit("productUploadResponse",{"error":{"message":"Please pass file details or action details"}});
         }
-    })
+      }else{
+        uploadFile(file,__dirname,action,function(err,uploadresult){
+          if(err){
+            logger.emit("error",err.message,sessionuserid)
+            if(action.user!=undefined){
+               socket.emit("userUploadResponse",err);
+            }else if(action.org!=undefined){
+              socket.emit("orgUploadResponse",err);
+            }else{
+              socket.emit("productUploadResponse",err);
+            }
+          }else{
+            if(action.user!=undefined){
+               socket.emit("userUploadResponse",null,uploadresult);
+            }else if(action.org!=undefined){
+              socket.emit("orgUploadResponse",null,uploadresult);
+            }else{
+              socket.emit("productUploadResponse",null,uploadresult);
+            }
+          }
+       })
       }
-      
+    })
   })
-})
 }
+
 uploadFile=function(file,dirname,action,callback){
   var file_name=file.filename;
   var file_buffer=file.filebuffer;
@@ -227,7 +234,7 @@ uploadFile=function(file,dirname,action,callback){
   var fileName = dirname + '/tmp/uploads/' + file_name;
   fs.open(fileName, 'a', 0755, function(err, fd) {
     if (err) {
-      callback(err)
+      callback({"error":{"message":"uploadFile fs.open:"+err}})
     }else{
       var ext = path.extname(fileName||'').split('.');
       ext=ext[ext.length - 1];
@@ -235,7 +242,7 @@ uploadFile=function(file,dirname,action,callback){
       console.log("file extension"+ext);
       fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
         if(err){
-          callback(err);
+          callback({"error":{"message":"uploadFile fs.write:"+err}})
         }else{
           console.log(written+" bytes are written from buffer");
           var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
@@ -250,15 +257,15 @@ uploadFile=function(file,dirname,action,callback){
                          //ACL: 'public-read-write',
                          ContentType: file_type
                 };
-             userFileUpload(action.user.userid,params,function(err,imagelocation){
+             userFileUpload(action.user.userid,params,function(err,result){
               fs.close(fd, function() {
                  exec("rm -rf '"+fileName+"'");
                   console.log('File user saved successful!');
                });
               if(err){
-                callback({error:{user:err}});
+                callback(err);
               }else{
-                callback({success:{user:"User Pic Added Successfully",imageurl:imagelocation}});
+                callback(null,result);
               }
             })
           }else if(action.org!=undefined){//organization upload
@@ -273,12 +280,11 @@ uploadFile=function(file,dirname,action,callback){
                          //ACL: 'public-read-write',
                          ContentType: file_type
                 };
-             orgFileUpload(action.org.orgid,params,function(err,imagelocation){
+              orgFileUpload(action.org.orgid,params,function(err,result){
                 if(err){
-                  console.log("org upload error"+err);
-                  callback({error:{org:err}});
+                  callback(err);
                 }else{
-                  callback({success:{org:"Org Image Uploaded Successfully",imageurl:imagelocation}});
+                  callback(null,result);
                 }
                 fs.close(fd, function() {
                   exec("rm -rf '"+fileName+"'");
@@ -296,10 +302,9 @@ uploadFile=function(file,dirname,action,callback){
                 };
              productFileUpload(action.product.prodle,params,function(err,imagelocation){
               if(err){
-                console.log("product fileupload error"+err);
-                callback({error:{product:err}});
+                callback(err);
               }else{
-                callback({success:{product:"Proudct Upload Successfully",imageurl:imagelocation}});
+                callback(null,result);
               }
               fs.close(fd, function() {
                  exec("rm -rf '"+fileName+"'");
@@ -307,8 +312,6 @@ uploadFile=function(file,dirname,action,callback){
                   });
              })
           }
-          ///////S3-AMAZON BUCKET/////
-        
         }
       });
     }
@@ -318,25 +321,24 @@ uploadFile=function(file,dirname,action,callback){
 var userFileUpload=function(userid,awsparams,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
-      console.log(err)
-      callback(err)
+      callback({"error":{"message":"s3bucket.putObject:-userFileUpload"+err}})
     } else {
       logger.emit("log","fileupload saved");
       var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
       s3bucket.getSignedUrl('getObject',params1, function (err, url) {
         if(err){
-          logger.emit("error","Error in getting getSignedUrl"+err);
-          callback(err);
+          // logger.emit("error","userFileUpload:Error in getting getSignedUrl"+err);
+          callback({"error":{"message":"userFileUpload:Error in getting getSignedUrl"+err}});
         }else{
           var newprofileurl=url;
           console.log("url"+newprofileurl);
           UserModel.update({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
             if(err){
-              callback(err);
+              callback({"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
             }else if(profilepicupdatestatus==1){
-              callback(null,newprofileurl)
+              callback(null,{"success":{"message":"User Profile Pic Updated Successfully"}})
             }else{
-              callback("provided is wrong");
+              callback({"error":{"code":"AU003","message":"Provided userid is wrong"+userid}});
             }
           })
         }
@@ -347,26 +349,22 @@ var userFileUpload=function(userid,awsparams,callback){
 var orgFileUpload=function(orgid,awsparams,callback){
  s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
-      console.log(err)
-      callback(err)
+      callback({"error":{"message":"s3bucket.putObject:-orgFileUpload"+err}})
     } else {
       logger.emit("log","fileupload saved");
       var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
       s3bucket.getSignedUrl('getObject', params1, function (err, url) {
         if(err){
-          logger.emit("log","Error in getting getSignedUrl"+err);
-          callback(err);
+          callback({"error":{"message":"orgFileUpload:Error in getting getSignedUrl"+err}});
         }else{
          // var newprofileurl=url;
          var image_data={image:url,imageid:generateId()}
           OrgModel.update({orgid:orgid},{$push:{org_images:image_data}},function(err,orguploadstatus){
-            if(err){
-              logger.emit("log","Error in updatin"+err);
-              callback(err);
+            callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
             }else if(orguploadstatus==1){
-              callback(null,url)
+              callback(null,{"success":{"message":"Org images uploaded Successfully"}})
             }else{
-              callback("provided orgid is wrong");
+              callback({"error":{"code":"AO002","message":"Wrong orgid"+orgid}});
             }
           })
         }
@@ -377,25 +375,22 @@ var orgFileUpload=function(orgid,awsparams,callback){
 var productFileUpload=function(prodle,awsparams,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
-      console.log(err)
-      callback(err)
+      callback({"error":{"message":"s3bucket.putObject:-productFileUpload"+err}})
     } else {
       logger.emit("log","fileupload saved");
       var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
       s3bucket.getSignedUrl('getObject',params1, function (err, url) {
         if(err){
-          logger.emit("error","Error in getting getSignedUrl");
-          callback(err);
+          callback({"error":{"message":"productFileUpload:Error in getting getSignedUrl"+err}});
         }else{
-          // var newprofileurl=url;
           var image_data={image:url,imageid:generateId()}
           ProductModel.update({prodle:prodle},{$push:{product_images:image_data}},function(err,productuploadstatus){
             if(err){
-              callback(err);
+              callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
             }else if(productuploadstatus==1){
-              callback(null,url)
+              callback(null,{"success":{"message":"Product images uploaded Successfully"}})
             }else{
-              callback("provided prodle is wrong");
+              callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
             }
           })
         }

@@ -48,19 +48,19 @@ exports.deleteComment = function(req, res) {
     
 }
 exports.comment=function(io,__dirname){ 
-io.of('/prodoapp').on('connection', function(socket) {
+io.of('/api/prodoapp').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
     socket.on('addComment', function(prodle,commentdata) {
       var comment = new Comment(commentdata);
       logger.emit("log",prodle+""+JSON.stringify(commentdata));
       comment.removeAllListeners("failedAddComment");
       comment.on("failedAddComment",function(err){
-        logger.emit("error", err.error.message);
+        logger.emit("error", err.error.message,sessionuserid);
         socket.emit("addcommentResponse",err);
       });
       comment.removeAllListeners("successfulAddComment");
       comment.on("successfulAddComment",function(result){
-        logger.emit("info", result.success.message);
+        logger.emit("info", result.success.message,sessionuserid);
         socket.emit("addcommentResponse",null,result);
         if(result.success.product_comment.type=="product"){
           socket.broadcast.emit("productcommentResponse",null,result);
