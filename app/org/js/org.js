@@ -214,7 +214,7 @@ var _validateSubscriptionPlan=function(self,organizationdata,sessionuserid,subsc
 	var _sendEmailToInvitees = function(self,organization,usergrp_array){
 		//validate the org data
 		var initialvalue=0;
-		EmailTemplateModel.findOne({templatetype:"invite"}).lean().exec(function(err,emailtemplate){
+		EmailTemplateModel.findOne({templatetype:"orgmemberinvite"}).lean().exec(function(err,emailtemplate){
 		  	if(err){
 		    	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
 		  	}else if(emailtemplate){
@@ -752,7 +752,7 @@ var _addOrgInvitees = function(self,orgid,usergrp) {
 	var _sendInviteEmailToOrgInvitees = function(self,newusers,existingusers,grpname,organization) {
 		//validate the org data
 		var initialvalue=0;
-			EmailTemplateModel.findOne({templatetype:"invite"}).lean().exec(function(err,emailtemplate){
+			EmailTemplateModel.findOne({templatetype:"orgmemberinvite"}).lean().exec(function(err,emailtemplate){
 			  if(err){
 			    self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
 			  }else if(emailtemplate){

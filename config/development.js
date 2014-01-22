@@ -6,11 +6,23 @@ module.exports = {
       debug:true,
       recaptchaPrivateKey:"6LdDj-oSAAAAAJcAYticzZ4NSZ4KzQc9ZbamEHUL",
       recaptchaUrl:"http://www.google.com/recaptcha/api/verify",
-      mailhost:"smtp.ipage.com",
-      mailauth:{
-        user: "sunil@giantleapsystems.com",
-        pass: "Sunil12345"
-    }
-
+      smtp_general:{
+        host: "smtp.prodonus.com", // hostname
+        secureConnection: true, // use SSL
+        port: 465, // port for secure SMTP
+        auth:{
+         user: "noreply@prodonus.com",
+          pass: "Nr12345$"
+        }
+      },
+      smtp_business:{
+        host: "smtp.prodonus.com", // hostname
+        secureConnection: true, // use SSL
+        port: 465, // port for secure SMTP
+        auth:{
+          user: "business@prodonus.com",
+          pass: "Bus12345$"
+        }
+      }
     }
   }

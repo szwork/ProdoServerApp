@@ -64,7 +64,7 @@ exports.addOrganization = function(req,res){
       }else if(!user){
         logger.emit("error","user does'nt exists",req.user.userid);
       }else{
-        var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"user"});
+        var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"inviteuser"});
         verificationToken.createVerificationToken(function (err, token) {
           if (err){  
             logger.emit("error","Error in crating verification token for"+user.userid,req.user.userid);
@@ -85,7 +85,7 @@ exports.addOrganization = function(req,res){
               subject:subject.s, // Subject line
               html: html.s // html body
             };
-            commonapi.sendMail(message,function(result){
+            commonapi.sendMail(message,CONFIG.smtp_general,function(result){
               if (result == "failure") {
                logger.emit("error","Error in sending invite mail to "+email,req.user.userid);
               }else {
@@ -337,7 +337,7 @@ exports.orginvites = function(req,res) {
         }else if(!user){
           logger.emit("error","user does'nt exists",req.user.userid);
         }else{
-          var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"user"});
+          var verificationToken = new verificationTokenModel({_userId: user.userid,tokentype:"inviteuser"});
           verificationToken.createVerificationToken(function (err, token) {
             if (err){  
                 logger.emit("error","Error in crating verification token for"+user.userid,req.user.userid);
@@ -357,7 +357,7 @@ exports.orginvites = function(req,res) {
                   subject:subject.s, // Subject line
                   html: html.s // html body
               };
-              commonapi.sendMail(message,function(result){
+              commonapi.sendMail(message,CONFIG.smtp_general,function(result){
                 if (result == "failure") {
                    logger.emit("error","Error in sending invite mail to "+email,req.user.userid);
                 }else {

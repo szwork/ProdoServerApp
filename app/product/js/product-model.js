@@ -47,6 +47,7 @@ var productSchema = mongoose.Schema({
   prodle:{type:String,unique: true},
   orgid:{type:String,ref:"Organization"},//means manufacturer
   orgprodid:{type:String},
+  product_logo:{type:String},
   name: { type: String },/**/
   display_name:{type:String},/**/
   model_no:{type:String},/**/

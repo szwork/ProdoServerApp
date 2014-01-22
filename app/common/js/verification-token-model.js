@@ -18,7 +18,7 @@ var ObjectId = mongoose.Schema.ObjectId;
 var verificationTokenSchema = new mongoose.Schema({
     _userId: { type:String,required: true, ref: 'User' },
     token: { type: String, required: true },
-    tokentype:{type:String},
+    tokentype:{type:String},//signupuser,inviteuser
     createddate: { type: Date, required: true, default: Date.now },
     status:{type:String,default:"active"}
 });

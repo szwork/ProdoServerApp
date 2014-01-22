@@ -507,3 +507,42 @@ exports.checkUsernameExists=function(req,res){
   user.checkUsernameExists(username);
 
 }
+exports.userInvites=function(req,res){
+  // var userdata=req.body.user;
+  var user=new User();
+  var sessionuserid=req.user.userid;
+  var userinvitedata=req.body.userinvites;
+  user.removeAllListeners("failedUserInvites");
+  user.on("failedUserInvites",function(err){
+    logger.emit("error", err.error.message);
+    res.send(err);
+  });
+  user.removeAllListeners("successfulUserInvites");
+  user.on("successfulUserInvites",function(result){
+    logger.emit("info", result.success.message);
+    // callback(null,result);
+    res.send(result);
+  });
+  user.removeAllListeners("senduserinvite");
+  user.on("senduserinvite",function(userinvite_template,inivtedata,user){
+    var subject=S(userinvite_template.subject);
+    var template=S(userinvite_template.description);
+    template=template.replaceAll("<email>",user.email);
+    template=template.replaceAll("<username>",user.username);
+    var message = {
+        from: "Prodonus  <noreply@prodonus.com>", // sender address
+        to: inivtedata.email, // list of receivers
+        subject:subject.s, // Subject line
+        html: template.s // html body
+      };
+    commonapi.sendMail(message,CONFIG.smtp_general, function (result){
+      if(result=="failure"){
+        logger.emit("error","User inivte not sent to "+message.to+" by"+user.email);
+      }else{
+        logger.emit("log","User Invite Sent Successfully to"+message.to+" by"+user.email);
+      }
+    });
+  });
+  user.sendUserInvites(userinvitedata,sessionuserid);
+
+}

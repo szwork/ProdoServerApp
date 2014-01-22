@@ -19,6 +19,7 @@ var PaymentModel=require("../../subscription/js/payment-model");
 var SubscriptionModel=require("../../subscription/js/subscription-model");
 var productModel=require("../../product/js/product-model");
 var Product=require("../../product/js/product");
+var BusinessOpportunityModel=require("../../businessopportunity/js/business-opportunity-model");
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.ipage.com", // hostname
     secureConnection: true, // use SSL
@@ -115,7 +116,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 	};
 	//create verification token
 	var _createVerificationToken = function(self,user,host){
-		var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"user"});
+		var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"signupuser"});
         verificationToken.createVerificationToken(function (err, token) {
         	console.log("addedUser1");
           if (err){  
@@ -155,7 +156,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 	              };
 	            logger.emit("log",JSON.stringify(message));
 	 			 // calling to sendmail method
-	            commonapi.sendMail(message, function (result){
+	            commonapi.sendMail(message,CONFIG.smtp_general,function (result){
 	            	if(result=="failure"){
 	            		self.emit("failedUserRegistration",{"error":{"code":"AT001","message":"Error to send verification email"}});
 	            	}else{
@@ -248,7 +249,7 @@ var _sendWelcomeInviteEmail = function (self,user) {
 					        subject:emailtemplate.subject, // Subject line
 					        html: html+"" // html body
 			      		};
-			      		commonapi.sendMail(message, function (result){
+			      		commonapi.sendMail(message,CONFIG.smtp_general, function (result){
 					        if (result == "failure") {
 					        	self.emit("failedUserActivation",{"error":{"code":"AT001","message":"Error in to send welcome mail"}});
 					        } else {
@@ -287,7 +288,7 @@ var _sendWelcomeEmail = function (self,user) {
 		        subject:emailtemplate.subject, // Subject line
 		        html: html+"" // html body
       		};
-      		commonapi.sendMail(message, function (result){
+      		commonapi.sendMail(message, CONFIG.smtp_general,function (result){
 		        if (result == "failure") {
 		        	self.emit("failedUserActivation",{"error":{"code":"AT001","message":"Error in to send welcome mail"}});
 		        } else {
@@ -697,7 +698,7 @@ logger.emit("log","_sendPasswordSetting");
                 subject:emailtemplate.subject, // Subject line
                 html: description.s // html body
               };
-        commonapi.sendMail(message, function (result){
+        commonapi.sendMail(message,CONFIG.smtp_general, function (result){
           if (result == "failure") {
                 self.emit("failedSendPasswordSetting",{"error":{"code":"AT001","message":"Error to send password reset setting"}});
           } else {
@@ -815,7 +816,7 @@ var  _sendRegenerateTokenMail=function(self,token,user,host){
 	              };
 	            
 	            //calling to sendmail method
-	            commonapi.sendMail(message, function (result){
+	            commonapi.sendMail(message,CONFIG.smtp_general, function (result){
 	            	if(result=="failure"){
 	            		self.emit("failedRegenerateVerificationUrl",{"error":{"code":"AT001","message":"Error to send verification email"}});
 	            	}else{
@@ -1167,5 +1168,70 @@ var _checkUsernameExist=function(self,username){
 			self.emit("successfulCheckUsernameExists",{"success":{"message":" Username Available"}});
 		}
 	})
+}
+User.prototype.sendUserInvites=function(userinvitedata,sessionuserid){
+	var self=this;
+	/////////////////////////////
+	_validateUserInviteData(self,userinvitedata,sessionuserid);
+	/////////////////////////////
+}
+var _validateUserInviteData=function(self,userinvitedata,sessionuserid){
+	if(userinvitedata==undefined){
+		self.emit("failedUserInvites",{"error":{"code":"AV001","message":"Please provide userinvite data"}});
+	}else if(userinvitedata.length==0){
+		self.emit("failedUserInvites",{"error":{"code":"AV001","message":"Please pass at least invite details"}});
+	}else{
+		////////////////////////////////////
+		_sendUserInvitaion(self,userinvitedata,sessionuserid);
+		//////////////////////////
+	}
+}
+var _sendUserInvitaion=function(self,userinvitedata,sessionuserid){
+	userModel.findOne({userid:sessionuserid},function(err,user){
+		if(err){
+			self.emit("failedUserInvites",{"error":{"code":"ED001","message":"_sendUserInvitaion DbError"+err}});
+		}else if(!user){
+			self.emit("failedUserInvites",{"error":{"code":"AU003","message":"Userid is Wrong"}});	
+		}else{
+			EmailTemplateModel.findOne({templatetype:"userinvite"},function(err,userinvite_emailtemplate){
+				if(err){
+					self.emit("failedUserInvites",{"error":{"code":"ED001","message":"Email template"+err}});	
+				}else if(!userinvite_emailtemplate){
+					self.emit("failedUserInvites",{"error":{"message":"Email template"+err}});	
+				}else{
+					for(var i=0;i<userinvitedata.length;i++)
+					{
+			  		self.emit("senduserinvite",userinvite_emailtemplate,userinvitedata[i],user);
+					}
+					///////////////////////////////////////////////////////////////
+					_addUserInviteIntoBusinessOpportunity(self,userinvitedata,user);
+					////////////////////////////////////////////////////////////
+
+				}
+			})
+		}
+	})
+}
+var _addUserInviteIntoBusinessOpportunity=function(self,userinvitedata,user){
+
+ var business_opportunity=[];
+	for(var i=0;i<userinvitedata.length;i++)
+	{
+		business_opportunity.push({invitetype:"user",from:user.email,to:userinvitedata[i].email,fromusertype:user.usertype});
+	}
+ 
+	 BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){
+	 	if(err){
+	 		self.emit("failedUserInvites",{"error":{"code":"ED001","message":"Business Opportunity"+err}});	
+	 	}else{
+	 		/////////////////////////////////////////////////
+	 		_successfullUserInvites(self);
+	 		///////////////////////////////////////////////
+	 	}
+ 	})
+}
+var _successfullUserInvites=function (self) {
+	logger.emit("log","_successfullUserInvites");
+	self.emit("successfulUserInvites",{"success":{"message":"User Inivite Send Successfully"}});
 }
 

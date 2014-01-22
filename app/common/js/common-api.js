@@ -37,12 +37,7 @@ var UserModel=require("../../user/js/user-model");
 //         pass: "App12345$"
 //     }
 // });
-var smtpTransport = nodemailer.createTransport("SMTP", {
-    host: CONFIG.mailhost, // hostname
-    secureConnection: true, // use SSL
-    port: 465, // port for secure SMTP
-    auth:CONFIG.mailauth
-});
+
 // var smtpTransport = nodemailer.createTransport("SES", {
 //     AWSAccessKeyID: "AKIAJ2BXGCZW2235YKYA",
 //     AWSSecretKey: "AsgYdCF/B5jGGyXezogxbrrbOZMgK4WAwuxJyj+tf8G/"
@@ -53,13 +48,7 @@ var smtpTransport = nodemailer.createTransport("SMTP", {
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
-exports.removeListner=function(emitter){
-     emitter.removeAllListener(function()
-        {
-                console.log('removing "message" listener');
-        });
 
-}
 // exports.sendTestMail=function(req,res){
 //    var message = {
 //       from: "Sunil More  <sunil@giantleapsystems.com>", // sender address
@@ -139,13 +128,11 @@ exports.getbcrypstring=function(data,callback){
   });
 }
 //send an email
-exports.sendMail = function(message,callback){
-  console.log("message format"+JSON.stringify(message));
+exports.sendMail = function(message,smtpconfig,callback){
+  var smtpTransport = nodemailer.createTransport("SMTP",smtpconfig);
   smtpTransport.sendMail(message, 
  	  function (error, success) {
-      if (error){
-        // not much point in attempting to send again, so we give up
-        // will need to give the user a mechanism to resend verification
+      if(error){
         logger.error("Unable to send via Prodonus: " + error.message);
         callback("failure");
       }else{
@@ -191,14 +178,18 @@ exports.uploadFiles=function(io,__dirname){
     socket.on('uploadFiles', function(file,action) {
       console.log("calling to Upload files");
       ///////////////
-      if(!file && !action){
+      if(!action){
+        logger.emit("error","uploadFiles dont't know action");
+      }else if(!file){
         if(action.user!=undefined){
           socket.emit("userUploadResponse",{"error":{"message":"Please pass file details or action details"}});
         }else if(action.org!=undefined){
           socket.emit("orgUploadResponse",{"error":{"message":"Please pass file details or action details"}});
-        }else{
+        }else if(action.product!=undefined){
           socket.emit("productUploadResponse",{"error":{"message":"Please pass file details or action details"}});
-        }
+        }else{
+          socket.emit("productLogoResponse",{"error":{"message":"Please pass file details or action details"}});
+        } 
       }else{
         uploadFile(file,__dirname,action,function(err,uploadresult){
           if(err){
@@ -207,16 +198,20 @@ exports.uploadFiles=function(io,__dirname){
                socket.emit("userUploadResponse",err);
             }else if(action.org!=undefined){
               socket.emit("orgUploadResponse",err);
-            }else{
+            }else if(action.product!=undefined){
               socket.emit("productUploadResponse",err);
+            }else{
+               socket.emit("productUploadLogoResponse",err);
             }
           }else{
             if(action.user!=undefined){
                socket.emit("userUploadResponse",null,uploadresult);
             }else if(action.org!=undefined){
               socket.emit("orgUploadResponse",null,uploadresult);
-            }else{
+            }else if(action.product!=undefined){
               socket.emit("productUploadResponse",null,uploadresult);
+            }else if(action.productlogo!=undefined){
+              socket.emit("productUploadLogoResponse",null,uploadresult);
             }
           }
        })
@@ -291,7 +286,7 @@ uploadFile=function(file,dirname,action,callback){
                     console.log('File saved successful!');
                   });
              })
-          }else{//product uploads
+          }else if(action.product!=undefined){//product uploads
              bucketFolder="prodonus/org/"+action.product.orgid+"/product/"+action.product.prodle;
              params = {
                          Bucket: bucketFolder,
@@ -300,7 +295,7 @@ uploadFile=function(file,dirname,action,callback){
                          //ACL: 'public-read-write',
                          ContentType: file_type
                 };
-             productFileUpload(action.product.prodle,params,function(err,imagelocation){
+             productFileUpload(action.product.prodle,params,function(err,result){
               if(err){
                 callback(err);
               }else{
@@ -311,6 +306,29 @@ uploadFile=function(file,dirname,action,callback){
                     console.log('File saved successful!');
                   });
              })
+          }else if(action.productlogo!=undefined){//product logo upload
+                bucketFolder="prodonus/org/"+action.product.orgid+"/product/"+action.product.prodle;
+               params = {
+                         Bucket: bucketFolder,
+                         Key: action.product.orgid+action.product.prodle+s3filekey,
+                         Body: writebuffer,
+                         //ACL: 'public-read-write',
+                         ContentType: file_type
+                };
+             productLogoUpload(action.product.prodle,params,function(err,result){
+              if(err){
+                callback(err);
+              }else{
+                callback(null,result);
+              }
+              fs.close(fd, function() {
+                 exec("rm -rf '"+fileName+"'");
+                    console.log('File saved successful!');
+                  });
+             })
+
+          }else{
+            logger.emit("error","File Upload doen't understand which action to perform");
           }
         }
       });
@@ -323,7 +341,6 @@ var userFileUpload=function(userid,awsparams,callback){
     if (err) {
       callback({"error":{"message":"s3bucket.putObject:-userFileUpload"+err}})
     } else {
-      logger.emit("log","fileupload saved");
       var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
       s3bucket.getSignedUrl('getObject',params1, function (err, url) {
         if(err){
@@ -331,12 +348,12 @@ var userFileUpload=function(userid,awsparams,callback){
           callback({"error":{"message":"userFileUpload:Error in getting getSignedUrl"+err}});
         }else{
           var newprofileurl=url;
-          console.log("url"+newprofileurl);
+        
           UserModel.update({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
             }else if(profilepicupdatestatus==1){
-              callback(null,{"success":{"message":"User Profile Pic Updated Successfully"}})
+              callback(null,{"success":{"message":"User Profile Pic Updated Successfully","image":newprofileurl}})
             }else{
               callback({"error":{"code":"AU003","message":"Provided userid is wrong"+userid}});
             }
@@ -390,6 +407,31 @@ var productFileUpload=function(prodle,awsparams,callback){
               callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
             }else if(productuploadstatus==1){
               callback(null,{"success":{"message":"Product images uploaded Successfully"}})
+            }else{
+              callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
+            }
+          })
+        }
+      });
+    }
+  })  
+}
+var productLogoUpload=function(prodle,awsparams,callback){
+  s3bucket.putObject(awsparams, function(err, data) {
+    if (err) {
+      callback({"error":{"message":"s3bucket.putObject:-productLogoUpload"+err}})
+    } else {
+      logger.emit("log","fileupload saved");
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject',params1, function (err, url) {
+        if(err){
+          callback({"error":{"message":"productLogoUpload:Error in getting getSignedUrl"+err}});
+        }else{
+          ProductModel.update({prodle:prodle},{$set:{product_logo:url}},function(err,productuploadstatus){
+            if(err){
+              callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
+            }else if(productuploadstatus==1){
+              callback(null,{"success":{"message":"Product images uploaded Successfully","image":url}})
             }else{
               callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
             }
