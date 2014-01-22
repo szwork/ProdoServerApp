@@ -1,88 +1,129 @@
 info: socket.io started
 Prodonus is ready to server on port 8000
 Connected to prodo-dev
-///////calling to signin//////////
-req body[object Object]
-signin1
-signin2
-///////End of signin//////////
-login successUser subscription has expired
-114.143.183.59 - - [Wed, 11 Dec 2013 05:00:58 GMT] "POST /api/user/signin HTTP/1.1" 200 593 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.19 Safari/537.36"
-114.143.183.59 - - [Wed, 11 Dec 2013 05:01:02 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 304 - "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.19 Safari/537.36"
-///////calling to signin//////////
-req body[object Object]
-signin1
-signin2
-///////End of signin//////////
-failed signinInvalid password
-///////End of signin//////////
-failed signinInvalid password
-114.143.183.59 - - [Wed, 11 Dec 2013 05:01:20 GMT] "POST /api/user/signin HTTP/1.1" 200 75 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
-///////End of signin//////////
-failed signinInvalid password
-///////End of signin//////////
-failed signinInvalid password
-///////calling to signin//////////
-req body[object Object]
-signin1
-signin2
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-114.143.183.59 - - [Wed, 11 Dec 2013 05:01:27 GMT] "POST /api/user/signin HTTP/1.1" 200 593 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-114.143.183.59 - - [Wed, 11 Dec 2013 05:01:32 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 200 77 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
-114.143.183.59 - - [Wed, 11 Dec 2013 05:01:32 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 304 - "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
-///////calling to signin//////////
-req body[object Object]
-signin1
-signin2
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-114.143.183.59 - - [Wed, 11 Dec 2013 05:12:26 GMT] "POST /api/user/signin HTTP/1.1" 200 593 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-///////End of signin//////////
-login successUser subscription has expired
-114.143.183.59 - - [Wed, 11 Dec 2013 05:12:29 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 304 - "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:25.0) Gecko/20100101 Firefox/25.0"
-114.143.183.59 - - [Wed, 11 Dec 2013 09:46:44 GMT] "GET /api/product/xkWw_RNsr HTTP/1.1" 200 77 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36"
+successful connection to socket.io
+debug: authorized
+info: handshake authorized So0cJOesUt6lbBBk7gNB
+debug: setting request GET /socket.io/1/websocket/So0cJOesUt6lbBBk7gNB?session_id=pq8lMpVF1gUYkFMtYFphUEOD
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: client authorized for 
+debug: websocket writing 1::
+debug: client authorized for /prodoapp
+debug: websocket writing 1::/prodoapp
+debug: client authorized for /prodoupload
+debug: websocket writing 1::/prodoupload
+debug: emitting heartbeat for client So0cJOesUt6lbBBk7gNB
+debug: websocket writing 2::
+debug: set heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: got heartbeat packet
+debug: cleared heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: emitting heartbeat for client So0cJOesUt6lbBBk7gNB
+debug: websocket writing 2::
+debug: set heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: got heartbeat packet
+debug: cleared heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: emitting heartbeat for client So0cJOesUt6lbBBk7gNB
+debug: websocket writing 2::
+debug: set heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: got heartbeat packet
+debug: cleared heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: emitting heartbeat for client So0cJOesUt6lbBBk7gNB
+debug: websocket writing 2::
+debug: set heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: got heartbeat packet
+debug: cleared heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: emitting heartbeat for client So0cJOesUt6lbBBk7gNB
+debug: websocket writing 2::
+debug: set heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: got heartbeat packet
+debug: cleared heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: emitting heartbeat for client So0cJOesUt6lbBBk7gNB
+debug: websocket writing 2::
+debug: set heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: got heartbeat packet
+debug: cleared heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: emitting heartbeat for client So0cJOesUt6lbBBk7gNB
+debug: websocket writing 2::
+debug: set heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: got heartbeat packet
+debug: cleared heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: emitting heartbeat for client So0cJOesUt6lbBBk7gNB
+debug: websocket writing 2::
+debug: set heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: got heartbeat packet
+debug: cleared heartbeat timeout for client So0cJOesUt6lbBBk7gNB
+debug: set heartbeat interval for client So0cJOesUt6lbBBk7gNB
+info: transport end (undefined)
+debug: set close timeout for client So0cJOesUt6lbBBk7gNB
+debug: cleared close timeout for client So0cJOesUt6lbBBk7gNB
+debug: cleared heartbeat interval for client So0cJOesUt6lbBBk7gNB
+debug: discarding transport
+log user{ __v: 0,
+  _id: 52d504c803ad8f880800003f,
+  email: 'bhagyashri@giantleapsystems.com',
+  fullname: 'Bhagyashri',
+  password: '$2a$10$jsJ.UU1iUiTRBz/Vlk3Msu0VB5.6s9I.oL5HgQNWNFuZGGP/7bOJe',
+  terms: true,
+  userid: 'uek3HCg4-O',
+  profile_pic: null,
+  adddate: Tue Jan 14 2014 09:35:04 GMT+0000 (UTC),
+  status: 'active',
+  products_recommends: [],
+  products_followed: [],
+  payment_history: [],
+  payment: { paymentid: '3pzbs0h89wo' },
+  subscription: 
+   { discountcode: null,
+     planexpirydate: Wed Apr 16 2014 08:02:11 GMT+0000 (UTC),
+     planstartdate: Wed Apr 16 2014 08:02:11 GMT+0000 (UTC),
+     planid: '9pycof7eia2' },
+  org: { isAdmin: true, orgtype: 'company', orgid: 'orgl14Y7w4bd' },
+  address: 
+   { zipcode: null,
+     country: null,
+     state: null,
+     city: null,
+     address3: null,
+     address2: null,
+     address1: null },
+  verified: true,
+  isOtpPassword: false,
+  mobile: null,
+  phone: null,
+  gender: null,
+  dob: null }
+org length4
+user___{"userid":"uek3HCg4-O","fullname":"Bhagyashri","products_followed":[],"isOtpPassword":false,"org":{"orgid":"orgl14Y7w4bd","orgtype":"company","isAdmin":true}}
+useradmin
+user in org[object Object]organization nameGiant Leap Systemsgrpnameadmin
+subscription length5
+payment length2
+_successfulIsLoggedIn
+[32minfo[39m: Getting User details Successfully userid=uek3HCg4-O
+122.169.85.158 - - [Thu, 16 Jan 2014 12:05:58 GMT] "GET /api/isloggedin HTTP/1.1" 200 537 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36"
+successful connection to socket.io
+debug: authorized
+info: handshake authorized QBt_G90zoKveQy8R7gNC
+///////Calling to Get Products///////
+prodlegk3BLA4Zd
+orgid:orgl14Y7w4bd
+sessionid:uek3HCg4-O
+_successfulProductGet
+Getting Product details successfully
+[32minfo[39m: Getting Product details Successfully userid=uek3HCg4-O
+122.169.85.158 - - [Thu, 16 Jan 2014 12:06:03 GMT] "GET /api/product/orgl14Y7w4bd/gk3BLA4Zd HTTP/1.1" 200 5770 "http://localhost/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36"
+debug: setting request GET /socket.io/1/websocket/QBt_G90zoKveQy8R7gNC?session_id=pq8lMpVF1gUYkFMtYFphUEOD
+debug: set heartbeat interval for client QBt_G90zoKveQy8R7gNC
+debug: client authorized for 
+debug: websocket writing 1::
+debug: client authorized for /prodoapp
+debug: websocket writing 1::/prodoapp
+debug: client authorized for /prodoupload
+debug: websocket writing 1::/prodoupload
