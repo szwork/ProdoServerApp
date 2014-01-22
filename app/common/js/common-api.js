@@ -16,10 +16,10 @@ var nodemailer = require("nodemailer");
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var generateTimeId = require('time-uuid');
-var SequenceModel=require('./sequence-model');
+
 var logger=require("./logger");
 var fs = require('fs');
-var FileUploadModel=require("./file-upload-model");
+
 var AWS = require('aws-sdk');
 var exec = require('child_process').exec;
 var generateId = require('time-uuid');
@@ -60,67 +60,67 @@ exports.removeListner=function(emitter){
         });
 
 }
-exports.sendTestMail=function(req,res){
-   var message = {
-      from: "Sunil More  <sunil@giantleapsystems.com>", // sender address
-      to: "sunilmore690@gmail.com, sunilmore6490@gmail.com", // list of receivers
-      subject: "Hello ", // Subject line
-      // text: "Hello world ", // plaintext body
-      html: "<b>Hello world </b>" // html body
-    }
-    smtpTransport.sendMail(message, 
-    function (error, success) {
-      if (error){
-        // not much point in attempting to send again, so we give up
-        // will need to give the user a mechanism to resend verification
-        logger.error("Unable to send via Prodonus: " + error.message);
-        //callback("failure");
-        res.send(error);
-      }else{
-        res.send(success);
-      }
-      //sending succussful then success
-    });
-}
-exports.loadsequences=function(req,res){
-  var sequencedata=[{
-    name: "user",
-    nextsequence:0
-   },
-   {
-    name: "organization",
-    nextsequence: 0
-  }
-   ];
+// exports.sendTestMail=function(req,res){
+//    var message = {
+//       from: "Sunil More  <sunil@giantleapsystems.com>", // sender address
+//       to: "sunilmore690@gmail.com, sunilmore6490@gmail.com", // list of receivers
+//       subject: "Hello ", // Subject line
+//       // text: "Hello world ", // plaintext body
+//       html: "<b>Hello world </b>" // html body
+//     }
+//     smtpTransport.sendMail(message, 
+//     function (error, success) {
+//       if (error){
+//         // not much point in attempting to send again, so we give up
+//         // will need to give the user a mechanism to resend verification
+//         logger.error("Unable to send via Prodonus: " + error.message);
+//         //callback("failure");
+//         res.send(error);
+//       }else{
+//         res.send(success);
+//       }
+//       //sending succussful then success
+//     });
+// }
+// exports.loadsequences=function(req,res){
+//   var sequencedata=[{
+//     name: "user",
+//     nextsequence:0
+//    },
+//    {
+//     name: "organization",
+//     nextsequence: 0
+//   }
+//    ];
 
-      SequenceModel.find({},function(err,sequencedata){
-        if(err){
-            console.error(err);
-        }else if(sequencedata.length==0){
-          /* SequenceModel.create(sequencedata,function(err,docs){
-            if(err){
-              console.log("error in inserting defaulte sequneces");
-            }
-            else{
-              console.log("default sequneces saved");
-              console.log("sequencedata"+sequencedata);
-              res.send({"success":"initia sequence data saved"});
-              //res.send({"success"})
-            }
-          });*/
-      var sequence=new SequenceModel({name:"user",nextsequence:0})
-      sequence.save(function(err,docs){
+//       SequenceModel.find({},function(err,sequencedata){
+//         if(err){
+//             console.error(err);
+//         }else if(sequencedata.length==0){
+//            SequenceModel.create(sequencedata,function(err,docs){
+//             if(err){
+//               console.log("error in inserting defaulte sequneces");
+//             }
+//             else{
+//               console.log("default sequneces saved");
+//               console.log("sequencedata"+sequencedata);
+//               res.send({"success":"initia sequence data saved"});
+//               //res.send({"success"})
+//             }
+//           });
+//       var sequence=new SequenceModel({name:"user",nextsequence:0})
+//       sequence.save(function(err,docs){
 
-      })
+//       })
 
-        }else{
-          console.log("sequencedata already exists");
-          res.send({"error":"sequence data already exists"});
-        }
-      })
+//         }else{
+//           console.log("sequencedata already exists");
+//           res.send({"error":"sequence data already exists"});
+//         }
+//       })
      
 
-}
+// }
 //get bcrypt string
 exports.getbcrypstring=function(data,callback){
   bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
@@ -158,26 +158,26 @@ exports.sendMail = function(message,callback){
 };
 
 
-exports.getNextSequnce=function(name,callback)
-{
-  console.log("calling to getNextSequnce method");
-  SequenceModel.findAndModify(
-            { name: name },
-            [],
-            {$inc: { nextsequence: 1 } },{new:true},function(err,sequencedata)
-            {
-              if(err)
-              {
-                logger.error(err+"error in sequcne collection");
-              }
-              console.log("sequencedata"+sequencedata)
-              callback(null,sequencedata.nextsequence)
+// exports.getNextSequnce=function(name,callback)
+// {
+//   console.log("calling to getNextSequnce method");
+//   SequenceModel.findAndModify(
+//             { name: name },
+//             [],
+//             {$inc: { nextsequence: 1 } },{new:true},function(err,sequencedata)
+//             {
+//               if(err)
+//               {
+//                 logger.error(err+"error in sequcne collection");
+//               }
+//               console.log("sequencedata"+sequencedata)
+//               callback(null,sequencedata.nextsequence)
 
-            });
+//             });
  
-  // console.log("return sequence data"+ret);
+//   // console.log("return sequence data"+ret);
   
-}
+// }
 exports.uploadFiles=function(io,__dirname){
   io.of('/api/prodoupload').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
@@ -360,7 +360,8 @@ var orgFileUpload=function(orgid,awsparams,callback){
          // var newprofileurl=url;
          var image_data={image:url,imageid:generateId()}
           OrgModel.update({orgid:orgid},{$push:{org_images:image_data}},function(err,orguploadstatus){
-            callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
+            if(err){
+              callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
             }else if(orguploadstatus==1){
               callback(null,{"success":{"message":"Org images uploaded Successfully"}})
             }else{

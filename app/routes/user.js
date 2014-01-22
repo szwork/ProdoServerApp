@@ -32,7 +32,7 @@ exports.init = function (app) {
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
   app.get("/api/isloggedin",api.userapi.isLoggedIn);
-  app.get("/api/sendtestmail",api.commonapi.sendTestMail);
+  // app.get("/api/sendtestmail",api.commonapi.sendTestMail);
   app.get("/api/user/followun/:prodle",auth, api.userapi.followunfollowproduct);
   app.get('/api/subscription/:plantype',api.subscriptionapi.getSubscriptionPlanbyType);
   // app.post("/api/userinvites/:userid",auth,api.userapi.userInvites);
