@@ -25,7 +25,7 @@ var subscriptionSchema = mongoose.Schema({
       currency:String
     },//monthly quarterly yearly
   planstartdate:{type:Date,default:Date.now()},
-  status:{type:String,default:"active"},
+  status:{type:String,default:"inactive"},
   
 });
 subscriptionSchema.pre('save', function(next) {

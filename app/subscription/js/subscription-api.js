@@ -37,6 +37,18 @@ var subscriptionarray=
 			currency:"dollar"
 		}
 	},
+	{
+		
+		plantype:"individual",
+		plandescription:"90 days Trial Plan for Individual",
+		planpaymentcommitment:
+		{
+			commitmenttype:"quarterly",
+			amount:0,
+			currency:"dollar"
+		},
+		status:"active"
+	},
 	{ 
 		plantype:"company",
 		// plandescription:"Individual Quarterly Plan",
@@ -71,6 +83,18 @@ var subscriptionarray=
 	},
 	{
 		
+		plantype:"company",
+		plandescription:"90 days Trial Plan for Company",
+		planpaymentcommitment:
+		{
+			commitmenttype:"quarterly",
+			amount:0,
+			currency:"dollar"
+		},
+		status:"active"
+	},
+	{
+		
 		plantype:"manufacturer",
 		plandescription:"Manufacturer Monthly Plan",
 		planpaymentcommitment:
@@ -79,6 +103,18 @@ var subscriptionarray=
 			amount:20,
 			currency:"dollar"
 		}
+	},
+	{
+		
+		plantype:"manufacturer",
+		plandescription:"90 days Trial Plan for Manufacturer",
+		planpaymentcommitment:
+		{
+			commitmenttype:"quarterly",
+			amount:0,
+			currency:"dollar"
+		},
+		status:"active"
 	},
 	{	
 		
