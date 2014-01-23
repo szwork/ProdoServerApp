@@ -191,7 +191,7 @@ User.prototype.activateAccount = function(token) {
 var _verifyToken = function(self,token) {
 	console.log("calling to verify token");
 	// self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in Db to find verification token"}});
-  VerificationTokenModel.findAndModify({token: token,status:"active",tokentype:"user"},[],
+  VerificationTokenModel.findAndModify({token: token,status:"active"},[],
                 {$set: {status:"deactive"}},{new:false} ,function (err, userVerificationToken){
     if (err){
 
@@ -205,7 +205,7 @@ var _verifyToken = function(self,token) {
           		self.emit("failedUserActivation",{"error":{"code":"AV001","message":"Error in verifying user"}});
         	}else{
         		//here it will check user of type invitee user or not
-        		if(user.password!=undefined && user.orgid==undefined){
+        		if(userVerificationToken.tokentype=="signupuser"){
         		///////////////////////////
         	 _sendWelcomeEmail(self,user);	//user
         	 ////////////////////////////	
@@ -241,10 +241,10 @@ var _sendWelcomeInviteEmail = function (self,user) {
 							}else{
 								var html=emailtemplate.description;
 			    	    html=S(html);
-			      		html=html.replaceAll("<orgname>",user.orgid);
+			      		html=html.replaceAll("<orgname>",user.org.orgname);
 			      		html=html.replaceAll("<password>",otp);
 			      		var message = {
-					        from: "Prodonus  <sunil@giantleapsystems.com>", // sender address
+					        from: "Prodonus  <noreply@prodonus.com>", // sender address
 					        to: user.email, // list of receivers
 					        subject:emailtemplate.subject, // Subject line
 					        html: html+"" // html body

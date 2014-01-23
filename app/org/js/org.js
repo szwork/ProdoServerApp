@@ -9,6 +9,7 @@ var orgHistoryModel=require("./org-history-model");
 var __=require("underscore");
 var SubscriptionModel=require("../../subscription/js/subscription-model");
 var verificationTokenModel = require('../../common/js/verification-token-model');
+var BusinessOpportunityModel=require("../../businessopportunity/js/business-opportunity-model");
 var Organization = function(organizationdata) {
 	this.organization=organizationdata;
 };
@@ -814,6 +815,81 @@ var _succesfullOrgMembersInvites=function(self){
 	logger.emit("log","_succesfullOrgMembersInvites");
 	self.emit("successfulOrgInvites",{"success":{"message":"Organization Invites sent successfully"}});
 
+}
+Organization.prototype.sendOrgCustomerInvites=function(orgid,orgcustomerinvites,sessionuserid){
+	var self=this;
+	/////////////////////
+	_validateOrgCustomerInvites(self,orgid,orgcustomerinvites,sessionuserid);
+}
+var _validateOrgCustomerInvites=function(self,orgid,orgcustomerinvites,sessionuserid){
+	if(orgcustomerinvites==undefined){
+		self.emit("failedOrgCustomerInvites",{"error":{"code":"AV001","message":"Please pass other orgcustomerinvites  data"}});
+	}else if(orgcustomerinvites.length==0){
+		self.emit("failedOrgCustomerInvites",{"error":{"code":"AV001","message":"Please pass atleast one organization details to send invites"}});
+	}else{
+		///////////////////////////////////
+    _sendOrgCustomerInvitation(self,orgid,orgcustomerinvites,sessionuserid);
+		///////////////////////////////
+	}
+}
+var _sendOrgCustomerInvitation=function(self,orgid,orgcustomerinvites,sessionuserid){
+	orgModel.findOne({orgid:orgid},function(err,organization){
+				if(err){
+					self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
+				}else if(!organization){
+					self.emit("failedOrgCustomerInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
+				}else{
+					userModel.findOne({userid:sessionuserid},function(err,user){
+						if(err){
+							self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"_sendOtherOrgInvitation DbError"+err}});
+						}else if(!user){
+							self.emit("failedOrgCustomerInvites",{"error":{"code":"AU003","message":"Userid is Wrong"}});	
+						}else{
+							EmailTemplateModel.findOne({templatetype:"orgcustomerinvite"},function(err,orgcustomerginvite_emailtemplate){
+								if(err){
+									self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"Email template"+err}});	
+								}else if(!orgcustomerginvite_emailtemplate){
+									self.emit("failedOrgCustomerInvites",{"error":{"message":"Email template"+err}});	
+								}else{
+									for(var i=0;i<orgcustomerinvites.length;i++)
+									{
+										if(orgcustomerinvites[i].email!=undefined){
+							  			self.emit("sendinviteorgcustomer",orgcustomerginvite_emailtemplate,orgcustomerinvites[i],user,organization);
+							  		}
+									}
+									///////////////////////////////////////////////////////////////
+									_addOrganizationCustomerInviteIntoBusinessOpportunity(self,orgcustomerinvites,user);
+									////////////////////////////////////////////////////////////
+
+								}
+							})//end of email template
+						}
+					})//end of user find
+				}
+			})
+	}
+var _addOrganizationCustomerInviteIntoBusinessOpportunity=function(self,orgcustomerinvites,user){
+
+ var business_opportunity=[];
+	for(var i=0;i<orgcustomerinvites.length;i++)
+	{
+		if(orgcustomerinvites[i].email!=undefined){
+			business_opportunity.push({invitetype:"orgcustomer",from:user.email,to:orgcustomerinvites[i].email,fromusertype:user.usertype});
+		}
+	}
+ 	BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){
+	 	if(err){
+	 		self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"Business Opportunity"+err}});	
+	 	}else{
+	 		/////////////////////////////////////////////////
+	 		_successfullOrgCustomerInvites(self);
+	 		///////////////////////////////////////////////
+	 	}
+ 	})
+}
+var _successfullOrgCustomerInvites=function (self) {
+	logger.emit("log","_successfullOrgCustomerInvites");
+	self.emit("successfulOrgCustomerInvites",{"success":{"message":"Organization customer invitation sent Successfully"}});
 }
 	
 	

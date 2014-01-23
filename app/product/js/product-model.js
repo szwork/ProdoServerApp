@@ -31,7 +31,7 @@ var productFeatureSchema = mongoose.Schema({
 
 var commentSchema = mongoose.Schema({
   commentid:{type:String},
-  user:{userid:{type:String,ref:"User"},profile_pic_Urlpath:{type:String},fullname:{type:String},orgname:{type:String},grpname:{type:String}},
+  user:{userid:{type:String,ref:"User"},profile_pic_Urlpath:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
   //orgname and grpname set when user is organization  user
   status:{type:String},
   datecreated:{type:Date}, 

@@ -178,9 +178,9 @@ exports.uploadFiles=function(io,__dirname){
     socket.on('uploadFiles', function(file,action) {
       console.log("calling to Upload files");
       ///////////////
-      if(!action){
+      if(action.product==undefined || action.org==undefined || action.user==undefined ||action.productlogo==undefined){
         logger.emit("error","uploadFiles dont't know action");
-      }else if(!file){
+      }else if(file==undefined ){ 
         if(action.user!=undefined){
           socket.emit("userUploadResponse",{"error":{"message":"Please pass file details or action details"}});
         }else if(action.org!=undefined){
@@ -243,6 +243,7 @@ uploadFile=function(file,dirname,action,callback){
           var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
            var bucketFolder;
            var params;
+           writebuffer= new Buffer(file_buffer, "base64");
           if(action.user!=undefined){//user upload
              bucketFolder="prodonus/user/"+action.user.userid;
              params = {
@@ -307,15 +308,15 @@ uploadFile=function(file,dirname,action,callback){
                   });
              })
           }else if(action.productlogo!=undefined){//product logo upload
-                bucketFolder="prodonus/org/"+action.product.orgid+"/product/"+action.product.prodle;
+                bucketFolder="prodonus/org/"+action.productlogo.orgid+"/product/"+action.productlogo.prodle;
                params = {
                          Bucket: bucketFolder,
-                         Key: action.product.orgid+action.product.prodle+s3filekey,
+                         Key: action.productlogo.orgid+action.productlogo.prodle+s3filekey,
                          Body: writebuffer,
                          //ACL: 'public-read-write',
                          ContentType: file_type
                 };
-             productLogoUpload(action.product.prodle,params,function(err,result){
+             productLogoUpload(action.productlogo.prodle,params,function(err,result){
               if(err){
                 callback(err);
               }else{

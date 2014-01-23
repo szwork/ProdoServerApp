@@ -195,7 +195,9 @@ var _addComment=function(self,prodle,commentdata,product){
       }else{
       	//updateLatestWarrantyComment(product_commentdata.prodle);
       }
-		///////////////////////////////////
+  		// product_commentdata.status=undefined;
+    // 	product_commentdata.prodle=undefined;
+		// ///////////////////////////////////
 		_successfulAddComment(self,product_commentdata);
 		/////////////////////////////////
 				
@@ -225,9 +227,9 @@ var _isAuhorizedUserToDeleteComment=function(self,sessionuserid,commentid){
   		 if(comment.user.userid!=sessionuserid){
   		 		self.emit("failedCommentDeletion",{"error":{"code":"EA001","message":"You are not authorize to delete this comment"}});	
   		 }else{
-  		 	 //////////////////////////
-        _deleteComment(self,commentid);
-				/////////////////////////
+  		 	//////////////////////////////
+        	_deleteComment(self,commentid);
+		    /////////////////////////////
 			}
 		}else{
   		self.emit("failedCommentDeletion",{"error":{"code":"AC001","message":"comment id is wrong"}});

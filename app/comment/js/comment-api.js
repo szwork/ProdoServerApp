@@ -63,9 +63,9 @@ io.of('/api/prodoapp').on('connection', function(socket) {
         logger.emit("info", result.success.message,sessionuserid);
         socket.emit("addcommentResponse",null,result);
         if(result.success.product_comment.type=="product"){
-          socket.broadcast.emit("productcommentResponse",null,result);
+          socket.broadcast.emit("productcommentResponse"+prodle,null,result);
         }else{
-          socket.broadcast.emit("warrantycommentResponse",null,result);
+          socket.broadcast.emit("warrantycommentResponse"+prodle,null,result);
         }
       });
       comment.addComment(sessionuserid,prodle,__dirname);

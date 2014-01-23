@@ -429,3 +429,103 @@ exports.deleteOrgImage=function(req,res){s
     //////////////////////////////////////////////// ///////////
   }
 }
+exports.otherOrgInvites=function(req,res){
+  var otherorginvites=req.body.otherorginvites;
+  var orgid=req.params.orgid;
+  logger.emit("log","REQ BODY orgInvites: "+JSON.stringify(req.body));
+  
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedOtherOrgInvites");
+  organization.on("failedOtherOrgInvites",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulOtherOrgInvites");
+  organization.on("successfulOtherOrgInvites",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  organization.removeAllListeners("sendotherorginvite");
+  organization.on("sendotherorginvite",function(otherorginvite_template,inivtedata,user,organization){
+    var subject=S(otherorginvite_template.subject);
+    var template=S(otherorginvite_template.description);
+    template=template.replaceAll("<email>",user.email);
+    template=template.replaceAll("<username>",user.username);
+    template=template.replaceAll("<orgname>",organization.name);
+    var message = {
+        from: "Prodonus  <business@prodonus.com>", // sender address
+        to: inivtedata.email, // list of receivers
+        subject:subject.s, // Subject line
+        html: template.s // html body
+      };
+    commonapi.sendMail(message,CONFIG.smtp_business, function (result){
+      if(result=="failure"){
+        logger.emit("error","company inivte not sent to "+message.to+" by"+user.email);
+      }else{
+        logger.emit("log","Company Invite Sent Successfully to"+message.to+" by"+user.email);
+      }
+    });
+  });
+  if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedOtherOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to send invite to other company"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to add org");
+    organization.emit("failedOtherOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to send invite to other company"}}); 
+  }else{
+    //////////////////////////////////////////////////////////////////////
+    organization.sendOtherOrgInvites(orgid,otherorginvites,sessionuserid);
+    ////////////////////////////////////////////////////////////////////// 
+  }
+}
+exports.OrgCustomerInvites=function(req,res){
+  var orgcustomerinvites=req.body.orgcustomerinvites;
+  var orgid=req.params.orgid;
+  logger.emit("log","REQ BODY OrgCustomerInvites: "+JSON.stringify(req.body));
+  
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedOrgCustomerInvites");
+  organization.on("failedOrgCustomerInvites",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulOrgCustomerInvites");
+  organization.on("successfulOrgCustomerInvites",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  organization.removeAllListeners("sendinviteorgcustomer");
+  organization.on("sendinviteorgcustomer",function(orgcustomerinvite_template,orgcustomer,user,organization){
+    var subject=S(orgcustomerinvite_template.subject);
+    var template=S(orgcustomerinvite_template.description);
+    template=template.replaceAll("<email>",user.email);
+    template=template.replaceAll("<username>",user.username);
+    template=template.replaceAll("<orgname>",organization.name);
+    var message = {
+        from: "Prodonus  <noreply@prodonus.com>", // sender address
+        to: orgcustomer.email, // list of receivers
+        subject:subject.s, // Subject line
+        html: template.s // html body
+      };
+    commonapi.sendMail(message,CONFIG.smtp_general, function (result){
+      if(result=="failure"){
+        logger.emit("error","Organization Customer invite not sent to "+message.to+" by"+user.email);
+      }else{
+        logger.emit("log","Organization Customer invite Sent Successfully to"+message.to+" by"+user.email);
+      }
+    });
+  });
+  if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedOrgCustomerInvites",{"error":{"code":"EA001","message":"You have not authorized to send invite to other company"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to add org");
+    organization.emit("failedOrgCustomerInvites",{"error":{"code":"EA001","message":"You have not authorized to send invite to other company"}}); 
+  }else{
+    //////////////////////////////////////////////////////////////////////
+    organization.sendOrgCustomerInvites(orgid,orgcustomerinvites,sessionuserid);
+    ////////////////////////////////////////////////////////////////////// 
+  }
+}

@@ -27,6 +27,11 @@ exports.loadEmailTemplate=function(req,res){
 			description: "Hi <username>,<br> Welcome to Prodonus! You’ve just joined a community of product manufacturers and users who are sharing their insights on products. At Prodonus, we strive to bring business closer to their customers to enable conversation , in addition to managing their warranties.<br>Talk to manufacturers, interact with consumers from around the world, and explore tons of interesting questions and insights. We are committed to bring all the manufacturers available to everyone.<br>Eager to start? Start following the products that interests you, and there’s no limit to the number of products you can follow.<br>We are thrilled that you have joined us! Congratulations! Leave comments and suggestions, and share your story!<br>During your free trial period, you will be able to use prodonus as you would like, of any number of products. At the end of the free trial period, you will be asked to select a plan according to the user type - individuals, companies, manfacturer's.<br<Cheers,<br>Prodonus Team<br><br>You are receiving this email because <email> is subscribed to Prodonus. Please do not reply directly to noreply@prodonus.com. If you have any questions or feedback, please visit our support link or write to support@prodonus.com"
 		},
 		{
+			templatetype: "welcomeinvite",
+			subject: "Your Password details",
+			description: "Hi <username>,<br> Welcome to Prodonus! <orgname> Your One Time Password:<password>You’ve just joined a community of product manufacturers and users who are sharing their insights on products. At Prodonus, we strive to bring business closer to their customers to enable conversation , in addition to managing their warranties.<br>Talk to manufacturers, interact with consumers from around the world, and explore tons of interesting questions and insights. We are committed to bring all the manufacturers available to everyone.<br>Eager to start? Start following the products that interests you, and there’s no limit to the number of products you can follow.<br>We are thrilled that you have joined us! Congratulations! Leave comments and suggestions, and share your story!<br>During your free trial period, you will be able to use prodonus as you would like, of any number of products. At the end of the free trial period, you will be asked to select a plan according to the user type - individuals, companies, manfacturer's.<br<Cheers,<br>Prodonus Team<br><br>You are receiving this email because <email> is subscribed to Prodonus. Please do not reply directly to noreply@prodonus.com. If you have any questions or feedback, please visit our support link or write to support@prodonus.com"
+		},
+		{
 			templatetype: "orgmemberinvite",
 			subject: "Invite from <companyname> for <grpname>",
 			description: "Invite has sent by <companyname> to join Prodonus ,please click this link to add your details :<br> <url><br><br>Prodonus"
@@ -38,6 +43,11 @@ exports.loadEmailTemplate=function(req,res){
 		},
 		{
 			templatetype: "orgcustomerinvite",
+			subject: "Invite From Prodonus ",
+			description: "Invite has sent by <username> to join Prodonus ,please click this link to add your details www.prodonus.com"
+		},
+		{
+			templatetype: "otherorginvite",
 			subject: "Invite From Prodonus ",
 			description: "Invite has sent by <username> to join Prodonus ,please click this link to add your details www.prodonus.com"
 		}]

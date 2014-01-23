@@ -34,5 +34,7 @@ exports.init = function (app) {
  app.delete("/api/orgaddress/:orgid/:orgaddressid",auth,api.orgapi.deleteOrgAddress);
  app.delete("/api/image/org/:orgid",auth,api.orgapi.deleteOrgImage);
 
- app.post('/api/orginvites/:orgid', auth,api.orgapi.orginvites);
+ app.post('/api/orginvite/:orgid', auth,api.orgapi.orginvites);
+ app.post("/api/otherorginvite/:orgid",auth,api.orgapi.otherOrgInvites);
+ app.post("/api/orgcustomerinvite/:orgid",auth,api.orgapi.OrgCustomerInvites);
 }
