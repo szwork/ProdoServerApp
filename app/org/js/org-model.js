@@ -73,7 +73,7 @@ var OrganizationSchema = mongoose.Schema({
       planstartdate:{type:Date}, 
       planexpirydate:Date
     },
-    payment:{paymentid:{type:String,default:"payment"}},
+    payment:{paymentid:{type:String,default:null}},
     org_images:[{image:{type:String},imageid:{type:String}}], 
     orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
     terms:{type:Boolean}

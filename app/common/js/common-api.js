@@ -176,11 +176,11 @@ exports.uploadFiles=function(io,__dirname){
      //action:{product:{userid:,orgid:,prodle:}}
     
     socket.on('uploadFiles', function(file,action) {
-      console.log("calling to Upload files");
+      // console.log("calling to Upload files");
       ///////////////
-      if(action.product==undefined || action.org==undefined || action.user==undefined ||action.productlogo==undefined){
-        logger.emit("error","uploadFiles dont't know action");
-      }else if(file==undefined ){ 
+      if(action==null || action==undefined){
+         logger.emit("error","uploadFiles dont't know action");
+       }else if(file==undefined ){ 
         if(action.user!=undefined){
           socket.emit("userUploadResponse",{"error":{"message":"Please pass file details or action details"}});
         }else if(action.org!=undefined){
@@ -233,8 +233,8 @@ uploadFile=function(file,dirname,action,callback){
     }else{
       var ext = path.extname(fileName||'').split('.');
       ext=ext[ext.length - 1];
-      console.log("buffer size"+file_buffer.size);
-      console.log("file extension"+ext);
+      // console.log("buffer size"+file_buffer.size);
+      // console.log("file extension"+ext);
       fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
         if(err){
           callback({"error":{"message":"uploadFile fs.write:"+err}})
@@ -243,7 +243,7 @@ uploadFile=function(file,dirname,action,callback){
           var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
            var bucketFolder;
            var params;
-           writebuffer= new Buffer(file_buffer, "base64");
+           // writebuffer= new Buffer(file_buffer, "base64");
           if(action.user!=undefined){//user upload
              bucketFolder="prodonus/user/"+action.user.userid;
              params = {

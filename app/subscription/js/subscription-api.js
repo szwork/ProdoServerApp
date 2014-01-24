@@ -40,7 +40,7 @@ var subscriptionarray=
 	{
 		
 		plantype:"individual",
-		plandescription:"90 days Trial Plan for Individual",
+		plandescription:"90 days Free Trial Plan for Individual",
 		planpaymentcommitment:
 		{
 			commitmenttype:"quarterly",
@@ -84,7 +84,7 @@ var subscriptionarray=
 	{
 		
 		plantype:"company",
-		plandescription:"90 days Trial Plan for Company",
+		plandescription:"90 days Free Trial Plan for Company",
 		planpaymentcommitment:
 		{
 			commitmenttype:"quarterly",
@@ -107,7 +107,7 @@ var subscriptionarray=
 	{
 		
 		plantype:"manufacturer",
-		plandescription:"90 days Trial Plan for Manufacturer",
+		plandescription:"90 days Free Trial Plan for Manufacturer",
 		planpaymentcommitment:
 		{
 			commitmenttype:"quarterly",
@@ -161,11 +161,11 @@ for(var i=0;i<subscriptionarray.length;i++){
 exports.getAllSubscriptionPlan=function(req,res)
 {
 
-	SubscriptionModel.aggregate({$group:{_id: "$plantype",plans: { $push: {planid:"$planid",plandescription:"$plandescription",planpaymentcommitment:"$planpaymentcommitment"}}}},{$project:{plans:1,plantype:"$_id",_id:0}}
+	SubscriptionModel.aggregate({$match:{status:"active"}},{$group:{_id: "$plantype",plans: { $push: {planid:"$planid",plandescription:"$plandescription",planpaymentcommitment:"$planpaymentcommitment"}}}},{$project:{plans:1,plantype:"$_id",_id:0}}
 ,function(err,subscription){
 		if(err)
 		{	
-			logger.emit("error","DBERROR:getAllSubscriptionPlan \nerror message:"+err)
+			// logger.emit("error","DBERROR:getAllSubscriptionPlan \nerror message:"+err)
 		 	res.send({"error":{"message":"Database Server Issuce","code":"ED001"}}) 
 		}else if(subscription.length>0){
 			res.send({"success":{"message":"Get Subscription plans Successfully","subscription":subscription}});
