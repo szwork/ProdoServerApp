@@ -55,8 +55,8 @@ exports.addOrganization = function(req,res){
     organization.removeAllListeners();
     res.send(err);
   })
-  organization.removeAllListeners("sendinvitemail");
-  organization.on('sendinvitemail',function(email,emailtemplate,orgname,grpname){
+  organization.removeAllListeners("sendneorguserinviteemail");
+  organization.on('sendneorguserinviteemail',function(email,emailtemplate,orgname,grpname){
     var template_description=emailtemplate.description;
     userModel.findOne({email:email},{userid:1,email:1},function(err,user){
       if(err){
@@ -74,7 +74,7 @@ exports.addOrganization = function(req,res){
             html=html.replaceAll("<email>",user.email);
             html=html.replaceAll("<url>",url);
             html=html.replaceAll("<orgname>",orgname);
-            html=html.replaceAll("<grpname",grpname);
+            html=html.replaceAll("<grpname>",grpname);
             var subject=S(emailtemplate.subject); 
             subject=subject.replaceAll("<orgname>",orgname);
             subject=subject.replaceAll("<grpname>",grpname);
@@ -97,6 +97,40 @@ exports.addOrganization = function(req,res){
       }
     })
   });
+    organization.removeAllListeners("sendinvitemail");
+    organization.on('sendinvitemail',function(email,emailtemplate,orgname,grpname){//already invite email is registered with
+      var template_description=emailtemplate.description;
+      userModel.findOne({email:email},{userid:1,email:1},function(err,user){
+          if(err){
+            logger.emit("error","error in db to find users",req.user.userid);
+          }else if(!user){
+            logger.emit("error","user does'nt exists",req.user.userid);
+          }else{
+             var html=S(template_description); 
+              html=html.replaceAll("<email>",user.email);
+              html=html.replaceAll("<orgname>",orgname);
+              html=html.replaceAll("<grpname>",grpname);
+              var subject=S(emailtemplate.subject);
+              subject=subject.replaceAll("<orgname>",orgname);
+              subject=subject.replaceAll("<grpname>",grpname);
+             var message = {
+                from: "Prodonus  <noreply@prodonus.com>", // sender address
+                to: user.email, // list of receivers
+                subject:subject.s, // Subject line
+                html: html.s // html body
+            };
+            commonapi.sendMail(message,CONFIG.smtp_general,function(result){
+              if (result == "failure") {
+                 logger.emit("error","Error in sending invite mail to "+email,req.user.userid);
+              }else {
+                logger.emit("log","invite sent to"+email); 
+              }
+            })
+        }
+      })
+    })
+    
+  
   var sessionuserid=req.user.userid;
   organization.addOrganization(sessionuserid,subscriptiondata);
 }
@@ -326,12 +360,10 @@ exports.orginvites = function(req,res) {
     logger.emit("info", result.success.message);
     res.send(result);
   });
-  organization.removeAllListeners("sendEmailToInvitees");
-  organization.on('sendEmailToInvitees',function(email,emailtemplate,orgname,grpname){
+  organization.removeAllListeners("sendorginviteandverification");
+  organization.on('sendorginviteandverification',function(email,emailtemplate,orgname,grpname){
     var template_description=emailtemplate.description;
-    
-    
-      userModel.findOne({email:email},{userid:1,email:1},function(err,user){
+    userModel.findOne({email:email},{userid:1,email:1},function(err,user){
         if(err){
           logger.emit("error","error in db to find users",req.user.userid);
         }else if(!user){
@@ -347,10 +379,10 @@ exports.orginvites = function(req,res) {
                 html=html.replaceAll("<email>",user.email);
                 html=html.replaceAll("<url>",url);
                 html=html.replaceAll("<orgname>",orgname);
-                html=html.replaceAll("<grpname",grpname);
+                html=html.replaceAll("<grpname>",grpname);
                 var subjecsubjectt=S(emailtemplate.subject);
                 subject=subject.replaceAll("<orgname>",orgname);
-                subject=subject.replaceAll("<grpname",grpname);
+                subject=subject.replaceAll("<grpname>",grpname);
                var message = {
                   from: "Prodonus  <noreply@prodonus.com>", // sender address
                   to: user.email, // list of receivers
@@ -368,8 +400,41 @@ exports.orginvites = function(req,res) {
           })
         }
       })
+     })
+    organization.removeAllListeners("sendorginvites");
+    organization.on('sendorginvites',function(email,emailtemplate,orgname,grpname){//already invite email is registered with
+      var template_description=emailtemplate.description;
+      userModel.findOne({email:email},{userid:1,email:1},function(err,user){
+          if(err){
+            logger.emit("error","error in db to find users",req.user.userid);
+          }else if(!user){
+            logger.emit("error","user does'nt exists",req.user.userid);
+          }else{
+             var html=S(template_description); 
+              html=html.replaceAll("<email>",user.email);
+              html=html.replaceAll("<orgname>",orgname);
+              html=html.replaceAll("<grpname>",grpname);
+              var subject=S(emailtemplate.subject);
+              subject=subject.replaceAll("<orgname>",orgname);
+              subject=subject.replaceAll("<grpname>",grpname);
+             var message = {
+                from: "Prodonus  <noreply@prodonus.com>", // sender address
+                to: user.email, // list of receivers
+                subject:subject.s, // Subject line
+                html: html.s // html body
+            };
+            commonapi.sendMail(message,CONFIG.smtp_general,function(result){
+              if (result == "failure") {
+                 logger.emit("error","Error in sending invite mail to "+email,req.user.userid);
+              }else {
+                logger.emit("log","invite sent to"+email); 
+              }
+            })
+        }
+      })
+    })
     
-  });
+  
   if(req.user.org.orgid!=orgid){
     logger.emit("log","Given orgid is not match with session userid");
     organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}});
@@ -451,8 +516,9 @@ exports.otherOrgInvites=function(req,res){
     var subject=S(otherorginvite_template.subject);
     var template=S(otherorginvite_template.description);
     template=template.replaceAll("<email>",user.email);
-    template=template.replaceAll("<username>",user.username);
+    template=template.replaceAll("<fromusername>",user.username);
     template=template.replaceAll("<orgname>",organization.name);
+    template=template.replaceAll("<name>",inivtedata.name);
     var message = {
         from: "Prodonus  <business@prodonus.com>", // sender address
         to: inivtedata.email, // list of receivers
@@ -501,8 +567,10 @@ exports.OrgCustomerInvites=function(req,res){
     var subject=S(orgcustomerinvite_template.subject);
     var template=S(orgcustomerinvite_template.description);
     template=template.replaceAll("<email>",user.email);
-    template=template.replaceAll("<username>",user.username);
+    template=template.replaceAll("<fromusername>",user.username);
     template=template.replaceAll("<orgname>",organization.name);
+    template=template.replaceAll("<customername>",orgcustomer.name);
+    
     var message = {
         from: "Prodonus  <noreply@prodonus.com>", // sender address
         to: orgcustomer.email, // list of receivers

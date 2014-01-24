@@ -199,41 +199,52 @@ var _validateSubscriptionPlan=function(self,organizationdata,sessionuserid,subsc
 	          	logger.emit("log",inviteuserdata);
 	          	var inviteusers=userdata;
 	          	/////////////////////////////////////////////////
-	           _sendEmailToInvitees(self,organization,usergrp_array);
+	           _sendEmailToInvitees(self,organization,usergrp_array,newusers);
 	            /////////////////////////////////////////////////
 	          }
 	        })
 	      }else{//if the provided email id is already registered with prodonus
-			      ////////////////////////
-			     	_addInviteUserToGroup(self,organization,usergrp_array);
-			     	////////////////////////
+			      /////////////////////////////////////////////////////////////
+			     	_sendEmailToInvitees(self,organization,usergrp_array,newusers);
+			     	////////////////////////////////////////////////////////////
 	    	}
 	  }
   })
 };
 
-	var _sendEmailToInvitees = function(self,organization,usergrp_array){
+	var _sendEmailToInvitees = function(self,organization,usergrp_array,newusers){
 		//validate the org data
 		var initialvalue=0;
-		EmailTemplateModel.findOne({templatetype:"orgmemberinvite"}).lean().exec(function(err,emailtemplate){
-		  	if(err){
-		    	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
-		  	}else if(emailtemplate){
-		  		// logger.emit("log","calling to sendinvitemail");
-          for(var i=0;i<usergrp_array.length;i++){
-          	for(var j=0;j<usergrp_array[i].invites.length;j++){
-          			self.emit("sendinvitemail", usergrp_array[i].invites[j],emailtemplate,organization.name,usergrp_array[i].grpname);
-          	}
-					}
+		EmailTemplateModel.findOne({templatetype:"orgmemberinvite"}).lean().exec(function(err,neworgusertemplate){
+	  	if(err){
+	    	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
+	  	}else if(neworgusertemplate){
+	  		EmailTemplateModel.findOne({templatetype:"orgmemberonlyinvite"}).lean().exec(function(err,orgusertemplate){
+	  			if(err){
+	    			 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
+	  			}else if(orgusertemplate){
+	  		// logger.emit("log","calling to sendinvitemail");
+	          for(var i=0;i<usergrp_array.length;i++){
+	          	for(var j=0;j<usergrp_array[i].invites.length;j++){
+	          		if(__.contains(newusers, usergrp_array[i].invites[j])){//it is new user
+	          			self.emit("sendneorguserinviteemail", usergrp_array[i].invites[j],neworgusertemplate,organization.name,usergrp_array[i].grpname);
+	          		}else{//already prodonus registered user
+	          			self.emit("sendinvitemail", usergrp_array[i].invites[j],orgusertemplate,organization.name,usergrp_array[i].grpname);	
+	          		}	
+	          	}
+	          }
+	          /////////////////////////////////////////
+						_addInviteUserToGroup(self,organization,usergrp_array);
+						///////////////////////////////////////
+	    	}else{
+	  				self.emit("failedOrgAdd",{"error":{"code":"ED002","message":"Server setup template issue"}});
+	  		}
+			})//end of orgmemberonlyinvite
+		}
+	})
+}
 				
-					/////////////////////////////////////////
-					_addInviteUserToGroup(self,organization,usergrp_array);
-					///////////////////////////////////////
-		    }else{
-		  		self.emit("failedOrgAdd",{"error":{"code":"ED002","message":"Server setup template issue"}});
-		  	}
-		})
-	}
+		
 
 	var _addInviteUserToGroup = function(self,organization,usergrp_array) {
 		
@@ -739,9 +750,9 @@ var _addOrgInvitees = function(self,orgid,usergrp) {
 							})
 						}else{//if provided invites already exists 
 							logger.emit("log","provided invites emails already exists");
-							///////////////////////////////////////////////////////////////////
-					  	_AddUserIntoOrgGroup(self,newusers,existingusers,organization,usergrp.grpname);
-					  	////////////////////////////////////////////////////////////////////
+							//////////////////////////////////////////////////////////////////////////////////////
+							_sendInviteEmailToOrgInvitees(self,newusers,existingusers,usergrp.grpname,organization);
+							/////////////////////////////////////////////////////////////////////////////
 						}
     			}
 			})
@@ -753,25 +764,43 @@ var _addOrgInvitees = function(self,orgid,usergrp) {
 	var _sendInviteEmailToOrgInvitees = function(self,newusers,existingusers,grpname,organization) {
 		//validate the org data
 		var initialvalue=0;
-			EmailTemplateModel.findOne({templatetype:"orgmemberinvite"}).lean().exec(function(err,emailtemplate){
-			  if(err){
-			    self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
-			  }else if(emailtemplate){
-			  	logger.emit("log","calling to sendinvitemail");
-			  	for(var i=0;i<newusers.length;i++){
-
-					/////////////////////////////////////////////////////////////////////////////////
-					self.emit("sendEmailToInvitees", newusers[i],emailtemplate,organization.name,grpname);
-					////////////////////////////////////////////////////////////////////////////////	
-			  	}	
+		logger.emit("log","_sendInviteEmailToOrgInvitees");
+			EmailTemplateModel.findOne({templatetype:"orgmemberinvite"}).lean().exec(function(err,neworgusertemplate){
+	  	if(err){
+	  			logger.emit("log","2");
+	    	 self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
+	  	}else if(neworgusertemplate){
+	  		EmailTemplateModel.findOne({templatetype:"orgmemberonlyinvite"}).lean().exec(function(err,orgusertemplate){
+	  			if(err){
+	  				logger.emit("log","3");
+	    			 self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
+	  			}else if(orgusertemplate){
+	  	 			for(var i=0;i<newusers.length;i++){
+							/////////////////////////////////////////////////////////////////////////////////
+							self.emit("sendorginviteandverification", newusers[i],neworgusertemplate,organization.name,grpname);
+							////////////////////////////////////////////////////////////////////////////////	
+			  		}
+			  		for(var j=0;j<existingusers.length;j++)
+			  		{
+			  			/////////////////////////////////////////////////////////////////////////////////
+							self.emit("sendorginvites", existingusers[j],orgusertemplate,organization.name,grpname);
+							////////////////////////////////////////////////////////////////////////////////
+			  		}	
+			  		logger.emit("log","1");
 			  	///////////////////////////////////////////
 			  	_AddUserIntoOrgGroup(self,newusers,existingusers,organization,grpname);
 			  	///////////////////////////////////////////
-			}else{
-			  		self.emit("failedOrgAdd",{"error":{"code":"ED002","message":"Server setup template issue"}});
-			}
-		})
-	}
+				}else{
+					logger.emit("log","4");
+			  	self.emit("failedOrgInvites",{"error":{"code":"ED002","message":"Server setup template issue"}});
+				}
+			})
+		}else{
+			logger.emit("log","5");
+			self.emit("failedOrgInvites",{"error":{"code":"ED002","message":"Server setup template issue"}});
+		}
+	})
+}
 	
 var _AddUserIntoOrgGroup=function(self,newusers,existingusers,organization,grpname){
 	var useremails=__.union(newusers,existingusers);

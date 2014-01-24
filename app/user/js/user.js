@@ -77,7 +77,7 @@ var _validateRegisterUser = function(self,userdata,host) {
   	 }	else if(userdata.terms==false){
 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
 	  }else{
-	  	userModel.findOne({email:userdata.email,username:userdata.username},{email:1}).lean().exec(function(err,user){
+	  	userModel.findOne({$or:[{email:userdata.email},{username:userdata.username}]},{email:1}).lean().exec(function(err,user){
 			if(err){
 				self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
 			}else if(user){
