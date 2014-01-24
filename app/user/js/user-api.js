@@ -195,7 +195,7 @@ exports.signin = function(req, res) {
 }
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
-    userModel.findOne({ email: email,status:"active"}, function(err, user) {
+    userModel.findOne({$or:[{email: email},{username:email}],status:"active"}, function(err, user) {
       if (err){ 
        return done(err); 
       }
@@ -529,6 +529,7 @@ exports.userInvites=function(req,res){
     var template=S(userinvite_template.description);
     template=template.replaceAll("<email>",user.email);
     template=template.replaceAll("<username>",user.username);
+     template=template.replaceAll("<name>",inivtedata.name);
     var message = {
         from: "Prodonus  <noreply@prodonus.com>", // sender address
         to: inivtedata.email, // list of receivers

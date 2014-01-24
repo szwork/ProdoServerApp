@@ -60,7 +60,7 @@ exports.loadEmailTemplate=function(req,res){
 
       EmailTemplateModel.create(emailtemplatedata,function(err,docs){
         if(err){
-          console.log("error in inserting defaulte emailtemplate");
+          console.log("error in inserting default emailtemplate");
         }
         else{
           console.log("default emailtemplate saved");
