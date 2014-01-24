@@ -962,7 +962,7 @@ var _checkDiscountCodeValid=function(self,user,paymentdata){
 				
 		// 	}
 		// })
-	self.emit({"error":{"message":"Discount code payment not done"});
+	self.emit({"error":{"message":"Discount code payment not done"}});
 	}
 }
 var _applyPlanToUser=function(self,user,paymentdata){//if user has no discount code

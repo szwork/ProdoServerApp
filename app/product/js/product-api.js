@@ -47,7 +47,7 @@ exports.addProduct=function(req,res){
     logger.emit("log","hi"+orgid +":"+req.user.org.orgid);
     if(sessionorgid!=orgid)
     { 
-      logger.emit("error","You are not an organization user to add product",sessionuserid)
+      logger.emit("error","You are not an product user to add product",sessionuserid)
       product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You have not authorize to add product"}})
     }else if(req.user.org.isAdmin!=true){
       logger.emit("error","You are not an admin to add product",sessionuserid)
@@ -234,3 +234,35 @@ exports.deleteProductImage=function(req,res){
   }
 }
 
+exports.updateProduct = function(req, res) {
+  var orgid=req.params.orgid;
+  var productdata=req.body.product;
+  var prodle=req.params.prodle;
+  var product = new Product(productdata);
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedUpdateProduct");
+    product.on("failedUpdateProduct",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("successfulProductUpdation");
+  product.on("successfulProductUpdation",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    
+   if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    product.emit("failedUpdateProduct",{"error":{"code":"EA001","message":"You have not authorized to update product"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to update product");
+    product.emit("failedUpdateProduct",{"error":{"code":"EA001","message":"You have not authorized to update product"}}); 
+  }else{
+    ///////////////////////////////////
+    product.updateProduct(orgid,prodle);
+    ////////////////////////////////// 
+  }
+    
+}
