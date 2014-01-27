@@ -17,99 +17,105 @@ var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var generateTimeId = require('time-uuid');
 
-var logger=require("./logger");
+ var logger=require("./logger");
 var fs = require('fs');
 
 var AWS = require('aws-sdk');
-var exec = require('child_process').exec;
+
 var generateId = require('time-uuid');
 var path=require("path");
-var OrgModel=require("../../org/js/org-model");
-var ProductModel=require("../../product/js/product-model");
+var userModel=require('../../user/js/user-model');
+var OrgModel=require('../../org/js/org-model');
+var ProductModel=require('../../product/js/product-model');
+var exec = require('child_process').exec;
 var CONFIG = require('config').Prodonus;
-var UserModel=require("../../user/js/user-model");
-// var smtpTransport = nodemailer.createTransport("SMTP", {
-//     host: "smtp.ipage.com", // hostname
-//     secureConnection: false, // use SSL
-//     port: 587, // port for secure SMTP
-//     auth: {
-//         user: "app@prodonus.com",
-//         pass: "App12345$"
-//     }
-// });
+// logger.emit("log","userModel"+userModel);
+// logger.emit("log","orgModel"+OrgModel);
 
-// var smtpTransport = nodemailer.createTransport("SES", {
-//     AWSAccessKeyID: "AKIAJ2BXGCZW2235YKYA",
-//     AWSSecretKey: "AsgYdCF/B5jGGyXezogxbrrbOZMgK4WAwuxJyj+tf8G/"
-// });
-// AWS.config.region = 'ap-southeast-1';
-// AWS.config.AWS_ACCESS_KEY_ID = "AKIAJOGXRBMWHVXPSC7Q";
-// AWS.config.AWS_SECRET_ACCESS_KEY = '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';
+// // logger.emit("log",Prouc)
+// // var userModel=require("../../user/js/user-model");
+// // var smtpTransport = nodemailer.createTransport("SMTP", {
+// //     host: "smtp.ipage.com", // hostname
+// //     secureConnection: false, // use SSL
+// //     port: 587, // port for secure SMTP
+// //     auth: {
+// //         user: "app@prodonus.com",
+// //         pass: "App12345$"
+// //     }
+// // });
+
+// // var smtpTransport = nodemailer.createTransport("SES", {
+// //     AWSAccessKeyID: "AKIAJ2BXGCZW2235YKYA",
+// //     AWSSecretKey: "AsgYdCF/B5jGGyXezogxbrrbOZMgK4WAwuxJyj+tf8G/"
+// // });
+// // AWS.config.region = 'ap-southeast-1';
+// // AWS.config.AWS_ACCESS_KEY_ID = "AKIAJOGXRBMWHVXPSC7Q";
+// // AWS.config.AWS_SECRET_ACCESS_KEY = '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';
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
 
-// exports.sendTestMail=function(req,res){
-//    var message = {
-//       from: "Sunil More  <sunil@giantleapsystems.com>", // sender address
-//       to: "sunilmore690@gmail.com, sunilmore6490@gmail.com", // list of receivers
-//       subject: "Hello ", // Subject line
-//       // text: "Hello world ", // plaintext body
-//       html: "<b>Hello world </b>" // html body
-//     }
-//     smtpTransport.sendMail(message, 
-//     function (error, success) {
-//       if (error){
-//         // not much point in attempting to send again, so we give up
-//         // will need to give the user a mechanism to resend verification
-//         logger.error("Unable to send via Prodonus: " + error.message);
-//         //callback("failure");
-//         res.send(error);
-//       }else{
-//         res.send(success);
-//       }
-//       //sending succussful then success
-//     });
-// }
-// exports.loadsequences=function(req,res){
-//   var sequencedata=[{
-//     name: "user",
-//     nextsequence:0
-//    },
-//    {
-//     name: "organization",
-//     nextsequence: 0
-//   }
-//    ];
+// // exports.sendTestMail=function(req,res){
+// //    var message = {
+// //       from: "Sunil More  <sunil@giantleapsystems.com>", // sender address
+// //       to: "sunilmore690@gmail.com, sunilmore6490@gmail.com", // list of receivers
+// //       subject: "Hello ", // Subject line
+// //       // text: "Hello world ", // plaintext body
+// //       html: "<b>Hello world </b>" // html body
+// //     }
+// //     smtpTransport.sendMail(message, 
+// //     function (error, success) {
+// //       if (error){
+// //         // not much point in attempting to send again, so we give up
+// //         // will need to give the user a mechanism to resend verification
+// //         logger.error("Unable to send via Prodonus: " + error.message);
+// //         //callback("failure");
+// //         res.send(error);
+// //       }else{
+// //         res.send(success);
+// //       }
+// //       //sending succussful then success
+// //     });
+// // }
+// // exports.loadsequences=function(req,res){
+// //   var sequencedata=[{
+// //     name: "user",
+// //     nextsequence:0
+// //    },
+// //    {
+// //     name: "organization",
+// //     nextsequence: 0
+// //   }
+// //    ];
 
-//       SequenceModel.find({},function(err,sequencedata){
-//         if(err){
-//             console.error(err);
-//         }else if(sequencedata.length==0){
-//            SequenceModel.create(sequencedata,function(err,docs){
-//             if(err){
-//               console.log("error in inserting defaulte sequneces");
-//             }
-//             else{
-//               console.log("default sequneces saved");
-//               console.log("sequencedata"+sequencedata);
-//               res.send({"success":"initia sequence data saved"});
-//               //res.send({"success"})
-//             }
-//           });
-//       var sequence=new SequenceModel({name:"user",nextsequence:0})
-//       sequence.save(function(err,docs){
+// //       SequenceModel.find({},function(err,sequencedata){
+// //         if(err){
+// //             console.error(err);
+// //         }else if(sequencedata.length==0){
+// //            SequenceModel.create(sequencedata,function(err,docs){
+// //             if(err){
+// //               console.log("error in inserting defaulte sequneces");
+// //             }
+// //             else{
+// //               console.log("default sequneces saved");
+// //               console.log("sequencedata"+sequencedata);
+// //               res.send({"success":"initia sequence data saved"});
+// //               //res.send({"success"})
+// //             }
+// //           });
+// //       var sequence=new SequenceModel({name:"user",nextsequence:0})
+// //       sequence.save(function(err,docs){
 
-//       })
+// //       })
 
-//         }else{
-//           console.log("sequencedata already exists");
-//           res.send({"error":"sequence data already exists"});
-//         }
-//       })
+// //         }else{
+// //           console.log("sequencedata already exists");
+// //           res.send({"error":"sequence data already exists"});
+// //         }
+// //       })
      
 
-// }
+// // }
 //get bcrypt string
 exports.getbcrypstring=function(data,callback){
   bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
@@ -127,9 +133,11 @@ exports.getbcrypstring=function(data,callback){
     }
   });
 }
-//send an email
+// //send an email
 exports.sendMail = function(message,smtpconfig,callback){
   var smtpTransport = nodemailer.createTransport("SMTP",smtpconfig);
+
+  message.html="<div width=500 height=100 style='background-color:black'><img src='http://prodonus.com/assets/images/prodonus.png'></img><h2><font color=white>Warranty And Social Network Platform for Product</font></h2></div><br>"+message.html;
   smtpTransport.sendMail(message, 
  	  function (error, success) {
       if(error){
@@ -145,26 +153,26 @@ exports.sendMail = function(message,smtpconfig,callback){
 };
 
 
-// exports.getNextSequnce=function(name,callback)
-// {
-//   console.log("calling to getNextSequnce method");
-//   SequenceModel.findAndModify(
-//             { name: name },
-//             [],
-//             {$inc: { nextsequence: 1 } },{new:true},function(err,sequencedata)
-//             {
-//               if(err)
-//               {
-//                 logger.error(err+"error in sequcne collection");
-//               }
-//               console.log("sequencedata"+sequencedata)
-//               callback(null,sequencedata.nextsequence)
+// // exports.getNextSequnce=function(name,callback)
+// // {
+// //   console.log("calling to getNextSequnce method");
+// //   SequenceModel.findAndModify(
+// //             { name: name },
+// //             [],
+// //             {$inc: { nextsequence: 1 } },{new:true},function(err,sequencedata)
+// //             {
+// //               if(err)
+// //               {
+// //                 logger.error(err+"error in sequcne collection");
+// //               }
+// //               console.log("sequencedata"+sequencedata)
+// //               callback(null,sequencedata.nextsequence)
 
-//             });
+// //             });
  
-//   // console.log("return sequence data"+ret);
+// //   // console.log("return sequence data"+ret);
   
-// }
+// // }
 exports.uploadFiles=function(io,__dirname){
   io.of('/api/prodoupload').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
@@ -192,7 +200,7 @@ exports.uploadFiles=function(io,__dirname){
         } 
       }else{
         var user=socket.handshake.user;
-        logger.emit("log",user);
+        logger.emit("log","socket session user"+user);
         uploadFile(file,__dirname,action,user,function(err,uploadresult){
           if(err){
             logger.emit("error",err.error.message,sessionuserid)
@@ -265,16 +273,17 @@ uploadFile=function(file,dirname,action,sessionuser,callback){
                            //ACL: 'public-read-write',
                            ContentType: file_type
                   };
+                  
                userFileUpload(action.user.userid,params,function(err,result){
-                fs.close(fd, function() {
-                   exec("rm -rf '"+fileName+"'");
-                    console.log('File user saved successful!');
-                 });
                 if(err){
                   callback(err);
                 }else{
                   callback(null,result);
                 }
+                fs.close(fd, function() {
+                  exec("rm -rf '"+fileName+"'");
+                    console.log('File saved successful!');
+                });
               })
             }
           }else if(action.org!=undefined){//organization upload
@@ -424,6 +433,26 @@ uploadFile=function(file,dirname,action,sessionuser,callback){
 })
 }
 
+// var userFileUpload=function(userid,awsparams,callback){
+//   s3bucket.putObject(awsparams, function(err, data) {
+//     if (err) {
+//       callback({"error":{"message":"s3bucket.putObject:-userFileUpload"+err}})
+//     } else {
+      
+        
+//           userModel.update({userid:userid},{$set:{profile_pic:"newprofileurl"}},function(err,profilepicupdatestatus){
+//             if(err){
+//               callback({"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
+//             }else if(profilepicupdatestatus==1){
+//               callback(null,{"success":{"message":"User Profile Pic Updated Successfully","image":newprofileurl}})
+//             }else{
+//               callback({"error":{"code":"AU003","message":"Provided userid is wrong"+userid}});
+//             }
+//           })
+      
+//     }
+//   }) 
+// }
 var userFileUpload=function(userid,awsparams,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
@@ -437,7 +466,7 @@ var userFileUpload=function(userid,awsparams,callback){
         }else{
           var newprofileurl=url;
         
-          UserModel.update({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
+          userModel.update({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
             }else if(profilepicupdatestatus==1){

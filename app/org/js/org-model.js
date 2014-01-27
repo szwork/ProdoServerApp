@@ -13,7 +13,7 @@
 
 var mongoose = require('../../common/js/db');
 var ObjectId = mongoose.Schema.ObjectId;
-var mongooseRedisCache = require("mongoose-redis-cache");
+// var mongooseRedisCache = require("mongoose-redis-cache");
 var shortId = require('shortid');
 var mongoShortId = require('mongoose-shortid');
 var UserGroupSchema = mongoose.Schema({     
@@ -92,9 +92,5 @@ OrganizationSchema.pre('save', function(next) {
    
 
 var Organization = mongoose.model('organization', OrganizationSchema);
- mongooseRedisCache(mongoose, {
-       host: "localhost",
-       port: "6379"
-      
-     })
+ 
 module.exports = Organization;

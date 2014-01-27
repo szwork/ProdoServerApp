@@ -341,9 +341,19 @@ var _validateSignin=function(self,userdata){
 
 User.prototype.signinSession=function(user){
 var self=this;
-///////////////////////////
-_isOTPUser(self,user);
-/////////////////////
+
+userModel.findOne({userid:user.userid},function(err,userdata){
+	if(err){
+		self.emit("failedUserSignin",{"error":{"code":"ED001","message":" Db error:signinSession"+err}});
+	}else if(!userdata){
+		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please enter password"}});
+	}else{
+	///////////////////////////
+	_isOTPUser(self,userdata);
+	/////////////////////
+	}
+})
+
 };
 var _isOrganizationUser=function(user,callback){
 	if(user.org!=undefined){
@@ -511,11 +521,14 @@ User.prototype.updateUser = function(userid) {
 	var userdata=this.user;
 	if(userdata==undefined){
 		self.emit("failedUserUpdation",{"error":{"code":"AV001","message":"Please provide userdata"}});	
+	}else if(userdata.subscription!=undefined || userdata.payment!=undefined){
+
 	}else{
 			/////////////////////////////////
 	_updateUser(self,userid,userdata);
 	////////////////////////////////
 	}
+
 	// /////////////////////////////////
 	// _updateUser(self,userid,userdata);
 	// ////////////////////////////////
