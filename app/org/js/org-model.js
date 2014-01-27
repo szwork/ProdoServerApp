@@ -62,6 +62,7 @@ var OrganizationSchema = mongoose.Schema({
     //type means org is also a consumer orgtypid of consumer & also of company
     name: { type:String ,require:true},
     description: { type:String },
+    org_logo:{type:String},
     prodo_setupdate: { type:Date,default:Date.now()}, /*the date the company was setup on prodonus*/
     prodo_closedate: { type:Date },/* the date the company was closed on Prodonus*/
     location:[LocationSchema],
