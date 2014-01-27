@@ -241,132 +241,13 @@ uploadFile=function(file,dirname,action,sessionuser,callback){
   var file_length=file.filelength;  
   var file_type=file.filetype;
 
-  if(action.user!=undefined){//user upload
-
-    __userFileBuffer(action,file,dirname,action,sessionuser,function(err,result){
-      if(err){
-        callback(err);
-      }else{
-        callback(null,result)
-      }
-    })
-    
-  }else if(action.org!=undefined){//organization upload
-    __orgFileBuffer(action,file,dirname,action,sessionuser,function(err,result){
-      if(err){
-         callback(err)
-      }else{
-        callback(null,result)
-      }
-    })
-    
-  }else if(action.product!=undefined){//product uploads
-    __productFileBuffer(action,file,dirname,action,sessionuser,function(err,result){
-      if(err){
-         callback(err)
-      }else{
-        callback(null,result)
-      }
-    })
-    
-  }else if(action.productlogo!=undefined){//product logo upload
-    __productLogoFileBuffer(action,file,dirname,action,sessionuser,function(err,result){
-      if(err){
-        callback(err)
-      }else{
-        callback(null,result)
-      }
-    })
-  }else if(action.orglogo!=undefined){//Organization logo upload
-  __orgLogoFileBuffer(action,file,dirname,action,sessionuser,function(err,result){
-      if(err){
-        callback(err)
-      }else{
-        callback(null,result)
-      }
-    })
-  }else {
-    logger.emit("error","File Upload doesn't understand which action to perform");
-  }
-}
-
-
-var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
-  var file_name=file.filename;
-  var file_buffer=file.filebuffer;
-  var file_length=file.filelength;  
-  var file_type=file.filetype;
-
-  var ext = path.extname(fileName||'').split('.');
-  ext=ext[ext.length - 1];
-  var fileName = dirname + '/tmp/uploads/' + file_name;
-  console.log("filename"+fileName);
-  easyimg.thumbnail({src:fileName, dst:fileName,width:150, height:400},function(err, image) {
-    if (err){
-      callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
-    }else{
-      fs.open(fileName, 'a', 0755, function(err, fd) {
-      if (err) {
-        callback({"error":{"message":"uploadFile fs.open:"+err}})
-      }else{
-       
-        // console.log("buffer size"+file_buffer.size);
-        // console.log("file extension"+ext);
-        fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
-          if(err){
-            callback({"error":{"message":"uploadFile fs.write:"+err}})
-          }else{
-            console.log(written+" bytes are written from buffer");
-            var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-             var bucketFolder;
-             var params;
-             // writebuffer= new Buffer(file_buffer, "base64");
-            
-              if(action.user.userid!=sessionuser.userid){
-                callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
-              }else{
-                bucketFolder="prodonus/user/"+action.user.userid;
-                params = {
-                     Bucket: bucketFolder,
-                     Key: action.user.userid+s3filekey,
-                     Body: writebuffer,
-                     //ACL: 'public-read-write',
-                     ContentType: file_type
-                };
-                userFileUpload(action.user.userid,params,function(err,result){
-                  if(err){
-                    callback(err);
-                  }else{
-                    callback(null,result);
-                  }
-                  fs.close(fd, function() {
-                    exec("rm -rf '"+fileName+"'");
-                      console.log('File saved successful!');
-                  });
-                })
-              }
-            }
-          
-        })
-      }
-    })
-  }
-})
-}
-var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
-  var file_name=file.filename;
-  var file_buffer=file.filebuffer;
-  var file_length=file.filelength;  
-  var file_type=file.filetype;
-
-  var ext = path.extname(fileName||'').split('.');
-  ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
   fs.open(fileName, 'a', 0755, function(err, fd) {
     if (err) {
       callback({"error":{"message":"uploadFile fs.open:"+err}})
     }else{
-      
+      var ext = path.extname(fileName||'').split('.');
+      ext=ext[ext.length - 1];
       // console.log("buffer size"+file_buffer.size);
       // console.log("file extension"+ext);
       fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
@@ -381,6 +262,32 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
           if(sessionuser.org.orgid==null){
             callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
           }else{
+            if(action.user!=undefined){//user upload
+              if(action.user.userid!=sessionuser.userid){
+                callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
+              }else{
+                bucketFolder="prodonus/user/"+action.user.userid;
+                params = {
+                           Bucket: bucketFolder,
+                           Key: action.user.userid+s3filekey,
+                           Body: writebuffer,
+                           //ACL: 'public-read-write',
+                           ContentType: file_type
+                  };
+                  
+               userFileUpload(action.user.userid,params,function(err,result){
+                if(err){
+                  callback(err);
+                }else{
+                  callback(null,result);
+                }
+                fs.close(fd, function() {
+                  exec("rm -rf '"+fileName+"'");
+                    console.log('File saved successful!');
+                });
+              })
+            }
+          }else if(action.org!=undefined){//organization upload
             if(action.org.userid!=sessionuser.userid){
               callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
             }else if(sessionuser.org.orgid!=action.org.orgid){
@@ -410,40 +317,8 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                 });
              })
             }
-          }
-        }
-      })
-    }
-  })
-}
-var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback){
-  var file_name=file.filename;
-  var file_buffer=file.filebuffer;
-  var file_length=file.filelength;  
-  var file_type=file.filetype;
+          }else if(action.product!=undefined){//product uploads
 
-  var ext = path.extname(fileName||'').split('.');
-  ext=ext[ext.length - 1];
-  var fileName = dirname + '/tmp/uploads/' + file_name;
-  fs.open(fileName, 'a', 0755, function(err, fd) {
-    if (err) {
-      callback({"error":{"message":"uploadFile fs.open:"+err}})
-    }else{
-     
-      // console.log("buffer size"+file_buffer.size);
-      // console.log("file extension"+ext);
-      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
-        if(err){
-          callback({"error":{"message":"uploadFile fs.write:"+err}})
-        }else{
-          console.log(written+" bytes are written from buffer");
-          var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-           var bucketFolder;
-           var params;
-           // writebuffer= new Buffer(file_buffer, "base64");
-          if(sessionuser.org.orgid==null){
-            callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
-          }else{
             if(action.product.userid!=sessionuser.userid){
               callback({"error":{"code":"EA001","message":"You are not an authorized to   add product images"}});   
             }else if(sessionuser.org.orgid!=action.product.orgid){
@@ -481,102 +356,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
                 }
               })
             }
-          }
-        }
-      })
-    }
-  })
-}
-var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback){
-  var file_name=file.filename;
-  var file_buffer=file.filebuffer;
-  var file_length=file.filelength;  
-  var file_type=file.filetype;
-
- var ext = path.extname(fileName||'').split('.');
-  ext=ext[ext.length - 1];
-  var fileName = dirname + '/tmp/uploads/' + file_name;
-  fs.open(fileName, 'a', 0755, function(err, fd) {
-    if (err) {
-      callback({"error":{"message":"uploadFile fs.open:"+err}})
-    }else{
-     
-      // console.log("buffer size"+file_buffer.size);
-      // console.log("file extension"+ext);
-      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
-        if(err){
-          callback({"error":{"message":"uploadFile fs.write:"+err}})
-        }else{
-          console.log(written+" bytes are written from buffer");
-          var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-           var bucketFolder;
-           var params;
-           // writebuffer= new Buffer(file_buffer, "base64");
-          if(sessionuser.org.orgid==null){
-            callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
-          }else{
-            if(action.orglogo.userid!=sessionuser.userid){
-              callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
-            }else if(sessionuser.org.orgid!=action.orglogo.orgid){
-              callback({"error":{"code":"EA001","message":"You are not an organization user to add Organization logo"}});
-            }else if(sessionuser.org.isAdmin==false){
-              callback({"error":{"code":"EA001","message":"You are not authorized to add product logo"}});
-            }else{
-              bucketFolder="prodonus/org/"+action.orglogo.orgid;
-              params = {
-                       Bucket: bucketFolder,
-                       Key: action.orglogo.orgid+s3filekey,
-                       Body: writebuffer,
-                       //ACL: 'public-read-write',
-                       ContentType: file_type
-              };
-              orgLogoUpload(action.orglogo.orgid,params,function(err,result){
-                if(err){
-                  callback(err);
-                }else{
-                 callback(null,result);
-                }
-                fs.close(fd, function() {
-                 exec("rm -rf '"+fileName+"'");
-                    console.log('File saved successful!');
-                });
-              })
-            }
-          }
-        }
-      })
-    }
-  })
-}
-var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback){
-  var file_name=file.filename;
-  var file_buffer=file.filebuffer;
-  var file_length=file.filelength;  
-  var file_type=file.filetype;
-
-  var ext = path.extname(fileName||'').split('.');
-  ext=ext[ext.length - 1];
-  var fileName = dirname + '/tmp/uploads/' + file_name;
-  fs.open(fileName, 'a', 0755, function(err, fd) {
-    if (err) {
-      callback({"error":{"message":"uploadFile fs.open:"+err}})
-    }else{
-      // var ext = path.extname(fileName||'').split('.');
-      // ext=ext[ext.length - 1];
-      // console.log("buffer size"+file_buffer.size);
-      // console.log("file extension"+ext);
-      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
-        if(err){
-          callback({"error":{"message":"uploadFile fs.write:"+err}})
-        }else{
-          console.log(written+" bytes are written from buffer");
-          var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-           var bucketFolder;
-           var params;
-           // writebuffer= new Buffer(file_buffer, "base64");
-          if(sessionuser.org.orgid==null){
-            callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
-          }else{
+          }else if(action.productlogo!=undefined){//product logo upload
             if(action.productlogo.userid!=sessionuser.userid){
               callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
             }else if(sessionuser.org.orgid!=action.productlogo.orgid){
@@ -616,14 +396,65 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
                 }
               })
             }
+          }else if(action.orglogo!=undefined){//Organization logo upload
+            if(action.orglogo.userid!=sessionuser.userid){
+              callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
+            }else if(sessionuser.org.orgid!=action.orglogo.orgid){
+              callback({"error":{"code":"EA001","message":"You are not an organization user to add Organization logo"}});
+            }else if(sessionuser.org.isAdmin==false){
+              callback({"error":{"code":"EA001","message":"You are not authorized to add product logo"}});
+            }else{
+              bucketFolder="prodonus/org/"+action.orglogo.orgid;
+              params = {
+                       Bucket: bucketFolder,
+                       Key: action.orglogo.orgid+s3filekey,
+                       Body: writebuffer,
+                       //ACL: 'public-read-write',
+                       ContentType: file_type
+              };
+              orgLogoUpload(action.orglogo.orgid,params,function(err,result){
+                if(err){
+                  callback(err);
+                }else{
+                 callback(null,result);
+                }
+                fs.close(fd, function() {
+                 exec("rm -rf '"+fileName+"'");
+                    console.log('File saved successful!');
+                });
+              })
+            }
+          }else {
+            logger.emit("error","File Upload doesn't understand which action to perform");
           }
         }
-      })
-    }
-  })
+      }
+    })
+  }
+})
 }
-var userFileUpload=function(userid,awsparams,callback){
 
+// var userFileUpload=function(userid,awsparams,callback){
+//   s3bucket.putObject(awsparams, function(err, data) {
+//     if (err) {
+//       callback({"error":{"message":"s3bucket.putObject:-userFileUpload"+err}})
+//     } else {
+      
+        
+//           userModel.update({userid:userid},{$set:{profile_pic:"newprofileurl"}},function(err,profilepicupdatestatus){
+//             if(err){
+//               callback({"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
+//             }else if(profilepicupdatestatus==1){
+//               callback(null,{"success":{"message":"User Profile Pic Updated Successfully","image":newprofileurl}})
+//             }else{
+//               callback({"error":{"code":"AU003","message":"Provided userid is wrong"+userid}});
+//             }
+//           })
+      
+//     }
+//   }) 
+// }
+var userFileUpload=function(userid,awsparams,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
       callback({"error":{"message":"s3bucket.putObject:-userFileUpload"+err}})

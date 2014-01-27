@@ -566,9 +566,7 @@ var _validateUpdateOrgAddressData=function(self,orgid,orgaddressid,orgaddress){
    
 	if(orgaddress==undefined){
 		self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please pass orgaddress data to add"}}); 
-	}else if(orgaddress.locationtype==undefined){
-		self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please pass locationtype"}}); 		
-	}else if(orgaddress.address==undefined){
+	 }else  if(orgaddress.address==undefined){
 		self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please provide address details"}}); 				
 	}else if(orgaddress.address.city==undefined){
 	 self.emit("failedUpdateAddress",{"error":{"code":"AV001","message":"Please provide orgaddress city"}}); 				
