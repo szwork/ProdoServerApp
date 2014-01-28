@@ -550,5 +550,24 @@ exports.userInvites=function(req,res){
     });
   });
   user.sendUserInvites(userinvitedata,sessionuserid);
-
 }
+//get profile details
+exports.getProfileInfo = function(req, res) {
+  var userid = req.params.userid;
+  // console.log("getProfileInfo..");
+  
+  var user = new User();
+  user.removeAllListeners("failedUserGetUserProfile");
+  user.on("failedUserGetUserProfile",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    //user.removeAllListeners();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulUserProfile");
+  user.on("successfulUserProfile",function(result){
+    logger.emit("info", result.success.message,req.user.userid);
+    //user.removeAllListeners();
+    res.send(result);
+  });
+  user.getProfileInfo(userid);
+};
