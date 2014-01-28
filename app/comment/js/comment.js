@@ -91,7 +91,7 @@ var _checkProdleIsValid=function(self,sessionuserid,prodle,commentdata,__dirname
 	})
 }
 var __checkCommentImageExists=function(self,prodle,commentdata,product,__dirname){
-	commentdata.commentid=generateId();
+	// commentdata.commentid=generateId();
 	commentdata.status="active";
 	commentdata.datecreated=new Date();
 	commentdata.prodle=prodle;
@@ -263,3 +263,35 @@ var _successfulCommentDeletion = function(self) {
 		logger.emit("log","_successfulCommentDeletion");
   	self.emit("successfulCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
 	}
+Comment.prototype.loadMoreComment = function(sessionuserid,commentid) {
+	var self=this;
+
+    ///////////////////////////////////////
+    _loadMoreComment(self,sessionuserid,commentid);
+};
+var _loadMoreComment=function(self,sessionuserid,commentid){
+	CommentModel.findOne({commentid:commentid,status:"active"},{prodle:1,commentid:1},function(err,comment){
+		if(err){
+			self.emit("failedLoadMoreComment",{"error":{"code":"ED001","message":"_loadMoreComment:Error in db to delete comment"}});
+		}else if(!comment){
+			self.emit("failedLoadMoreComment",{"error":{"code":"AC001","message":"Wrong commentid"}});
+		}else{
+			var query=CommentModel.find({prodle:comment.prodle,status:"active",commentid:{$lt:comment.commentid}},{_id:0,status:0}).sort({commentid:-1}).limit(10);
+			query.exec(function(err,nextcomments){
+				if(err){
+					self.emit("failedLoadMoreComment",{"error":{"code":"ED001","message":"_loadMoreComment: Error in db to delete comment"}});
+				}else if(nextcomments.length==0){
+					self.emit("failedLoadMoreComment",{"error":{"message":"There is no more next comment"}});
+				}else{
+					///////////////////////////////////
+					_successfullLoadMoreComments(self,nextcomments);
+					//////////////////////////////////
+				}
+			})
+		}
+	})
+}
+var _successfullLoadMoreComments=function(self,nextcomments){
+	logger.emit("log","_successfullLoadMoreComments");
+	self.emit("successfulLoadMoreComment", {"success":{"message":"Next comments","comment":nextcomments}});
+}

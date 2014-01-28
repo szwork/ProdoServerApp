@@ -399,7 +399,7 @@ var _isOrganizationUser=function(user,callback){
 }
 var getUserRequiredData=function(user,callback){
     
-	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword,subscription:user.subscription};
+	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword,subscription:user.subscription,profile_pic:user.profile_pic};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	console.log("log","user"+user);
