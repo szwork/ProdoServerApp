@@ -12,7 +12,8 @@
 */
 
 //require schema model
-var VerificationTokenModel=require('../../common/js/verification-token-model')
+var VerificationTokenModel=require('../../common/js/verification-token-model');
+var AWS = require('aws-sdk');
 var userModel = require('./user-model');
 var EmailTemplateModel=require('../../common/js/email-template-model');
 
@@ -25,6 +26,8 @@ var LocalStrategy = require('passport-local').Strategy;
 var S=require('string');
 var logger=require("../../common/js/logger");
 var CONFIG = require('config').Prodonus;
+var exec = require('child_process').exec;
+
 var User=require("./user");
 var orgModel=require("../../org/js/org-model");
 //default emiltemplate record saved
@@ -160,7 +163,7 @@ exports.signin = function(req, res) {
   user.on("passportauthenticate",function(userdata){
     var passportrequest={};
     passportrequest.body=userdata;
-    passport.authenticate('local', function(err, userdata, info) {
+    passport.authenticate('local', function(err, user_data, info) {
       if (err) { 
 
         user.emit("failedUserSignin",{"error":{"code":"AP002","message":"Error in passport to authenticate"}});
@@ -172,8 +175,10 @@ exports.signin = function(req, res) {
         //  if(userdata.orgid!=undefined){
         //      user_sessiondata.orgid=userdata.orgid;
         //  }
-        console.log("userdata"+userdata);
-        req.logIn(userdata,function(err){
+       
+        user_data.password=undefined;
+         console.log("session pass data"+user_data);
+        req.logIn(user_data,function(err){
           if(err){
             // req.sesion.userid=req.user.userid;
             logger.emit("log","passport sesion problem"+err);
@@ -181,7 +186,7 @@ exports.signin = function(req, res) {
           }else{
            // userid=userdata.userid;
             ///////////////////////////
-            user.signinSession(userdata);
+            user.signinSession(user_data);
             ///////////////////////////
           }
         });
@@ -195,7 +200,7 @@ exports.signin = function(req, res) {
 }
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
-    userModel.findOne({ email: email,status:"active"}, function(err, user) {
+    userModel.findOne({$or:[{email: email},{username:email}],status:"active"},{email:1,password:1,org:1,userid:1,username:1}, function(err, user) {
       if (err){ 
        return done(err); 
       }
@@ -529,6 +534,7 @@ exports.userInvites=function(req,res){
     var template=S(userinvite_template.description);
     template=template.replaceAll("<email>",user.email);
     template=template.replaceAll("<username>",user.username);
+     template=template.replaceAll("<name>",inivtedata.name);
     var message = {
         from: "Prodonus  <noreply@prodonus.com>", // sender address
         to: inivtedata.email, // list of receivers

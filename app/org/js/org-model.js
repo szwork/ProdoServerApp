@@ -13,7 +13,7 @@
 
 var mongoose = require('../../common/js/db');
 var ObjectId = mongoose.Schema.ObjectId;
-var mongooseRedisCache = require("mongoose-redis-cache");
+// var mongooseRedisCache = require("mongoose-redis-cache");
 var shortId = require('shortid');
 var mongoShortId = require('mongoose-shortid');
 var UserGroupSchema = mongoose.Schema({     
@@ -62,6 +62,7 @@ var OrganizationSchema = mongoose.Schema({
     //type means org is also a consumer orgtypid of consumer & also of company
     name: { type:String ,require:true},
     description: { type:String },
+    org_logo:{type:String},
     prodo_setupdate: { type:Date,default:Date.now()}, /*the date the company was setup on prodonus*/
     prodo_closedate: { type:Date },/* the date the company was closed on Prodonus*/
     location:[LocationSchema],
@@ -73,7 +74,7 @@ var OrganizationSchema = mongoose.Schema({
       planstartdate:{type:Date}, 
       planexpirydate:Date
     },
-    payment:{paymentid:{type:String,default:"payment"}},
+    payment:{paymentid:{type:String,default:null}},
     org_images:[{image:{type:String},imageid:{type:String}}], 
     orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
     terms:{type:Boolean}
@@ -91,9 +92,5 @@ OrganizationSchema.pre('save', function(next) {
    
 
 var Organization = mongoose.model('organization', OrganizationSchema);
- mongooseRedisCache(mongoose, {
-       host: "localhost",
-       port: "6379"
-      
-     })
+ 
 module.exports = Organization;

@@ -43,10 +43,10 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 		 if(productdata==undefined){
 		 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please provide data to add product"}});
 		 }else if(productdata.name==undefined){
-	   	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
-	   } else if(productdata.description==undefined){
-	    self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
-	   }else{
+	   		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
+	   	} else if(productdata.description==undefined){
+	    	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
+	  	 }else{
 
 	   	/////////////////////////////
 	   	_addProduct(self,productdata,orgid);
@@ -255,4 +255,41 @@ var _deleteProductImage=function(self,prodleimageids,prodle,orgid){
 var _successfulDeleteProductImage=function(self){
 	logger.emit("log","_successfulDeleteProductImage");
 	self.emit("successfulDeleteProductImage",{"success":{"message":"Delete Product Images Successfully"}});
+}
+Product.prototype.updateProduct = function(orgid,prodle) {
+	var self=this;
+	//////////////////
+	_validateUpdateProductData(self,orgid,prodle);
+	///////////////////
+};
+var _validateUpdateProductData=function(self,orgid,prodle){
+	var productdata=self.product;
+	if(productdata==undefined){
+		self.emit("failedUpdateProduct",{"error":{"code":"AV001","message":"Please pass update data"}});
+	}else if(productdata.prodle!=undefined){
+		self.emit("failedUpdateProduct",{"error":{"code":"EA001","message":"Can't update prodle"}});
+	}else if(productdata.product_comments!=undefined){
+		self.emit("failedUpdateProduct",{"error":{"code":"EA001","message":"Can't  update product comments"}});
+	}else{
+		_updateProduct(self,orgid,prodle,productdata)
+	}
+
+}
+var _updateProduct=function(self,orgid,prodle,productdata){
+	productModel.update({orgid:orgid,prodle:prodle},{$set:productdata}).lean().exec(function(err,productupdatestatus){
+		if(err){
+			self.emit("failedUpdateProduct",{"error":{"code":"ED001","message":"Error in db to update product"}});
+		}else if(productupdatestatus!=1){
+			self.emit("failedUpdateProduct",{"error":{"code":"AP001","message":"product id is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulUpdateProduct(self);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulUpdateProduct=function(self){
+	logger.emit("log","_successfulUpdateProduct");
+	self.emit("successfulProductUpdation", {"success":{"message":"Update Product Successfully"}});
 }
