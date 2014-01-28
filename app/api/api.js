@@ -15,6 +15,8 @@ var orgapi = require("../org/js/org-api");
 var userapi = require("../user/js/user-api");
 var productapi=require("../product/js/product-api");
 var productsearchapi = require("../productsearch/js/product-search-api");
+var allproductsapi = require("../productsearch/js/all-product-api");
+
 var emailtemplateapi = require("../common/js/email-template-api");
 var subscriptionapi=require("../subscription/js/subscription-api");
 var commonapi=require("../common/js/common-api");
@@ -24,6 +26,8 @@ exports.orgapi = orgapi;
 exports.userapi = userapi;
 exports.productapi = productapi;
 exports.productsearchapi = productsearchapi;
+exports.allproductsapi = allproductsapi;
+
 exports.commentapi=commentapi;
 //exports.commonapi=commonapi;
 exports.subscriptionapi=subscriptionapi;

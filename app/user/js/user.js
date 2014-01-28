@@ -1235,3 +1235,30 @@ var _successfullUserInvites=function (self) {
 	self.emit("successfulUserInvites",{"success":{"message":"User Inivite Send Successfully"}});
 }
 
+/************ GET PROFILE INFORMATION ******************/
+User.prototype.getProfileInfo = function(userid) {
+	var self=this;
+	console.log("UserID.. " + userid);
+	//////////////////
+	_getProfileInfo(self,userid);
+	///////////////////
+};
+var _getProfileInfo = function(self,userid){
+	userModel.findOne({"userid" : userid},{profile_pic:1,username:1,org:1,products_recommends:1,products_followed:1,_id:0}).lean().exec(function(err,user){
+		if(err){
+			self.emit("failedUserGetUserProfile",{"error":{"code":"ED001","message":"Error in db to find all users"}});
+		}else if(!user){
+			self.emit("failedUserGetUserProfile",{"error":{"code":"AU003","message":"No user exists"}});
+		}else{
+			////////////////////////////////
+			_successfulUserProfile(self,user);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulUserProfile = function(self,user){
+	logger.emit("log","_successfulUserProfile");
+	self.emit("successfulUserProfile", {"success":{"message":"Getting User Profile Successfully","user":user}});
+	console.log(user);
+}
