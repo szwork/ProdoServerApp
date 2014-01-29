@@ -572,7 +572,8 @@ exports.getProfileInfo = function(req, res) {
 
 //get my products followed
 exports.getMyProductsFollowed = function(req, res) {
-  var prodles = req.query.prodle;  
+  var prodles = req.query.prodles;  
+  logger.emit("log","test"+JSON.stringify(req.query));
   var user = new User();
   user.removeAllListeners("failedProductsFollowed");
   user.on("failedProductsFollowed",function(err){
@@ -589,7 +590,8 @@ exports.getMyProductsFollowed = function(req, res) {
 
 //get my recommended products followed
 exports.getMyRecommendProductsFollowed = function(req, res) {
-  var prodles = req.query.prodle;
+  var prodles = req.query.prodles;
+  logger.emit("log",req.query);
   var user = new User();
   user.removeAllListeners("failedRecommendProductsFollowed");
   user.on("failedRecommendProductsFollowed",function(err){

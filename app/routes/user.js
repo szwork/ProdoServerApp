@@ -54,7 +54,7 @@ exports.init = function (app) {
    app.post("/api/makepayment",auth,api.userapi.makePayment);
    app.get("/api/userunique/:username",api.userapi.checkUsernameExists);
    
-   app.post('/api/loademailtemplate',api.emailtemplateapi.loadEmailTemplate);
+   app.post('/api/loademailtemplate',auth,api.emailtemplateapi.loadEmailTemplate);
   // app.post('/api/loadsequence',api.commonapi.loadsequences);
    app.get('/api/profileinfo/:userid',auth,api.userapi.getProfileInfo);//get profile info
    app.get('/api/myproductsfollowed',auth,api.userapi.getMyProductsFollowed);//get my products followed

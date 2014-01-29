@@ -1421,10 +1421,22 @@ var _successfulUserProfile = function(self,user){
 }
 
 /************ GET MY PRODUCTS FOLLOWED ******************/
-User.prototype.getMyProductsFollowed = function(prodle) {
+User.prototype.getMyProductsFollowed = function(prodles) {
 	var self=this;
-	_getMyProductsFollowed(self,prodle);
+	/// /////////////////////////////
+    _validateMyProductsFollowed(self,prodles);
+	
+
 };
+var _validateMyProductsFollowed=function(self,prodles){
+	if(prodles==undefined){
+		self.emit("failedProductsFollowed",{"error":{"code":"AV001","message":"Please pass prodles"}});
+	}else{
+	/////////////////////////////////
+	_getMyProductsFollowed(self,prodles);
+	/////////////////////////////////////
+	}
+}
 var _getMyProductsFollowed = function(self,prodle){
 	var prodles=S(prodle);
     var prodles_array=[];
@@ -1452,8 +1464,20 @@ var _successfulProductsFollowed = function(self,products){
 /************ GET MY RECOMMENED PRODUCTS FOLLOWED ******************/
 User.prototype.getMyRecommendProductsFollowed = function(prodle) {
 	var self=this;
-	_getMyRecommendProductsFollowed(self,prodle);
+/// /////////////////////////////
+    _validateMyProductRecommended(self,prodle);
+	
+
 };
+var _validateMyProductRecommended=function(self,prodles){
+	if(prodles==undefined){
+		self.emit("failedProductsFollowed",{"error":{"code":"AV001","message":"Please pass prodles"}});
+	}else{
+	/////////////////////////////////
+	_getMyRecommendProductsFollowed(self,prodles);
+	/////////////////////////////////////
+	}
+}
 var _getMyRecommendProductsFollowed = function(self,prodle){
 	var prodles = S(prodle);
     var prodles_array=[];
