@@ -1248,7 +1248,7 @@ var _checkprodle=function(self,prodle,sessionuserid){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(checkprodlestatus){
-			_followunfollowproduct(self,product,sessionuserid);			
+			_followunfollowproduct(self,checkprodlestatus,sessionuserid);			
 		}else{
 			logger.emit("log","Incorrect prodle");
 			self.emit("failedFollowUnFollowProduct",{"error":{"message":"Incorrect prodle","prodle":prodle}});
