@@ -56,7 +56,7 @@ exports.loadMoreComment=function(req,res){
     logger.emit("error", err.error.message,req.user.userid);
     res.send(err);
   });
-
+    comment.removeAllListeners("successfulLoadMoreComment");
     comment.on("successfulLoadMoreComment",function(result){
       logger.emit("info", result.success.message);
       

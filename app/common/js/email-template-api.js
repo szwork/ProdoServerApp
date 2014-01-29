@@ -14,7 +14,7 @@ exports.loadEmailTemplate=function(req,res){
 	var emailtemplatedata=[ {
 			templatetype: "password",
 			subject: "Password reset request for Prodonus",
-			description: "Forgot your password, <username>Prodonus received a request for new password for your Prodonus account <email>.your one time password (OTP) : <otp>Please signin to www.prodonus.com using your one-time-passwordThe Prodonus Support TeamThis message was sent to <email>. If you don't want to receive these emails from Prodonus in the future, please <a href=''>unsubscribe</a>. For support help write to support@prodonus.com."
+			description: "Forgot your password, <username>Prodonus received a request for new password for your Prodonus account <email>.your one time password (OTP) : <password>Please signin to www.prodonus.com using your one-time-passwordThe Prodonus Support TeamThis message was sent to <email>. If you don't want to receive these emails from Prodonus in the future, please <a href=''>unsubscribe</a>. For support help write to support@prodonus.com."
 		},
 		{
 			templatetype: "verify",
@@ -58,17 +58,22 @@ exports.loadEmailTemplate=function(req,res){
 		}]
 
 
-      EmailTemplateModel.create(emailtemplatedata,function(err,docs){
-        if(err){
-          console.log("error in inserting default emailtemplate");
-        }
-        else{
-          console.log("default emailtemplate saved");
-          res.send({"success":"default emailtemplate saved"});
-          //res.send({"success"})
-        }
- 
-	  });
+     for(var i=0;i<emailtemplatedata.length;i++){
+		emailtemplatedata.update({templatetype:emailtemplatedata[i].templatetype},{$set:emailtemplatedata[i]},{upsert:true},function(err,langcodeupdatestatus){
+			if(err){
+				//res.send("error in db ")
+				// logger.error("error in db");
+			}else if(langcodeupdatestatus==1){
+				//res.send("Workcategory uploaed");
+				// logger.log("log","subscriptionarray loaded loaded");
+				console.log("emailtemplate :"+i);
+			}else{
+				//res.send("");
+				// logger.error("log","ssssssss");
+			}
+		})
+	};
+	res.send("default email template loads");
 }
 
 

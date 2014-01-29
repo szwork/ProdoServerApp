@@ -301,7 +301,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
   console.log("filename"+fileName);
-  easyimg.thumbnail({src:fileName, dst:fileName,width:150, height:400},function(err, image) {
+  easyimg.rescrop({src:fileName, dst:fileName,width:150,height:110,cropwidth:100, cropheight:128},function(err, image) {
     if (err){
       callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
     }else{

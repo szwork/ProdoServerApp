@@ -299,10 +299,12 @@ var _validateSubscriptionPlan=function(self,organizationdata,sessionuserid,subsc
 		logger.emit("log",orgdata);
 		if(orgdata==undefined){
 			self.emit("failedOrgUpdation",{"error":{"code":"AV001","message":"Please provide organizationdata"}});
+		}else if(orgdata.subscription!=undefined ||orgdata.payment!=undefined || orgdata.usergrp!=undefined || orgdata.orgid!=undefined ||orgdata.org_logo!=undefined ||orgdata.location!=undefined ){
+			self.emit("failedOrgUpdation",{"error":{"code":"ED002","message":"You can not change this information of organization"}});
 		}else{
-		////////////////////////////////////////
-		_updateOrganization(self,orgid,orgdata,sessionuserid);
-		///////////////////////////////////////
+			////////////////////////////////////////
+			_updateOrganization(self,orgid,orgdata,sessionuserid);
+			///////////////////////////////////////
 		}
 };
 

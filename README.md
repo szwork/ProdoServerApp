@@ -12,7 +12,7 @@ AU001-email already exists
 AU002-Password invalid
 AU003-No user exists
 AU004-Please give prodonus registered email id
-AU005
+AU005-WRONG USERID
 AU006-ERROR IN COMPARING PASSWORD
 AR001-recaptcha error
 //////////////
@@ -44,3 +44,7 @@ AS002-planid is wrong
 ///////discount code/////////////
 AD001-DISCOUNT CODE IS WRONG
 AD002-PLANID IS WRONG
+
+//////////////////////
+AC001-WRONG COMMENT
+AC002-No More comments
