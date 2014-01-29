@@ -1,6 +1,6 @@
 // Importing 
 var reds = require('../lib/reds'),
-	agent = require('superagent'),
+	// agent = require('superagent'),
 	search = reds.createSearch('products');
 
 var ProductModel = require("../../product/js/product-model");

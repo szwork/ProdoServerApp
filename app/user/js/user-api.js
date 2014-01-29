@@ -256,7 +256,7 @@ exports.updateUser = function(req, res) {
     
     
     
-    if(isAuthorizedUser(userid,sessionuserid)){
+    if(sessionuserid==userid){
       user.updateUser(userid);
     }else{
      user.emit("failedUserUpdation",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})

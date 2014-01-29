@@ -21,7 +21,7 @@ var logger = require("../../common/js/logger")
 
 var CommentSchema = mongoose.Schema({
   commentid:{type:String}, 
-  user:{userid:{type:String,ref:"User"},profile_pic_Urlpath:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
+  user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
   prodle:{type:String, ref:"Product"},
   status:{type:String,default:"active"}, 
   type:{type:String},

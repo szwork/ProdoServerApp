@@ -12,7 +12,7 @@ AU001-email already exists
 AU002-Password invalid
 AU003-No user exists
 AU004-Please give prodonus registered email id
-
+AU005
 AU006-ERROR IN COMPARING PASSWORD
 AR001-recaptcha error
 //////////////

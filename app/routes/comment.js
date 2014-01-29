@@ -9,4 +9,5 @@ exports.init = function (app) {
   // app.get("/api/product/:prodle",auth,api.productapi.getProduct);//get single product data
    //app.put("/api/product/:prodle",auth,api.productapi.updateProduct);//update the product data
   app.delete("/api/comment/:commentid",auth,api.commentapi.deleteComment);//delete product
+  app.get("/api/nextcomments/:commentid",auth,api.commentapi.loadMoreComment);
 }

@@ -47,6 +47,23 @@ exports.deleteComment = function(req, res) {
   comment.deleteComment(sessionuserid,commentid);
     
 }
+exports.loadMoreComment=function(req,res){
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var comment=new Comment();
+  comment.removeAllListeners("failedLoadMoreComment");
+  comment.on("failedLoadMoreComment",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+
+    comment.on("successfulLoadMoreComment",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+    });
+  comment.loadMoreComment(sessionuserid,commentid);
+}
 exports.comment=function(io,__dirname){ 
 io.of('/api/prodoapp').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;

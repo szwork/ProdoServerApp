@@ -399,7 +399,7 @@ var _isOrganizationUser=function(user,callback){
 }
 var getUserRequiredData=function(user,callback){
     
-	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword,subscription:user.subscription};
+	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword,subscription:user.subscription,profile_pic:user.profile_pic};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	console.log("log","user"+user);
@@ -521,19 +521,70 @@ User.prototype.updateUser = function(userid) {
 	var userdata=this.user;
 	if(userdata==undefined){
 		self.emit("failedUserUpdation",{"error":{"code":"AV001","message":"Please provide userdata"}});	
-	}else if(userdata.subscription!=undefined || userdata.payment!=undefined){
-
+	}else if( userdata.email!=undefined || userdata.isOtpPassword!=undefined || userdata.terms!=undefined ||userdata.products_followed!=undefined || userdata.products_recommends!=undefined || userdata.subscription!=undefined || userdata.payment!=undefined || userdata.org!=undefined ||userdata.verified!=undefined || userdata.status!=undefined){
+		self.emit("failedUserUpdation",{"error":{"code":"","message":"You can not update the given data"}});	
 	}else{
-			/////////////////////////////////
-	_updateUser(self,userid,userdata);
-	////////////////////////////////
+
+		_isUpdateUserContainsUsername(self,userid,userdata);
+	
 	}
 
-	// /////////////////////////////////
-	// _updateUser(self,userid,userdata);
-	// ////////////////////////////////
+	
 };
-
+var _isUpdateUserContainsUsername=function(self,userid,userdata){
+	if(userdata.username!=undefined){
+	 	if(userdata.password==undefined){
+	 		self.emit("failedUserUpdation",{"error":{"code":"AV001","message":"Please provide password to update username"}});	
+	 	}else{
+	 		/////////////////////////////////////
+	 		_updateUsername(self,userid,userdata);
+	 		/////////////////////////////////////
+	 	}
+	}else{
+		if(username.password!=undefined){
+			self.emit("failedUserUpdation",{"error":{"code":"EA001","message":"You can't change the password this way"}});	
+		}else{
+			///////////////////////////////////
+			_updateUser(self,userid,userdata);
+			////////////////////////////////
+		}
+	}
+}
+var _updateUsername=function(self,userid,userdata){
+	userModel.findOne({userid:userid},function(err,user){
+		if(err){
+			self.emit("failedUserUpdation",{"error":{"code":"ED001","message":"DB error:_updateUsername"+err}});	
+		}else if(!user){
+			self.emit("failedUserUpdation",{"error":{"code":"AU005","message":"Userid wrong"}});	
+		}else{
+			user.comparePassword(userdata.password, function(err, isMatch){
+	      if (err){
+	        self.emit("failedUserUpdation",{"error":{"message":"Database Issue"}});	
+	      } else if( !isMatch ) {
+	      	self.emit("failedUserUpdation",{"error":{"message":"Wrong password"}});	
+	      }else{
+	       	delete userdata.password;
+	       	///////////////////////////////
+	       	_checkUsernameIsExistForUpdate(self,userid,userdata);
+	       	/////////////////////////////////////////////////
+	      }
+	    });
+		}
+	})
+}
+var 	_checkUsernameIsExistForUpdate=function(self,userid,userdata){
+	userModel.findOne({username:userdata.username},{userid:1},function(err,user){
+		if(err){
+			self.emit("failedUserUpdation",{"error":{"code":"ED001","message":"DB error:_updateUsername"+err}});	
+		}else if(user){
+			self.emit("failedUserUpdation",{"error":{"message":"Username already exists to update"}});	
+		}else{
+			///////////////////////////////////
+			_updateUser(self,userid,userdata);
+			//////////////////////////////////
+		}
+	})
+}
 var _updateUser=function(self,userid,userdata){
 	userdata.updatedate=new Date();
 	logger.emit("log","_updateUser");
@@ -552,7 +603,7 @@ var _updateUser=function(self,userid,userdata){
 }
 var _successfulUserUpdation = function(self) {
 		//validate the user data
-		logger.emit("log","_successfulUserUpdation");
+		
 		logger.emit("log","successfulUserUpdation");
 		self.emit("successfulUserUpdation", {"success":{"message":"User Updated Successfully"}});
 	}
