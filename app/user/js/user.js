@@ -1401,9 +1401,7 @@ var _successfullUserInvites=function (self) {
 User.prototype.getProfileInfo = function(userid) {
 	var self=this;
 	console.log("UserID.. " + userid);
-	//////////////////
 	_getProfileInfo(self,userid);
-	///////////////////
 };
 var _getProfileInfo = function(self,userid){
 	userModel.findOne({"userid" : userid},{profile_pic:1,username:1,org:1,products_recommends:1,products_followed:1,_id:0}).lean().exec(function(err,user){
@@ -1412,15 +1410,70 @@ var _getProfileInfo = function(self,userid){
 		}else if(!user){
 			self.emit("failedUserGetUserProfile",{"error":{"code":"AU003","message":"No user exists"}});
 		}else{
-			////////////////////////////////
 			_successfulUserProfile(self,user);
-			//////////////////////////////////
 		}
 	})
 };
 
 var _successfulUserProfile = function(self,user){
 	logger.emit("log","_successfulUserProfile");
-	self.emit("successfulUserProfile", {"success":{"message":"Getting User Profile Successfully","user":user}});
-	console.log(user);
+	self.emit("successfulUserProfile", {"success":{"message":"Getting User Profile Successfully","user":user}});	
+}
+
+/************ GET MY PRODUCTS FOLLOWED ******************/
+User.prototype.getMyProductsFollowed = function(prodle) {
+	var self=this;
+	_getMyProductsFollowed(self,prodle);
+};
+var _getMyProductsFollowed = function(self,prodle){
+	var prodles=S(prodle);
+    var prodles_array=[];
+	if(prodles.contains(",")){
+		prodles_array=prodles.split(",");
+	}else{
+		prodles_array.push(prodles.s);
+	}
+	productModel.find({"prodle" :{$in:prodles_array}},{name:1,prodle:1,orgid:1,product_logo:1,_id:0}).lean().exec(function(err,products){
+		if(err){
+			self.emit("failedProductsFollowed",{"error":{"code":"ED001","message":"Error in db to find all users"}});
+		}else if(products.length==0){
+			self.emit("failedProductsFollowed",{"error":{"code":"AU003","message":"No products followed"}});
+		}else{
+			_successfulProductsFollowed(self,products);
+		}
+	})
+};
+
+var _successfulProductsFollowed = function(self,products){
+	logger.emit("log","_successfulProductsFollowed");
+	self.emit("successfulProductsFollowed", {"success":{"message":"Getting Followed Products Successfully","products":products}});	
+}
+
+/************ GET MY RECOMMENED PRODUCTS FOLLOWED ******************/
+User.prototype.getMyRecommendProductsFollowed = function(prodle) {
+	var self=this;
+	_getMyRecommendProductsFollowed(self,prodle);
+};
+var _getMyRecommendProductsFollowed = function(self,prodle){
+	var prodles = S(prodle);
+    var prodles_array=[];
+	if(prodles.contains(",")){
+		prodles_array=prodles.split(",");
+	}else{
+		prodles_array.push(prodles.s);
+	}
+	productModel.find({"prodle" :{$in:prodles_array}},{name:1,prodle:1,orgid:1,product_logo:1,_id:0}).lean().exec(function(err,products){
+		if(err){
+			self.emit("failedRecommendProductsFollowed",{"error":{"code":"ED001","message":"Error in db to find all users"}});
+		}else if(products.length==0){
+			self.emit("failedRecommendProductsFollowed",{"error":{"code":"AU003","message":"No recommended products exists"}});
+		}else{
+			_successfulRecommendProductsFollowed(self,products);
+		}
+	})
+};
+
+var _successfulRecommendProductsFollowed = function(self,products){
+	logger.emit("log","_successfulRecommendProductsFollowed");
+	self.emit("successfulRecommendProductsFollowed", {"success":{"message":"Getting Recommended Products Successfully","products":products}});	
 }

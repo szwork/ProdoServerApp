@@ -56,5 +56,7 @@ exports.init = function (app) {
    
    app.post('/api/loademailtemplate',api.emailtemplateapi.loadEmailTemplate);
   // app.post('/api/loadsequence',api.commonapi.loadsequences);
-   app.get('/api/profileinfo/:userid',auth,api.userapi.getProfileInfo);
+   app.get('/api/profileinfo/:userid',auth,api.userapi.getProfileInfo);//get profile info
+   app.get('/api/myproductsfollowed',auth,api.userapi.getMyProductsFollowed);//get my products followed
+   app.get('/api/myrecommendproducts',auth,api.userapi.getMyRecommendProductsFollowed);//get my recommend products followed
 }

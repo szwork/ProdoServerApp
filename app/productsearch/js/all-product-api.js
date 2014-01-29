@@ -5,9 +5,11 @@ var reds = require('../lib/reds'),
 
 var ProductModel = require("../../product/js/product-model");
 var logger=require("../../common/js/logger");
-var S=require("string");
+// var S=require("string");
 exports.allProduct = function(req,res){
-	
+	var productsearchdata = req.body.productsearchdata;
+	console.log(JSON.stringify(productsearchdata));
+
 	var query = {}
 	var start = new Date;
 	var strs = [];
@@ -17,24 +19,24 @@ exports.allProduct = function(req,res){
 		}else{
 			
 			for(var i=0;i<doc.length;i++){
-				strs.push(JSON.stringify(doc[i]));
+				strs.push(doc[i]);
 			}
 			
 			// Indexing
-			indexing(strs);
+			 indexing(strs);
 			
 			/* SEARCH */
-			// search.query(query = 'LG').end(function(err, ids){
-			//   if (err) throw err;
-			//   console.log("ids " + ids);
-			//   var result = ids.map(function(i){ return strs[i]; });
-			//   // console.log(result);
-			//   console.log('  Search results for "%s"', query);
-			//   result.forEach(function(str){
-			//     console.log('    - %s', str);
-			//     res.send(str);
-			//   });
-			// });
+			search.query(query = productsearchdata.name).end(function(err, ids){
+			  if (err) throw err;
+			  console.log("ids " + ids);
+			  var result = ids.map(function(i){ return strs[i]; });			  
+			  console.log('  Search results for "%s"', query);
+			  result.forEach(function(str){
+			    console.log('    - %s', str);
+			    // res.send(str);
+			  });
+			  res.send(result);
+			}, 'or');
 		}
 	});
 
@@ -48,13 +50,12 @@ exports.allProduct = function(req,res){
 				console.log('  \033[90m%s \033[36m%s\033[0m', msg, str);
 			}
 
-			log('fetching');
-			//agent.get(str, function(res){
+			log('fetching');			
+			// agent.get(str, function(res){
 				var words;
-
 				 // strip html tags
-				log('stripping tags');
-				words = striptags(res.text);
+				//log('stripping tags');
+				//words = striptags(res.text);
 
 				// index
 				log('indexing');
@@ -63,7 +64,8 @@ exports.allProduct = function(req,res){
 				    log('completed');
 				    --pending || done();
 				});
-			//});
+				search.remove(i);				
+			// });
 		});
 	}
 
@@ -76,5 +78,4 @@ exports.allProduct = function(req,res){
 	function striptags(html) {
 		return String(html).replace(/<\/?([^>]+)>/g, '');
 	}
-	module.exports.strs = strs;
 }
