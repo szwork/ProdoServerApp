@@ -560,14 +560,46 @@ exports.getProfileInfo = function(req, res) {
   user.removeAllListeners("failedUserGetUserProfile");
   user.on("failedUserGetUserProfile",function(err){
     logger.emit("error", err.error.message,req.user.userid);
-    //user.removeAllListeners();
     res.send(err);
   });
   user.removeAllListeners("successfulUserProfile");
   user.on("successfulUserProfile",function(result){
     logger.emit("info", result.success.message,req.user.userid);
-    //user.removeAllListeners();
     res.send(result);
   });
   user.getProfileInfo(userid);
+};
+
+//get my products followed
+exports.getMyProductsFollowed = function(req, res) {
+  var prodles = req.query.prodle;  
+  var user = new User();
+  user.removeAllListeners("failedProductsFollowed");
+  user.on("failedProductsFollowed",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  user.removeAllListeners("successfulProductsFollowed");
+  user.on("successfulProductsFollowed",function(result){
+    logger.emit("info", result.success.message,req.user.userid);
+    res.send(result);
+  });
+  user.getMyProductsFollowed(prodles);
+};
+
+//get my recommended products followed
+exports.getMyRecommendProductsFollowed = function(req, res) {
+  var prodles = req.query.prodle;
+  var user = new User();
+  user.removeAllListeners("failedRecommendProductsFollowed");
+  user.on("failedRecommendProductsFollowed",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  user.removeAllListeners("successfulRecommendProductsFollowed");
+  user.on("successfulRecommendProductsFollowed",function(result){
+    logger.emit("info", result.success.message,req.user.userid);
+    res.send(result);
+  });
+  user.getMyRecommendProductsFollowed(prodles);
 };
