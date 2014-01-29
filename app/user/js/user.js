@@ -1248,7 +1248,7 @@ var _checkprodle=function(self,prodle,sessionuserid){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(checkprodlestatus){
-			_followunfollowproduct(self,prodle,sessionuserid);			
+			_followunfollowproduct(self,product,sessionuserid);			
 		}else{
 			logger.emit("log","Incorrect prodle");
 			self.emit("failedFollowUnFollowProduct",{"error":{"message":"Incorrect prodle","prodle":prodle}});
@@ -1256,22 +1256,22 @@ var _checkprodle=function(self,prodle,sessionuserid){
 	})
 }
 
-var _followunfollowproduct=function(self,prodle,sessionuserid){
+var _followunfollowproduct=function(self,product,sessionuserid){
 
-	userModel.findOne({userid:sessionuserid,products_followed:prodle},function(err,userdata){
+	userModel.findOne({userid:sessionuserid,"products_followed.prodle":product.prodle},function(err,userdata){
 		if(err){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(!userdata){
-			_followproduct(self,prodle,sessionuserid);				
+			_followproduct(self,product,sessionuserid);				
 		}else{
-			_unfollowproduct(self,prodle,sessionuserid);
+			_unfollowproduct(self,product,sessionuserid);
 		}
 	})
 }
 
-var _followproduct=function(self,prodle,sessionuserid){
-	userModel.update({userid:sessionuserid},{$push:{products_followed:prodle}},function(err,followprodstatus){
+var _followproduct=function(self,product,sessionuserid){
+	userModel.update({userid:sessionuserid},{$push:{products_followed:{prodle:product.prodle,orgid:product.orgid}}},function(err,followprodstatus){
 			// userModel.push({"products_followed":prodle},function(err,followprodstatus){
 		if(err){
 			logger.emit("log","failed to connect to database");
@@ -1286,8 +1286,8 @@ var _followproduct=function(self,prodle,sessionuserid){
 		}
 	});
 }
-var _unfollowproduct=function(self,prodle,sessionuserid){
-	userModel.update({userid:sessionuserid},{$pull:{"products_followed":prodle}},function(err,unfollowprodstatus){
+var _unfollowproduct=function(self,product,sessionuserid){
+	userModel.update({userid:sessionuserid},{$pull:{"products_followed":{prodle:product.prodle,orgid:product.orgid}}},function(err,unfollowprodstatus){
 		if(err){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});

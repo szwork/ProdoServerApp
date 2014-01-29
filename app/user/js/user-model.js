@@ -53,8 +53,8 @@ var userSchema = mongoose.Schema({
   },
   payment:{paymentid:{type:String,ref:"payment",default:null}},
   payment_history:[{paymentid:{type:String,ref:"payment"}}],
-  products_followed: [{prodle:{type:String,ref:"product"}}], //list of prodle - product ids handles #12934xyz
-  products_recommends:[{prodle:{type:String,ref:"product"} , rating:{type:String} ,repeat_value:{type:String}}], //list of prodles
+  products_followed: [{prodle:{type:String,ref:"product"},orgid:{type:String,ref:"organizations"}}], //list of prodle - product ids handles #12934xyz
+  products_recommends:[{prodle:{type:String,ref:"product"} ,orgid:{type:String,ref:"organizations"}, rating:{type:String} ,repeat_value:{type:String}}], //list of prodles
   status:{type:String,default:"active"},
   terms:{type:Boolean},
   adddate:{ type:Date,default:Date.now },

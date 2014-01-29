@@ -99,7 +99,7 @@ exports.activateAccount = function(req, res) {
   //commonapi.removeListner(user);
     var redirect_data="<html><body><script>";
      redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
-     redirect_data+="</script>Please wsait page redirect to Prodonus </body></html>"
+     redirect_data+="</script>Please wait page redirect to Prodonus &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
    //  res.writeHead(200, {'Content-Length': redirect_data.length,'Content-Type': 'text/html' });
     // //user.removeAllListeners();
 
