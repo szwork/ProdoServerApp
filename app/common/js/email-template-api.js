@@ -59,7 +59,7 @@ exports.loadEmailTemplate=function(req,res){
 
 
      for(var i=0;i<emailtemplatedata.length;i++){
-		emailtemplatedata.update({templatetype:emailtemplatedata[i].templatetype},{$set:emailtemplatedata[i]},{upsert:true},function(err,langcodeupdatestatus){
+		EmailTemplateModel.update({templatetype:emailtemplatedata[i].templatetype},{$set:emailtemplatedata[i]},{upsert:true},function(err,langcodeupdatestatus){
 			if(err){
 				//res.send("error in db ")
 				// logger.error("error in db");

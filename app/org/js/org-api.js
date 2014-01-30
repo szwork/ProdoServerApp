@@ -512,12 +512,12 @@ exports.otherOrgInvites=function(req,res){
     res.send(result);
   });
   organization.removeAllListeners("sendotherorginvite");
-  organization.on("sendotherorginvite",function(otherorginvite_template,inivtedata,user,organization){
+  organization.on("sendotherorginvite",function(otherorginvite_template,inivtedata,user,organization_data){
     var subject=S(otherorginvite_template.subject);
     var template=S(otherorginvite_template.description);
     template=template.replaceAll("<email>",user.email);
     template=template.replaceAll("<fromusername>",user.username);
-    template=template.replaceAll("<orgname>",organization.name);
+    template=template.replaceAll("<orgname>",organization_data.name);
     template=template.replaceAll("<name>",inivtedata.name);
     var message = {
         from: "Prodonus  <business@prodonus.com>", // sender address

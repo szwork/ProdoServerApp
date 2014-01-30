@@ -14,6 +14,7 @@ var Organization = function(organizationdata) {
 	this.organization=organizationdata;
 };
 //this function is used to remvoe duplication element from json array
+var email_providerlist=["gmail","yahoo","live","hotmail","ymail","rediff"];
 function removeDuplicates(arrayIn) {
     var arrayOut = [];
     for (var a=0; a < arrayIn.length; a++) {
@@ -395,7 +396,7 @@ Organization.prototype.getOrganization = function(orgid) {
 };
 var _getOrganization=function(self,orgid){
 
-	orgModel.findOne({orgid:orgid,status:"active"},{location:0}).lean().exec(function(err,organization){
+	orgModel.findOne({orgid:orgid,status:"active"},{location:0,subscription:0,payment:0}).lean().exec(function(err,organization){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find organizationdata"}});
 		}else if(organization){
@@ -920,5 +921,86 @@ var _successfullOrgCustomerInvites=function (self) {
 	logger.emit("log","_successfullOrgCustomerInvites");
 	self.emit("successfulOrgCustomerInvites",{"success":{"message":"Organization customer invitation sent Successfully"}});
 }
+Organization.prototype.sendOtherOrgInvites=function(orgid,otherorginvites,sessionuserid){
+	var self=this;
+	/////////////////////
+	_validateOtherOrgInvites(self,orgid,otherorginvites,sessionuserid);
+}
+var _validateOtherOrgInvites=function(self,orgid,otherorginvites,sessionuserid){
+	if(otherorginvites==undefined){
+		self.emit("failedOtherOrgInvites",{"error":{"code":"AV001","message":"Please pass other org invites data"}});
+	}else if(otherorginvites.length==0){
+		self.emit("failedOtherOrgInvites",{"error":{"code":"AV001","message":"Please pass atleast one organization details to send invites"}});
+	}else{
+		///////////////////////////////////
+    _sendOtherOrganizationInvitation(self,orgid,otherorginvites,sessionuserid);
+		///////////////////////////////
+	}
+}
+var _sendOtherOrganizationInvitation=function(self,orgid,otherorginvites,sessionuserid){
+	orgModel.findOne({orgid:orgid},function(err,organization){
+				if(err){
+					self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
+				}else if(!organization){
+					self.emit("failedOtherOrgInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
+				}else{
+					userModel.findOne({userid:sessionuserid},function(err,user){
+						if(err){
+							self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"_sendOtherOrgInvitation DbError"+err}});
+						}else if(!user){
+							self.emit("failedOtherOrgInvites",{"error":{"code":"AU003","message":"Userid is Wrong"}});	
+						}else{
+							EmailTemplateModel.findOne({templatetype:"otherorginvite"},function(err,otherorginvite_emailtemplate){
+								if(err){
+									self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Email template"+err}});	
+								}else if(!otherorginvite_emailtemplate){
+									self.emit("failedOtherOrgInvites",{"error":{"message":"Email template"+err}});	
+								}else{
+									for(var i=0;i<otherorginvites.length;i++)
+									{
+										var host=S(otherorginvites[i].email).substring(otherorginvites[i].email.indexOf("@")+1,otherorginvites[i].email.indexOf(".",otherorginvites[i].email.indexOf("@")))
+										logger.emit("log",email_providerlist.indexOf(host.s));
+										if(otherorginvites[i].email!=undefined && email_providerlist.indexOf(host.s)<0){
+							  			self.emit("sendotherorginvite",otherorginvite_emailtemplate,otherorginvites[i],user,organization);
+							  		}
+									}
+									///////////////////////////////////////////////////////////////
+									_addOtherOrganizationInviteIntoBusinessOpportunity(self,otherorginvites,user);
+									////////////////////////////////////////////////////////////
+
+								}
+							})//end of email template
+						}
+					})//end of user find
+				}
+			})
+	}
+var _addOtherOrganizationInviteIntoBusinessOpportunity=function(self,otherorginvites,user){
+
+ var business_opportunity=[];
+
+	for(var i=0;i<otherorginvites.length;i++)
+	{
+		var host=S(otherorginvites[i].email).substring(otherorginvites[i].email.indexOf("@")+1,otherorginvites[i].email.indexOf(".",otherorginvites[i].email.indexOf("@")))
+		if(otherorginvites[i].email!=undefined && email_providerlist.indexOf(host.s)<0){
+			business_opportunity.push({invitetype:"business",from:user.email,to:otherorginvites[i].email,fromusertype:user.usertype,orgname:otherorginvites[i].orgname});
+		}
+	}
+ 	BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){
+	 	if(err){
+	 		self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Business Opportunity"+err}});	
+	 	}else{
+	 		/////////////////////////////////////////////////
+	 		_successfullOtherOrgInvites(self);
+	 		///////////////////////////////////////////////
+	 	}
+ 	})
+}
+var _successfullOtherOrgInvites=function (self) {
+	logger.emit("log","_successfullOtherOrgInvites");
+	self.emit("successfulOtherOrgInvites",{"success":{"message":"Other Organization invitation sent Successfully"}});
+}
+	
+
 	
 	

@@ -20,6 +20,7 @@ var businessOpportunitySchema = new mongoose.Schema({
   fromusertype:{type:String},
   tousertype:{type:String},
   contact:[{type:String}],
+  orgname:{type:String},
   location:{
   	address1:{type:String},
     address2:{type:String},
