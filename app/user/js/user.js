@@ -133,6 +133,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 	};
 	//find verify template and send verification token
 	var _sendVerificationEmail = function(self,token, user,host) {
+
 		logger.emit("log","host"+host);
 		//send verification email to activate the user account
 		console.log("addedUser3");
@@ -144,12 +145,13 @@ var _validateRegisterUser = function(self,userdata,host) {
 			}else if(emailtemplate){
 				console.log("addedUser6");
 				var url = "http://"+host+"/api/verify/"+token;
+				console.log("URL " + url);
 				var html=emailtemplate.description;
 	            html=S(html);
 	            html=html.replaceAll("<name>",user.fullname);
 	            html=html.replaceAll("<url>",url);
 	          	var message = {
-	                from: "Prodonus <sunil@giantleapsystems.com>", // sender address
+	                from: "Prodonus <noreply@prodonus.com>", // sender address
 	                to: user.email, // list of receivers
 	                subject:emailtemplate.subject, // Subject line
 	                html: html.s // html body
@@ -199,21 +201,21 @@ var _verifyToken = function(self,token) {
     } else if (userVerificationToken){
       userModel.findAndModify({ userid: userVerificationToken._userId},[],
                 {$set: {verified:true}},{new:false}, function(err,user){
-          if(err){
+        if(err){
     			self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in Db to find verification token"}});
-          }else if(!user){
+        }else if(!user){
           		self.emit("failedUserActivation",{"error":{"code":"AV001","message":"Error in verifying user"}});
-        	}else{
+        }else{
         		//here it will check user of type invitee user or not
         		if(userVerificationToken.tokentype=="signupuser"){
-        		///////////////////////////
-        	 _sendWelcomeEmail(self,user);	//user
-        	 ////////////////////////////	
+        			///////////////////////////
+        	 		_sendWelcomeEmail(self,user);	//user
+        	 		////////////////////////////	
         		}else{
-        		///////////////////////////
-        	 _sendWelcomeInviteEmail(self,user);	//invitee user 
-        	 ////////////////////////////
-        	}
+        			///////////////////////////
+        		 	_sendWelcomeInviteEmail(self,user);	//invitee user 
+        	 		////////////////////////////
+        		}
         }
       })
     }else{
@@ -1311,8 +1313,8 @@ User.prototype.checkUsernameExists=function(username){
 var _validateCheckUsernameExists=function(self,username){
 	if(username==undefined){
 		self.emit("failedCheckUsernameExists",{"error":{"code":"AV001","message":"please provide username"}});
-	}else if(username.trim().length<6 || username.length>15 ){
-		self.emit("failedCheckUsernameExists",{"error":{"code":"AV001","message":"username length should be greater than 6 and less than 15"}});
+	}else if(username.trim().length<3 || username.length>15 ){
+		self.emit("failedCheckUsernameExists",{"error":{"code":"AV001","message":"username length should be greater than 2 and less than 15"}});
 	}else{
 		username=username.trim();
 		///////////////////////////////////////////////////////
@@ -1325,7 +1327,7 @@ var _checkUsernameExist=function(self,username){
 		if(err){
 		 self.emit("failedCheckUsernameExists",{"error":{"code":"ED001","message":"function:_successfullValidateCheckUsernameExists\n "}});
 		}else if(usernamedata){
-			self.emit("failedCheckUsernameExists",{"error":{"message":" Username Already exists"}});
+			self.emit("failedCheckUsernameExists",{"error":{"code":"ED003","message":" Username Already exists"}});
 		}else{
 			self.emit("successfulCheckUsernameExists",{"success":{"message":" Username Available"}});
 		}

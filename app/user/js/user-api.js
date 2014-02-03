@@ -99,7 +99,7 @@ exports.activateAccount = function(req, res) {
   //commonapi.removeListner(user);
     var redirect_data="<html><body><script>";
      redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
-     redirect_data+="</script>Please wait page redirect to Prodonus &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
+     redirect_data+="</script>Please wait launching Prodonus &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
    //  res.writeHead(200, {'Content-Length': redirect_data.length,'Content-Type': 'text/html' });
     // //user.removeAllListeners();
 
@@ -201,19 +201,18 @@ exports.signin = function(req, res) {
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
     userModel.findOne({$or:[{email: email},{username:email}],status:"active"},{email:1,password:1,org:1,userid:1,username:1,verified:1}, function(err, user) {
-      if (err){ 
+      if (err){
        return done(err); 
       }
       if (!user) {//to check user is exist or not
         return done(null, false, {code:"AU001", message: 'User does not exists' }); 
       } else if(user.verified==false){
-        return done(null,false,{code:"AU003",message:"please verfiy or resend verfication email"});
+        return done(null,false,{code:"AU003",message:"Please verifiy or resend verification email"});
       }else{
       user.comparePassword(password, function(err, isMatch){
         if ( err ){
           return done(err);
-        } else if( isMatch ) {
-          
+        } else if( isMatch ) {          
           return done(null, user);
         }else{
           logger.emit("error","Invalid password",user.userid);
@@ -250,7 +249,7 @@ exports.updateUser = function(req, res) {
     user.removeAllListeners("successfulUserUpdation");
     user.on("successfulUserUpdation",function(result){
       logger.emit("info", result.success.message);
-      // //user.removeAllListeners();
+      // user.removeAllListeners();
       res.send(result);
     });
     
@@ -349,7 +348,7 @@ exports.forgotPassword = function(req, res) {
 }
 
 exports.recaptcha = function(req, res) {
-  var user=new User();
+  var user = new User();
   var recaptcha=req.body.recaptcha;
   var clientip = req.header('x-forwarded-for') || req.connection.remoteAddress;
   user.removeAllListeners("failedRecaptcha");
@@ -365,7 +364,6 @@ exports.recaptcha = function(req, res) {
     res.send(result);
   });
   user.reCaptcha(recaptcha,clientip);
-
 }
 
 exports.regenerateVerificationUrl = function(req, res) {
