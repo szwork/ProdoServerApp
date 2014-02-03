@@ -66,7 +66,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please provide userdata"}});
 	}else if(userdata.username==undefined){
 		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please provide username"}});
-	} else if(userdata.username.length<6 || userdata.username.length>15){
+	} else if(userdata.username.length<3 || userdata.username.length>15){
 		self.emit("failedUserRegistration",{"error":{"message":"Username should greater than 6 and less than 15 chars"}});
 	}else if(isValidEmail(userdata.email).error!=undefined){
 	    self.emit("failedUserRegistration",isValidEmail(userdata.email));

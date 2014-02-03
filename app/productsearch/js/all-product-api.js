@@ -10,10 +10,10 @@ exports.allProduct = function(req,res){
 	var productsearchdata = req.body.productsearchdata;
 	console.log(JSON.stringify(productsearchdata));
 
-	var query = {}
+	// var query = {}
 	var start = new Date;
 	var strs = [];
-	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
+	ProductModel.find({},{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 		if(err){
 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});
 		}else{
@@ -22,10 +22,10 @@ exports.allProduct = function(req,res){
 				strs.push(doc[i]);
 			}
 			
-			// Indexing
+			/* Indexing */
 			 indexing(strs);
 			
-			/* SEARCH */
+			/* Searching */
 			search.query(query = productsearchdata.name).end(function(err, ids){
 			  if (err) throw err;
 			  console.log("ids " + ids);
@@ -36,24 +36,23 @@ exports.allProduct = function(req,res){
 			    // res.send(str);
 			  });
 			  res.send(result);
-			}, 'or');
+			});
 		}
 	});
 
 
 	function indexing(strs){
-		var pending = strs.length;
-				
+		var pending = strs.length;	
 		strs.forEach(function(str, i){
 
 			function log(msg) {
 				console.log('  \033[90m%s \033[36m%s\033[0m', msg, str);
 			}
 
-			log('fetching');			
+			log('fetching');
 			// agent.get(str, function(res){
-				var words;
-				 // strip html tags
+				//var words;
+				// strip html tags
 				//log('stripping tags');
 				//words = striptags(res.text);
 
@@ -64,7 +63,7 @@ exports.allProduct = function(req,res){
 				    log('completed');
 				    --pending || done();
 				});
-				search.remove(i);				
+				// search.remove(i);				
 			// });
 		});
 	}
