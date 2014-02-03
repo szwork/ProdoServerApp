@@ -138,7 +138,7 @@ exports.getbcrypstring=function(data,callback){
 exports.sendMail = function(message,smtpconfig,callback){
   var smtpTransport = nodemailer.createTransport("SMTP",smtpconfig);
 
-  message.html="<div width=500 height=100 style='background-color:black'><img src='http://prodonus.com/assets/images/prodonus.png'></img><h2><font color=white>Warranty And Social Network Platform for Product</font></h2></div><br>"+message.html;
+  message.html="<div width=500 height=100 style='background-color:black'><img src='http://prodonus.com/assets/images/prodonus.png'></img><h2><font color=white>Social Network And Warranty Platform for Products</font></h2></div><br>"+message.html;
   smtpTransport.sendMail(message, 
  	  function (error, success) {
       if(error){
