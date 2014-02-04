@@ -7,8 +7,8 @@ var ProductModel = require("../../product/js/product-model");
 var logger=require("../../common/js/logger");
 // var S=require("string");
 exports.allProduct = function(req,res){
-	var productsearchdata = req.body.productsearchdata;
-	console.log(JSON.stringify(productsearchdata));
+	// var productsearchdata = req.body.productsearchdata;
+	// console.log(JSON.stringify(productsearchdata));
 
 	// var query = {}
 	var start = new Date;
@@ -23,21 +23,22 @@ exports.allProduct = function(req,res){
 			}
 			
 			/* Indexing */
-			 indexing(strs);
+			 // indexing(strs);
 			
 			/* Searching */
-			search.query(query = productsearchdata.name).end(function(err, ids){
-			  if (err) throw err;
-			  console.log("ids " + ids);
-			  var result = ids.map(function(i){ return strs[i]; });			  
-			  console.log('  Search results for "%s"', query);
-			  result.forEach(function(str){
-			    console.log('    - %s', str);
-			    // res.send(str);
-			  });
-			  res.send(result);
-			});
+			// search.query(query = productsearchdata.name).end(function(err, ids){
+			//   if (err) throw err;
+			//   console.log("ids " + ids);
+			//   var result = ids.map(function(i){ return strs[i]; });			  
+			//   console.log('  Search results for "%s"', query);
+			//   result.forEach(function(str){
+			//     console.log('    - %s', str);
+			//     // res.send(str);
+			//   });
+			  // res.send(result);
+			// });
 		}
+		res.send(strs);
 	});
 
 

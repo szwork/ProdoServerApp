@@ -55,15 +55,15 @@ var _searchProduct = function(self,productsearchdata){
 		// }else if(doc.length==0){
 		// 	self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Product does not exist with given name"}});
 		}else{
-			var productName = [];
-			for(var i=0;i<doc.length;i++){
-				productName.push(doc[i].name);
-			}
-	  		_successfulProductSearch(self,productName);
+			// var productName = [];
+			// for(var i=0;i<doc.length;i++){
+			// 	productName.push(doc[i].name);
+			// }
+	  		_successfulProductSearch(self,doc);
 	  	}
 	})
 }
-var _successfulProductSearch = function(self,productName){
+var _successfulProductSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
-	self.emit("successfulProductSearch", {"success":{"message":"Product details","doc":productName}});
+	self.emit("successfulProductSearch", {"success":{"message":"Product details","doc":doc}});
 }
