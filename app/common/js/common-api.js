@@ -301,10 +301,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
   console.log("filename"+fileName);
-  easyimg.rescrop({src:fileName, dst:fileName,width:150,height:110,cropwidth:100, cropheight:128},function(err, image) {
-    if (err){
-      callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
-    }else{
+ 
       fs.open(fileName, 'a', 0755, function(err, fd) {
       if (err) {
         callback({"error":{"message":"uploadFile fs.open:"+err}})
@@ -316,43 +313,46 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
           if(err){
             callback({"error":{"message":"uploadFile fs.write:"+err}})
           }else{
-            console.log(written+" bytes are written from buffer");
-            var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-             var bucketFolder;
-             var params;
-             // writebuffer= new Buffer(file_buffer, "base64");
-            
-              if(action.user.userid!=sessionuser.userid){
-                callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
+             easyimg.rescrop({src:fileName, dst:fileName,width:100,height:128,cropwidth:100, cropheight:128},function(err, image) {
+              if (err){
+                callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
               }else{
-                bucketFolder="prodonus/user/"+action.user.userid;
-                params = {
-                     Bucket: bucketFolder,
-                     Key: action.user.userid+s3filekey,
-                     Body: writebuffer,
-                     //ACL: 'public-read-write',
-                     ContentType: file_type
-                };
-                userFileUpload(action.user.userid,params,function(err,result){
-                  if(err){
-                    callback(err);
+                console.log(written+" bytes are written from buffer");
+                var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                 var bucketFolder;
+                 var params;
+                 // writebuffer= new Buffer(file_buffer, "base64");
+                
+                  if(action.user.userid!=sessionuser.userid){
+                    callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
                   }else{
-                    callback(null,result);
+                    bucketFolder="prodonus/user/"+action.user.userid;
+                    params = {
+                         Bucket: bucketFolder,
+                         Key: action.user.userid+s3filekey,
+                         Body: writebuffer,
+                         //ACL: 'public-read-write',
+                         ContentType: file_type
+                    };
+                    userFileUpload(action.user.userid,params,function(err,result){
+                      if(err){
+                        callback(err);
+                      }else{
+                        callback(null,result);
+                      }
+                      fs.close(fd, function() {
+                        exec("rm -rf '"+fileName+"'");
+                          console.log('File saved successful!');
+                      });
+                    })
                   }
-                  fs.close(fd, function() {
-                    exec("rm -rf '"+fileName+"'");
-                      console.log('File saved successful!');
-                  });
-                })
-              }
+                }
+              })
             }
-          
-        })
-      }
-    })
-  }
-})
-}
+          })
+        }
+      })
+    }
 var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   var file_name=file.filename;
   var file_buffer=file.filebuffer;
