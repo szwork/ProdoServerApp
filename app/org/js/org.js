@@ -396,7 +396,7 @@ Organization.prototype.getOrganization = function(orgid) {
 };
 var _getOrganization=function(self,orgid){
 
-	orgModel.findOne({orgid:orgid,status:"active"},{location:0,subscription:0,payment:0}).lean().exec(function(err,organization){
+	orgModel.findOne({orgid:orgid,status:"active"},{location:0,subscription:0,payment:0,usergrp:0}).lean().exec(function(err,organization){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find organizationdata"}});
 		}else if(organization){
@@ -1000,7 +1000,13 @@ var _successfullOtherOrgInvites=function (self) {
 	logger.emit("log","_successfullOtherOrgInvites");
 	self.emit("successfulOtherOrgInvites",{"success":{"message":"Other Organization invitation sent Successfully"}});
 }
-	
-
+Organization.prototype.getMyGroupMembers=function(orgid){
+	var self=this;
+	/////////////////////
+	_getMyGroupMembers(self,orgid);
+}	
+var _getMyGroupMembers=function(self,orgid){
+	// orgModel.findOne({orgid:orgid},{})
+}
 	
 	

@@ -597,3 +597,30 @@ exports.OrgCustomerInvites=function(req,res){
     ////////////////////////////////////////////////////////////////////// 
   }
 }
+exports.getMyGroupMembers=function(req,res){
+
+  var orgid=req.params.orgid;
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedGetMyGroupMembers");
+  organization.on("failedGetMyGroupMembers",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulGetMyGroupMembers");
+  organization.on("successfulGetMyGroupMembers",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedGetMyGroupMembers",{"error":{"code":"EA001","message":"You have not authorized to get Group Members"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to see group member details");
+    organization.emit("failedGetMyGroupMembers",{"error":{"code":"EA001","message":"You have not authorized to get Group Members"}}); 
+  }else{
+    /////////////////////////////////
+    organization.getMyGroupMembers(orgid);
+    //////////////////////////////// 
+  }
+}
