@@ -203,7 +203,7 @@ var _addComment=function(self,prodle,commentdata,product){
   		// product_commentdata.status=undefined;
     	// 	product_commentdata.prodle=undefined;
 		// ///////////////////////////////////
-		_addFeatureAnalytics(self,prodle,commentdata,product);
+		// _addFeatureAnalytics(self,prodle,commentdata,product);
 		_successfulAddComment(self,product_commentdata);
 		/////////////////////////////////
 				
@@ -213,7 +213,7 @@ var _addComment=function(self,prodle,commentdata,product){
 var _addFeatureAnalytics = function(self,prodle,commentdata,product){
 	FeatureAnalyticsModel.findOne({featureid:commentdata.analytics.featureid},function(err,analyticsdata){
 		if(err){
-			// logger.emit("failedAddComment",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
 		}else if(!analyticsdata){
 			// calling to add new analytics with prodle and featureid
 			_addNewFeatureAnalytics(self,prodle,commentdata,product);
@@ -228,30 +228,30 @@ var _addNewFeatureAnalytics = function(self,prodle,commentdata,product){
 	commentdata.analytics.count = 1;
 	analytics_data.save(function(err,analyticsdata){
 		if(err){
-			// logger.emit("failedAddComment",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
+			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Error in db to save FeatureAnalytics"}});
 		}else{      
-			///////////////////////////////////
-			_successfulAddComment(self,analyticsdata);
-			/////////////////////////////////				
+			logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics added sucessfully","analytics_data":analyticsdata}})
 		}
 	})
 }
 
 var _updateFeatureAnalytics = function(self,prodle,commentdata,product){
 	//cheacking tagid and tagname exist
-	String query = {$and:[{analytics.tagid:commentdata.analytics.tagid},{analytics.tagname:commentdata.analytics.tagname}]};
+	var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
 	FeatureAnalyticsModel.findOne(query,function(err,analyticsdata){
 		if(err){
-			// logger.emit("failedAddComment",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
-		}else if(!analyticsdata){			
+			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find tag id and tag name err message: "+err}})
+		}else if(!analyticsdata){
 		}else{
 			//increment count
-			FeatureAnalyticsModel.update(query,{$inc:{analytics.count:1}},function(err,analyticsdata){
+			FeatureAnalyticsModel.update(query,{$inc:{"analytics.count":1}},function(err,analyticsupdatedata){
 				if(err){
-					// logger.emit("failedAddComment",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
-				}else if(!analyticsdata){
+					logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to update count err message: "+err}})
+				}else if(!analyticsupdatedata){
+					logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Feature analytics not updated"}})
 				}else{
-					_successfulAddComment(self,analyticsdata);
+					logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics updated sucessfully","analytics_data":analyticsdata}})
+					// _successfulAddComment(self,analyticsdata);
 				}
 			})
 		}

@@ -27,7 +27,7 @@ var featureAnalyticsSchema = mongoose.Schema({
 //   product.prodle=shortId.generate();  
 //    console.log("product pre"+product);
 //   next();
-})
+// })
 //Seed a feature analytics
  featureAnalyticsSchema.set('redisCache', true);
  featureAnalyticsSchema.set('expires', 90);
