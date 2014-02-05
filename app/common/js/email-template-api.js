@@ -14,7 +14,7 @@ exports.loadEmailTemplate=function(req,res){
 	var emailtemplatedata=[ {
 			templatetype: "password",
 			subject: "Password reset request for Prodonus",
-			description: "Forgot your password, <username>Prodonus received a request for new password for your Prodonus account <email>.your one time password (OTP) : <password>Please signin to www.prodonus.com using your one-time-passwordThe Prodonus Support TeamThis message was sent to <email>. If you don't want to receive these emails from Prodonus in the future, please <a href=''>unsubscribe</a>. For support help write to support@prodonus.com."
+			description: "Forgot your password, <username>Prodonus received a request for reset password for your Prodonus account <email>.To Reset Your Password , please copy and paste this address into your web browser's address bar:<br><br><url><br><br>The Prodonus Support TeamThis message was sent to <email>. If you don't want to receive these emails from Prodonus in the future, please <a href=''>unsubscribe</a>. For support help write to support@prodonus.com."
 		},
 		{
 			templatetype: "verify",

@@ -69,7 +69,7 @@ exports.activateAccount = function(req, res) {
   logger.emit("log","calling to activate Account");
   var user = new User();
   var html=S("<html><body><h1><font color=blue><a href='http://"+req.get("host")+"'>Prodonus</a></font></h1><br><message></body></html>");
-   user.removeAllListeners("failedUserActivation");
+  user.removeAllListeners("failedUserActivation");
   user.on("failedUserActivation",function(err){
     console.log("failedUserActivation" + err)
     logger.emit("error", err.error.message);
@@ -252,9 +252,6 @@ exports.updateUser = function(req, res) {
       // user.removeAllListeners();
       res.send(result);
     });
-    
-    
-    
     if(sessionuserid==userid){
       user.updateUser(userid);
     }else{
@@ -343,7 +340,7 @@ exports.forgotPassword = function(req, res) {
     //user.removeAllListeners();
     res.send(result);
   });
-  user.sendPasswordSetting();
+  user.sendPasswordSetting(req.get('host'));
 
 }
 
@@ -603,3 +600,61 @@ exports.getMyRecommendProductsFollowed = function(req, res) {
   });
   user.getMyRecommendProductsFollowed(prodles);
 };
+exports.passwordUrlAction=function(req,res){
+  var token = req.params.token;
+  logger.emit("log","req body"+JSON.stringify(req.params.token));
+  var user = new User();
+  var html=S("<html><body><h1><font color=blue><a href='http://"+req.get("host")+"'>Prodonus</a></font></h1><br><message></body></html>");
+  user.removeAllListeners("failedPasswordUrlAction");
+  user.on("failedPasswordUrlAction",function(err){
+    
+    logger.emit("error", err.error.message);
+    html=html.replaceAll("<message>",err.error.message).s;
+   // user.removeListener('failedUserActivation', function (stream) {
+   //   logger.emit("log","failedUserActivation event removed");
+   // });
+   // //user.removeAllListeners();
+    res.send(html);
+  });
+  user.removeAllListeners("successfulPasswordUrlAction");
+  user.on("successfulPasswordUrlAction",function(result){
+    logger.emit("info", result.success.message,req.user.userid);
+    res.send(result);
+  });
+  user.removeAllListeners("tokenresetpassword");
+  user.on("tokenresetpassword",function(user){
+    req.logIn(user,function(err){
+      if(err){
+        html=html.replaceAll("<message>","Server Issue");
+        res.send(html.s);
+      }else{
+        var redirect_data="<html><body><script>";
+        redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/#/resetpassword')},3000);";
+        redirect_data+="</script>Please wait launching Prodonus &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
+        res.send(redirect_data);
+      }
+    })     
+  });
+  user.removeAllListeners("passwordtokenredirect");
+  user.on("passwordtokenredirect",function(redirecturl){
+    logger.emit("log","calling to tokenredirect"+redirecturl);
+ 
+  // commonapi.removeListner(user,function(result){
+  //     logger.log("log","All user listner removed");
+  //   })
+  //commonapi.removeListner(user);
+      var redirect_data="<html><body><script>";
+       redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
+       redirect_data+="</script>Please wait launching Prodonus &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
+     //  res.writeHead(200, {'Content-Length': redirect_data.length,'Content-Type': 'text/html' });
+      // //user.removeAllListeners();
+      res.send(redirect_data);
+
+   // user.removeListner("tokenredirect",function(stream){
+   //   console.log("lsitner removed");
+   // })
+
+  
+  });
+  user.passwordUrlAction(token);
+}

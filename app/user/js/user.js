@@ -19,6 +19,7 @@ var PaymentModel=require("../../subscription/js/payment-model");
 var SubscriptionModel=require("../../subscription/js/subscription-model");
 var productModel=require("../../product/js/product-model");
 var Product=require("../../product/js/product");
+var ForgotPasswordTokenModel=require("../../common/js/password-token-model");
 var BusinessOpportunityModel=require("../../businessopportunity/js/business-opportunity-model");
 var smtpTransport = nodemailer.createTransport("SMTP", {
     host: "smtp.ipage.com", // hostname
@@ -67,7 +68,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 	}else if(userdata.username==undefined){
 		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please provide username"}});
 	} else if(userdata.username.length<3 || userdata.username.length>15){
-		self.emit("failedUserRegistration",{"error":{"message":"Username should greater than 6 and less than 15 chars"}});
+		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Username should greater than 6 and less than 15 chars"}});
 	}else if(isValidEmail(userdata.email).error!=undefined){
 	    self.emit("failedUserRegistration",isValidEmail(userdata.email));
 	 }else if(userdata.password==undefined){
@@ -686,14 +687,14 @@ var _successfulUserGetAll=function(self,user){
 	self.emit("successfulUserGetAll", {"success":{"message":"Getting User details Successfully","user":user}});
 }
 
-User.prototype.sendPasswordSetting = function() {
+User.prototype.sendPasswordSetting = function(host) {
 	var self=this;
 	////////////////////////////////////////
-	_validateSendPasswordSetting(self);
+	_validateSendPasswordSetting(self,host);
 	/////////////////////////////////////
 };
 
-var _validateSendPasswordSetting=function(self){
+var _validateSendPasswordSetting=function(self,host){
 	logger.emit("log","_validateSendPasswordSetting");
 	var user=self.user;
 	if(user==undefined){
@@ -707,18 +708,18 @@ var _validateSendPasswordSetting=function(self){
  	}else{
  		logger.emit("log","_isProdonusRegisteredEmailId");
  		////////////////////////////////////////
- 		_isProdonusRegisteredEmailId(self,user.email);
+ 		_isProdonusRegisteredEmailId(self,user.email,host);
  		/////////////////////////////////////////
  	}  		
 };
-var _isProdonusRegisteredEmailId=function(self,email){
+var _isProdonusRegisteredEmailId=function(self,email,host){
 	logger.emit("log","_isProdonusRegisteredEmailId");
 	userModel.findOne({email:email},{userid:1,email:1,firstname:1,lastname:1,fullname:1}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find users"}});
 		}else if(user){
 			////////////////////////////////////
-			_createOTPPasswordSetting(self,user);
+			_createPasswordTokenSetting(self,user,host);
 			///////////////////////////////////
 		}else{
 			self.emit("failedSendPasswordSetting",{"error":{"code":"AU004","message":"Please give prodonus registered email id"}});
@@ -726,37 +727,29 @@ var _isProdonusRegisteredEmailId=function(self,email){
 		}
 	})
 };
-var _createOTPPasswordSetting=function(self,user){
+var _createPasswordTokenSetting=function(self,user,host){
 	logger.emit("log","_createOTPPasswordSetting");
-	var otp = Math.floor(Math.random()*100000000);
+	var verificationToken = new ForgotPasswordTokenModel({_userId: user.userid});
+    verificationToken.createforgotPasswordToken(function (err, token) {
+      if (err){
+      	self.emit("failedSendPasswordSetting",{"error":{"message":"Problem In Server To Forgot Password Token"+err}});
+      }else if(token){
+      	/////////////////////////////////
+      	_sendPasswordSetting(self,token,user,host);
+      	////////////////////////////////
+      }
+    })
+} 
 
-	commonapi.getbcrypstring(otp,function(err,hashpassword){
-		if(err){
-			self.emit("failedSendPasswordSetting",{"error":{"code":"AB001","message":"Error in get bcrypt passsword"}});
-		}else{
-			userModel.update({userid:user.userid},{$set:{password:hashpassword,isOtpPassword:true}},function(err,status){
-				if(err){
-					self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
-				}else if(status!=1){
-					self.emit("failedSendPasswordSetting",{"error":{"code":"AU005","message":"User does't exists"}});
-				}else{
-					////////////////////////////////
-					_sendPasswordSetting(self,user,otp);
-					////////////////////////////////
-				}
-			})
-		}
-	})
-};
-
-var _sendPasswordSetting=function(self,user,otp){
-logger.emit("log","_sendPasswordSetting");
+var _sendPasswordSetting=function(self,token,user,host){
+	logger.emit("log","_sendPasswordSetting");
   EmailTemplateModel.findOne({"templatetype":"password"}).lean().exec(function(err,emailtemplate){
   	if(err){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find password emailtemplate"}});
   	}else if(emailtemplate){
   			var description=S(emailtemplate.description);
-  			description=description.replaceAll("<password>",otp);
+  			var url = "http://"+host+"/api/resetpassword/"+token;
+  			description=description.replaceAll("<url>",url);
   			description=description.replaceAll("<fullname>",user.fullname);
   			var message = {
                 from: "Prodonus  <noreply@prodonus.com>", // sender address
@@ -1502,4 +1495,36 @@ var _getMyRecommendProductsFollowed = function(self,prodle){
 var _successfulRecommendProductsFollowed = function(self,products){
 	logger.emit("log","_successfulRecommendProductsFollowed");
 	self.emit("successfulRecommendProductsFollowed", {"success":{"message":"Getting Recommended Products Successfully","products":products}});	
+}
+User.prototype.passwordUrlAction = function(token) {
+	var self=this;
+		/// /////////////////////////////
+    _passwordUrlAction(self,token);
+    /////////////////////////////////
+};
+var _passwordUrlAction=function(self,token){
+	ForgotPasswordTokenModel.findAndModify({token: token,status:"active"},[],
+                {$set: {status:"deactive"}},{new:false} ,function (err, forgotpasswordtoken){
+    if (err){
+    	self.emit("failedPasswordUrlAction",{"error":{"code":"ED001","message":"Server Issue Please try after sometimes"}})
+    }else if(!forgotpasswordtoken){
+    	self.emit("passwordtokenredirect","#/message/passwordtokenexpired");
+    }else{
+    	userModel.findOne({userid:forgotpasswordtoken._userId}, function (err, user) {
+        if (err){
+        	self.emit("failedPasswordUrlAction",{"error":{"code":"ED001","message":"Database Server Issue"}});
+        }else if(!user){
+        	self.emit("failedPasswordUrlAction",{"error":{"message":"Wrong Userid"}})
+        }else{
+        	/////////////////////////////////////////
+        	_successfullPasswordUrlAction(self,user);
+        	////////////////////////////////////////
+        	
+        }
+      })
+    }
+  })
+}
+var _successfullPasswordUrlAction=function(self,user){
+	self.emit("tokenresetpassword",user);
 }

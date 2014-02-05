@@ -1006,7 +1006,15 @@ Organization.prototype.getMyGroupMembers=function(orgid){
 	_getMyGroupMembers(self,orgid);
 }	
 var _getMyGroupMembers=function(self,orgid){
-	// orgModel.findOne({orgid:orgid},{})
+	 orgModel.findOne({orgid:orgid},{usergrp:1},function(err,organization){
+	 	if(err){
+	 		self.emit("failedGetMyGroupMembers",{"error":{"code":"ED001","message":"Business _getMyGroupMembers"+err}});	
+	 	}else if(!organization){
+	 		self.emit("failedGetMyGroupMembers",{"error":{"code":"AO002","message":"wrong orgid"}});	
+	 	}else{
+	 		
+	 	}
+	 })
 }
 	
 	
