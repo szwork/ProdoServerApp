@@ -195,22 +195,21 @@ var _addComment=function(self,prodle,commentdata,product){
 			self.emit("failedAddComment",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
 		}else{
       
-      if(product_commentdata.type=="product"){
-      	updateLatestProductComment(product_commentdata.prodle);
-      }else{
-      	//updateLatestWarrantyComment(product_commentdata.prodle);
-      }
+      	if(product_commentdata.type=="product"){
+      		updateLatestProductComment(product_commentdata.prodle);
+      	}else{
+      		//updateLatestWarrantyComment(product_commentdata.prodle);
+      	}
   		// product_commentdata.status=undefined;
     	// 	product_commentdata.prodle=undefined;
 		// ///////////////////////////////////
 		// _addFeatureAnalytics(self,prodle,commentdata,product);
 		_successfulAddComment(self,product_commentdata);
-		/////////////////////////////////
-				
+		/////////////////////////////////				
 		}
 	})
 }
-var _addFeatureAnalytics = function(self,prodle,commentdata,product){
+var _addFeatureAnalytics = function(prodle,commentdata,product){
 	FeatureAnalyticsModel.findOne({featureid:commentdata.analytics.featureid},function(err,analyticsdata){
 		if(err){
 			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
@@ -223,7 +222,7 @@ var _addFeatureAnalytics = function(self,prodle,commentdata,product){
 		}
 	})
 }
-var _addNewFeatureAnalytics = function(self,prodle,commentdata,product){
+var _addNewFeatureAnalytics = function(prodle,commentdata,product){
 	var analytics_data = new FeatureAnalyticsModel(commentdata.analytics);
 	commentdata.analytics.count = 1;
 	analytics_data.save(function(err,analyticsdata){
@@ -235,13 +234,14 @@ var _addNewFeatureAnalytics = function(self,prodle,commentdata,product){
 	})
 }
 
-var _updateFeatureAnalytics = function(self,prodle,commentdata,product){
-	//cheacking tagid and tagname exist
+var _updateFeatureAnalytics = function(prodle,commentdata,product){
+	//checking tagid and tagname exist
 	var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
 	FeatureAnalyticsModel.findOne(query,function(err,analyticsdata){
 		if(err){
 			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find tag id and tag name err message: "+err}})
 		}else if(!analyticsdata){
+			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Tag id and tag name does not exist"}})
 		}else{
 			//increment count
 			FeatureAnalyticsModel.update(query,{$inc:{"analytics.count":1}},function(err,analyticsupdatedata){
@@ -256,8 +256,6 @@ var _updateFeatureAnalytics = function(self,prodle,commentdata,product){
 			})
 		}
 	})
-
-	
 }
 
 var _successfulAddComment=function(self,newcomment){
