@@ -236,7 +236,7 @@ var _sendWelcomeInviteEmail = function (self,user) {
 					if(err){
 						self.emit("failedUserActivation",{"error":{"code":"AB001","message":"Error in get bcrypt passsword"}});
 					}else{
-						userModel.update({userid:user.userid},{$set:{password:hashpassword,isOtpPassword:true}},function(err,status){
+						userModel.update({userid:user.userid},{$set:{password:hashpassword}},function(err,status){
 							if(err){
 								self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
 							}else if(status!=1){
@@ -402,7 +402,7 @@ var _isOrganizationUser=function(user,callback){
 }
 var getUserRequiredData=function(user,callback){
     
-	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,isOtpPassword:user.isOtpPassword,subscription:user.subscription,profile_pic:user.profile_pic};
+	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	console.log("log","user"+user);
@@ -444,14 +444,14 @@ var getUserRequiredData=function(user,callback){
 var _isOTPUser=function(self,user){
 	logger.emit("log","_isOTPUser user"+user);
 	getUserRequiredData(user,function(userdata){
-			if(userdata.isOtpPassword==true){
-				self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
-			}else{
+			// if(userdata.isOtpPassword==true){
+			// 	self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
+			// }else{
 
 		/////////////////////////
 		_isSubscribed(self,userdata);
 		/////////////////////////
-	}	
+		
 	
 		})
 	
