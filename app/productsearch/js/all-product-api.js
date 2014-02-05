@@ -9,18 +9,24 @@ var logger=require("../../common/js/logger");
 exports.allProduct = function(req,res){
 	// var productsearchdata = req.body.productsearchdata;
 	// console.log(JSON.stringify(productsearchdata));
-
+	var self=this;
 	// var query = {}
 	var start = new Date;
-	var strs = [];
+	// var strs = [];
 	ProductModel.find({},{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 		if(err){
-			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});
+			res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
+		}else if(doc.length==0){
+			res.send({"error":{"code":"ED001","message":"No product exists"}});
 		}else{
+			////////////////////////////////			
+			_successfulGetAllProduct(self,doc);
+			//////////////////////////////////
+		}
 			
-			for(var i=0;i<doc.length;i++){
-				strs.push(doc[i]);
-			}
+			// for(var i=0;i<doc.length;i++){
+			// 	strs.push(doc[i]);
+			// }
 			
 			/* Indexing */
 			 // indexing(strs);
@@ -37,9 +43,13 @@ exports.allProduct = function(req,res){
 			//   });
 			  // res.send(result);
 			// });
-		}
-		res.send(strs);
+		
 	});
+	
+	var _successfulGetAllProduct = function(self,doc){
+		logger.emit("log","_successfulGetAllProduct");
+		res.send({"success":{"message":"Getting Product details Successfully","doc":doc}});
+	}
 
 
 	function indexing(strs){
