@@ -912,15 +912,19 @@ var _validateResetPassword=function(self,userid){
 	var userdata=self.user;
 	if(userdata==undefined){
 		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please Provide Userdata"}});
-	}else if(userdata.currentpassword==undefined){
+	}else if(userdata.confirmnewpassword==undefined){
 		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please send currentpassword"}});
-	}else if(userdata.currentpassword.trim().length<0){
+	}else if(userdata.confirmnewpassword.trim().length<3 ){
 		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"please enter currentpassword"}});
 	}else if(userdata.newpassword==undefined){
 		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please send newpassword"}});
-	}else if(userdata.newpassword.trim().length<0){
-		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"please enter newpassword"}});
+	}else if(userdata.newpassword.trim().length<5){
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"password shoud be atleast 5 charecters"}});
+	}else if(userdata.confirmnewpassword!=userdata.newpassword){
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Confirm Pasword Shoud be same as new password"}});
 	}else{
+
+
 		/////////////////////////////
 		_resetPassword(self,userid,userdata);
 		////////////////////////////
@@ -928,36 +932,29 @@ var _validateResetPassword=function(self,userid){
 
 }
 var _resetPassword=function(self,userid,userdata){
-	var currentpassword=userdata.currentpassword;
+	
 	var newpassword=userdata.newpassword;
 	logger.emit("log","_resetPassword");
 	userModel.findOne({userid:userid},{userid:1,password:1},function(err,user){
 		if(err){
 			self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(user){
-			user.comparePassword(currentpassword, function(err, isMatch){
-      			if ( err ){
-          			self.emit("failedUserResetPassword",{"error":{"code":"AU006","message":"Error in comparing password"}});
-        		 } else if( !isMatch ) {
-          			self.emit("failedUserResetPassword",{"error":{"code":"AU002","message":"Your current password is wrong"}});
-    			}else{
-          			user.password=newpassword;
-          			user.isOtpPassword=false;
-          			user.save(function(err,user_data){
-          				if(err){
-          					self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to change the password"}});
-          				}else{
-          					/////////////////////////////
-						   _successfulUserResetPassword(self);
-							/////////////////////////////
-          				}
-          			})
-       		   }
-      		});
-		}else{
+			user.password=newpassword;
+      // user.isOtpPassword=false;
+      user.save(function(err,user_data){
+        if(err){
+          self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to change the password"}});
+        }else{
+          /////////////////////////////
+					_successfulUserResetPassword(self);
+				  /////////////////////////////
+        }
+      })
+    }else{
 			self.emit("failedUserResetPassword",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 		}
-	})
+ 	});
+	
 }
 var _successfulUserResetPassword = function(self) {
 		//validate the user data

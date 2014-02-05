@@ -386,6 +386,7 @@ exports.resetPassword=function(req,res){
 
   var userdata=req.body.user;
   var user=new User(userdata);
+  logger.emit("log","req body"+JSON.stringify(req.body));
   var userid=req.params.userid;
   var sessionuserid=req.user.userid;
    user.removeAllListeners("failedUserResetPassword");
