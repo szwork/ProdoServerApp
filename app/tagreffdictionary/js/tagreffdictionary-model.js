@@ -5,9 +5,9 @@
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
 * Change History:
 * ----------------------------------------------------------------------
-* date | author | description 
+* date | author | description
 * ----------------------------------------------------------------------
-* 04-02-2014 | xyx | Add a new property 
+* 04-02-2014 | xyx | Add a new property
 */
 
 var mongoose = require('../../common/js/db');
@@ -27,7 +27,7 @@ TagReffDictionary.pre('save', function(next) {
   console.log("calling to tags save pre");  
   var tag = this;
   logger.emit("log","tagdata in pre "+tag);
-  tag.tagid="t"+shortId.generate();
+  tag.tagid = "t"+shortId.generate();
   logger.emit("log","shortid : "+tag.tagid);
   next();
 });
@@ -36,7 +36,7 @@ TagReffDictionary.set('redisCache', true);
 TagReffDictionary.set('expires', 90);
 //Seed a tagreffdictionary
 TagReffDictionary.statics.findAndModify = function (query, sort, doc, options, callback) {
-    return this.collection.findAndModify(query, sort, doc, options, callback);
+  return this.collection.findAndModify(query, sort, doc, options, callback);
 };
 var ProductTags = mongoose.model('tagreffdictionary', TagReffDictionary);
 

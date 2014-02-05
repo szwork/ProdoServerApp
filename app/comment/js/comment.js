@@ -2,6 +2,7 @@
 
 var CommentModel=require("./comment-model");
 var ProductModel=require("../../product/js/product-model");
+var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
 var events = require("events");
 var shortId = require('shortid');
 var logger=require("../../common/js/logger");
@@ -60,6 +61,10 @@ var _validateCommentData=function(self,sessionuserid,prodle,__dirname) {
 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
 	}else if(commentdata.type==undefined){
 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
+	}else if(commentdata.analytics==undefined){
+		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass analytics"}});			
+	}else if(commentdata.analytics.featureid==undefined){
+		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass featureid in analytics"}});			
 	}else{
 		///////////////////////////////////////////////////////
 		_isSessionUserToComment(self,sessionuserid,prodle,commentdata,__dirname);
@@ -196,15 +201,64 @@ var _addComment=function(self,prodle,commentdata,product){
       	//updateLatestWarrantyComment(product_commentdata.prodle);
       }
   		// product_commentdata.status=undefined;
-    // 	product_commentdata.prodle=undefined;
+    	// 	product_commentdata.prodle=undefined;
 		// ///////////////////////////////////
+		_addFeatureAnalytics(self,prodle,commentdata,product);
 		_successfulAddComment(self,product_commentdata);
 		/////////////////////////////////
 				
 		}
 	})
 }
+var _addFeatureAnalytics = function(self,prodle,commentdata,product){
+	FeatureAnalyticsModel.findOne({featureid:commentdata.analytics.featureid},function(err,analyticsdata){
+		if(err){
+			// logger.emit("failedAddComment",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+		}else if(!analyticsdata){
+			// calling to add new analytics with prodle and featureid
+			_addNewFeatureAnalytics(self,prodle,commentdata,product);
+		}else{
+			// calling to update analytics
+			_updateFeatureAnalytics(self,prodle,commentdata,product);
+		}
+	})
+}
+var _addNewFeatureAnalytics = function(self,prodle,commentdata,product){
+	var analytics_data = new FeatureAnalyticsModel(commentdata.analytics);
+	commentdata.analytics.count = 1;
+	analytics_data.save(function(err,analyticsdata){
+		if(err){
+			// logger.emit("failedAddComment",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
+		}else{      
+			///////////////////////////////////
+			_successfulAddComment(self,analyticsdata);
+			/////////////////////////////////				
+		}
+	})
+}
+
+var _updateFeatureAnalytics = function(self,prodle,commentdata,product){
+	//cheacking tagid and tagname exist
+	String query = {$and:[{analytics.tagid:commentdata.analytics.tagid},{analytics.tagname:commentdata.analytics.tagname}]};
+	FeatureAnalyticsModel.findOne(query,function(err,analyticsdata){
+		if(err){
+			// logger.emit("failedAddComment",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+		}else if(!analyticsdata){			
+		}else{
+			//increment count
+			FeatureAnalyticsModel.update(query,{$inc:{analytics.count:1}},function(err,analyticsdata){
+				if(err){
+					// logger.emit("failedAddComment",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+				}else if(!analyticsdata){
+				}else{
+					_successfulAddComment(self,analyticsdata);
+				}
+			})
+		}
+	})
+
 	
+}
 
 var _successfulAddComment=function(self,newcomment){
 	logger.emit("log","successfulAddComment");

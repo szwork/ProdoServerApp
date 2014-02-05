@@ -26,7 +26,9 @@ var pricingHistorySchema = mongoose.Schema({
 
 });
 var productFeatureSchema = mongoose.Schema({
-
+  featureid:{type:String},
+  featurename:{type:String},
+  description:{type:String}
 });
 
 var commentSchema = mongoose.Schema({

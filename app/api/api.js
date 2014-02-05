@@ -22,6 +22,7 @@ var commonapi=require("../common/js/common-api");
 var commentapi=require("../comment/js/comment-api");
 var discountapi=require("../discount/js/discount-api");
 var tagreffdictionary = require("../tagreffdictionary/js/tagreffdictionary-api");
+var featureanalytics = require("../featureanalytics/js/feature-analytics-api");
 
 exports.orgapi = orgapi;
 exports.userapi = userapi;
@@ -34,3 +35,4 @@ exports.emailtemplateapi=emailtemplateapi;
 exports.commonapi=commonapi;
 exports.discountapi=discountapi;
 exports.tagreffdictionary=tagreffdictionary;
+exports.featureanalytics = featureanalytics;

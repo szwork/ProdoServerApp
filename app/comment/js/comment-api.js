@@ -64,7 +64,7 @@ exports.loadMoreComment=function(req,res){
     });
   comment.loadMoreComment(sessionuserid,commentid);
 }
-exports.comment=function(io,__dirname){ 
+exports.comment=function(io,__dirname){
 io.of('/api/prodoapp').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
     socket.on('addComment', function(prodle,commentdata) {

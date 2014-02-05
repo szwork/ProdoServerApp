@@ -3,10 +3,8 @@ var logger = require("../../common/js/logger");
 
 
 exports.addTag = function(req, res) {
-	console.log("TagReff");
 	var sessionuserid = req.user.userid;
 	var tagReffDicData = req.body.tagreffdicdata;
-	// console.log("tagreffdicdata " + tagReffDicData.tagname);
 	var tagreffdictionary = new TagReffDictionary();
 
 	tagreffdictionary.removeAllListeners("failedAddTagReffDictionary");
@@ -23,7 +21,6 @@ exports.addTag = function(req, res) {
 }
 
 exports.getAllTag = function(req, res) {
-	console.log("getAllTag");
 	var sessionuserid = req.user.userid;	
 	var tagreffdictionary = new TagReffDictionary();
 
