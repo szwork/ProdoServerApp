@@ -63,8 +63,8 @@ var _validateCommentData=function(self,sessionuserid,prodle,__dirname) {
 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
 	}else if(commentdata.analytics==undefined){
 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass analytics"}});			
-	}else if(commentdata.analytics.featureid==undefined){
-		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass featureid in analytics"}});			
+	// }else if(commentdata.analytics.featureid==undefined){
+	// 	self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass featureid in analytics"}});			
 	}else{
 		///////////////////////////////////////////////////////
 		_isSessionUserToComment(self,sessionuserid,prodle,commentdata,__dirname);
@@ -202,14 +202,15 @@ var _addComment=function(self,prodle,commentdata,product){
       	}
   		// product_commentdata.status=undefined;
     	// 	product_commentdata.prodle=undefined;
-		// ///////////////////////////////////
-		_addFeatureAnalytics(self,prodle,commentdata,product);
+		// ///////////////////////////////////		
 		_successfulAddComment(self,product_commentdata);
+		_addFeatureAnalytics(self,prodle,commentdata,product);
 		/////////////////////////////////
 		}
 	})
 }
 var _addFeatureAnalytics = function(prodle,commentdata,product){
+	console.log("_addFeatureAnalytics");
 	FeatureAnalyticsModel.findOne({featureid:commentdata.analytics.featureid}).lean().exec(function(err,analyticsdata){
 		if(err){
 			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
@@ -223,6 +224,7 @@ var _addFeatureAnalytics = function(prodle,commentdata,product){
 	});
 }
 var _addNewFeatureAnalytics = function(prodle,commentdata,product){
+	console.log("_addNewFeatureAnalytics");
 	commentdata.analytics.count = 1;
 	var analytics_data = new FeatureAnalyticsModel(commentdata.analytics);	
 	analytics_data.save(function(err,analyticsdata){
@@ -235,6 +237,7 @@ var _addNewFeatureAnalytics = function(prodle,commentdata,product){
 }
 
 var _updateFeatureAnalytics = function(prodle,commentdata,product){
+	console.log("_updateFeatureAnalytics");
 	//checking tagid and tagname exist
 	// var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
 	var query = {tagid:commentdata.analytics.tagid,tagname:commentdata.analytics.tagname};
@@ -254,7 +257,7 @@ var _updateFeatureAnalytics = function(prodle,commentdata,product){
 					logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics updated sucessfully","analytics_data":analyticsdata}})
 					// _successfulAddComment(self,analyticsdata);
 				}
-			})
+			});
 		}
 	})
 }
