@@ -29,11 +29,11 @@ var _validateTagReffDicData = function(self,sessionuserid,tagReffDicData) {
 		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide level to tagreffdicdata"}});			
 	}else if(tagReffDicData.emotions.result==undefined){
 		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide result to tagreffdicdata"}});			
-	}else if(tagReffDicData.emotions.emotion_url==undefined){
-		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide emotion_url to tagreffdicdata"}});			
+	// }else if(tagReffDicData.emotions.emotion_url==undefined){
+	// 	self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide emotion_url to tagreffdicdata"}});			
 	}else{
 		///////////////////////////////////////////////////////
-		_checkTagnameIsExist(self,sessionuserid,tagReffDicData)
+		_checkTagnameIsExist(self,sessionuserid,tagReffDicData);
 		///////////////////////////////////////////////////////
 	}
 }
@@ -43,7 +43,7 @@ var _checkTagnameIsExist = function(self,sessionuserid,tagReffDicData){
 		if(err){
 			self.emit("failedAddTagReffDictionary",{"error":{"code":"ED001","message":"DB error:_addTag"+err}});	
 		}else if(tagname){
-			self.emit("failedAddTagReffDictionary",{"error":{"message":"Tagname already exists"}});	
+			self.emit("failedAddTagReffDictionary",{"error":{"code":"ED001","message":"Tag name already exists"}});	
 		}else{
 			///////////////////////////////////
 			_addTag(self,tagReffDicData);

@@ -20,7 +20,7 @@ var logger = require("../../common/js/logger");
 var featureAnalyticsSchema = mongoose.Schema({
   prodle:{type:String,unique: true},
   featureid:{type:String,ref:"productFeatureSchema"},  
-  analytics: [{tagid:{type:String,ref:"TagReffDictionary"},tagname:{type:String,ref:"TagReffDictionary"},count:{type:String}}],  
+  analytics: [{tagid:{type:String,ref:"TagReffDictionary"},tagname:{type:String,ref:"TagReffDictionary"},count:{type:String}}]
 });
 // featureAnalyticsSchema.pre('save', function(next) {
 //   var product = this;
