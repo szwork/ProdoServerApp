@@ -612,6 +612,25 @@ exports.getMyGroupMembers=function(req,res){
     logger.emit("info", result.success.message);
     res.send(result);
   });
+  organization.removeAllListeners("getgroupmembers");
+  organization.on("getgroupmembers",function(usergrp,usergrpmembers,count){
+    if(count<usergrp.length){
+      userModel.find({userid:{$in:usergrp[count].grpmembers}},{_id:0,userid:1,username:1,email:1,profile_pic:1},function(err,user){
+        if(err){
+          organization.emit("failedGetMyGroupMembers",{"error":{"code":"ED001","message":"Database Server Issue"}})
+        }else if(!user){
+          count+=1;
+          organization.emit("getgroupmembers",usergrp,usergrpmembers,count);
+        }else{
+          usergrpmembers.push({grpname:usergrp[count].grpname,grpmembers:user});
+          count+=1;
+          organization.emit("getgroupmembers",usergrp,usergrpmembers,count);
+        }
+      })
+    }else{
+      organization.successfullGetGroupMembers(usergrpmembers);
+    }
+  });
   if(req.user.org.orgid!=orgid){
     logger.emit("log","Given orgid is not match with session userid");
     organization.emit("failedGetMyGroupMembers",{"error":{"code":"EA001","message":"You have not authorized to get Group Members"}});

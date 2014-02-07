@@ -1013,8 +1013,46 @@ var _getMyGroupMembers=function(self,orgid){
 	 		self.emit("failedGetMyGroupMembers",{"error":{"code":"AO002","message":"wrong orgid"}});	
 	 	}else{
 	 		
+	 		var usergrpmembers=[];
+	 		var initialvalue=0;
+	 		self.emit("getgroupmembers",organization.usergrp,usergrpmembers,initialvalue);
+	 // 		logger.emit("log","grpmembers"+grpmembers);
+	 // 		userModel.find({userid:{$in:grpmembers}},{userid:1,username:1,email:1,profile_pic:1},function(err,useroforg){
+	 // 			if(err){
+	 // 				self.emit("failedGetMyGroupMembers",{"error":{"code":"ED001","message":"_getMyGroupMembers _getMyGroupMembers"+err}});	
+	 // 			}else if(useroforg.length==0){
+	 // 				self.emit("failedGetMyGroupMembers",{"error":{"code":"ED001","message":"No Group Members exists"}});	
+	 // 			}else{
+	 // 				// logger.emit("log",useroforg)
+	 			
+	 // 				// var user=JSON.parse(user);
+	 // 				var user=[]
+	 // 				for(var i=0;i<useroforg.length;i++){
+	 // 					user.push(useroforg[i]);
+	 // 				}
+	 // 				for(var i=0;i<usergrp.length;i++)
+	 // 				{
+	 // 					var grpname=usergrp[i].grpname;
+	 // 					console.log("grpname"+grpname)
+	 // 					for(var j=0;j<user.length;j++)
+	 // 					{	
+	 // 						logger.emit("log","Hi"+usergrp[i].grpmembers.indexOf(user[j].userid))
+	 // 						if(usergrp[i].grpmembers.indexOf(user[j].userid)==0){
+	 // 							logger.emit("log","Test");
+	 // 							user[i].grpname=grpname;
+	 // 							logger.emit("log","HI"+user[i].grpname);
+	 // 						}
+	 // 					}
+	 // 				}
+	 // 				// var user=JSON.parse(useroforg);
+	 // 			  logger.emit("log","grp"+JSON.stringify(user));
+	 // 			}
+	 // 		})
 	 	}
 	 })
 }
-	
+Organization.prototype.successfullGetGroupMembers=function(usergrp){
+	var self=this;
+	self.emit("successfulGetMyGroupMembers",{"success":{"message":"Group Members Getting Successfully","usergrp":usergrp}});
+}	
 	

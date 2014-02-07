@@ -630,8 +630,8 @@ exports.passwordUrlAction=function(req,res){
         res.send(html.s);
       }else{
         var redirect_data="<html><body><script>";
-        redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/#/resetpassword')},3000);";
-        redirect_data+="</script>Please wait launching Prodonus &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
+        redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/#/message/resetpassword')},3000);";
+        redirect_data+="</script>Please wait redirect to reset password &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
         res.send(redirect_data);
       }
     })     
