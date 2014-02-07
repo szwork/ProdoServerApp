@@ -548,7 +548,7 @@ User.prototype.updateUser = function(userid) {
 };
 var _isUpdateUserContainsUsername=function(self,userid,userdata){
 	if(userdata.username!=undefined){
-	 	if(userdata.password==undefined){
+	 	if(userdata.password==undefined || userdata.password==""){
 	 		self.emit("failedUserUpdation",{"error":{"code":"AV001","message":"Please provide password to update username"}});	
 	 	}else{
 	 		/////////////////////////////////////
@@ -556,7 +556,7 @@ var _isUpdateUserContainsUsername=function(self,userid,userdata){
 	 		/////////////////////////////////////
 	 	}
 	}else{
-		if(username.password!=undefined){
+		if(username.password!=undefined || userdata.password==""){
 			self.emit("failedUserUpdation",{"error":{"code":"EA001","message":"You can't change the password this way"}});	
 		}else{
 			///////////////////////////////////
@@ -658,7 +658,7 @@ User.prototype.getUser = function(userid) {
 	_getUser(self,userid);
 };
 var _getUser=function(self,userid){
-	userModel.findOne({userid:userid}).lean().exec(function(err,user){
+	userModel.findOne({userid:userid},{password:0}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find user"}});
 		}else if(user){

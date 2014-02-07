@@ -10,9 +10,14 @@ var __=require("underscore");
 var SubscriptionModel=require("../../subscription/js/subscription-model");
 var verificationTokenModel = require('../../common/js/verification-token-model');
 var BusinessOpportunityModel=require("../../businessopportunity/js/business-opportunity-model");
+var commonapi=require("../../common/js/common-api");
+var CONFIG = require('config').Prodonus;
+
 var Organization = function(organizationdata) {
 	this.organization=organizationdata;
 };
+var MyObjectId = require('mongoose').Types.ObjectId;
+
 //this function is used to remvoe duplication element from json array
 var email_providerlist=["gmail","yahoo","live","hotmail","ymail","rediff"];
 function removeDuplicates(arrayIn) {
@@ -1055,4 +1060,126 @@ Organization.prototype.successfullGetGroupMembers=function(usergrp){
 	var self=this;
 	self.emit("successfulGetMyGroupMembers",{"success":{"message":"Group Members Getting Successfully","usergrp":usergrp}});
 }	
-	
+Organization.prototype.removeOrgGroupMember=function(user,orgid,grpid,usermemberid){
+	var self=this;
+	/////////////////////
+	_checkGropMemberIsExistOrNot(self,user,orgid,grpid,usermemberid);
+}	
+var _checkGropMemberIsExistOrNot=function(self,user,orgid,grpid,usermemberid){
+
+	logger.emit("log","usermemberid"+usermemberid);
+	orgModel.aggregate({$unwind:"$usergrp"},{$match:{"usergrp.grpmembers":usermemberid,orgid:orgid}},{$project:{name:1,usergrp:1}},function(err,usergrps){
+		if(err){
+			self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"ED001","message":"Database Server Issue"+err}}); 
+		}else if(usergrps.length==0){
+			self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"AU003","message":"Userid is wrong"}}); 
+		}else{
+			if(usergrps.length==1){
+				////////////////////////////////////
+				_deleteUserAndRemoveFromOrg(self,user,orgid,grpid,usermemberid,usergrps[0].usergrp.grpname,usergrps[0].name)	;
+				//////////////////////////////////
+			}else{
+				/////////////////////////////////
+				_removeFromOrganizationGroup(self,user,orgid,grpid,usermemberid)
+				//////////////////////////////
+			}
+		}
+	});
+}
+var _deleteUserAndRemoveFromOrg=function(self,user,orgid,grpid,usermemberid,grpname,orgname){
+	userModel.update({userid:usermemberid},{$set:{status:"deactive"}},function(err,deleteorguserstatus){
+		if(err){
+			self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"ED001","message":"Database Server Issue"+err}}); 
+		}else if(!deleteorguserstatus){
+			self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"AU003","message":"userid is wrong"}}); 			
+		}else{
+			orgModel.update({orgid:orgid,"usergrp.grpmembers":usermemberid,"usergrp._id":grpid},{$pull:{"usergrp.$.grpmembers":usermemberid}},function(err,orguserremovestatus){
+				if(err){
+					self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"ED001","message":"Database Server Issue"+err}}); 
+				}else if(orguserremovestatus==0){
+					self.emit("failedRemoveOrgGroupMembers",{"error":{"message":"orgid is wrong"}}); 
+				}else{
+					/////////////////////////////////////////////////////////
+						_sendMailToOrgMemberUserDelete(self,user,orgid,usermemberid,"removememberfromorganduser",orgname,grpname);
+					///////////////////////////////////////////////////////
+					////////////////////////////////////////////////////
+					_succesfullOrgMemberDelete(self);
+					//////////////////////////////////////////////////
+				}
+			});
+		}
+	})
+}
+var _removeFromOrganizationGroup=function(self,user,orgid,grpid,usermemberid){
+	logger.emit("log","grpid"+grpid);
+	var query=orgModel.aggregate({$unwind:"$usergrp"},{$match:{"usergrp._id":MyObjectId(grpid),orgid:orgid}},{$project:{name:1,usergrp:1}})
+	logger.emit("log","query"+JSON.stringify(query));
+	query.exec(function(err,orgrpdata){
+		if(err){
+			self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"ED001","message":"Database Server Issue"+err}}); 
+		}else if(orgrpdata.length==0){
+			logger.emit("log",orgrpdata);
+			self.emit("failedRemoveOrgGroupMembers",{"error":{"message":"org grpid is wrong"}}); 
+		}else{
+			orgModel.update({orgid:orgid,"usergrp.grpmembers":usermemberid,"usergrp._id":grpid},{$pull:{"usergrp.$.grpmembers":usermemberid}},function(err,orguserremovestatus){
+				if(err){
+					self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"ED001","message":"Database Server Issue"+err}}); 
+				}else if(orguserremovestatus==0){
+					self.emit("failedRemoveOrgGroupMembers",{"error":{"message":"orgid is wrong"}}); 
+				}else{
+					////////////////////////////////////////////////////
+					_succesfullOrgMemberDelete(self);
+					//////////////////////////////////////////////////
+						/////////////////////////////////////////////////////////
+						_sendMailToOrgMemberUserDelete(self,user,orgid,usermemberid,"removememberonlyfromorg",orgrpdata[0].name,orgrpdata[0].usergrp.grpname);
+					///////////////////////////////////////////////////////
+
+				}
+			});
+		}
+	});
+}
+var _succesfullOrgMemberDelete=function(self){
+	logger.emit("log","_succesfullOrgMemberDelete");
+	self.emit("successfulRemoveOrgGroupMembers",{"success":{"message":"Group Members removed successfully"}});
+}
+var _sendMailToOrgMemberUserDelete=function(self,sessionuser,orgid,usermemberid,templatename,orgname,grpname){
+	EmailTemplateModel.findOne({templatetype:templatename},function(err,orguserremovetemplate){
+		if(err){
+			logger.emit("error",""+err)
+		}else if(!orguserremovetemplate){
+			logger.emit("error","template of"+templatename +"doesn't exists");
+		}else{
+			userModel.findOne({userid:usermemberid},function(err,orguser){
+				if(err){
+				 logger.emit("error","Database Error");
+				}else if(!orguser){
+					 logger.emit("error","orgmemberid is wrong");
+				}else{
+					var subject=S(orguserremovetemplate.subject);
+					subject=subject.replaceAll("<orgname>",orgname);
+					subject=subject.replaceAll("<grpname>",grpname);
+					var template=S(orguserremovetemplate.description);
+					template=template.replaceAll("<email>",sessionuser.email);
+					template=template.replaceAll("<fromusername>",sessionuser.username);
+					template=template.replaceAll("<orgname>",orgname);
+					template=template.replaceAll("<grpname>",grpname);
+
+					var message = {
+						from: "Prodonus  <noreply@prodonus.com>", // sender address
+						to: orguser.email, // list of receivers
+						subject:subject.s, // Subject line
+						html: template.s // html body
+					};
+					commonapi.sendMail(message,CONFIG.smtp_general, function (result){
+						if(result=="failure"){
+							logger.emit("error","Organization Member remove message "+message.to+" by"+sessionuser.email);
+						}else{
+							logger.emit("log","Organization Customer invite Sent Successfully to"+message.to+" by"+sessionuser.email);
+						}
+					});
+				}
+			})
+		}
+	})
+}

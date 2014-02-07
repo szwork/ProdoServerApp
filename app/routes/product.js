@@ -15,6 +15,6 @@ exports.init = function (app) {
  app.post("/api/productfeature/:orgid/:prodle",auth,api.productapi.addProductFeatures);
  app.put("/api/productfeature/:orgid/:prodle/:productfeatureid",auth,api.productapi.updateProductFeature);
  app.delete("/api/productfeature/:orgid/:prodle/:productfeatureid",auth,api.productapi.deleteProductFeature);
-app.get("/api/productfeature/:orgid/:prodle",auth,api.productapi.getProductFeature);
+ app.get("/api/productfeature/:orgid/:prodle",auth,api.productapi.getProductFeature);
 
 }
