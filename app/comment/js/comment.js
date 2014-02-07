@@ -204,10 +204,23 @@ var _addComment=function(self,prodle,commentdata,product){
     	// 	product_commentdata.prodle=undefined;
 		// ///////////////////////////////////		
 		_successfulAddComment(self,product_commentdata);
-		_addFeatureAnalytics(self,prodle,commentdata,product);
+		_validateFeatureAnalytics(self,prodle,commentdata,product);
+		// _addFeatureAnalytics(self,prodle,commentdata,product);
 		/////////////////////////////////
 		}
 	})
+}
+var _validateFeatureAnalytics = function(prodle,commentdata,product){
+	console.log("_validateFeatureAnalytics");
+	var analytics = commentdata.analytics;
+	if(analytics.leangth>0){
+		console.log("analytics " + analytics);
+		console.log("analytics featureid" + analytics[0].featureid);
+		console.log("analytics featurename" + analytics[0].featurename);
+		console.log("analytics tag" + analytics[0].tag);
+	}else{
+		console.log("Please pass analitics data");		
+	}
 }
 var _addFeatureAnalytics = function(prodle,commentdata,product){
 	console.log("_addFeatureAnalytics");
