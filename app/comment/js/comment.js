@@ -210,17 +210,17 @@ var _addComment=function(self,prodle,commentdata,product){
 	})
 }
 var _addFeatureAnalytics = function(prodle,commentdata,product){
-	FeatureAnalyticsModel.findOne({featureid:commentdata.analytics.featureid},function(err,analyticsdata){
+	FeatureAnalyticsModel.findOne({featureid:commentdata.analytics.featureid}).lean().exec(function(err,analyticsdata){
 		if(err){
 			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
 		}else if(!analyticsdata){
-			// calling to add new analytics with prodle and featureid
+			logger.emit("calling to add new analytics with prodle and featureid");
 			_addNewFeatureAnalytics(self,prodle,commentdata,product);
 		}else{
-			// calling to update analytics
+			logger.emit("calling to update analytics");
 			_updateFeatureAnalytics(self,prodle,commentdata,product);
 		}
-	})
+	});
 }
 var _addNewFeatureAnalytics = function(prodle,commentdata,product){
 	commentdata.analytics.count = 1;
@@ -238,7 +238,7 @@ var _updateFeatureAnalytics = function(prodle,commentdata,product){
 	//checking tagid and tagname exist
 	// var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
 	var query = {tagid:commentdata.analytics.tagid,tagname:commentdata.analytics.tagname};
-	FeatureAnalyticsModel.findOne(query,function(err,analyticsdata){
+	FeatureAnalyticsModel.findOne(query).lean().exec(function(err,analyticsdata){
 		if(err){
 			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find tag id and tag name err message: "+err}})
 		}else if(!analyticsdata){

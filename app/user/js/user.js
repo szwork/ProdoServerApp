@@ -97,14 +97,15 @@ var _validateRegisterUser = function(self,userdata,host) {
 	}
 };
 var _addProductsFollowedByUser = function(self,userdata,host){
-	productModel.findOne({"name":"Prodonus"},{prodle:1,orgid:1,_id:0}).lean().exec(function(err,product){
+	productModel.findOne({"name":"Prodonus"},{prodle:1,orgid:1}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
 		}else if(product){
 			userdata.products_followed =[{prodle:product.prodle,orgid:product.orgid}];
 			_addUser(self,userdata,host);
 	    }else{
-	       	self.emit("failedUserRegistration",{"error":{"code":"ED002","message":"No product exist"}});
+	       	// self.emit("failedUserRegistration",{"error":{"code":"ED002","message":"No product exist"}});
+	       	_addUser(self,userdata,host);
 		}
 	});
 }
@@ -158,7 +159,6 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 			}else if(emailtemplate){
 				console.log("addedUser6");
 				var url = "http://"+host+"/api/verify/"+token;
-				console.log("URL " + url);
 				var html=emailtemplate.description;
 	            html=S(html);
 	            html=html.replaceAll("<name>",user.fullname);
