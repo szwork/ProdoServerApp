@@ -68,7 +68,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 	}else if(userdata.username==undefined){
 		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Please provide username"}});
 	} else if(userdata.username.length<3 || userdata.username.length>15){
-		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Username should greater than 6 and less than 15 chars"}});
+		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Username should greater than 3 and less than 15 chars"}});
 	}else if(isValidEmail(userdata.email).error!=undefined){
 	    self.emit("failedUserRegistration",isValidEmail(userdata.email));
 	 }else if(userdata.password==undefined){
@@ -90,12 +90,24 @@ var _validateRegisterUser = function(self,userdata,host) {
 	 	    	logger.emit("log","_validated");
 
 	 	    	///////////////////////
-	 			 _addUser(self,userdata,host);
+	 	    	_addProductsFollowedByUser(self,userdata,host);	 			 
 	 			 ///////////////////////
 	 	  }
 		})
 	}
 };
+var _addProductsFollowedByUser = function(self,userdata,host){
+	productModel.findOne({"name":"Prodonus"},{prodle:1,orgid:1,_id:0}).lean().exec(function(err,product){
+		if(err){
+			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
+		}else if(product){
+			userdata.products_followed =[{prodle:product.prodle,orgid:product.orgid}];
+			_addUser(self,userdata,host);
+	    }else{
+	       	self.emit("failedUserRegistration",{"error":{"code":"ED002","message":"No product exist"}});
+		}
+	});
+}
    var _addUser = function(self,userdata,host) {
 		//adding user
 		var user=userModel(userdata);
