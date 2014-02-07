@@ -213,14 +213,14 @@ var _addComment=function(self,prodle,commentdata,product){
 var _validateFeatureAnalytics = function(prodle,commentdata,product){
 	console.log("_validateFeatureAnalytics");
 	// var analytics = commentdata.analytics;
-	if((commentdata.analytics).length>0){
+	if(commentdata.analytics.length>0){
 		console.log("analytics array " + commentdata.analytics);
 		console.log("analytics array leangth " + commentdata.analytics.length);
 		// console.log("analytics featureid" + analytics[0].featureid);
 		// console.log("analytics featurename" + analytics[0].featurename);
 		// console.log("analytics tag" + analytics[0].tag);
 	}else{
-		console.log("Please pass analytics data");		
+		console.log("Please pass analytics data");
 	}
 }
 var _addFeatureAnalytics = function(prodle,commentdata,product){
