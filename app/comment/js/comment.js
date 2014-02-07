@@ -212,14 +212,14 @@ var _addComment=function(self,prodle,commentdata,product){
 }
 var _validateFeatureAnalytics = function(prodle,commentdata,product){
 	console.log("_validateFeatureAnalytics");
-	var analytics = commentdata.analytics;
-	if(analytics.length>0){
+	// var analytics = commentdata.analytics;
+	if((commentdata.analytics).length>0){
 		console.log("analytics " + analytics);
 		console.log("analytics featureid" + analytics[0].featureid);
 		console.log("analytics featurename" + analytics[0].featurename);
 		console.log("analytics tag" + analytics[0].tag);
 	}else{
-		console.log("Please pass analitics data");		
+		console.log("Please pass analytics data");		
 	}
 }
 var _addFeatureAnalytics = function(prodle,commentdata,product){
