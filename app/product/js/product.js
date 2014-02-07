@@ -293,3 +293,132 @@ var _successfulUpdateProduct=function(self){
 	logger.emit("log","_successfulUpdateProduct");
 	self.emit("successfulProductUpdation", {"success":{"message":"Update Product Successfully"}});
 }
+Product.prototype.addProductFeature = function(orgid,prodle,productfeaturedata) {
+	var self=this;
+	//////////////////
+	_validateProductFeature(self,orgid,prodle,productfeaturedata);
+	///////////////////
+};
+var _validateProductFeature=function(self,orgid,prodle,productfeaturedata){
+	
+	if(productfeaturedata==undefined){
+		self.emit("failedAddProudctFeatures",{"error":{"code":"AV001","message":"Please pass productfeaturedata"}});
+	}else if(productfeaturedata.length==0){
+		self.emit("failedAddProudctFeatures",{"error":{"code":"EA001","message":"Please provide atleast one product feature"}});
+	}else{
+		_addProductFeature(self,orgid,prodle,productfeaturedata)
+	}
+
+}
+var _addProductFeature=function(self,orgid,prodle,productfeaturedata){
+
+	productModel.update({orgid:orgid,prodle:prodle},{$addToSet:{features:{$each:productfeaturedata}}}).exec(function(err,productfeatureaddstatus){
+		if(err){
+			self.emit("failedAddProudctFeatures",{"error":{"code":"ED001","message":"Error in db to add product feature"+err}});
+		}else if(productfeatureaddstatus!=1){
+			self.emit("failedAddProudctFeatures",{"error":{"code":"AP001","message":"product id is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulAddProductFeatures(self);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulAddProductFeatures=function(self){
+	logger.emit("log","_successfulAddProductFeatures");
+	self.emit("successfulAddProductFeatures", {"success":{"message":"Product Feature Added Suceessfully"}});
+}
+Product.prototype.updateProductFeature = function(orgid,prodle,productfeatureid,productfeaturedata) {
+	var self=this;
+	//////////////////
+	_validateUpdateProductFeature(self,orgid,prodle,productfeatureid,productfeaturedata);
+	///////////////////
+};
+var _validateUpdateProductFeature=function(self,orgid,prodle,productfeatureid,productfeaturedata){
+	
+	if(productfeaturedata==undefined){
+		self.emit("failedUpdateProudctFeatures",{"error":{"code":"AV001","message":"Please pass productfeaturedata"}});
+	}else if(productfeaturedata.featurename==undefined ){
+		self.emit("failedUpdateProudctFeatures",{"error":{"code":"EA001","message":"Please provide featurename "}});
+	}else if(productfeaturedata.featuredescription==undefined) {
+		self.emit("failedUpdateProudctFeatures",{"error":{"code":"EA001","message":"Please provide featurre description "}});
+	}else{
+		_updateProductFeature(self,orgid,prodle,productfeatureid,productfeaturedata)
+	}
+	
+
+}
+var _updateProductFeature=function(self,orgid,prodle,productfeatureid,productfeaturedata){
+
+	productModel.update({orgid:orgid,prodle:prodle,"features._id":productfeatureid},{$set:{"features.$.featurename":productfeaturedata.featurename,"features.$.featuredescription":productfeaturedata.featuredescription}}).exec(function(err,productfeatureupdatestatus){
+		if(err){
+			self.emit("failedUpdateProudctFeatures",{"error":{"code":"ED001","message":"Error in db to update product"}});
+		}else if(productfeatureupdatestatus!=1){
+			self.emit("failedUpdateProudctFeatures",{"error":{"code":"AP001","message":"product id or feature id is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulUpdateProductFeatures(self);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulUpdateProductFeatures=function(self){
+	logger.emit("log","_successfulUpdateProductFeatures");
+	self.emit("successfulUpdateProductFeatures", {"success":{"message":"Product Feature Updated Suceessfully"}});
+}
+Product.prototype.deleteProductFeature = function(orgid,prodle,productfeatureid) {
+	var self=this;
+	_deleteProductFeature(self,orgid,prodle,productfeatureid)
+};
+
+var _deleteProductFeature=function(self,orgid,prodle,productfeatureid,productfeaturedata){
+
+	productModel.update({orgid:orgid,prodle:prodle,"features._id":productfeatureid},{$pull:{features:{_id:productfeatureid}}}).exec(function(err,productfeaturedeletestatus){
+		if(err){
+			self.emit("failedDeleteProudctFeatures",{"error":{"code":"ED001","message":"Error in db to delete product"}});
+		}else if(productfeaturedeletestatus!=1){
+			self.emit("failedDeleteProudctFeatures",{"error":{"message":"featureid or prodle is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulDeleteProductFeatures(self);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulDeleteProductFeatures=function(self){
+	logger.emit("log","_successfulDeleteProductFeatures");
+	self.emit("_successfulDeleteProductFeatures", {"success":{"message":"Product Feature Deleted Suceessfully"}});
+}
+Product.prototype.getProductFeature = function(orgid,prodle) {
+	var self=this;
+	_getProductFeature(self,orgid,prodle)
+};
+
+var _getProductFeature=function(self,orgid,prodle){
+
+	productModel.findOne({orgid:orgid,prodle:prodle},{features:1,_id:0}).exec(function(err,productfeature){
+		if(err){
+			self.emit("failedGetProudctFeatures",{"error":{"code":"ED001","message":"Error in db to delete product"}});
+		}else if(!productfeature){
+			self.emit("failedGetProudctFeatures",{"error":{"message":"prodle is wrong"}});
+		}else{
+			for(var i=0;i<productfeature.features.length;i++)
+			{
+				productfeature.features[i].featureid=productfeature.features[i]._id;
+				productfeature.features[i]._id=undefined;
+					
+			}
+			////////////////////////////////
+			_successfulGetProductFeatures(self,productfeature.features);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetProductFeatures=function(self,productfeature){
+	logger.emit("log","_successfulGetProductFeatures");
+	self.emit("successfulGetProductFeatures", {"success":{"message":"Product Feature Getting Suceessfully","productfeature":productfeature}});
+}

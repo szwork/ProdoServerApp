@@ -266,3 +266,127 @@ exports.updateProduct = function(req, res) {
   }
     
 }
+exports.addProductFeatures=function(req,res){
+  var productfeaturedata=req.body.productfeature;
+  var orgid=req.params.orgid;
+  // var productdata=req.body.product;
+  var prodle=req.params.prodle;
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedAddProudctFeatures");
+    product.on("failedAddProudctFeatures",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("successfulAddProductFeatures");
+  product.on("successfulAddProductFeatures",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    
+   if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    product.emit("failedAddProudctFeatures",{"error":{"code":"EA001","message":"You have not authorized to add product feature"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to update product");
+    product.emit("failedAddProudctFeatures",{"error":{"code":"EA001","message":"You have not authorized to add product feature"}}); 
+  }else{
+    ///////////////////////////////////
+    product.addProductFeature(orgid,prodle,productfeaturedata);
+    ////////////////////////////////// 
+  }
+}
+exports.updateProductFeature=function(req,res){
+  var productfeaturedata=req.body.productfeature;
+  var productfeatureid=req.params.productfeatureid;
+  var orgid=req.params.orgid;
+  // var productdata=req.body.product;
+  var prodle=req.params.prodle;
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedUpdateProudctFeatures");
+    product.on("failedUpdateProudctFeatures",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("successfulUpdateProductFeatures");
+  product.on("successfulUpdateProductFeatures",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    
+   if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    product.emit("failedUpdateProudctFeatures",{"error":{"code":"EA001","message":"You have not authorized to update product feature"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to update product");
+    product.emit("failedUpdateProudctFeatures",{"error":{"code":"EA001","message":"You have not authorized to update product feature"}}); 
+  }else{
+    ///////////////////////////////////
+    product.updateProductFeature(orgid,prodle,productfeatureid,productfeaturedata);
+    ////////////////////////////////// 
+  }
+}
+exports.deleteProductFeature=function(req,res){
+  
+  var productfeatureid=req.params.productfeatureid;
+  var orgid=req.params.orgid;
+  // var productdata=req.body.product;
+  var prodle=req.params.prodle;
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedDeleteProudctFeatures");
+    product.on("failedDeleteProudctFeatures",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("_successfulDeleteProductFeatures");
+  product.on("_successfulDeleteProductFeatures",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    
+   if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    product.emit("failedDeleteProudctFeatures",{"error":{"code":"EA001","message":"You have not authorized to update product feature"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to update product");
+    product.emit("failedDeleteProudctFeatures",{"error":{"code":"EA001","message":"You have not authorized to update product feature"}}); 
+  }else{
+    ///////////////////////////////////
+    product.deleteProductFeature(orgid,prodle,productfeatureid);
+    ////////////////////////////////// 
+  }
+}
+exports.getProductFeature=function(req,res){
+
+  var orgid=req.params.orgid;
+  // var productdata=req.body.product;
+  var prodle=req.params.prodle;
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedGetProudctFeatures");
+    product.on("failedGetProudctFeatures",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("successfulGetProductFeatures");
+  product.on("successfulGetProductFeatures",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    
+   
+    ///////////////////////////////////
+    product.getProductFeature(orgid,prodle);
+    ////////////////////////////////// 
+  
+}

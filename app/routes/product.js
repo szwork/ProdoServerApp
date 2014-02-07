@@ -12,6 +12,9 @@ exports.init = function (app) {
   app.delete("/api/product/:orgid/:prodle",auth,api.productapi.deleteProduct);//delete product
  //delete product image
  app.delete("/api/image/product/:orgid/:prodle",auth,api.productapi.deleteProductImage);
-
+ app.post("/api/productfeature/:orgid/:prodle",auth,api.productapi.addProductFeatures);
+ app.put("/api/productfeature/:orgid/:prodle/:productfeatureid",auth,api.productapi.updateProductFeature);
+ app.delete("/api/productfeature/:orgid/:prodle/:productfeatureid",auth,api.productapi.deleteProductFeature);
+app.get("/api/productfeature/:orgid/:prodle",auth,api.productapi.getProductFeature);
 
 }
