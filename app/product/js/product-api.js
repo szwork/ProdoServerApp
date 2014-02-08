@@ -383,8 +383,6 @@ exports.getProductFeature=function(req,res){
     // product.removeAllListeners();
     res.send(result);
   });
-    
-   
     ///////////////////////////////////
     product.getProductFeature(orgid,prodle);
     ////////////////////////////////// 

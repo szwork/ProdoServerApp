@@ -622,7 +622,7 @@ exports.getMyGroupMembers=function(req,res){
           count+=1;
           organization.emit("getgroupmembers",usergrp,usergrpmembers,count);
         }else{
-          usergrpmembers.push({grpname:usergrp[count].grpname,grpmembers:user});
+          usergrpmembers.push({grpid:usergrp[count]._id,grpname:usergrp[count].grpname,grpmembers:user});
           count+=1;
           organization.emit("getgroupmembers",usergrp,usergrpmembers,count);
         }
@@ -640,6 +640,38 @@ exports.getMyGroupMembers=function(req,res){
   }else{
     /////////////////////////////////
     organization.getMyGroupMembers(orgid);
+    //////////////////////////////// 
+  }
+};
+exports.removeOrgGroupMembers=function(req,res){
+  var orgid=req.params.orgid;
+  var sessionuserid=req.user.userid;
+  var grpid=req.params.grpid;
+  var organization=new Organization();
+  var usermemberid=req.params.userid;
+  logger.emit("log","orgid:"+orgid+"grpid:"+grpid+"usermemberid:"+usermemberid);
+  organization.removeAllListeners("failedRemoveOrgGroupMembers");
+  organization.on("failedRemoveOrgGroupMembers",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulRemoveOrgGroupMembers");
+  organization.on("successfulRemoveOrgGroupMembers",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  
+  if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedRemoveOrgGroupMembers",{"error":{"code":"EA001","message":"You have not authorized to remove group members"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to see group member details");
+    organization.emit("failedRemoveOrgGroupMembers",{"error":{"code":"EA001","message":"You have not authorized to remove group members"}}); 
+  }else if(sessionuserid==usermemberid){
+    organization.emit("failedRemoveOrgGroupMembers",{"error":{"code":"EA001","message":"You can not remove adming group members"}}); 
+  }else{
+    /////////////////////////////////
+    organization.removeOrgGroupMember(req.user,orgid,grpid,usermemberid);
     //////////////////////////////// 
   }
 }
