@@ -203,9 +203,9 @@ var _addComment=function(self,prodle,commentdata,product){
   		// product_commentdata.status=undefined;
     	// 	product_commentdata.prodle=undefined;
 		// ///////////////////////////////////
-		// _addFeatureAnalytics(self,prodle,commentdata,product);
+		_addFeatureAnalytics(self,prodle,commentdata,product);
 		_successfulAddComment(self,product_commentdata);
-		/////////////////////////////////				
+		/////////////////////////////////
 		}
 	})
 }
@@ -223,11 +223,11 @@ var _addFeatureAnalytics = function(prodle,commentdata,product){
 	})
 }
 var _addNewFeatureAnalytics = function(prodle,commentdata,product){
-	var analytics_data = new FeatureAnalyticsModel(commentdata.analytics);
 	commentdata.analytics.count = 1;
+	var analytics_data = new FeatureAnalyticsModel(commentdata.analytics);	
 	analytics_data.save(function(err,analyticsdata){
 		if(err){
-			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Error in db to save FeatureAnalytics"}});
+			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Error in db to save feature analytics"}});
 		}else{      
 			logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics added sucessfully","analytics_data":analyticsdata}})
 		}
@@ -236,7 +236,8 @@ var _addNewFeatureAnalytics = function(prodle,commentdata,product){
 
 var _updateFeatureAnalytics = function(prodle,commentdata,product){
 	//checking tagid and tagname exist
-	var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
+	// var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
+	var query = {tagid:commentdata.analytics.tagid,tagname:commentdata.analytics.tagname};
 	FeatureAnalyticsModel.findOne(query,function(err,analyticsdata){
 		if(err){
 			logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find tag id and tag name err message: "+err}})
