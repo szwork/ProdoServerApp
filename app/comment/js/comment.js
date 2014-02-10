@@ -246,7 +246,7 @@ var _addFeatureAnalytics = function(prodle,analytics,product){
 
 var _addNewFeatureAnalytics = function(prodle,analytics,product){
 	console.log("_addNewFeatureAnalytics");
-	var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
+	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
 	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
 		if(err){
             console.log("Error in db to find feature id err message: " + err);
@@ -257,9 +257,9 @@ var _addNewFeatureAnalytics = function(prodle,analytics,product){
             var analytics_data = new FeatureAnalyticsModel(analytics);
         	analytics_data.save(function(err,analyticsdata){
             	if(err){
-               	 	logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Error in db to save feature analytics"}});
+               	 	console.log("Error in db to save feature analytics" + err);
             	}else{
-                	logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics added sucessfully","analytics_data":analyticsdata}})
+                	console.log("Feature analytics added sucessfully" + analyticsdata);
             	}
         	})
         }
@@ -277,18 +277,18 @@ var _updateFeatureAnalytics = function(prodle,analytics,product){
     var query = {tagid:analytics.tagid,tagname:analytics.tagname};
     FeatureAnalyticsModel.findOne(query).lean().exec(function(err,analyticsdata){
         if(err){
-            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find tag id and tag name err message: "+err}})
+            console.log("Error in db to find tag id and tag name err message: " + err);
         }else if(!analyticsdata){
-            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Tag id and tag name does not exist"}})
+            console.log("Tag id and tag name does not exist");
         }else{
             //increment count
             FeatureAnalyticsModel.update(query,{$inc:{"analytics.count":1}},function(err,analyticsupdatedata){
                 if(err){
-                    logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to update count err message: "+err}})
+                    console.log("Error in db to update count err message: " + err);
                 }else if(!analyticsupdatedata){
-                    logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Feature analytics not updated"}})
+                    console.log("Feature analytics not updated");
                 }else{
-                    logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics updated sucessfully","analytics_data":analyticsdata}})
+                    console.log("Feature analytics updated sucessfully analytics_data : " + analyticsdata);
                     // _successfulAddComment(self,analyticsdata);
                 }
             });
