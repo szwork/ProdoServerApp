@@ -11,6 +11,7 @@ var AWS = require('aws-sdk');
 var fs=require("fs");
 var path=require("path");
 var exec = require('child_process').exec;
+var TagReferenceDictionary = require("../../tagreffdictionary/js/tagreffdictionary-model");
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
@@ -213,74 +214,86 @@ var _validateFeatureAnalytics = function(prodle,commentdata,product){
         console.log("_validateFeatureAnalytics");
         // var analytics = commentdata.analytics;
         if(commentdata.analytics.length>0){
-                console.log("analytics array " + commentdata.analytics);
-                console.log("analytics array leangth " + commentdata.analytics.length);
-               for(var i=0;i<commentdata.analytics.length;i++){
-                        console.log("analytics featureid" + commentdata.analytics[i].featureitad);
-                        console.log("analytics featurename" + commentdata.analytics[i].featurename);
-                        console.log("analytics tag" + commentdata.analytics[i].tag);
-                        _addFeatureAnalytics(prodle,commentdata.analytics[i],product);
-                }
+            console.log("analytics array " + commentdata.analytics);
+            console.log("analytics array leangth " + commentdata.analytics.length);
+            for(var i=0;i<commentdata.analytics.length;i++){
+                console.log("analytics featureid" + commentdata.analytics[i].featureitad);
+                console.log("analytics featurename" + commentdata.analytics[i].featurename);
+                console.log("analytics tag" + commentdata.analytics[i].tag);
+                _addFeatureAnalytics(prodle,commentdata.analytics[i],product);
+            }
         }else{
                 console.log("Please pass analytics data");
         }
 }
 
 var _addFeatureAnalytics = function(prodle,analytics,product){
-        console.log("_addFeatureAnalytics");
-        console.log("CDA " + analytics);
-        console.log("CDAFID " + analytics.featureid);
-        FeatureAnalyticsModel.findOne({featureid:analytics.featureid}).lean().exec(function(err,analyticsdata){
-                if(err){
-                        logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
-                }else if(!analyticsdata){
-                        console.log("calling to add new analytics with prodle and featureid");
-                        _addNewFeatureAnalytics(prodle,analytics,product);
-                }else{
-                        console.log("calling to update analytics");
-                        _updateFeatureAnalytics(prodle,analytics,product);
-                }
-        });
+    console.log("_addFeatureAnalytics");
+    console.log("CDA " + analytics);
+    console.log("CDAFID " + analytics.featureid);
+    FeatureAnalyticsModel.findOne({featureid:analytics.featureid}).lean().exec(function(err,analyticsdata){
+        if(err){
+            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+        }else if(!analyticsdata){
+            console.log("calling to add new analytics with prodle and featureid");
+            _addNewFeatureAnalytics(prodle,analytics,product);
+        }else{
+            console.log("calling to update analytics");
+            _updateFeatureAnalytics(prodle,analytics,product);
+        }
+    });
 }
 
 var _addNewFeatureAnalytics = function(prodle,analytics,product){
-        console.log("_addNewFeatureAnalytics");
-        analytics = [{tagid:analytics.featureid,tagname:analytics.tag,count:1}];
-        var analytics_data = new FeatureAnalyticsModel(analytics);
-        analytics_data.save(function(err,analyticsdata){
-                if(err){
-                        logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Error in db to save feature analytics"}});
-                }else{
-                        logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics added sucessfully","analytics_data":analyticsdata}})
-                }
-        })
+	console.log("_addNewFeatureAnalytics");
+	var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
+	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
+		if(err){
+            console.log("Error in db to find feature id err message: " + err);
+        }else if(!tagdata){
+            console.log("Tag name does not exist to get tagid");
+        }else{
+            analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,count:1}];
+            var analytics_data = new FeatureAnalyticsModel(analytics);
+        	analytics_data.save(function(err,analyticsdata){
+            	if(err){
+               	 	logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Error in db to save feature analytics"}});
+            	}else{
+                	logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics added sucessfully","analytics_data":analyticsdata}})
+            	}
+        	})
+        }
+	});        
+        // analytics.prodle=prodle;
+        // featureid = analytics.featureid;
+        
 }
 
 
 var _updateFeatureAnalytics = function(prodle,analytics,product){
-        console.log("_updateFeatureAnalytics");
-        //checking tagid and tagname exist
-        // var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
-        var query = {tagid:analytics.tagid,tagname:analytics.tagname};
-        FeatureAnalyticsModel.findOne(query).lean().exec(function(err,analyticsdata){
+    console.log("_updateFeatureAnalytics");
+    //checking tagid and tagname exist
+    // var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
+    var query = {tagid:analytics.tagid,tagname:analytics.tagname};
+    FeatureAnalyticsModel.findOne(query).lean().exec(function(err,analyticsdata){
+        if(err){
+            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find tag id and tag name err message: "+err}})
+        }else if(!analyticsdata){
+            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Tag id and tag name does not exist"}})
+        }else{
+            //increment count
+            FeatureAnalyticsModel.update(query,{$inc:{"analytics.count":1}},function(err,analyticsupdatedata){
                 if(err){
-                        logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find tag id and tag name err message: "+err}})
-                }else if(!analyticsdata){
-                        logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Tag id and tag name does not exist"}})
+                    logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to update count err message: "+err}})
+                }else if(!analyticsupdatedata){
+                    logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Feature analytics not updated"}})
                 }else{
-                        //increment count
-                        FeatureAnalyticsModel.update(query,{$inc:{"analytics.count":1}},function(err,analyticsupdatedata){
-                                if(err){
-                                        logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to update count err message: "+err}})
-                                }else if(!analyticsupdatedata){
-                                        logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":"Feature analytics not updated"}})
-                                }else{
-                                        logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics updated sucessfully","analytics_data":analyticsdata}})
-                                        // _successfulAddComment(self,analyticsdata);
-                                }
-                        });
+                    logger.emit("successfulAddFeatureAnalytics",{"success":{"message":"Feature analytics updated sucessfully","analytics_data":analyticsdata}})
+                    // _successfulAddComment(self,analyticsdata);
                 }
-        })
+            });
+        }
+    })
 }
 
 
