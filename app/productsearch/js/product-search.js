@@ -34,10 +34,15 @@ ProductSearch.prototype.searchProduct = function(productsearchdata){
 }
 
 var _validateProductSearchData = function(self,productsearchdata) {
-		if(productsearchdata.name == "" || productsearchdata.name == " "){
+	console.log("_validateProductSearchData");
+		if(productsearchdata.name==undefined || productsearchdata.name=="" || productsearchdata.name==" "){
 		 	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"Please provide valid prdouct name to search product"}});
-		// } else if(productsearchdata.model_no == ""){
-	 //    	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"please pass product description "}});
+		} else if(productsearchdata.model_no == undefined){
+	    	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"please pass model no."}});
+	  	} else if(productsearchdata.features == undefined){
+	    	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"please pass product features"}});
+	  	}else if(productsearchdata.category == undefined){
+	    	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"please pass category"}});
 	  	}else{
 		   	_searchProduct(self,productsearchdata);
 	   	}
@@ -47,7 +52,23 @@ var _searchProduct = function(self,productsearchdata){
 	var firstTwoChar = productsearchdata.name.substring(0,2);
 	var firstThreeChar = productsearchdata.name.substring(0,3);
 
-	var query = {$or : [{name:{$regex : productsearchdata.name, $options: 'i'}},{name:{$regex : firstThreeChar, $options: 'i'}},{name:{$regex : firstTwoChar, $options: 'i'}},{name:{$regex : firstChar, $options: 'i'}}]}
+	var query = {$or : [
+						{name:
+							{$regex : productsearchdata.name, $options: 'i'}},
+							{name:{$regex : firstThreeChar, $options: 'i'}},
+							{name:{$regex : firstTwoChar, $options: 'i'}},
+							{name:{$regex : firstChar, $options: 'i'}},
+
+						{model_no:
+							{$regex : productsearchdata.model_no, $options: 'i'}},
+
+						{"features.featurename":
+							{$regex : productsearchdata.features, $options: 'i'}},
+
+						{"category.prodle":
+							{$regex : productsearchdata.category, $options: 'i'}}
+						]
+				}
 
 	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 		if(err){

@@ -276,7 +276,7 @@ var _updateFeatureAnalytics = function(prodle,analytics,product){
         if(err){
             console.log("Error in db to find tag id and tag name err message: " + err);
         }else if(!analyticsdata){
-        	
+        	_addNewFeatureAnalytics(prodle,analytics,product);
             console.log("Tag id and tag name does not exist");
         }else{
             //increment count
