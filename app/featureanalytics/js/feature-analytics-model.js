@@ -18,7 +18,7 @@ var logger = require("../../common/js/logger");
 
 //Feature Analytics Model
 var featureAnalyticsSchema = mongoose.Schema({
-  prodle:{type:String,unique: true},
+  prodle:{type:String},
   featureid:{type:String,ref:"productFeatureSchema"},
   analytics: [{tagid:{type:String,ref:"TagReffDictionary"},tagname:{type:String,ref:"TagReffDictionary"},count:{type:String}}]
 });
