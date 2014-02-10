@@ -1414,11 +1414,41 @@ var _getProfileInfo = function(self,userid){
 		}else if(!user){
 			self.emit("failedUserGetUserProfile",{"error":{"code":"AU003","message":"No user exists"}});
 		}else{
-			_successfulUserProfile(self,user);
+			//////////////////////////////////
+			_profileInfoProductFollowdAndRecommends(self,user);	
+			
 		}
 	})
 };
+var _profileInfoProductFollowdAndRecommends=function(self,user){
+	var product_followed_array=[];
+	var product_recommends_array=[];
+	for(var i=0;i<user.products_followed.length;i++){
+		product_followed_array.push(user.products_followed[i].prodle);
+	}
+	for(var i=0;i<user.products_recommends.length;i++){
+		product_recommends_array.push(user.products_recommends[i].prodle);	
+	}
+	productModel.find({prodle:{$in:product_followed_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductfollowed){
+		if(err){
+			self.emit("failedUserGetUserProfile",{"error":{"code":"ED001","message":"No user exists"}});
+		}else {
+			user.products_followed=userproductfollowed;
+			productModel.find({prodle:{$in:product_recommends_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductrecommends){
+				if(err){
+					self.emit("failedUserGetUserProfile",{"error":{"code":"ED001","message":"No user exists"}});
+				}else {
+			     user.products_recommends=userproductrecommends;
+			     ////////////////////////////
+			    _successfulUserProfile(self,user);
+			    /////////////////////////////////
 
+				}
+			})
+		}
+	})
+
+}
 var _successfulUserProfile = function(self,user){
 	logger.emit("log","_successfulUserProfile");
 	self.emit("successfulUserProfile", {"success":{"message":"Getting User Profile Successfully","user":user}});	
