@@ -253,6 +253,7 @@ var _addNewFeatureAnalytics = function(prodle,analytics,product){
         }else if(!tagdata){
             console.log("Tag name does not exist to get tagid");
         }else{
+        	analytics.prodle = prodle;
             analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,count:1}];
             var analytics_data = new FeatureAnalyticsModel(analytics);
         	analytics_data.save(function(err,analyticsdata){
@@ -264,25 +265,22 @@ var _addNewFeatureAnalytics = function(prodle,analytics,product){
         	})
         }
 	});        
-        // analytics.prodle=prodle;
-        // featureid = analytics.featureid;
-        
 }
 
 
 var _updateFeatureAnalytics = function(prodle,analytics,product){
     console.log("_updateFeatureAnalytics");
     //checking tagid and tagname exist
-    // var query = {$and:[{"analytics.tagid":commentdata.analytics.tagid},{"analytics.tagname":commentdata.analytics.tagname}]};
-    var query = {tagid:analytics.tagid,tagname:analytics.tagname};
+    var query = {prodle:prodle,featureid:analytics.featureid,"analytics.tagname":analytics.tag};
     FeatureAnalyticsModel.findOne(query).lean().exec(function(err,analyticsdata){
         if(err){
             console.log("Error in db to find tag id and tag name err message: " + err);
         }else if(!analyticsdata){
+        	
             console.log("Tag id and tag name does not exist");
         }else{
             //increment count
-            FeatureAnalyticsModel.update(query,{$set:{count:{$inc:1}}},function(err,analyticsupdatedata){
+            FeatureAnalyticsModel.update(query,{$inc:{"analytics.$.count":1}},function(err,analyticsupdatedata){
                 if(err){
                     console.log("Error in db to update count err message: " + err);
                 }else if(!analyticsupdatedata){
