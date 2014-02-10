@@ -282,7 +282,7 @@ var _updateFeatureAnalytics = function(prodle,analytics,product){
             console.log("Tag id and tag name does not exist");
         }else{
             //increment count
-            FeatureAnalyticsModel.update(query,{$inc:{"analytics.count":1}},function(err,analyticsupdatedata){
+            FeatureAnalyticsModel.update(query,{$set:{count:{$inc:1}}},function(err,analyticsupdatedata){
                 if(err){
                     console.log("Error in db to update count err message: " + err);
                 }else if(!analyticsupdatedata){
