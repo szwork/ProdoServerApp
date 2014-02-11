@@ -557,7 +557,7 @@ var _isUpdateUserContainsUsername=function(self,userid,userdata){
 	 		/////////////////////////////////////
 	 	}
 	}else{
-		if(username.password!=undefined || userdata.password==""){
+		if(userdata.password!=undefined || userdata.password==""){
 			self.emit("failedUserUpdation",{"error":{"code":"EA001","message":"You can't change the password this way"}});	
 		}else{
 			///////////////////////////////////
@@ -659,7 +659,7 @@ User.prototype.getUser = function(userid) {
 	_getUser(self,userid);
 };
 var _getUser=function(self,userid){
-	userModel.findOne({userid:userid},{verified:0,status:0,password:0,org:0,subscription:0,payment:0,terms:0,adddate:0,updatedate:0,removedate:0,isAdmin:0}).lean().exec(function(err,user){
+	userModel.findOne({userid:userid},{verified:0,status:0,password:0,subscription:0,payment:0,terms:0,adddate:0,updatedate:0,removedate:0,isAdmin:0}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find user"}});
 		}else if(user){
@@ -1570,4 +1570,197 @@ var _passwordUrlAction=function(self,token){
 }
 var _successfullPasswordUrlAction=function(self,user){
 	self.emit("tokenresetpassword",user);
+}
+User.prototype.changeEmail = function(userid) {
+	var self=this;
+		/// /////////////////////////////
+    _validateChangeEmailData(self,userid);
+    /////////////////////////////////
+};
+var _validateChangeEmailData=function(self,userid){
+	var userdata=self.user;
+	if(userdata==undefined){
+		self.emit("failedChangeEmail",{"error":{"code":"AV001","message":"Please pass userdata to change email"}})
+	}else if(isValidEmail(userdata.email).error!=undefined){
+	    self.emit("failedChangeEmail",isValidEmail(userdata.email));
+	}else if(userdata.currentpassword==undefined){
+		self.emit("failedChangeEmail",{"error":{"code":"AV001","message":"Please pass your current password"}})
+	}else{
+         ///////////////////////////////
+         _changeEmail(self,userid,userdata);
+         //////////////////////////////
+	}
+}
+var _changeEmail=function(self,userid,userdata){
+	userModel.findOne({userid:userid},function(err,user){
+		if(err){
+			self.emit("failedChangeEmail",{"error":{"code":"ED001","message":"DB error:_changeEmail"+err}});	
+		}else if(!user){
+			self.emit("failedChangeEmail",{"error":{"code":"AU005","message":"Userid wrong"}});	
+		}else{
+			///////////////////////////////////////////////////////////
+			_checkPassWordIsCorrectToChangeEmail(self,userid,userdata,user);
+			///////////////////////////////////////////////////////
+		}
+	})
+}
+var _checkPassWordIsCorrectToChangeEmail=function(self,userid,userdata,user){
+	user.comparePassword(userdata.currentpassword, function(err, isMatch){
+    if (err){
+      self.emit("failedChangeEmail",{"error":{"message":"Database Issue"}});	
+    } else if( !isMatch ) {
+    	self.emit("failedChangeEmail",{"error":{"message":"Wrong password"}});	
+    }else{
+    	///////////////////////
+    	_updateEmail(self,userid,userdata,user);
+    	///////////////////////
+    }
+  })
+}
+var _updateEmail=function(self,userid,userdata,user){
+	userModel.update({userid:userid},{$set:{email:userdata.email}},function(err,useremailupdatestatus){
+		if(err){
+			self.emit("failedChangeEmail",{"error":{"code":"ED001","message":"Database Issue"}});
+		}else if(useremailupdatestatus==0){
+			self.emit("failedChangeEmail",{"error":{"code":"AU005","message":"wrong userid"+_updateEmail}});
+		}else{
+			/////////////////////////////////////////////
+			_sendEmailForChangeEmail(userid,userdata,user);
+			////////////////////////////////////////
+			//////////////////////////////
+			_successfullEmailChange(self);
+			/////////////////////////////
+		}
+	})
+}
+var _sendEmailForChangeEmail=function(userid,userdata,user){
+	EmailTemplateModel.findOne({templatetype:"emailchange"},function(err,changeemailtemplate){
+		if(err){
+			logger.emit("error","Database Server Issue send change email template",user.userid);
+		}else if(!changeemailtemplate){
+			logger.emit("error","Change Email template not exist");
+		}else{
+			var html=S(changeemailtemplate.description); 
+      html=html.replaceAll("<email>",user.email);
+      html=html.replaceAll("<username>",user.username);
+     	var message = {
+        from: "Prodonus  <noreply@prodonus.com>", // sender address
+        to: userdata.email, // list of receivers
+        subject:changeemailtemplate.subject, // Subject line
+        html: html.s // html body
+    	};
+	    commonapi.sendMail(message,CONFIG.smtp_general,function(result){
+	      if (result == "failure") {
+	         logger.emit("error","Error in sending change email"+user.email,req.user.userid);
+	      }else {
+	        logger.emit("log","change email  sent to"+user.email); 
+	      }
+	    })
+  	}
+	})
+}
+var _successfullEmailChange=function(self){
+	logger.emit("log","_successfullEmailChange");
+	self.emit("successfulChangeEmail",{"success":{"message":"Email Changed Successfully"}});
+}
+User.prototype.changePassword = function(userid) {
+	var self=this;
+		/// /////////////////////////////
+    _validateChangePasswordData(self,userid);
+    /////////////////////////////////
+};
+var _validateChangePasswordData=function(self,userid){
+	var userdata=self.user;
+	if(userdata==undefined){
+		self.emit("failedChangePassword",{"error":{"code":"AV001","message":"Please pass userdata to change email"}})
+	}else if(userdata.currentpassword==undefined){
+		self.emit("failedChangePassword",{"error":{"code":"AV001","message":"Please pass your current password"}})
+	}else if(userdata.confirmnewpassword==undefined){
+		self.emit("failedChangePassword",{"error":{"code":"AV001","message":"Please send currentpassword"}});
+	}else if(userdata.confirmnewpassword.trim().length<3 ){
+		self.emit("failedChangeEmail",{"error":{"code":"AV001","message":"please enter currentpassword"}});
+	}else if(userdata.newpassword==undefined){
+		self.emit("failedChangePassword",{"error":{"code":"AV001","message":"Please send newpassword"}});
+	}else if(userdata.newpassword.trim().length<5){AV001
+		self.emit("failedChangePassword",{"error":{"code":"AV001","message":"password shoud be atleast 5 charecters"}});
+	}else if(userdata.confirmnewpassword!=userdata.newpassword){
+		self.emit("failedChangePassword",{"error":{"code":"AV001","message":"Confirm Pasword Shoud be same as new password"}});
+	}else{
+         ///////////////////////////////
+         _changePassword(self,userid,userdata);
+         //////////////////////////////
+	}
+}
+var _changePassword=function(self,userid,userdata){
+	userModel.findOne({userid:userid},function(err,user){
+		if(err){
+			self.emit("failedChangePassword",{"error":{"code":"ED001","message":"DB error:_changeEmail"+err}});	
+		}else if(!user){
+			self.emit("failedChangePassword",{"error":{"code":"AU005","message":"Userid wrong"}});	
+		}else{
+			///////////////////////////////////////////////////////////
+			_checkPassWordIsCorrectToChangePassword(self,userid,userdata,user);
+			///////////////////////////////////////////////////////
+		}
+	})
+}
+var _checkPassWordIsCorrectToChangePassword=function(self,userid,userdata,user){
+	user.comparePassword(userdata.currentpassword, function(err, isMatch){
+    if (err){
+      self.emit("failedChangePassword",{"error":{"message":"Database Issue"}});	
+    } else if( !isMatch ) {
+    	self.emit("failedChangePassword",{"error":{"message":"Wrong password"}});	
+    }else{
+    	///////////////////////
+    	_updatePassword(self,userid,userdata,user);
+    	///////////////////////
+    }
+  })
+}
+var _updatePassword=function(self,userid,userdata,user){
+	user.password=userdata.newpassword;
+  user.save(function(err,user_data){
+    if(err){
+      self.emit("failedChangePassword",{"error":{"code":"ED001","message":" _updatePassword:Error in db to change the password"}});
+    }else{
+      /////////////////////////////
+			_successfullPasswordChange(self);
+		  /////////////////////////////
+
+		  ////////////////////////////
+		  _sendEmailForChangePassword(userid,userdata,user);
+		  /////////////////////////////
+
+    }
+  })
+}
+var _sendEmailForChangePassword=function(userid,userdata,user){
+	EmailTemplateModel.findOne({templatetype:"passwordchange"},function(err,changepasswordtemplate){
+		if(err){
+			logger.emit("error","Database Server Issue send change email template",user.userid);
+		}else if(!changepasswordtemplate){
+			logger.emit("error","Change Email template not exist");
+		}else{
+			var html=S(changepasswordtemplate.description); 
+      html=html.replaceAll("<email>",user.email);
+      html=html.replaceAll("<username>",user.username);
+     	var message = {
+        from: "Prodonus  <noreply@prodonus.com>", // sender address
+        to: user.email, // list of receivers
+        subject:changepasswordtemplate.subject, // Subject line
+        html: html.s // html body
+    	};
+	    commonapi.sendMail(message,CONFIG.smtp_general,function(result){
+	      if (result == "failure") {
+	         logger.emit("error","Error in sending mail of change password"+user.email,req.user.userid);
+	      }else {
+	        logger.emit("log","change email  sent to"+user.email); 
+	      }
+	    })
+  	}
+	})
+}
+var _successfullPasswordChange=function(self){
+	logger.emit("log","_successfullPasswordChange");
+	self.emit("successfulChangePassword",{"success":{"message":"Password Changed Successfully"}});
 }
