@@ -67,7 +67,9 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 		})
 	}
 	var _addProduct=function(self,productdata,orgid){
+
 		productdata.orgid=orgid;
+		productdata.features=[{featurename:"product",featuredescription:"product features"}];
 	  var product=new productModel(productdata);
 	  product.save(function(err,product_data){
 	  	if(err){
@@ -319,28 +321,87 @@ var _validateProductFeature=function(self,orgid,prodle,productfeaturedata){
 	}else if(productfeaturedata.length==0){
 		self.emit("failedAddProudctFeatures",{"error":{"code":"EA001","message":"Please provide atleast one product feature"}});
 	}else{
-		_addProductFeature(self,orgid,prodle,productfeaturedata)
+		/////////////////////////////////////////////////////////////////////
+		_checkFeatureNameIsAlreadyExists(self,orgid,prodle,productfeaturedata);
+		/////////////////////////////////////////////////////////
+		
 	}
 
 }
-var _addProductFeature=function(self,orgid,prodle,productfeaturedata){
-
-	productModel.update({orgid:orgid,prodle:prodle},{$addToSet:{features:{$each:productfeaturedata}}}).exec(function(err,productfeatureaddstatus){
+var _checkFeatureNameIsAlreadyExists=function(self,orgid,prodle,productfeaturedata){
+	var feature_exist=[];
+  var new_feature=[];
+  var feature_names=[];
+  for(var i=0;i<productfeaturedata.length;i++){
+  	if(productfeaturedata[i].featurename!=undefined && productfeaturedata[i].featuredescription!=undefined){
+  		feature_names.push(productfeaturedata[i].featurename);
+		}
+  }
+  logger.emit("log","feature_names"+feature_names);		
+  var query=productModel.aggregate({$match:{prodle:prodle}},{$unwind:"$features"},{$match:{"features.featurename":{$in:feature_names}}});
+  logger.emit("log","query"+JSON.stringify(query));
+  query.exec(function(err,product_features){
+  	if(err){
+  		self.emit("failedAddProudctFeatures",{"error":{"code":"ED001","message":"E_checkFeatureNameIsAlreadyExists"+err}});
+  	}else if(product_features.length==0){
+  		var add_product_feature=[];
+  		console.log("hhh");
+  		for(var i=0;i<productfeaturedata.length;i++){
+				
+					add_product_feature.push(productfeaturedata[i]);
+				
+  		}
+  		logger.emit("log","add_product_feature"+add_product_feature);
+  		////////////////////////
+		_addProductFeature(self,orgid,prodle,add_product_feature,[]);
+		//////////////////////////////////
+  	}else{
+  		logger.emit("log","productfeature"+product_features.length);
+  		logger.emit("log","productfeaturedata"+productfeaturedata.length);
+  		if(product_features.length>=productfeaturedata.length){
+  			self.emit("failedAddProudctFeatures",{"error":{"message":"Feature you provided already existed"}});	
+  		}else{
+  			var database_features_name=[];
+  		for(var i=0;i<product_features.length;i++){
+  			database_features_name.push(product_features[i].features.featurename)
+  		}
+  		for(var i=0;i<productfeaturedata.length;i++){
+  			if(productfeaturedata[i].featurename!=undefined && productfeaturedata[i].featuredescription!=undefined){
+  				if(database_features_name.indexOf(productfeaturedata[i].featurename)<0){
+  					new_feature.push(productfeaturedata[i]);
+		  		}else{
+		  			feature_exist.push(productfeaturedata[i]);
+		  		}
+				}
+		  }
+		  logger.emit("log","new features"+new_feature);
+		  logger.emit("log","feature_exist"+feature_exist);
+		  ////////////////////////
+			_addProductFeature(self,orgid,prodle,new_feature,feature_exist);
+			//////////////////////////////////
+  		}
+  	}
+  })
+}
+var _addProductFeature=function(self,orgid,prodle,productfeaturedata,feature_exist){
+  
+ 
+	productModel.update({orgid:orgid,prodle:prodle,},{$addToSet:{features:{$each:productfeaturedata}}}).exec(function(err,productfeatureaddstatus){
 		if(err){
 			self.emit("failedAddProudctFeatures",{"error":{"code":"ED001","message":"Error in db to add product feature"+err}});
 		}else if(productfeatureaddstatus!=1){
 			self.emit("failedAddProudctFeatures",{"error":{"code":"AP001","message":"product id is wrong"}});
 		}else{
 			////////////////////////////////
-			_successfulAddProductFeatures(self);
+			_successfulAddProductFeatures(self,feature_exist);
 			//////////////////////////////////
 		}
 	})
 };
 
-var _successfulAddProductFeatures=function(self){
+var _successfulAddProductFeatures=function(self,feature_exist){
 	logger.emit("log","_successfulAddProductFeatures");
-	self.emit("successfulAddProductFeatures", {"success":{"message":"Product Feature Added Suceessfully"}});
+	self.emit("successfulAddProductFeatures", {"success":{"message":"Product Feature Added Suceessfully","exist_product_feature":feature_exist}});
 }
 Product.prototype.updateProductFeature = function(orgid,prodle,productfeatureid,productfeaturedata) {
 	var self=this;
@@ -422,7 +483,6 @@ var _getProductFeature=function(self,orgid,prodle){
 			{
 				productfeature.features[i].featureid=productfeature.features[i]._id;
 				productfeature.features[i]._id=undefined;
-					
 			}
 			////////////////////////////////
 			_successfulGetProductFeatures(self,productfeature.features);
