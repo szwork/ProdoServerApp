@@ -102,10 +102,11 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
 		}else if(product){
 			userdata.products_followed =[{prodle:product.prodle,orgid:product.orgid}];
-			_addUser(self,userdata,host);
+			 _addUser(self,userdata,host);
 	    }else{
-	       	// self.emit("failedUserRegistration",{"error":{"code":"ED002","message":"No product exist"}});
-	       	_addUser(self,userdata,host);
+	    	
+	    	 _addUser(self,userdata,host);
+
 		}
 	});
 }
@@ -371,7 +372,7 @@ userModel.findOne({userid:user.userid},function(err,userdata){
 
 };
 var _isOrganizationUser=function(user,callback){
-	if(user.org!=undefined){
+	if(user.org!=undefined && user.org.orgid!=null){
 		//console.log("organization user");
 		orgModel.findOne({orgid:user.org.orgid},{name:1,usergrp:1,orgtype:1}).lean().exec(function(err,organization){
             if(err){
@@ -414,12 +415,12 @@ var _isOrganizationUser=function(user,callback){
 }
 var getUserRequiredData=function(user,callback){
     
-	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic};
+	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin };
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	console.log("log","user"+user);
   // user=JSON.stringify(user);
-  console.log("org length"+Object.keys(user.org).length)
+   console.log("org length" +Object.keys(user.org).length)
 		
 	if(user.org.orgid!=null && user.org.isAdmin!=null){
 		user_senddata.org=user.org;
@@ -658,13 +659,16 @@ User.prototype.getUser = function(userid) {
 	_getUser(self,userid);
 };
 var _getUser=function(self,userid){
-	userModel.findOne({userid:userid},{password:0}).lean().exec(function(err,user){
+	userModel.findOne({userid:userid},{verified:0,status:0,password:0,org:0,subscription:0,payment:0,terms:0,adddate:0,updatedate:0,removedate:0,isAdmin:0}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find user"}});
 		}else if(user){
-	         ////////////////////////////////
-			_successfulUserGet(self,user);
-			//////////////////////////////////
+			_isOrganizationUser(user,function(user){
+				 ////////////////////////////////
+				_successfulUserGet(self,user);
+				//////////////////////////////////
+			})
+	        
 		}else{
 		    self.emit("failedUserGet",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 		}
