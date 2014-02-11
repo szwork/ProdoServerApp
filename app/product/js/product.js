@@ -48,11 +48,24 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	    	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
 	  	 }else{
 
-	   	/////////////////////////////
-	   	_addProduct(self,productdata,orgid);
-	   	///////////////////////
+
+	  	_checkProductNameIsSame(self,productdata,orgid);
+	   	
 	   }
 	};
+	var _checkProductNameIsSame=function(self,productdata,orgid){
+		productModel.findOne({name:productdata.name},function(err,product){
+			if(err){
+				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
+			}else if(product){
+				self.emit("failedProductAdd",{"error":{"message":"product name already exist please give another name "}});	
+			}else{
+				/////////////////////////////
+	   		_addProduct(self,productdata,orgid);
+	   		///////////////////////
+			}
+		})
+	}
 	var _addProduct=function(self,productdata,orgid){
 		productdata.orgid=orgid;
 	  var product=new productModel(productdata);

@@ -42,8 +42,8 @@ var userSchema = mongoose.Schema({
     country:{type:String,default:null},
     zipcode:{type:String,default:null}
    },
-  org:{orgid:{type:String,default:null},orgtype:{type:String,default:null},isAdmin:{type:Boolean,default:null}},
-  // orgid: { type:String, ref: 'Organization'},
+  org:{orgid:{type:String,default:null},orgname:{type:String},orgtype:{type:String,default:null},isAdmin:{type:Boolean,default:null}},
+  // orgid: { type:String, ref: 'Organization'}pe,
   // isAdmin:{type:Boolean,default:false},
   subscription:{
     planid:{type:String,ref:"Subscription",default:null} ,//referencing from Subscription 

@@ -196,7 +196,7 @@ var _validateSubscriptionPlan=function(self,organizationdata,sessionuserid,subsc
 	      	var userdata=[];
 	      	for(var i=0;i<newusers.length;i++)
 	     		{
-						userdata[i]={email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false},subscription:{planid:organization.subscription.planid}};
+						userdata[i]={email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid}};
 	      	}
 	        userModel.create(userdata,function(err,inviteuserdata){
 	          if(err){
@@ -741,7 +741,7 @@ var _addOrgInvitees = function(self,orgid,usergrp) {
 				    	var userdata=[];
 					    for(var i=0;i<newusers.length;i++)
 					    {
-					      userdata[i]={email:newusers[i],org:{orgid:orgid,isAdmin:false,orgtype:organization.orgtype},username:newusers[i]};
+					      userdata[i]={email:newusers[i],org:{orgid:orgid,isAdmin:false,orgtype:organization.orgtype,orgname:organization.name},username:newusers[i]};
 					    }
 							userModel.create(userdata,function(err,inviteuserdata){
 								if(err){

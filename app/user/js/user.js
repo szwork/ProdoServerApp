@@ -102,9 +102,12 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
 		}else if(product){
 			userdata.products_followed =[{prodle:product.prodle,orgid:product.orgid}];
-			_addUser(self,userdata,host);
+			 _addUser(self,userdata,host);
 	    }else{
-	       	self.emit("failedUserRegistration",{"error":{"code":"ED002","message":"No product exist"}});
+	    	
+	    	 _addUser(self,userdata,host);
+	    
+	       	// self.emit("failedUserRegistration",{"error":{"code":"ED002","message":"No product exist"}});
 		}
 	});
 }
