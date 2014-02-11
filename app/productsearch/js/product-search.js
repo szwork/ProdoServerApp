@@ -35,55 +35,78 @@ ProductSearch.prototype.searchProduct = function(productsearchdata){
 
 var _validateProductSearchData = function(self,productsearchdata) {
 	console.log("_validateProductSearchData");
-		if(productsearchdata.Product_Name==undefined || productsearchdata.Product_Name=="" || productsearchdata.Product_Name==" "){
-		 	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"Please provide valid prdouct name to search product"}});
-		} else if(productsearchdata.Model_Number == undefined){
-	    	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"please pass model no."}});
-	  	} else if(productsearchdata.Feature == undefined){
-	    	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"please pass product features"}});
-	  	}else if(productsearchdata.Category == undefined){
-	    	self.emit("failedProductSearch",{"error":{"code":"AV001","message":"please pass category"}});
-	  	}else{
-		   	_searchProduct(self,productsearchdata);
-	   	}
+	var searchCriteria = [];
+	var query={};
+		if(productsearchdata.Product_Name!=undefined){
+			if(productsearchdata.Product_Name==""){				
+		 	}else{
+		 		query.name={$regex:"^"+productsearchdata.Product_Name.substring(0,1), $options: 'i'};		 	
+		 		searchCriteria.push({name:{$regex:productsearchdata.Product_Name,$options: 'i'}});
+		 	}
+		}
+		if(productsearchdata.Model_Number!=undefined){
+			if(productsearchdata.Model_Number==""){
+			}else{
+				query.model_no={$regex:"^"+productsearchdata.Model_Number.substring(0,1), $options: 'i'};		 	
+		 		searchCriteria.push({model_no:{$regex:productsearchdata.Model_Number,$options: 'i'}});	
+			}
+			
+	  	}
+	  	if(productsearchdata.Feature!=undefined){
+	  		if(productsearchdata.Feature==""){
+	  		}else{
+	  			query.features={$regex:"^"+productsearchdata.Feature.substring(0,1), $options: 'i'};		 	
+		 		searchCriteria.push({features:{$regex:productsearchdata.Feature,$options: 'i'}});	
+	  		}	  		
+	  	}
+	  	if(productsearchdata.Category!=undefined){
+	  		if(productsearchdata.Category==""){
+	  		}else{
+	  			query.category={$regex:"^"+productsearchdata.Category.substring(0,1), $options: 'i'};		 	
+		 		searchCriteria.push({category:{$regex:productsearchdata.Category,$options: 'i'}});	
+	  		}
+	  		
+	  	}
+		_searchProduct(self,productsearchdata,searchCriteria,query);   
+	   	
 };
-var _searchProduct = function(self,productsearchdata){
-	var firstChar = productsearchdata.Product_Name.substring(0,1);
-	var firstTwoChar = productsearchdata.Product_Name.substring(0,2);
-	var firstThreeChar = productsearchdata.Product_Name.substring(0,3);
+var _searchProduct = function(self,productsearchdata,searchCriteria,query){
+	// var firstChar = productsearchdata.Product_Name.substring(0,1);
+	// var firstTwoChar = productsearchdata.Product_Name.substring(0,2);
+	// var firstThreeChar = productsearchdata.Product_Name.substring(0,3);
 
-	var firstCharM = productsearchdata.Model_Number.substring(0,1);
-	var firstTwoCharM = productsearchdata.Model_Number.substring(0,2);
-	var firstThreeCharM = productsearchdata.Model_Number.substring(0,3);
+	// var firstCharM = productsearchdata.Model_Number.substring(0,1);
+	// var firstTwoCharM = productsearchdata.Model_Number.substring(0,2);
+	// var firstThreeCharM = productsearchdata.Model_Number.substring(0,3);
 
-	var firstCharF = productsearchdata.Feature.substring(0,1);
-	var firstTwoCharF = productsearchdata.Feature.substring(0,2);
-	var firstThreeCharF = productsearchdata.Feature.substring(0,3);
+	// var firstCharF = productsearchdata.Feature.substring(0,1);
+	// var firstTwoCharF = productsearchdata.Feature.substring(0,2);
+	// var firstThreeCharF = productsearchdata.Feature.substring(0,3);
+     // query.$or=searchCriteria;
+	var query = {$or : searchCriteria
+	// 					// {name:
+	// 					// 	{$regex : productsearchdata.Product_Name, $options: 'i'}},
+	// 					// 	{name:{$regex : firstThreeChar, $options: 'i'}},
+	// 					// 	{name:{$regex : firstTwoChar, $options: 'i'}},
+	// 					// 	{name:{$regex : firstChar, $options: 'i'}},
 
-	var query = {$or : [
-						{name:
-							{$regex : productsearchdata.Product_Name, $options: 'i'}},
-							{name:{$regex : firstThreeChar, $options: 'i'}},
-							{name:{$regex : firstTwoChar, $options: 'i'}},
-							{name:{$regex : firstChar, $options: 'i'}},
+	// 					// {model_no:
+	// 					// 	{$regex : productsearchdata.Model_Number, $options: 'i'}},
+	// 					// 	{model_no:{$regex : firstCharM, $options: 'i'}},
+	// 					// 	{model_no:{$regex : firstTwoCharM, $options: 'i'}},
+	// 					// 	{model_no:{$regex : firstThreeCharM, $options: 'i'}},
 
-						{model_no:
-							{$regex : productsearchdata.Model_Number, $options: 'i'}},
-							{model_no:{$regex : firstCharM, $options: 'i'}},
-							{model_no:{$regex : firstTwoCharM, $options: 'i'}},
-							{model_no:{$regex : firstThreeCharM, $options: 'i'}},
+	// 					// {features:
+	// 					// 	{featurename:{$regex:productsearchdata.Feature, $options: 'i'}}},
+	// 					// 	{features:{featurename:{$regex :firstCharF, $options: 'i'}}},
+	// 					// 	{features:{featurename:{$regex :firstTwoCharF, $options: 'i'}}},
+	// 					// 	{features:{featurename:{$regex :firstThreeCharF, $options: 'i'}}},
 
-						{features:
-							{featurename:{$regex:productsearchdata.Feature, $options: 'i'}}},
-							{features:{featurename:{$regex :firstCharF, $options: 'i'}}},
-							{features:{featurename:{$regex :firstTwoCharF, $options: 'i'}}},
-							{features:{featurename:{$regex :firstThreeCharF, $options: 'i'}}},
-
-						{category:{prodle:
-							{$regex : productsearchdata.Category, $options: 'i'}}}
-						]
+	// 					// {category:{prodle:
+	// 					// 	{$regex : productsearchdata.Category, $options: 'i'}}}
+						
 				}
-				console.log("Q " + query);
+		console.log(query);	
 	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 		if(err){
 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});
