@@ -955,22 +955,29 @@ var _resetPassword=function(self,userid,userdata){
 		if(err){
 			self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(user){
-			user.password=newpassword;
-      // user.isOtpPassword=false;
-      user.save(function(err,user_data){
-        if(err){
-          self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"Error in db to change the password"}});
-        }else{
-          /////////////////////////////
-					_successfulUserResetPassword(self);
-				  /////////////////////////////
-        }
-      })
+			commonapi.getbcrypstring(newpassword,function(err,newencryptedpasswrod){
+				if(err){
+					logger.emit("error","Error to encrypt password _updatePassword");
+					self.emit("failedUserResetPassword",{"error":{"message":"Server Issue plese try again"}});	
+				}else{
+					userModel.update({userid:userid},{$set:{password:newencryptedpasswrod}},function(err,userpasswordchangestatus){
+						if(err){
+							logger.emit("error","Database issue"+err,user.userid);
+							self.emit("failedUserResetPassword",{"error":{"message":"Database Server Issue"}});	
+						}else if(userpasswordchangestatus==0){
+							self.emit("failedUserResetPassword",{"error":{"code":"AU005","message":"Wrong password"}});	
+						}else{
+							////////////////////////////////
+							_successfulUserResetPassword(self);
+				  		////////////////////////////////
+						}
+		  		})
+				}
+			})
     }else{
 			self.emit("failedUserResetPassword",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 		}
  	});
-	
 }
 var _successfulUserResetPassword = function(self) {
 		//validate the user data
@@ -1618,18 +1625,26 @@ var _checkPassWordIsCorrectToChangeEmail=function(self,userid,userdata,user){
   })
 }
 var _updateEmail=function(self,userid,userdata,user){
-	userModel.update({userid:userid},{$set:{email:userdata.email}},function(err,useremailupdatestatus){
+	userModel.findOne({email:userdata.email},function(err,useremailcheck){
 		if(err){
-			self.emit("failedChangeEmail",{"error":{"code":"ED001","message":"Database Issue"}});
-		}else if(useremailupdatestatus==0){
-			self.emit("failedChangeEmail",{"error":{"code":"AU005","message":"wrong userid"+_updateEmail}});
+			self.emit("failedChangeEmail",{"error":{"message":"Database Issue"}});	
+		}else if(useremailcheck){
+			self.emit("failedChangeEmail",{"error":{"message":"Email already exists"}});	
 		}else{
-			/////////////////////////////////////////////
-			_sendEmailForChangeEmail(userid,userdata,user);
-			////////////////////////////////////////
-			//////////////////////////////
-			_successfullEmailChange(self);
-			/////////////////////////////
+			userModel.update({userid:userid},{$set:{email:userdata.email}},function(err,useremailupdatestatus){
+				if(err){
+					self.emit("failedChangeEmail",{"error":{"code":"ED001","message":"Database Issue"+err}});
+				}else if(useremailupdatestatus==0){
+					self.emit("failedChangeEmail",{"error":{"code":"AU005","message":"wrong userid"+_updateEmail}});
+				}else{
+					/////////////////////////////////////////////
+					_sendEmailForChangeEmail(userid,userdata,user);
+					////////////////////////////////////////
+					//////////////////////////////
+					_successfullEmailChange(self);
+					/////////////////////////////
+				}
+			})
 		}
 	})
 }
@@ -1718,21 +1733,29 @@ var _checkPassWordIsCorrectToChangePassword=function(self,userid,userdata,user){
   })
 }
 var _updatePassword=function(self,userid,userdata,user){
-	user.password=userdata.newpassword;
-  user.save(function(err,user_data){
-    if(err){
-      self.emit("failedChangePassword",{"error":{"code":"ED001","message":" _updatePassword:Error in db to change the password"}});
-    }else{
-      /////////////////////////////
-			_successfullPasswordChange(self);
-		  /////////////////////////////
+	commonapi.getbcrypstring(userdata.newpassword,function(err,newencryptedpasswrod){
+		if(err){
+			logger.emit("error","Error to encrypt password _updatePassword");
+			self.emit("failedChangePassword",{"error":{"message":"Server Issue plese try again"}});	
+		}else{
+			userModel.update({userid:userid},{$set:{password:newencryptedpasswrod}},function(err,userpasswordchangestatus){
+				if(err){
+					logger.emit("error","Database issue"+err,user.userid);
+					self.emit("failedChangePassword",{"error":{"message":"Database Server Issue"}});	
+				}else if(userpasswordchangestatus==0){
+					self.emit("failedChangePassword",{"error":{"code":"AU005","message":"Wrong password"}});	
+				}else{
+					/////////////////////////////
+					_successfullPasswordChange(self);
+		  		/////////////////////////////
 
-		  ////////////////////////////
-		  _sendEmailForChangePassword(userid,userdata,user);
-		  /////////////////////////////
-
-    }
-  })
+		  		////////////////////////////
+		  		_sendEmailForChangePassword(userid,userdata,user);
+		  		/////////////////////////////
+				}
+  		})
+		}
+	})
 }
 var _sendEmailForChangePassword=function(userid,userdata,user){
 	EmailTemplateModel.findOne({templatetype:"passwordchange"},function(err,changepasswordtemplate){
