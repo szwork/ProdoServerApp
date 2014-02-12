@@ -1161,7 +1161,12 @@ var _sendMailToOrgMemberUserDelete=function(self,sessionuser,orgid,usermemberid,
 					subject=subject.replaceAll("<grpname>",grpname);
 					var template=S(orguserremovetemplate.description);
 					template=template.replaceAll("<adminuser>",sessionuser.username);
-					template=template.replaceAll("<tousername>",orguser.username);
+					if(orguser.firstname!=undefined){
+						template=template.replaceAll("<tousername>",orguser.firstname);
+					}else{
+						template=template.replaceAll("<tousername>",orguser.username);
+					}
+					
 					template=template.replaceAll("<orgname>",orgname);
 					template=template.replaceAll("<grpname>",grpname);
 
@@ -1182,4 +1187,58 @@ var _sendMailToOrgMemberUserDelete=function(self,sessionuser,orgid,usermemberid,
 			})
 		}
 	})
+}
+Organization.prototype.broadCastMessage=function(user,orgid,broadcastmessagedata){
+	var self=this;
+	/////////////////////
+	_validateBroadcastMessage(self,user,orgid,broadcastmessagedata);
+}
+var _validateBroadcastMessage=function(self,user,orgid,broadcastmessagedata){
+	if(broadcastmessagedata==undefined){
+		self.emit("failedBroadcastMessage",{"error":{"code":"AV001","message":"Please pass broadcast data"}}); 
+	}else if(broadcastmessagedata.message==undefined){
+		self.emit("failedBroadcastMessage",{"error":{"code":"AV001","message":"Please pass message"}}); 
+	}else if(broadcastmessagedata.expireindays==undefined){
+		self.emit("failedBroadcastMessage",{"error":{"code":"AV001","message":"Please pass expireindays"}}); 
+	}else if(!S(broadcastmessagedata.expireindays).isNumeric()){
+		self.emit("failedBroadcastMessage",{"error":{"code":"AV001","message":"Please pass expireindays in numeric"}}); 
+	}else{
+		_broadcastOrganizationMessage(self,user,orgid,broadcastmessagedata);
+	}
+	
+	
+}
+var _broadcastOrganizationMessage=function(self,user,orgid,broadcastmessagedata){
+	orgModel.findOne({orgid:orgid},function(err,organization){
+		if(err){
+			logger.emit("logger","Database Issue:"+err,user.userid)
+			self.emit("failedBroadcastMessage",{"error":{"code":"ED001","message":"Database Server Issue"}}); 
+		}else if(!organization){
+			self.emit("failedBroadcastMessage",{"error":{"code":"AO002","message":"Wrong orgid"}}); 
+		}else{
+			var expirydate = new Date();
+			logger.emit("log","expirydate"+expirydate)
+			expirydate.setDate(expirydate.getDate()+parseInt(broadcastmessagedata.expireindays));
+			expirydate=new Date(expirydate);
+			logger.emit("log","expirydate"+broadcastmessagedata.expireindays)
+			broadcastmessagedata.expirydate=expirydate;
+			orgModel.update({orgid:orgid},{$push:{broadcast:broadcastmessagedata}},function(err,broadcastmessagestatus){
+				if(err){
+					logger.emit("logger","Database Issue:"+err,user.userid)
+					self.emit("failedBroadcastMessage",{"error":{"code":"ED001","message":"Database Server Issue"}}); 
+				}else if(broadcastmessagestatus==0){
+					self.emit("failedBroadcastMessage",{"error":{"code":"AO002","message":"Wrong orgid"}}); 
+				}else{
+					/////////////////////////////////
+					_successfullBroadCastMessage(self,broadcastmessagedata);
+					/////////////////////////////////
+				}
+			})		
+		}
+	})
+}
+var _successfullBroadCastMessage=function(self,broadcastmessagedata){
+	logger.emit("log","_successfullBroadCastMessage");
+	broadcastmessagedata.expireindays=undefined;
+	self.emit("successfulBroadastMessage",{"success":{"message":"Broadcasting message successfully","broadcast":broadcastmessagedata}});
 }

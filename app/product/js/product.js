@@ -69,18 +69,18 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	var _addProduct=function(self,productdata,orgid){
 
 		productdata.orgid=orgid;
-		productdata.features=[{featurename:"product",featuredescription:"product features"}];
-	  var product=new productModel(productdata);
-	  product.save(function(err,product_data){
-	  	if(err){
-	  		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
-	  	}else{
-	  		///////////////////////
-	  		_successfulProductAdd(self);
-	  		//////////////////////////
-	  	  
-	  	}
-	  })
+		productdata.features=[{featurename:productdata.name,featuredescription:"product features"}];
+	    var product=new productModel(productdata);
+	    product.save(function(err,product_data){
+		  	if(err){
+		  		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
+		  	}else{
+		  		///////////////////////
+		  		_successfulProductAdd(self);
+		  		//////////////////////////
+		  	  
+		  	}
+	  	})
 
 	}
 	var _successfulProductAdd=function(self){
