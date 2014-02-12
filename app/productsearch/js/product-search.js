@@ -37,13 +37,16 @@ ProductSearch.prototype.searchProduct = function(productsearchdata){
 var _validateProductSearchData = function(self,productsearchdata) {
 	console.log("_validateProductSearchData");
 	var searchCriteria = [];
-	var query={status:{$in:["active","init"]}};
+	var query={/*status:{$in:["active","init"]}*/};
+
 		if(productsearchdata.Product_Name!=undefined){
 			if(productsearchdata.Product_Name==""){				
 		 	}else{
 		 		var prod_name_arr = [];
 		 		if(S(productsearchdata.Product_Name).contains(",")){
 		 			prod_name_arr=productsearchdata.Product_Name.split(",");
+		 		}else if(S(productsearchdata.Product_Name).contains(" ")){
+		 			prod_name_arr=productsearchdata.Product_Name.split(" ");
 		 		}else{
 		 			prod_name_arr.push(productsearchdata.Product_Name);
 		 		}
@@ -58,12 +61,15 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		query.name={$in:product_or_name_array};		 		
 		 	}
 		}
+
 		if(productsearchdata.Model_Number!=undefined){
 			if(productsearchdata.Model_Number==""){
 			}else{
 				var model_no_array = [];
 		 		if(S(productsearchdata.Model_Number).contains(",")){
 		 			model_no_array=productsearchdata.Model_Number.split(",");
+		 		}else if(S(productsearchdata.Model_Number).contains(" ")){
+		 			model_no_array=productsearchdata.Model_Number.split(" ");
 		 		}else{
 		 			model_no_array.push(productsearchdata.Model_Number);
 		 		}
@@ -71,19 +77,21 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		// searchCriteria.push({model_no:new RegExp('^'+productsearchdata.Model_Number, "i")});	
 		 		var model_no_or_array=[];
 		 		for(var i=0;i<model_no_array.length;i++){
-		 			model_no_or_array.push(new RegExp('^'+model_no_array[i].substr(0,1), "i"));
+		 			model_no_or_array.push(new RegExp('^'+model_no_array[i], "i"));
 		 			searchCriteria.push({model_no: model_no_array[i]});
 		 		}
-		 		 query.model_no={$in:model_no_or_array};	
-			}
-			
+		 		query.model_no={$in:model_no_or_array};	
+			}			
 	  	}
+
 	  	if(productsearchdata.Feature!=undefined){
 	  		if(productsearchdata.Feature==""){
 	  		}else{
 	  			var feature_array = [];
 		 		if(S(productsearchdata.Feature).contains(",")){
 		 			feature_array=productsearchdata.Feature.split(",");
+		 		}else if(S(productsearchdata.Feature).contains(" ")){
+		 			feature_array=productsearchdata.Feature.split(" ");
 		 		}else{
 		 			feature_array.push(productsearchdata.Feature);
 		 		}
@@ -97,12 +105,15 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		query["features.featurename"]={$in:feature_or_array};
 	  		}	  		
 	  	}
+
 	  	if(productsearchdata.Category!=undefined){
 	  		if(productsearchdata.Category==""){
 	  		}else{
 	  			var category_array = [];
 		 		if(S(productsearchdata.Category).contains(",")){
 		 			category_array=productsearchdata.Category.split(",");
+		 		}else if(S(productsearchdata.Category).contains(" ")){
+		 			category_array=productsearchdata.Category.split(" ");
 		 		}else{
 		 			category_array.push(productsearchdata.Category);
 		 		}
@@ -114,12 +125,12 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 			searchCriteria.push({"category.prodle": new RegExp(category_array[i], "i")});
 		 		}
 		 		query["category.prodle"]={$in:category_or_array};
-	  		}
-	  		
+	  		}	  		
 	  	}
-		_searchProduct(self,productsearchdata,searchCriteria,query);   
-	   	
+
+		_searchProduct(self,productsearchdata,searchCriteria,query);	   	
 };
+
 var _searchProduct = function(self,productsearchdata,searchCriteria,query){	
     
     query.$or=searchCriteria;	
@@ -127,8 +138,8 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 		if(err){
 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});
-		// }else if(doc.length==0){
-		// 	self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Product does not exist with given name"}});
+		}else if(doc.length==0){
+			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"No product found for specified criteria"}});
 		}else{
 			// var productName = [];
 			// for(var i=0;i<doc.length;i++){
@@ -140,5 +151,5 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 }
 var _successfulProductSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
-	self.emit("successfulProductSearch", {"success":{"message":"Product details","doc":doc}});
+	self.emit("successfulProductSearch", {"success":{"message":+doc.length+" Products Found","doc":doc}});
 }

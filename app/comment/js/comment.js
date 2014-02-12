@@ -284,7 +284,7 @@ var _updateFeatureAnalytics = function(prodle,analytics,product){
     console.log("_updateFeatureAnalytics");
     //checking tagid and tagname exist
     var query = {prodle:prodle,featureid:analytics.featureid};
-    TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
+    TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1,tagname:1}).lean().exec(function(err,tagdata){
 		if(err){
             console.log("Error in db to find feature id err message: " + err);
         }else if(!tagdata){
