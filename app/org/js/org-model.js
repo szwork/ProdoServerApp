@@ -77,7 +77,8 @@ var OrganizationSchema = mongoose.Schema({
     payment:{paymentid:{type:String,default:null}},
     org_images:[{image:{type:String},imageid:{type:String}}], 
     orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
-    terms:{type:Boolean}
+    terms:{type:Boolean},
+    broadcast:[{message:{type:String},expirydate:{type:Date}}]
 
 });
 

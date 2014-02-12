@@ -1378,7 +1378,9 @@ var _sendUserInvitaion=function(self,userinvitedata,sessionuserid){
 				}else{
 					for(var i=0;i<userinvitedata.length;i++)
 					{
-			  		self.emit("senduserinvite",userinvite_emailtemplate,userinvitedata[i],user);
+						if(userinvitedata[i].name!=undefined && userinvitedata[i].name!="" && userinvitedata[i].email!=undefined && userinvitedata[i].email!="" && sValidEmail(userinvitedata[i].email).error==undefined){
+			  				self.emit("senduserinvite",userinvite_emailtemplate,userinvitedata[i],user);
+						}
 					}
 					///////////////////////////////////////////////////////////////
 					_addUserInviteIntoBusinessOpportunity(self,userinvitedata,user);
@@ -1631,6 +1633,7 @@ var _updateEmail=function(self,userid,userdata,user){
 		}else if(useremailcheck){
 			self.emit("failedChangeEmail",{"error":{"message":"Email already exists"}});	
 		}else{
+
 			userModel.update({userid:userid},{$set:{email:userdata.email}},function(err,useremailupdatestatus){
 				if(err){
 					self.emit("failedChangeEmail",{"error":{"code":"ED001","message":"Database Issue"+err}});
@@ -1656,11 +1659,17 @@ var _sendEmailForChangeEmail=function(userid,userdata,user){
 			logger.emit("error","Change Email template not exist");
 		}else{
 			var html=S(changeemailtemplate.description); 
-      html=html.replaceAll("<email>",user.email);
-      html=html.replaceAll("<username>",user.username);
+      html=html.replaceAll("<oldemail>",user.email);
+      html=html.replaceAll("<newemail>",userdata.email);
+      
+      if(user.firstname!=undefined){
+      	html=html.replaceAll("<user>",user.firstname);
+      }else{
+        html=html.replaceAll("<user>",user.username);
+  	 }
      	var message = {
         from: "Prodonus  <noreply@prodonus.com>", // sender address
-        to: userdata.email, // list of receivers
+        to: userdata.email+","+user.email, // list of receivers
         subject:changeemailtemplate.subject, // Subject line
         html: html.s // html body
     	};
@@ -1765,8 +1774,13 @@ var _sendEmailForChangePassword=function(userid,userdata,user){
 			logger.emit("error","Change Email template not exist");
 		}else{
 			var html=S(changepasswordtemplate.description); 
-      html=html.replaceAll("<email>",user.email);
-      html=html.replaceAll("<username>",user.username);
+      html=html.replaceAll("<newpassword>",userdata.newpassword);
+      if(user.firstname!=undefined){
+      	html=html.replaceAll("<user>",user.firstname);
+      }else{
+        html=html.replaceAll("<user>",user.username);
+      }
+      
      	var message = {
         from: "Prodonus  <noreply@prodonus.com>", // sender address
         to: user.email, // list of receivers
