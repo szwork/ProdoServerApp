@@ -705,3 +705,26 @@ exports.broadcastMessage=function(req,res){
     //////////////////////////////// 
   }
 }
+exports.getBroadcastMessage=function(req,res){
+  var orgid=req.params.orgid;
+  var sessionuserid=req.user.userid;
+  // var broadcastmessagedata=req.body.broadcast;
+  var organization=new Organization();
+  
+  // logger.emit("log","orgid:"+orgid+"grpid:"+grpid+"usermemberid:"+usermemberid);
+  organization.removeAllListeners("failedGetBroadcastMessage");
+  organization.on("failedGetBroadcastMessage",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulGetBroadastMessage");
+  organization.on("successfulGetBroadastMessage",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  
+    /////////////////////////////////
+    organization.GetBroadCastMessage(orgid);
+    //////////////////////////////// 
+  
+}

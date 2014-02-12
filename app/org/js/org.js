@@ -1222,6 +1222,7 @@ var _broadcastOrganizationMessage=function(self,user,orgid,broadcastmessagedata)
 			expirydate=new Date(expirydate);
 			logger.emit("log","expirydate"+broadcastmessagedata.expireindays)
 			broadcastmessagedata.expirydate=expirydate;
+			broadcastmessagedata.datecreated=new Date();
 			orgModel.update({orgid:orgid},{$push:{broadcast:broadcastmessagedata}},function(err,broadcastmessagestatus){
 				if(err){
 					logger.emit("logger","Database Issue:"+err,user.userid)
@@ -1241,4 +1242,30 @@ var _successfullBroadCastMessage=function(self,broadcastmessagedata){
 	logger.emit("log","_successfullBroadCastMessage");
 	broadcastmessagedata.expireindays=undefined;
 	self.emit("successfulBroadastMessage",{"success":{"message":"Broadcasting message successfully","broadcast":broadcastmessagedata}});
+}
+ Organization.prototype.GetBroadCastMessage=function(orgid){
+	var self=this;
+	///////////////////////////////
+	_getBroadcastMessage(self,orgid);
+	//////////////////////////////
+}
+var _getBroadcastMessage=function(self,orgid){
+	orgModel.aggregate({$match:{orgid:orgid}},{$unwind:"$broadcast"},{$match:{"broadcast.expirydate":{$gte:new Date()}}},{$project:{broadcast:1}},function(err,broadcastmessage){
+		if(err){
+			self.emit("failedGetBroadcastMessage",{"error":{"code":"ED001","message":"Database Server Issue"}}); 	
+		}else if(broadcastmessage.length==0){
+				self.emit("failedGetBroadcastMessage",{"error":{"message":"There is no message to broadcast"}}); 	
+		}else{
+			var broadcast=[];
+			for(var i=0;i<broadcastmessage.length;i++){
+				broadcast.push(broadcastmessage[i].broadcast);
+			}
+			/////////////////////////////////////
+			_successfullGetBroadcastMessage(self,broadcast);
+			///////////////////////////////////
+		}
+	})
+}
+var  _successfullGetBroadcastMessage=function(self,broadcastmessage){
+	self.emit("successfulGetBroadastMessage",{"success":{"message":"Getting Broadcast Message Successfully","broadcast":broadcastmessage}});
 }

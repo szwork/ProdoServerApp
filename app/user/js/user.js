@@ -1378,7 +1378,7 @@ var _sendUserInvitaion=function(self,userinvitedata,sessionuserid){
 				}else{
 					for(var i=0;i<userinvitedata.length;i++)
 					{
-						if(userinvitedata[i].name!=undefined && userinvitedata[i].name!="" && userinvitedata[i].email!=undefined && userinvitedata[i].email!="" && sValidEmail(userinvitedata[i].email).error==undefined){
+						if(userinvitedata[i].name!=undefined && userinvitedata[i].name!="" && userinvitedata[i].email!=undefined && userinvitedata[i].email!="" && isValidEmail(userinvitedata[i].email).error==undefined){
 			  				self.emit("senduserinvite",userinvite_emailtemplate,userinvitedata[i],user);
 						}
 					}
