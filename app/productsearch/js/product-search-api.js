@@ -15,14 +15,15 @@ exports.searchProduct = function(req,res){
 	var sessionuserid=req.user.userid;
 
    // logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
-    productsearch.removeAllListeners("failedProductSearch");
-    productsearch.on("failedProductSearch",function(err){
+    productsearch.removeAllListeners("failedToSearchProduct");
+    productsearch.on("failedToSearchProduct",function(err){
       logger.emit("error", err.error.message,sessionuserid);
       res.send(err);
     });
     productsearch.removeAllListeners("successfulProductSearch");
     productsearch.on("successfulProductSearch",function(doc){
       logger.emit("info", doc.success.message,sessionuserid);
+      // console.log("L " + doc.success.doc.length);
       res.send(doc);
     });
 
