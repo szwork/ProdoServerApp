@@ -37,7 +37,7 @@ ProductSearch.prototype.searchProduct = function(productsearchdata){
 var _validateProductSearchData = function(self,productsearchdata) {
 	console.log("_validateProductSearchData");
 	var searchCriteria = [];
-	var query={/*status:{$in:["active","init"]}*/};
+	var query={status:{$in:["active","init"]}};
 
 		if(productsearchdata.Product_Name!=undefined){
 			if(productsearchdata.Product_Name==""){				
@@ -139,7 +139,7 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 		if(err){
 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});
 		}else if(doc.length==0){
-			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"No product found for specified criteria"}});
+			self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
 		}else{
 			// var productName = [];
 			// for(var i=0;i<doc.length;i++){
@@ -151,5 +151,5 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 }
 var _successfulProductSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
-	self.emit("successfulProductSearch", {"success":{"message":+doc.length+" Products Found","doc":doc}});
+	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Products Found","doc":doc}});
 }
