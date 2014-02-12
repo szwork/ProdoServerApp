@@ -1160,8 +1160,8 @@ var _sendMailToOrgMemberUserDelete=function(self,sessionuser,orgid,usermemberid,
 					subject=subject.replaceAll("<orgname>",orgname);
 					subject=subject.replaceAll("<grpname>",grpname);
 					var template=S(orguserremovetemplate.description);
-					template=template.replaceAll("<email>",sessionuser.email);
-					template=template.replaceAll("<fromusername>",sessionuser.username);
+					template=template.replaceAll("<adminuser>",sessionuser.username);
+					template=template.replaceAll("<tousername>",orguser.username);
 					template=template.replaceAll("<orgname>",orgname);
 					template=template.replaceAll("<grpname>",grpname);
 

@@ -236,7 +236,7 @@ passport.deserializeUser(function(id, done) {
 exports.updateUser = function(req, res) {
   var userid=req.params.userid;
   var userdata=req.body.user;
-
+  logger.emit("log","update req body"+JSON.stringify(req.body));
   var user = new User(userdata);
   var sessionuserid=req.user.userid;
    user.removeAllListeners("failedUserUpdation");
@@ -658,4 +658,56 @@ exports.passwordUrlAction=function(req,res){
   
   });
   user.passwordUrlAction(token);
+}
+exports.changeEmail = function(req, res) {
+  var userid=req.params.userid;
+  var userdata=req.body.user;
+
+  var user = new User(userdata);
+  var sessionuserid=req.user.userid;
+   user.removeAllListeners("failedChangeEmail");
+    user.on("failedChangeEmail",function(err){
+      logger.emit("log","failedUserRegistration"+JSON.stringify(err));
+      logger.emit("error", err.error.message);
+      // //user.removeAllListeners();
+      res.send(err);
+    });
+    user.removeAllListeners("successfulChangeEmail");
+    user.on("successfulChangeEmail",function(result){
+      logger.emit("info", result.success.message);
+      // user.removeAllListeners();
+      res.send(result);
+    });
+    if(sessionuserid==userid){
+      user.changeEmail(userid);
+    }else{
+     user.emit("failedChangeEmail",{"error":{"code":"EA001","message":"You have not authorize to change email"}})
+    }
+    
+}
+exports.changePassword = function(req, res) {
+  var userid=req.params.userid;
+  var userdata=req.body.user;
+
+  var user = new User(userdata);
+  var sessionuserid=req.user.userid;
+   user.removeAllListeners("failedChangePassword");
+    user.on("failedChangePassword",function(err){
+      logger.emit("log","failedChangePassword"+JSON.stringify(err));
+      logger.emit("error", err.error.message);
+      // //user.removeAllListeners();
+      res.send(err);
+    });
+    user.removeAllListeners("successfulChangePassword");
+    user.on("successfulChangePassword",function(result){
+      logger.emit("info", result.success.message);
+      // user.removeAllListeners();
+      res.send(result);
+    });
+    if(sessionuserid==userid){
+      user.changePassword(userid);
+    }else{
+     user.emit("failedChangePassword",{"error":{"code":"EA001","message":"You have not authorize to change password"}})
+    }
+    
 }
