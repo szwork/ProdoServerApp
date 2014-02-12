@@ -982,7 +982,7 @@ var _resetPassword=function(self,userid,userdata){
 var _successfulUserResetPassword = function(self) {
 		//validate the user data
 		logger.emit("log","_successfulUserResetPassword");
-		logger.emit("log","_successfulUserResetPassword");
+		
 		self.emit("successfulUserResetPassword", {"success":{"message":"User password changed successfully"}});
 	}
    
