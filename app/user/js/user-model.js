@@ -60,7 +60,8 @@ var userSchema = mongoose.Schema({
   adddate:{ type:Date,default:Date.now },
   updatedate:{ type:Date},
   removedate:{ type:Date},
-  profile_pic:{type:String,default:null}
+  profile_pic:{type:String,default:null},
+  isAdmin:{type:Boolean,default:false}
 });
 
 //Encrypt the password and generate the idwhen you save.
