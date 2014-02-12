@@ -190,7 +190,19 @@ var _commentImageUpload=function(self,commentdata,product,awsparams){
   }) 
 }
 var _addComment=function(self,prodle,commentdata,product){
+
+	var tags_array=[];
+	if(commentdata.analytics.length>0){
+		for(var i=0;i<commentdata.analytics.length;i++){
+			if(commentdata.analytics[i].tag!=undefined){
+				tags_array.push(commentdata.analytics[i].tag);
+			}
+		}
+	}
+	commentdata.tags=tags_array;
 	var comment_data=new CommentModel(commentdata);
+	
+
 	comment_data.save(function(err,product_commentdata){
 		if(err){
 			self.emit("failedAddComment",{"error":{"code":"ED001","message":"Error in db to save new comment"}});
@@ -247,7 +259,7 @@ var _addFeatureAnalytics = function(prodle,analytics,product){
 var _addNewFeatureAnalytics = function(prodle,analytics,product){
 	console.log("_addNewFeatureAnalytics");
 	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
-	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
+	TagReferenceDictionary.findOne({tagname:analytics.tag, $options: 'i'},{tagid:1}).lean().exec(function(err,tagdata){
 		if(err){
             console.log("Error in db to find feature id err message: " + err);
         }else if(!tagdata){
@@ -277,7 +289,7 @@ var _updateFeatureAnalytics = function(prodle,analytics,product){
             console.log("Error in db to find tag id and tag name err message: " + err);
         }else if(!analyticsdata){
         	_addNewFeatureAnalytics(prodle,analytics,product);
-            console.log("Tag id and tag name does not exist");
+            // console.log("Tag id and tag name does not exist");
         }else{
             //increment count
             FeatureAnalyticsModel.update(query,{$inc:{"analytics.$.count":1}},function(err,analyticsupdatedata){

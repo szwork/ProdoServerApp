@@ -17,7 +17,12 @@ exports.addTag = function(req, res) {
     	logger.emit("info", result.success.message);      
 		res.send(result);
 	});
-    tagreffdictionary.addTag(sessionuserid,tagReffDicData);    
+	if(req.user.isAdmin==true){
+		tagreffdictionary.addTag(sessionuserid,tagReffDicData);
+	}else{
+		tagreffdictionary.emit("failedAddTagReffDictionary",{"error":{"message":"You are not authorized to add tag"}});
+	}
+    
 }
 
 exports.getAllTag = function(req, res) {
