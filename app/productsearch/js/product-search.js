@@ -52,6 +52,14 @@ var _searchProduct = function(self,productsearchdata){
 	var firstTwoChar = productsearchdata.Product_Name.substring(0,2);
 	var firstThreeChar = productsearchdata.Product_Name.substring(0,3);
 
+	var firstCharM = productsearchdata.Model_Number.substring(0,1);
+	var firstTwoCharM = productsearchdata.Model_Number.substring(0,2);
+	var firstThreeCharM = productsearchdata.Model_Number.substring(0,3);
+
+	var firstCharF = productsearchdata.Feature.substring(0,1);
+	var firstTwoCharF = productsearchdata.Feature.substring(0,2);
+	var firstThreeCharF = productsearchdata.Feature.substring(0,3);
+
 	var query = {$or : [
 						{name:
 							{$regex : productsearchdata.Product_Name, $options: 'i'}},
@@ -61,9 +69,15 @@ var _searchProduct = function(self,productsearchdata){
 
 						{model_no:
 							{$regex : productsearchdata.Model_Number, $options: 'i'}},
+							{model_no:{$regex : firstCharM, $options: 'i'}},
+							{model_no:{$regex : firstTwoCharM, $options: 'i'}},
+							{model_no:{$regex : firstThreeCharM, $options: 'i'}},
 
-						{features:{featurename:
-							{$regex : productsearchdata.Feature, $options: 'i'}}},
+						{features:
+							{featurename:{$regex:productsearchdata.Feature, $options: 'i'}}},
+							{features:{featurename:{$regex :firstCharF, $options: 'i'}}},
+							{features:{featurename:{$regex :firstTwoCharF, $options: 'i'}}},
+							{features:{featurename:{$regex :firstThreeCharF, $options: 'i'}}},
 
 						{category:{prodle:
 							{$regex : productsearchdata.Category, $options: 'i'}}}
