@@ -39,4 +39,7 @@ exports.init = function (app) {
  app.post("/api/orgcustomerinvite/:orgid",auth,api.orgapi.OrgCustomerInvites);
  app.delete("/api/orggroupmember/:orgid/:grpid/:userid",auth,api.orgapi.removeOrgGroupMembers);
  app.post("/api/organization/broadcast/:orgid",auth,api.orgapi.broadcastMessage);
+ app.get("/api/organization/broadcast/:orgid",auth,api.orgapi.getBroadcastMessage);
+ 
+
 }
