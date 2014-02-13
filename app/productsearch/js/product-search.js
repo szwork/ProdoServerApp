@@ -40,12 +40,12 @@ var _validateProductSearchData = function(self,productsearchdata) {
 	var query={status:{$in:["active","init"]}};
 
 		if(productsearchdata.Product_Name!=undefined){
-			if(productsearchdata.Product_Name==""){				
+			if(productsearchdata.Product_Name==""){
 		 	}else{
 		 		var prod_name_arr = [];
 		 		if(S(productsearchdata.Product_Name).contains(",")){
 		 			prod_name_arr=productsearchdata.Product_Name.split(",");
-		 		}else if(S(productsearchdata.Product_Name).contains(" ")){
+		 		}else if(S(productsearchdata.Product_Name).contains(" ")){		 			
 		 			prod_name_arr=productsearchdata.Product_Name.split(" ");
 		 		}else{
 		 			prod_name_arr.push(productsearchdata.Product_Name);
@@ -56,7 +56,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
                 var product_or_name_array=[];
 		 		for(var i=0;i<prod_name_arr.length;i++){
 		 			product_or_name_array.push(new RegExp('^'+prod_name_arr[i].substr(0,1), "i"));
-		 			searchCriteria.push({name: new RegExp(prod_name_arr[i], "i")});
+		 			searchCriteria.push({name: new RegExp(prod_name_arr[i].substr(0,1), "i")});
 		 		}
 		 		query.name={$in:product_or_name_array};		 		
 		 	}
