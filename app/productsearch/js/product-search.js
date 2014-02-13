@@ -17,7 +17,7 @@ var util = require("util");
 var events = require("events");
 var logger = require("../../common/js/logger");
 var commonapi = require('../../common/js/common-api');
-var S= require("string");
+var S = require("string");
 
 
 var ProductSearch = function(productsearchdata) {
@@ -131,10 +131,10 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		_searchProduct(self,productsearchdata,searchCriteria,query);	   	
 };
 
-var _searchProduct = function(self,productsearchdata,searchCriteria,query){	
+var _searchProduct = function(self,productsearchdata,searchCriteria,query){
     
     query.$or=searchCriteria;	
-	console.log(query);	
+	console.log(query);
 	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 		if(err){
 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});

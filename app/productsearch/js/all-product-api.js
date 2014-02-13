@@ -11,22 +11,28 @@ exports.allProduct = function(req,res){
 	// var query = {}
 	var start = new Date;
 	// var strs = [];
-	ProductModel.find({},{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
+	ProductModel.find({/*status:{$in:["active","init"]}*/},{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 		if(err){
 			res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
 		}else if(doc.length==0){
 			res.send({"error":{"code":"ED001","message":"No product exists"}});
 		}else{
+			var prod_name_arr = [];
+			for(var i=0;i<doc.length;i++){
+				console.log(doc[i].name);				
+				prod_name_arr.push(doc[i].name);
+			}
 			////////////////////////////////			
-			_successfulGetAllProduct(self,doc);
+			_successfulGetAllProduct(self,doc,prod_name_arr);
 			//////////////////////////////////
 		}
 		
 	});
 	
-	var _successfulGetAllProduct = function(self,doc){
+	var _successfulGetAllProduct = function(self,doc,prod_name_arr){
 		logger.emit("log","_successfulGetAllProduct");
-		res.send({"success":{"message":"Getting Product details Successfully","doc":doc}});
+		var s = {"success":{"message":"Getting Product details Successfully","doc":doc},"name":{"message":"Product Name","doc":prod_name_arr}};
+		res.send(s);
 	}
 	
 }
