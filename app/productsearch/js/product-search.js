@@ -60,7 +60,9 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		query.name={$in:product_or_name_array};
 		 	}
-		}
+		}else{
+	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass name"}});
+	  	}
 
 		if(productsearchdata.Model_Number!=undefined){
 			if(productsearchdata.Model_Number==""){
@@ -82,6 +84,8 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		query.model_no={$in:model_no_or_array};	
 			}			
+	  	}else{
+	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass model number"}});
 	  	}
 
 	  	if(productsearchdata.Feature!=undefined){
@@ -104,6 +108,8 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		query["features.featurename"]={$in:feature_or_array};
 	  		}	  		
+	  	}else{
+	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass feature"}});
 	  	}
 
 	  	if(productsearchdata.Category!=undefined){
@@ -126,6 +132,32 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		query["category.prodle"]={$in:category_or_array};
 	  		}	  		
+	  	}else{
+	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass category"}});
+	  	}
+
+	  	if(productsearchdata.Organization_Name!=undefined){
+	  		if(productsearchdata.Organization_Name==""){
+	  		}else{
+	  		// 	var category_array = [];
+		 		// if(S(productsearchdata.Category).contains(",")){
+		 		// 	category_array=productsearchdata.Category.split(",");
+		 		// }else if(S(productsearchdata.Category).contains(" ")){
+		 		// 	category_array=productsearchdata.Category.split(" ");
+		 		// }else{
+		 		// 	category_array.push(productsearchdata.Category);
+		 		// }
+	  		// 	// query.category=new RegExp('^'+productsearchdata.Category, "i");		 	
+		 		// // searchCriteria.push({category:{$regex:productsearchdata.Category,$options: 'i'}});	
+		 		// var category_or_array=[];
+		 		// for(var i=0;i<category_array.length;i++){
+		 		// 	category_or_array.push(new RegExp('^'+category_array[i].substr(0,1), "i"));		 			
+		 		// 	searchCriteria.push({"category.prodle": new RegExp(category_array[i], "i")});
+		 		// }
+		 		// query["category.prodle"]={$in:category_or_array};
+	  		}	  		
+	  	}else{
+	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass organisation name"}});
 	  	}
 
 		_searchProduct(self,productsearchdata,searchCriteria,query);	   	

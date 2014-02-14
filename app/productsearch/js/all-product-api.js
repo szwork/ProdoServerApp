@@ -8,7 +8,8 @@ var logger=require("../../common/js/logger");
 // var S=require("string");
 exports.allProduct = function(req,res){
 	var self=this;
-	var product_name = req.body.name.trim();
+	var product_data = req.body;
+	var product_name=product_data.name;
 	var product_or_name_array=[];
 	var query={status:{$in:["active","init"]}};
 	
@@ -22,7 +23,8 @@ exports.allProduct = function(req,res){
 			if(err){
 				res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
 			}else if(doc.length==0){
-				res.send({"error":{"code":"ED001","message":"No product exists"}});
+				var s = {"success":{"message":"No product exists","doc":doc},"name":{"message":"No product name exist","doc":""}};
+				res.send(s);
 			}else{
 				var prod_name_arr = [];
 				for(var i=0;i<doc.length;i++){
