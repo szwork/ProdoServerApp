@@ -6,28 +6,35 @@ var reds = require('../lib/reds'),
 var ProductModel = require("../../product/js/product-model");
 var logger=require("../../common/js/logger");
 // var S=require("string");
-exports.allProduct = function(req,res){	
+exports.allProduct = function(req,res){
 	var self=this;
-	// var query = {}
-	var start = new Date;
-	// var strs = [];
-	ProductModel.find({/*status:{$in:["active","init"]}*/},{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
-		if(err){
-			res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
-		}else if(doc.length==0){
-			res.send({"error":{"code":"ED001","message":"No product exists"}});
-		}else{
-			var prod_name_arr = [];
-			for(var i=0;i<doc.length;i++){
-				console.log(doc[i].name);				
-				prod_name_arr.push(doc[i].name);
-			}
-			////////////////////////////////			
-			_successfulGetAllProduct(self,doc,prod_name_arr);
-			//////////////////////////////////
-		}
-		
-	});
+	var product_name = req.body.name.trim();
+	var product_or_name_array=[];
+	var query={status:{$in:["active","init"]}};
+	
+	if(product_name==undefined || product_name==""){
+		res.send({"error":{"code":"AD001","message":"Please pass product name"}});
+	}else{
+		product_or_name_array.push(new RegExp('^'+product_name.substr(0,product_name.length), "i"));
+		product_or_name_array.push(new RegExp('^'+product_name.substr(0,1), "i"));
+		query.name={$in:product_or_name_array};
+		ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,doc){
+			if(err){
+				res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
+			}else if(doc.length==0){
+				res.send({"error":{"code":"ED001","message":"No product exists"}});
+			}else{
+				var prod_name_arr = [];
+				for(var i=0;i<doc.length;i++){
+					prod_name_arr.push(doc[i].name);
+				}
+				//////////////////////////////////
+				_successfulGetAllProduct(self,doc,prod_name_arr);
+				//////////////////////////////////
+			}		
+		});
+	}
+	
 	
 	var _successfulGetAllProduct = function(self,doc,prod_name_arr){
 		logger.emit("log","_successfulGetAllProduct");

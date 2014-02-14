@@ -45,7 +45,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		var prod_name_arr = [];
 		 		if(S(productsearchdata.Product_Name).contains(",")){
 		 			prod_name_arr=productsearchdata.Product_Name.split(",");
-		 		}else if(S(productsearchdata.Product_Name).contains(" ")){		 			
+		 		}else if(S(productsearchdata.Product_Name).contains(" ")){
 		 			prod_name_arr=productsearchdata.Product_Name.split(" ");
 		 		}else{
 		 			prod_name_arr.push(productsearchdata.Product_Name);
@@ -58,7 +58,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 			product_or_name_array.push(new RegExp('^'+prod_name_arr[i].substr(0,1), "i"));
 		 			searchCriteria.push({name: new RegExp(prod_name_arr[i].substr(0,1), "i")});
 		 		}
-		 		query.name={$in:product_or_name_array};		 		
+		 		query.name={$in:product_or_name_array};
 		 	}
 		}
 
@@ -135,7 +135,7 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
     
     query.$or=searchCriteria;	
 	console.log(query);
-	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
+	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,doc){
 		if(err){
 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});
 		}else if(doc.length==0){
