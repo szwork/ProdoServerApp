@@ -12,6 +12,7 @@
 */
 
 var ProductModel = require("../../product/js/product-model");
+var OrganizationModel = require("../../org/js/org-model");
 var events = require("events");
 var util = require("util");
 var events = require("events");
@@ -60,9 +61,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		query.name={$in:product_or_name_array};
 		 	}
-		}else{
-	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass name"}});
-	  	}
+		}
 
 		if(productsearchdata.Model_Number!=undefined){
 			if(productsearchdata.Model_Number==""){
@@ -84,8 +83,6 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		query.model_no={$in:model_no_or_array};	
 			}			
-	  	}else{
-	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass model number"}});
 	  	}
 
 	  	if(productsearchdata.Feature!=undefined){
@@ -108,8 +105,6 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		query["features.featurename"]={$in:feature_or_array};
 	  		}	  		
-	  	}else{
-	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass feature"}});
 	  	}
 
 	  	if(productsearchdata.Category!=undefined){
@@ -127,56 +122,68 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		// searchCriteria.push({category:{$regex:productsearchdata.Category,$options: 'i'}});	
 		 		var category_or_array=[];
 		 		for(var i=0;i<category_array.length;i++){
-		 			category_or_array.push(new RegExp('^'+category_array[i].substr(0,1), "i"));		 			
+		 			category_or_array.push(new RegExp('^'+category_array[i].substr(0,1), "i"));
 		 			searchCriteria.push({"category.prodle": new RegExp(category_array[i], "i")});
 		 		}
 		 		query["category.prodle"]={$in:category_or_array};
 	  		}	  		
-	  	}else{
-	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass category"}});
 	  	}
 
 	  	if(productsearchdata.Organization_Name!=undefined){
 	  		if(productsearchdata.Organization_Name==""){
+	  			_searchProduct(self,productsearchdata,searchCriteria,query);
 	  		}else{
-	  		// 	var category_array = [];
-		 		// if(S(productsearchdata.Category).contains(",")){
-		 		// 	category_array=productsearchdata.Category.split(",");
-		 		// }else if(S(productsearchdata.Category).contains(" ")){
-		 		// 	category_array=productsearchdata.Category.split(" ");
-		 		// }else{
-		 		// 	category_array.push(productsearchdata.Category);
-		 		// }
-	  		// 	// query.category=new RegExp('^'+productsearchdata.Category, "i");		 	
-		 		// // searchCriteria.push({category:{$regex:productsearchdata.Category,$options: 'i'}});	
-		 		// var category_or_array=[];
-		 		// for(var i=0;i<category_array.length;i++){
-		 		// 	category_or_array.push(new RegExp('^'+category_array[i].substr(0,1), "i"));		 			
-		 		// 	searchCriteria.push({"category.prodle": new RegExp(category_array[i], "i")});
-		 		// }
-		 		// query["category.prodle"]={$in:category_or_array};
-	  		}	  		
-	  	}else{
-	  		self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"Please pass organisation name"}});
-	  	}
+	  			/*********GETTING ORG_ID BY ORG_NAME*********/
+	  			var orgid_arr = [];
+				var org_array = [];
+				if(S(productsearchdata.Organization_Name).contains(",")){
+					org_array=productsearchdata.Organization_Name.split(",");
+				}else if(S(productsearchdata.Organization_Name).contains(" ")){
+					org_array=productsearchdata.Organization_Name.split(" ");
+				}else{
+					org_array.push(productsearchdata.Organization_Name);
+				}
 
-		_searchProduct(self,productsearchdata,searchCriteria,query);	   	
-};
+				var org_or_array=[];
+				for(var i=0;i<org_array.length;i++){
+					org_or_array.push(new RegExp('^'+org_array[i], "i"));
+					org_or_array.push(new RegExp('^'+org_array[i].substr(0,1), "i"));
+				}
+				var Q = {name:{$in:org_or_array}};
+				OrganizationModel.find(Q,{orgid:1,_id:0}).exec(function(err,doc){
+					if(err){
+						self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get orgid by orgname"}});
+					}else if(doc.length==0){
+						self.emit("successfulProductSearch",{"success":{"message":"Organisation and Product Name Does not match"}});
+					}else{						
+						for(var i=0;i<doc.length;i++){
+							orgid_arr.push(doc[i].orgid);
+						}						
+				 		query.orgid={$in:orgid_arr};
+				 		_searchProduct(self,productsearchdata,searchCriteria,query);
+				  	}
+				})
+			}
+	  	}
+	  	// _searchProduct(self,productsearchdata,searchCriteria,query);		   	
+}
+
+function _getOrgIdByOrgName(self,Organization_Name){
+	console.log("OrgName " +Organization_Name);	
+}
 
 var _searchProduct = function(self,productsearchdata,searchCriteria,query){
+    if(searchCriteria.length!=0){
+    	query.$or=searchCriteria;
+    }
     
-    query.$or=searchCriteria;	
 	console.log(query);
 	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,doc){
 		if(err){
-			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});
+			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"+err}});
 		}else if(doc.length==0){
 			self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
 		}else{
-			// var productName = [];
-			// for(var i=0;i<doc.length;i++){
-			// 	productName.push(doc[i].name);
-			// }
 	  		_successfulProductSearch(self,doc);
 	  	}
 	})
