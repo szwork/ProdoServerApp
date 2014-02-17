@@ -156,13 +156,13 @@ var _validateProductSearchData = function(self,productsearchdata) {
 					if(err){
 						self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get orgid by orgname"}});
 					}else if(doc.length==0){
-						self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
+						self.emit("successfulProductSearch",{"success":{"message":"No organisation found for specified criteria"}});
 					}else{
 						for(var i=0;i<doc.length;i++){
 							orgid_arr.push(doc[i].orgid);
 						}
 						if(productsearchdata.Product_Name==""){
-							_successfulProductSearch(self,doc);
+							_successfulOrgSearch(self,doc);
 						}else{
 							query.orgid={$in:orgid_arr};	
 						}				 		
@@ -197,4 +197,9 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 var _successfulProductSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
 	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Products Found","doc":doc}});
+}
+
+var _successfulOrgSearch = function(self,doc){
+	logger.emit("log","_successfulProductSearch");
+	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Organisation Found","doc":doc}});
 }
