@@ -25,7 +25,7 @@ exports.allProduct = function(req,res){
 		console.log("product_name_or_arr "+ product_name_or_arr);
 
 		/**********SEARCH FROM ORGANISATION MODEL********/
-		// console.log("Q " + JSON.stringify(query));
+		console.log("Q " + JSON.stringify(query));
 		OrganizationModel.find(query,{name:1,orgid:1,_id:0}).exec(function(err,doc){
 			if(err){
 				// res.send({"error":{"code":"ED001","message":"Error in db to search organisation"}});
@@ -36,16 +36,19 @@ exports.allProduct = function(req,res){
 				for(var i=0;i<doc.length;i++){
 					doc_arr.push(doc[i]);
 					prod_name_arr.push(doc[i].name);
+					console.log("doc_arr " +doc_arr);
 				}
 			}
 		});
 		/***********SEARCH FROM PRODUCTS MODEL**********/
+		console.log("Product####");
 		ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 			if(err){
 				res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
 			}else if(doc.length==0){
-				var s = {"success":{"message":"No product exists","doc":doc},"name":{"message":"No product name exist","doc":""}};
-				res.send(s);
+				// var s = {"success":{"message":"No product exists","doc":doc},"name":{"message":"No product name exist","doc":""}};
+				// res.send(s);
+				_successfulGetAllProduct(self,doc_arr,prod_name_arr);
 			}else{
 				// var prod_name_arr = [];
 				for(var i=0;i<doc.length;i++){
@@ -55,7 +58,7 @@ exports.allProduct = function(req,res){
 				//////////////////////////////////
 				_successfulGetAllProduct(self,doc_arr,prod_name_arr);
 				//////////////////////////////////
-			}		
+			}
 		});
 	}
 	
