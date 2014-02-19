@@ -1320,16 +1320,12 @@ var _unfollowproduct=function(self,product,sessionuserid){
 }
 
 var updateLatestProductFollowedCount=function(product){
-	
 	TrendingModel.findOne({prodle:product.prodle},function(err,trenddata){
 		if(err){
 			logger.emit("log","Error in updation latest product followed count");
 		}else if(!trenddata){
 			// logger.emit("error","No comment of product type");
-			var trend;
-			trend.prodle = product.prodle;
-			trend.commentcount=0;
-			trend.followedcount=1;
+			var trend={prodle:product.prodle,commentcount:0,followedcount:1};
             var trend_data = new TrendingModel(trend);
 			trend_data.save(function(err,analyticsdata){
             	if(err){
@@ -1353,7 +1349,6 @@ var updateLatestProductFollowedCount=function(product){
 }
 
 var updateLatestProductUnfollowedCount=function(product){
-	var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 	TrendingModel.findOne({prodle:product.prodle},function(err,trenddata){
 		if(err){
 			logger.emit("log","Error in updation latest product unfollowed count");

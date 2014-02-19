@@ -15,6 +15,7 @@ var util = require("util");
 var events = require("events");
 var logger = require("../../common/js/logger");
 var productModel = require("./product-model");
+var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var shortId = require('shortid');
@@ -466,6 +467,7 @@ var _successfulDeleteProductFeatures=function(self){
 	logger.emit("log","_successfulDeleteProductFeatures");
 	self.emit("_successfulDeleteProductFeatures", {"success":{"message":"Product Feature Deleted Suceessfully"}});
 }
+
 Product.prototype.getProductFeature = function(orgid,prodle) {
 	var self=this;
 	_getProductFeature(self,orgid,prodle)
@@ -495,3 +497,28 @@ var _successfulGetProductFeatures=function(self,productfeature){
 	logger.emit("log","_successfulGetProductFeatures");
 	self.emit("successfulGetProductFeatures", {"success":{"message":"Product Feature Getting Suceessfully","productfeature":productfeature}});
 }
+
+Product.prototype.getProductTrending = function() {
+	var self=this;
+	_getProductTrending(self);
+};
+
+var _getProductTrending=function(self){
+	console.log("_getProductTrending");
+	TrendingModel.find({},{prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
+		if(err){
+			self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
+		}else if(!trenddata){
+			self.emit("failedGetProudctTrends",{"error":{"message":"No trend data is available"}});
+		}else{
+			////////////////////////////////
+			_successfulGetProductTrends(self,trenddata);
+			//////////////////////////////////
+		}
+	})
+};
+var _successfulGetProductTrends=function(self,trenddata){
+	logger.emit("log","_successfulGetProductTrends");
+	self.emit("successfulGetProductTrends", {"success":{"message":"Product Trends Getting Suceessfully","ProductTrends":trenddata}});
+}
+

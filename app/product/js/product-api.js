@@ -388,3 +388,29 @@ exports.getProductFeature=function(req,res){
     ////////////////////////////////// 
   
 }
+
+exports.getProductTrending=function(req,res){
+  console.log("=================");
+  console.log("TrendingProducts");
+  console.log("=================");
+  // var prodle=req.params.prodle;
+  // console.log("Prodle " + prodle);
+  
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedGetProudctTrends");
+    product.on("failedGetProudctTrends",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("successfulGetProductTrends");
+  product.on("successfulGetProductTrends",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    ///////////////////////////////////
+    product.getProductTrending();
+    //////////////////////////////////  
+}
