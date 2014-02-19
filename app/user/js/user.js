@@ -15,6 +15,7 @@ var request=require("request");
 var orgModel=require("../../org/js/org-model");
 var nodemailer=require("nodemailer");
 var DiscountModel=require("../../discount/js/discount-model");
+var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 var PaymentModel=require("../../subscription/js/payment-model");
 var SubscriptionModel=require("../../subscription/js/subscription-model");
 var productModel=require("../../product/js/product-model");
@@ -1319,21 +1320,11 @@ var _unfollowproduct=function(self,product,sessionuserid){
 }
 
 var updateLatestProductFollowedCount=function(product){
-	var TrendingModel = require("../../featuretrending/js/feature-trending-model");
+	
 	TrendingModel.findOne({prodle:product.prodle},function(err,trenddata){
 		if(err){
 			logger.emit("log","Error in updation latest product followed count");
-		}else if(trenddata.length!=0){
-			TrendingModel.update({prodle:product.prodle},{$inc:{followedcount:1}},function(err,latestupatestatus){
-				if(err){
-					logger.emit("error","Error in updation latest product followed count");
-				}else if(latestupatestatus==1){
-					logger.emit("log","Latest product followed count updated");
-				}else{
-					logger.emit("error","Given product id is wrong to update latest product followed count");
-				}
-			})
-		}else{
+		}else if(!trenddata){
 			// logger.emit("error","No comment of product type");
 			var trend;
 			trend.prodle = product.prodle;
@@ -1347,6 +1338,16 @@ var updateLatestProductFollowedCount=function(product){
                 	console.log("Trending for Latest product followed added sucessfully" + analyticsdata);
             	}
         	})
+		}else{
+			TrendingModel.update({prodle:product.prodle},{$inc:{followedcount:1}},function(err,latestupatestatus){
+				if(err){
+					logger.emit("error","Error in updation latest product followed count");
+				}else if(latestupatestatus==1){
+					logger.emit("log","Latest product followed count updated");
+				}else{
+					logger.emit("error","Given product id is wrong to update latest product followed count");
+				}
+			})			
 		}
 	})
 }
@@ -1356,8 +1357,10 @@ var updateLatestProductUnfollowedCount=function(product){
 	TrendingModel.findOne({prodle:product.prodle},function(err,trenddata){
 		if(err){
 			logger.emit("log","Error in updation latest product unfollowed count");
-		}else if(trenddata.length!=0){
-			TrendingModel.update({prodle:product.prodle},{$dec:{followedcount:1}},function(err,latestupatestatus){
+		}else if(!trenddata){
+			// logger.emit("error","No comment of product type");
+		}else{
+			TrendingModel.update({prodle:product.prodle},{$inc:{followedcount:-1}},function(err,latestupatestatus){
 				if(err){
 					logger.emit("error","Error in updation latest product unfollowed count");
 				}else if(latestupatestatus==1){
@@ -1365,9 +1368,7 @@ var updateLatestProductUnfollowedCount=function(product){
 				}else{
 					logger.emit("error","Given product id is wrong to update latest product unfollowed count");
 				}
-			})
-		}else{
-			// logger.emit("error","No comment of product type");
+			})			
 		}
 	})
 }

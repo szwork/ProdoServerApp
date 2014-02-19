@@ -23,6 +23,6 @@ var featureTrendingSchema = mongoose.Schema({
  featureTrendingSchema.set('redisCache', true);
  featureTrendingSchema.set('expires', 90);
  
-var FeatureTrending = mongoose.model('featureanalytics', featureTrendingSchema);
+var FeatureTrending = mongoose.model('featuretrending', featureTrendingSchema);
 
 module.exports = FeatureTrending;

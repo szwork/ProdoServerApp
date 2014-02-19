@@ -3,7 +3,7 @@
 var CommentModel=require("./comment-model");
 var ProductModel=require("../../product/js/product-model");
 var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
-
+var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 var events = require("events");
 var shortId = require('shortid');
 var logger=require("../../common/js/logger");
@@ -41,17 +41,7 @@ var updateLatestProductCommentCount=function(prodle){
 	TrendingModel.findOne({prodle:prodle},function(err,trenddata){
 		if(err){
 			logger.emit("log","Error in updation latest comment count");
-		}else if(trenddata.length!=0){
-			TrendingModel.update({prodle:prodle},{$inc:{commentcount:1}},function(err,latestupatestatus){
-				if(err){
-					logger.emit("error","Error in updation latest comment count");
-				}else if(latestupatestatus==1){
-					logger.emit("log","Latest comment count for products updated");
-				}else{
-					logger.emit("error","Given product id is wrong to update latest comment count");
-				}
-			})
-		}else{
+		}else if(!trenddata){
 			// logger.emit("error","No comment of product type");
 			var trend;
 			trend.prodle = prodle;
@@ -65,6 +55,16 @@ var updateLatestProductCommentCount=function(prodle){
                 	console.log("Trending for Latest comment added sucessfully" + analyticsdata);
             	}
         	})
+		}else{			
+        	TrendingModel.update({prodle:prodle},{$inc:{commentcount:1}},function(err,latestupatestatus){
+				if(err){
+					logger.emit("error","Error in updation latest comment count");
+				}else if(latestupatestatus==1){
+					logger.emit("log","Latest comment count for products updated");
+				}else{
+					logger.emit("error","Given product id is wrong to update latest comment count");
+				}
+			})
 		}
 	})	
 }
