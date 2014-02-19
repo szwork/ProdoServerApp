@@ -36,10 +36,10 @@ var commentSchema = mongoose.Schema({
   user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
   //orgname and grpname set when user is organization  user
   status:{type:String},
-  datecreated:{type:Date}, 
-  dateremoved:{type:Date},   
-  commenttext:{type:String},   
-  tags:[{type:String,ref:"Tags"}], 
+  datecreated:{type:Date},
+  dateremoved:{type:Date},
+  commenttext:{type:String},  
+  tags:[{type:String,ref:"Tags"}],
   comment_image:[{imageid:{type:String},image:{type:String}}]
 });
 
@@ -70,7 +70,8 @@ var productSchema = mongoose.Schema({
   modifieddate:{type:Date},
   removeddate:{type:Date},
   comments_shown:{type:Number},
-  product_comments: [commentSchema], 
+  product_comments: [commentSchema],
+  commentcount:{type:Number,default:0},
   pricing:[pricingSchema],
   pricinghistory:[pricingHistorySchema],
   blogs: [{blogid:{type:String}}]
@@ -79,9 +80,8 @@ productSchema.pre('save', function(next) {
   var product = this;
   product.prodle=shortId.generate();  
    console.log("product pre"+product);
-  next(); 
- 
-  })
+  next();
+})
 //Seed a product
  productSchema.set('redisCache', true);
  productSchema.set('expires', 90);

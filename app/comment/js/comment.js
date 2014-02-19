@@ -20,7 +20,7 @@ var updateLatestProductComment=function(prodle){
 		if(err){
 			logger.emit("log","Error in updation latest 5 product comment");
 		}else if(comment.length!=0){
-			ProductModel.update({prodle:prodle},{$set:{product_comments:comment}},function(err,latestupatestatus){
+			ProductModel.update({prodle:prodle},{$inc:{commentcount:1}},{$set:{product_comments:comment}},function(err,latestupatestatus){
 				if(err){
 					logger.emit("error","Error in updation latest 5 product comment");
 				}else if(latestupatestatus==1){

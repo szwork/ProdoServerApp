@@ -20,13 +20,13 @@ exports.allProduct = function(req,res){
 		var prod_name_arr = [];
 		var doc_arr = [];
 		product_name_or_arr.push(new RegExp('^'+product_name.substr(0,product_name.length), "i"));
-		product_name_or_arr.push(new RegExp('^'+product_name.substr(0,1), "i"));
+		// product_name_or_arr.push(new RegExp('^'+product_name.substr(0,1), "i"));
 		query.name={$in:product_name_or_arr};
 		console.log("product_name_or_arr "+ product_name_or_arr);
 
 		/**********SEARCH FROM ORGANISATION MODEL********/
 		console.log("Q " + JSON.stringify(query));
-		OrganizationModel.find(query,{name:1,orgid:1,_id:0}).exec(function(err,doc){
+		OrganizationModel.find(query,{name:1,orgid:1,_id:0}).limit(5).exec(function(err,doc){
 			if(err){
 				// res.send({"error":{"code":"ED001","message":"Error in db to search organisation"}});
 			}else if(doc.length==0){
@@ -36,13 +36,12 @@ exports.allProduct = function(req,res){
 				for(var i=0;i<doc.length;i++){
 					doc_arr.push(doc[i]);
 					prod_name_arr.push(doc[i].name);
-					console.log("doc_arr " +doc_arr);
+					// console.log("doc_arr " +doc_arr);
 				}
 			}
 		});
 		/***********SEARCH FROM PRODUCTS MODEL**********/
-		console.log("Product####");
-		ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
+		ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).limit(5).exec(function(err,doc){
 			if(err){
 				res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
 			}else if(doc.length==0){

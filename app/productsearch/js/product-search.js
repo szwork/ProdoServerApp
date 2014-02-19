@@ -53,11 +53,10 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		// query.name=new RegExp('^'+productsearchdata.Product_Name, "i");
 		 		// searchCriteria.push({name: new RegExp('^'+productsearchdata.Product_Name, "i")});
-		 		
                 var product_or_name_array=[];
 		 		for(var i=0;i<prod_name_arr.length;i++){
 		 			product_or_name_array.push(new RegExp('^'+prod_name_arr[i].substr(0,1), "i"));
-		 			searchCriteria.push({name: new RegExp(prod_name_arr[i].substr(0,1), "i")});
+		 			searchCriteria.push({name: new RegExp(prod_name_arr[i], "i")});
 		 		}
 		 		query.name={$in:product_or_name_array};
 		 	}
@@ -81,7 +80,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 			model_no_or_array.push(new RegExp('^'+model_no_array[i], "i"));
 		 			searchCriteria.push({model_no: model_no_array[i]});
 		 		}
-		 		query.model_no={$in:model_no_or_array};	
+		 		query.model_no={$in:model_no_or_array};
 			}			
 	  	}
 
@@ -104,7 +103,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 			searchCriteria.push({"features.featurename": new RegExp(feature_array[i], "i")});
 		 		}
 		 		query["features.featurename"]={$in:feature_or_array};
-	  		}	  		
+	  		}
 	  	}
 
 	  	if(productsearchdata.Category!=undefined){
@@ -126,7 +125,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 			searchCriteria.push({"category.prodle": new RegExp(category_array[i], "i")});
 		 		}
 		 		query["category.prodle"]={$in:category_or_array};
-	  		}	  		
+	  		}
 	  	}
 
 	  	if(productsearchdata.Organization_Name!=undefined){
@@ -149,7 +148,6 @@ var _validateProductSearchData = function(self,productsearchdata) {
 					org_or_array.push(new RegExp('^'+org_array[i], "i"));
 					org_or_array.push(new RegExp('^'+org_array[i].substr(0,1), "i"));
 				}
-				// console.log("org_or_array " + org_or_array);
 				var Q = {status:{$in:["active","init"]},name:{$in:org_or_array}};
 				// console.log("QQQQQ " + JSON.stringify(Q));
 				OrganizationModel.find(Q,{name:1,orgid:1,_id:0}).exec(function(err,doc){
@@ -161,22 +159,22 @@ var _validateProductSearchData = function(self,productsearchdata) {
 						for(var i=0;i<doc.length;i++){
 							orgid_arr.push(doc[i].orgid);
 						}
-						if(productsearchdata.Product_Name==""){
+						if(productsearchdata.Product_Name=="" && productsearchdata.Model_Number=="" && productsearchdata.Feature=="" && productsearchdata.Category==""){
 							_successfulOrgSearch(self,doc);
 						}else{
-							query.orgid={$in:orgid_arr};	
+							query.orgid={$in:orgid_arr};
+							_searchProduct(self,productsearchdata,searchCriteria,query);
 						}				 		
-				 		_searchProduct(self,productsearchdata,searchCriteria,query);
 				  	}
 				})
 			}
 	  	}
-	  	// _searchProduct(self,productsearchdata,searchCriteria,query);		   	
+	  	// _searchProduct(self,productsearchdata,searchCriteria,query);
 }
 
-function _getOrgIdByOrgName(self,Organization_Name){
-	console.log("OrgName " +Organization_Name);	
-}
+// function _getOrgIdByOrgName(self,Organization_Name){
+// 	console.log("OrgName " +Organization_Name);	
+// }
 
 var _searchProduct = function(self,productsearchdata,searchCriteria,query){
     if(searchCriteria.length!=0){
@@ -194,6 +192,7 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 	  	}
 	})
 }
+
 var _successfulProductSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
 	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Products Found","doc":doc}});
@@ -201,5 +200,5 @@ var _successfulProductSearch = function(self,doc){
 
 var _successfulOrgSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
-	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Organisation Found","doc":doc}});
+	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Organisations Found","doc":doc}});
 }
