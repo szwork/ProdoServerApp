@@ -115,7 +115,7 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 }
    var _addUser = function(self,userdata,host) {
 		//adding user
-		if(userdata.prodousertype="individual"){
+		if(userdata.prodousertype=="individual"){
 			userdata.usertype="individual";
 		}
 		var user=userModel(userdata);

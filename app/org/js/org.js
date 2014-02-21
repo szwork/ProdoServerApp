@@ -79,9 +79,10 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata){
 var _applyDefulatOrganizationTrialPlan=function(self,organizationdata,sessionuserid){
 	SubscriptionModel.findOne({plantype:S(organizationdata.orgtype).toLowerCase().s,"planpaymentcommitment.amount":0},function(err,subscription){
 		if(err){
-			logger.emit("error","Database Issue"+err)
+			logger.emit("error","Database Issue:_applyDefulatOrganizationTrialPlan "+err);
+		  self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Database issue"}});
 		}else if(!subscription){
-			logger.emit("There is no trial subscription plan for "+organizationdata.orgtype);
+			self.emit("failedOrgAdd",{"error":{"code":"AS001","message":"trial plan for "+organizationdata.orgtype+" does'nt exists"}});
 		}else{
 			var planperioddescription={quarterly:3,monthly:1,yearly:12};
 			var planperiod=planperioddescription[subscription.planpaymentcommitment.commitmenttype];
@@ -94,7 +95,8 @@ var _applyDefulatOrganizationTrialPlan=function(self,organizationdata,sessionuse
 			var payment_data=new PaymentModel({userid:sessionuserid,price:subscription.planpaymentcommitment.amount});
 			payment_data.save(function(err,payment){
 				if(err){
-					self.emit("failedMakePayment",{"error":{"message":"Error in db to save new payment"}});				
+					logger.emit("error","Database Issue:_applyDefulatOrganizationTrialPlan "+err);
+					self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Database Issue"}});
 				}else{
 					organizationdata.subscription=subscription_set;
 					organizationdata.payment={paymentid:payment.paymentid}
