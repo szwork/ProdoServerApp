@@ -12,12 +12,13 @@
 */
 
 var ProductModel = require("../../product/js/product-model");
+var OrganizationModel = require("../../org/js/org-model");
 var events = require("events");
 var util = require("util");
 var events = require("events");
 var logger = require("../../common/js/logger");
 var commonapi = require('../../common/js/common-api');
-var S= require("string");
+var S = require("string");
 
 
 var ProductSearch = function(productsearchdata) {
@@ -37,10 +38,10 @@ ProductSearch.prototype.searchProduct = function(productsearchdata){
 var _validateProductSearchData = function(self,productsearchdata) {
 	console.log("_validateProductSearchData");
 	var searchCriteria = [];
-	var query={/*status:{$in:["active","init"]}*/};
+	var query={status:{$in:["active","init"]}};
 
 		if(productsearchdata.Product_Name!=undefined){
-			if(productsearchdata.Product_Name==""){				
+			if(productsearchdata.Product_Name==""){
 		 	}else{
 		 		var prod_name_arr = [];
 		 		if(S(productsearchdata.Product_Name).contains(",")){
@@ -52,13 +53,12 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		}
 		 		// query.name=new RegExp('^'+productsearchdata.Product_Name, "i");
 		 		// searchCriteria.push({name: new RegExp('^'+productsearchdata.Product_Name, "i")});
-		 		
                 var product_or_name_array=[];
 		 		for(var i=0;i<prod_name_arr.length;i++){
 		 			product_or_name_array.push(new RegExp('^'+prod_name_arr[i].substr(0,1), "i"));
 		 			searchCriteria.push({name: new RegExp(prod_name_arr[i], "i")});
 		 		}
-		 		query.name={$in:product_or_name_array};		 		
+		 		query.name={$in:product_or_name_array};
 		 	}
 		}
 
@@ -80,7 +80,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 			model_no_or_array.push(new RegExp('^'+model_no_array[i], "i"));
 		 			searchCriteria.push({model_no: model_no_array[i]});
 		 		}
-		 		query.model_no={$in:model_no_or_array};	
+		 		query.model_no={$in:model_no_or_array};
 			}			
 	  	}
 
@@ -103,7 +103,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 			searchCriteria.push({"features.featurename": new RegExp(feature_array[i], "i")});
 		 		}
 		 		query["features.featurename"]={$in:feature_or_array};
-	  		}	  		
+	  		}
 	  	}
 
 	  	if(productsearchdata.Category!=undefined){
@@ -121,35 +121,84 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		// searchCriteria.push({category:{$regex:productsearchdata.Category,$options: 'i'}});	
 		 		var category_or_array=[];
 		 		for(var i=0;i<category_array.length;i++){
-		 			category_or_array.push(new RegExp('^'+category_array[i].substr(0,1), "i"));		 			
+		 			category_or_array.push(new RegExp('^'+category_array[i].substr(0,1), "i"));
 		 			searchCriteria.push({"category.prodle": new RegExp(category_array[i], "i")});
 		 		}
 		 		query["category.prodle"]={$in:category_or_array};
-	  		}	  		
+	  		}
 	  	}
 
-		_searchProduct(self,productsearchdata,searchCriteria,query);	   	
-};
+	  	if(productsearchdata.Organization_Name!=undefined){
+	  		if(productsearchdata.Organization_Name==""){
+	  			_searchProduct(self,productsearchdata,searchCriteria,query);
+	  		}else{
+	  			/*********GETTING ORG_ID BY ORG_NAME*********/
+	  			var orgid_arr = [];
+				var org_array = [];
+				if(S(productsearchdata.Organization_Name).contains(",")){
+					org_array=productsearchdata.Organization_Name.split(",");
+				}else if(S(productsearchdata.Organization_Name).contains(" ")){
+					org_array=productsearchdata.Organization_Name.split(" ");
+				}else{
+					org_array.push(productsearchdata.Organization_Name);
+				}
 
-var _searchProduct = function(self,productsearchdata,searchCriteria,query){	
+				var org_or_array=[];
+				for(var i=0;i<org_array.length;i++){
+					org_or_array.push(new RegExp('^'+org_array[i], "i"));
+					org_or_array.push(new RegExp('^'+org_array[i].substr(0,1), "i"));
+				}
+				var Q = {status:{$in:["active","init"]},name:{$in:org_or_array}};
+				// console.log("QQQQQ " + JSON.stringify(Q));
+				OrganizationModel.find(Q,{name:1,orgid:1,_id:0}).exec(function(err,doc){
+					if(err){
+						self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get orgid by orgname"}});
+					}else if(doc.length==0){
+						self.emit("successfulProductSearch",{"success":{"message":"No organisation found for specified criteria"}});
+					}else{
+						for(var i=0;i<doc.length;i++){
+							orgid_arr.push(doc[i].orgid);
+						}
+						if(productsearchdata.Product_Name=="" && productsearchdata.Model_Number=="" && productsearchdata.Feature=="" && productsearchdata.Category==""){
+							_successfulOrgSearch(self,doc);
+						}else{
+							query.orgid={$in:orgid_arr};
+							_searchProduct(self,productsearchdata,searchCriteria,query);
+						}				 		
+				  	}
+				})
+			}
+	  	}
+	  	// _searchProduct(self,productsearchdata,searchCriteria,query);
+}
+
+// function _getOrgIdByOrgName(self,Organization_Name){
+// 	console.log("OrgName " +Organization_Name);	
+// }
+
+var _searchProduct = function(self,productsearchdata,searchCriteria,query){
+    if(searchCriteria.length!=0){
+    	query.$or=searchCriteria;
+    }
     
-    query.$or=searchCriteria;	
-	console.log(query);	
-	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
+	console.log(query);
+	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,doc){
 		if(err){
-			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"}});
+			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"+err}});
 		}else if(doc.length==0){
-			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"No product found for specified criteria"}});
+			self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
 		}else{
-			// var productName = [];
-			// for(var i=0;i<doc.length;i++){
-			// 	productName.push(doc[i].name);
-			// }
 	  		_successfulProductSearch(self,doc);
 	  	}
 	})
 }
+
 var _successfulProductSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
-	self.emit("successfulProductSearch", {"success":{"message":+doc.length+" Products Found","doc":doc}});
+	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Products Found","doc":doc}});
+}
+
+var _successfulOrgSearch = function(self,doc){
+	logger.emit("log","_successfulProductSearch");
+	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Organisations Found","doc":doc}});
 }

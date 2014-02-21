@@ -24,6 +24,8 @@ var discountapi=require("../discount/js/discount-api");
 var tagreffdictionary = require("../tagreffdictionary/js/tagreffdictionary-api");
 var featureanalytics = require("../featureanalytics/js/feature-analytics-api");
 
+var featuretrending = require("../featuretrending/js/feature-trending-api");
+
 exports.orgapi = orgapi;
 exports.userapi = userapi;
 exports.productapi = productapi;
@@ -36,3 +38,4 @@ exports.commonapi=commonapi;
 exports.discountapi=discountapi;
 exports.tagreffdictionary=tagreffdictionary;
 exports.featureanalytics = featureanalytics;
+exports.featuretrending = featuretrending;

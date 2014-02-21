@@ -4,29 +4,68 @@ var reds = require('../lib/reds'),
 	search = reds.createSearch('products');
 
 var ProductModel = require("../../product/js/product-model");
+var OrganizationModel = require("../../org/js/org-model");
 var logger=require("../../common/js/logger");
 // var S=require("string");
-exports.allProduct = function(req,res){	
+exports.allProduct = function(req,res){
 	var self=this;
-	// var query = {}
-	var start = new Date;
-	// var strs = [];
-	ProductModel.find({},{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
-		if(err){
-			res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
-		}else if(doc.length==0){
-			res.send({"error":{"code":"ED001","message":"No product exists"}});
-		}else{
-			////////////////////////////////			
-			_successfulGetAllProduct(self,doc);
-			//////////////////////////////////
-		}
-		
-	});
+	var product_data = req.body;
+	var product_name=product_data.name;
+	var product_name_or_arr=[];
+	var query={status:{$in:["active","init"]}};
 	
-	var _successfulGetAllProduct = function(self,doc){
+	if(product_name==undefined || product_name==""){
+		res.send({"error":{"code":"AD001","message":"Please pass product name"}});
+	}else{
+		var prod_name_arr = [];
+		var doc_arr = [];
+		product_name_or_arr.push(new RegExp('^'+product_name.substr(0,product_name.length), "i"));
+		// product_name_or_arr.push(new RegExp('^'+product_name.substr(0,1), "i"));
+		query.name={$in:product_name_or_arr};
+		console.log("product_name_or_arr "+ product_name_or_arr);
+
+		/**********SEARCH FROM ORGANISATION MODEL********/
+		console.log("Q " + JSON.stringify(query));
+		OrganizationModel.find(query,{name:1,orgid:1,_id:0}).limit(5).exec(function(err,doc){
+			if(err){
+				// res.send({"error":{"code":"ED001","message":"Error in db to search organisation"}});
+			}else if(doc.length==0){
+				// var s = {"success":{"message":"No organisation exists","doc":doc},"name":{"message":"No product name exist","doc":""}};
+				// res.send(s);
+			}else{
+				for(var i=0;i<doc.length;i++){
+					doc_arr.push(doc[i]);
+					prod_name_arr.push(doc[i].name);
+					// console.log("doc_arr " +doc_arr);
+				}
+			}
+		});
+		/***********SEARCH FROM PRODUCTS MODEL**********/
+		ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).limit(5).exec(function(err,doc){
+			if(err){
+				res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
+			}else if(doc.length==0){
+				// var s = {"success":{"message":"No product exists","doc":doc},"name":{"message":"No product name exist","doc":""}};
+				// res.send(s);
+				_successfulGetAllProduct(self,doc_arr,prod_name_arr);
+			}else{
+				// var prod_name_arr = [];
+				for(var i=0;i<doc.length;i++){
+					doc_arr.push(doc[i]);
+					prod_name_arr.push(doc[i].name);
+				}
+				//////////////////////////////////
+				_successfulGetAllProduct(self,doc_arr,prod_name_arr);
+				//////////////////////////////////
+			}
+		});
+	}
+	
+	
+	var _successfulGetAllProduct = function(self,doc,prod_name_arr){
 		logger.emit("log","_successfulGetAllProduct");
-		res.send({"success":{"message":"Getting Product details Successfully","doc":doc}});
+		var s = {"success":{"message":"Getting Product details Successfully","doc":doc},"name":{"message":"Product Name","doc":prod_name_arr}};
+		res.send(s);
 	}
 	
 }

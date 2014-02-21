@@ -15,6 +15,7 @@ var request=require("request");
 var orgModel=require("../../org/js/org-model");
 var nodemailer=require("nodemailer");
 var DiscountModel=require("../../discount/js/discount-model");
+var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 var PaymentModel=require("../../subscription/js/payment-model");
 var SubscriptionModel=require("../../subscription/js/subscription-model");
 var productModel=require("../../product/js/product-model");
@@ -461,7 +462,7 @@ var getUserRequiredData=function(user,callback){
 	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
-	console.log("log","user"+user);
+	// console.log("log","user"+user);
   // user=JSON.stringify(user);
    console.log("org length" +Object.keys(user.org).length)
 		
@@ -1336,6 +1337,7 @@ var _followproduct=function(self,product,sessionuserid){
 			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(followprodstatus){
 			logger.emit("log","successfulFollowProduct");
+			updateLatestProductFollowedCount(product);
 			self.emit("successfulFollowUnFollowProduct",{"success":{"message":"Following product"}});
 		}
 		else{
@@ -1351,10 +1353,60 @@ var _unfollowproduct=function(self,product,sessionuserid){
 			self.emit("failedFollowUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(unfollowprodstatus){
 			logger.emit("log","successfully unfollowed");
+			updateLatestProductUnfollowedCount(product);
 			self.emit("successfulFollowUnFollowProduct",{"success":{"message":"Unfollowing product"}});
 		}else{
 			logger.emit("log","Failure in unfollowing the product");
 			self.emit("failedFollowUnFollowProduct",{"error":{"code":"AF001","message":"Failed to Unfollow the product"}});
+		}
+	})
+}
+
+var updateLatestProductFollowedCount=function(product){
+	TrendingModel.findOne({prodle:product.prodle},function(err,trenddata){
+		if(err){
+			logger.emit("log","Error in updation latest product followed count");
+		}else if(!trenddata){
+			// logger.emit("error","No comment of product type");
+			var trend={prodle:product.prodle,commentcount:0,followedcount:1};
+            var trend_data = new TrendingModel(trend);
+			trend_data.save(function(err,analyticsdata){
+            	if(err){
+               	 	console.log("Error in db to save trending data" + err);
+            	}else{
+                	console.log("Trending for Latest product followed added sucessfully" + analyticsdata);
+            	}
+        	})
+		}else{
+			TrendingModel.update({prodle:product.prodle},{$inc:{followedcount:1}},function(err,latestupatestatus){
+				if(err){
+					logger.emit("error","Error in updation latest product followed count");
+				}else if(latestupatestatus==1){
+					logger.emit("log","Latest product followed count updated");
+				}else{
+					logger.emit("error","Given product id is wrong to update latest product followed count");
+				}
+			})			
+		}
+	})
+}
+
+var updateLatestProductUnfollowedCount=function(product){
+	TrendingModel.findOne({prodle:product.prodle},function(err,trenddata){
+		if(err){
+			logger.emit("log","Error in updation latest product unfollowed count");
+		}else if(!trenddata){
+			// logger.emit("error","No comment of product type");
+		}else{
+			TrendingModel.update({prodle:product.prodle},{$inc:{followedcount:-1}},function(err,latestupatestatus){
+				if(err){
+					logger.emit("error","Error in updation latest product unfollowed count");
+				}else if(latestupatestatus==1){
+					logger.emit("log","Latest product unfollowed count updated");
+				}else{
+					logger.emit("error","Given product id is wrong to update latest product unfollowed count");
+				}
+			})			
 		}
 	})
 }
