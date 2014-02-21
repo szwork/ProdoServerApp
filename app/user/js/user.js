@@ -77,6 +77,8 @@ var _validateRegisterUser = function(self,userdata,host) {
 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"passsword minimum length should be 6"}});
   	 }	else if(userdata.terms==false){
 	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
+	  }else if(userdata.prodousertype==undefined){
+	  	self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"please select usertyp"}});
 	  }else{
 	  	userModel.findOne({$or:[{email:userdata.email},{username:userdata.username}]},{email:1}).lean().exec(function(err,user){
 			if(err){
@@ -112,6 +114,9 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 }
    var _addUser = function(self,userdata,host) {
 		//adding user
+		if(userdata.prodousertype="individual"){
+			userdata.usertype="individual";
+		}
 		var user=userModel(userdata);
 	    user.save(function(err,user){
 	    	console.log("after save"+user);
@@ -177,6 +182,11 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 	            		self.emit("failedUserRegistration",{"error":{"code":"AT001","message":"Error to send verification email"}});
 	            	}else{
 	            		logger.emit("info","User added successfully");
+	            		if(user.prodousertype=="individual"){
+	            			/////////////////////////////////
+	            			_applyDefaultIndividualTrialPlan(user);
+	            			/////////////////////////////////
+	            		}
 	            		/////////////////////////////////
 	            		_successfulUserRegistration(self)
 	            		////////////////////////////////
@@ -194,7 +204,40 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 	};
 
 
+var _applyDefaultIndividualTrialPlan=function(user){
+	SubscriptionModel.findOne({plantype:"individual","planpaymentcommitment.amount":0},function(err,subscription){
+		if(err){
+			logger.emit("error","Database Issue"+err)
+		}else if(!subscription){
+			logger.emit("There is no trial subscription plan for individual");
+		}else{
+			var planperioddescription={quarterly:3,monthly:1,yearly:12};
+			var planperiod=planperioddescription[subscription.planpaymentcommitment.commitmenttype];
+			logger.emit('log',"planperiod"+planperiod);
 
+			var currentdate=new Date();
+			// var expirydate=new Date(currentdate.setDate(currentdate.getMonth()+3));
+			var expirydate=new Date(new Date(currentdate).setMonth(currentdate.getMonth()+planperiod));
+			var subscription_set={planid:subscription.planid,planstartdate:currentdate,planexpirydate:expirydate};
+			var payment_data=new PaymentModel({userid:user.userid,price:0});
+			payment_data.save(function(err,payment){
+				if(err){
+					self.emit("failedMakePayment",{"error":{"message":"Error in db to save new payment"}});				
+				}else{
+					userModel.update({userid:user.userid},{$set:{subscription:subscription_set,payment:{paymentid:payment.paymentid}}},function(err,userpaymentupdate){
+						if(err){
+							self.emit("failedMakePayment",{"error":{"message":"Error in db to update user payment details"+err}});				
+						}else if(userpaymentupdate==0){
+							self.emit("failedMakePayment",{"error":{"message":"Userid is wrong"}});					
+						}else{
+							logger.emit("log"," Default individual Trail Plan applied");
+						}
+					})
+				}
+			})
+		}
+	})
+}
 //verify user
 User.prototype.activateAccount = function(token) {
 	var self=this;
@@ -415,7 +458,7 @@ var _isOrganizationUser=function(user,callback){
 }
 var getUserRequiredData=function(user,callback){
     
-	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin };
+	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	console.log("log","user"+user);

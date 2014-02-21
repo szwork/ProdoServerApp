@@ -12,7 +12,7 @@ var verificationTokenModel = require('../../common/js/verification-token-model')
 var BusinessOpportunityModel=require("../../businessopportunity/js/business-opportunity-model");
 var commonapi=require("../../common/js/common-api");
 var CONFIG = require('config').Prodonus;
-
+var PaymentModel=require("../../subscription/js/payment-model");
 var Organization = function(organizationdata) {
 	this.organization=organizationdata;
 };
@@ -49,12 +49,6 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please give a location details"}});
 		  }else if(organizationdata.terms==false){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
-		  }else if(subscriptiondata==undefined){
-		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please provide subscrption details for Organization"}});
-		  }else if(subscriptiondata.plantype==undefined){
-		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please pass plantype"}});
-		  }else if(subscriptiondata.planid==undefined){
-		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please pass subscrption planid"}});
 		  }else{
 
 		    	logger.emit("log","_validated");
@@ -72,32 +66,49 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata){
 					self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find user"}});
 				}else if(user){
 					logger.emit("log","_hasAlreadyOrganization");
-					//////////////////////////////////////////////////////////////////////////////
-					_validateSubscriptionPlan(self,organizationdata,sessionuserid,subscriptiondata);
-					//////////////////////////////////////////////////////////////////////////////
+					//////////////////////////////////////////////////////////////////////
+					_applyDefulatOrganizationTrialPlan(self,organizationdata,sessionuserid);
+					///////////////////////////////////////////////////////////////////
+					
 				
 				}else{
 					self.emit("failedOrgAdd",{"error":{"code":"AO001","message":"You can add only one organization"}});
 				}
 		})
 	}
-var _validateSubscriptionPlan=function(self,organizationdata,sessionuserid,subscriptiondata){
-	SubscriptionModel.findOne({planid:subscriptiondata.planid,plantype:S(subscriptiondata.plantype).toLowerCase().s},function(err,subscription){
+var _applyDefulatOrganizationTrialPlan=function(self,organizationdata,sessionuserid){
+	SubscriptionModel.findOne({plantype:S(organizationdata.orgtype).toLowerCase().s,"planpaymentcommitment.amount":0},function(err,subscription){
 		if(err){
-		 	self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"_validateSubscriptionPlan:Database"+err}});	
+			logger.emit("error","Database Issue"+err)
 		}else if(!subscription){
-			self.emit("failedOrgAdd",{"error":{"message":"Subscription plan of planid"+subscriptiondata.planid+" and plantype"+subscriptiondata.plantype+"doesn't exists"}});	
+			logger.emit("There is no trial subscription plan for "+organizationdata.orgtype);
 		}else{
-			//////////////////////////////////////////////////////////////////////
-			_addOrganization(self,organizationdata,sessionuserid,subscriptiondata);
-			////////////////////////////////////////////////////////////////////
+			var planperioddescription={quarterly:3,monthly:1,yearly:12};
+			var planperiod=planperioddescription[subscription.planpaymentcommitment.commitmenttype];
+			logger.emit('log',"planperiod"+planperiod);
+
+			var currentdate=new Date();
+			// var expirydate=new Date(currentdate.setDate(currentdate.getMonth()+3));
+			var expirydate=new Date(new Date(currentdate).setMonth(currentdate.getMonth()+planperiod));
+			var subscription_set={planid:subscription.planid,planstartdate:currentdate,planexpirydate:expirydate};
+			var payment_data=new PaymentModel({userid:sessionuserid,price:subscription.planpaymentcommitment.amount});
+			payment_data.save(function(err,payment){
+				if(err){
+					self.emit("failedMakePayment",{"error":{"message":"Error in db to save new payment"}});				
+				}else{
+					organizationdata.subscription=subscription_set;
+					organizationdata.payment={paymentid:payment.paymentid}
+					//////////////////////////////////////////////////////////////////////
+					_addOrganization(self,organizationdata,sessionuserid);
+					////////////////////////////////////////////////////////////////////
+				}
+			})
 		}
 	})
-
 }
 	var _addOrganization = function(self,organizationdata,sessionuserid,subscriptiondata) {
 		//validate the org data
-        organizationdata.subscription={planid:subscriptiondata.planid};
+        // organizationdata.subscription={planid:subscriptiondata.planid};
 		var organization=new orgModel(organizationdata);
 
 		organization.save(function(err,organization){
