@@ -127,8 +127,8 @@ var _applyDefulatOrganizationTrialPlan=function(self,organizationdata,sessionuse
 
     
 	var _addOrgDetailsToUser = function(self,organization,sessionuserid) {
-
-		userModel.update({userid:sessionuserid},{$set:{"subscription.planid":organization.subscription.planid,usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,isAdmin:true,orgtype:organization.orgtype}}},function(err,userupdatestatus){
+    var organizationsubscription={planid:organization.subscription.planid,planstartdate:new Date(organization.subscription.planstartdate),planexpirydate:new Date(organization.subscription.planexpirydate)};
+		userModel.update({userid:sessionuserid},{$set:{payment:{paymentid:organization.payment.paymentid},subscription:organizationsubscription,usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,isAdmin:true,orgtype:organization.orgtype}}},function(err,userupdatestatus){
 	 	  if(err){
 	   	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to update user"}});
 	  	}else if(userupdatestatus!=1){
