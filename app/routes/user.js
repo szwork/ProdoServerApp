@@ -33,7 +33,10 @@ exports.init = function (app) {
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
   app.get("/api/isloggedin",api.userapi.isLoggedIn);
   // app.get("/api/sendtestmail",api.commonapi.sendTestMail);
-  app.get("/api/user/followun/:prodle",auth, api.userapi.followunfollowproduct);
+
+  app.get("/api/user/follow/:prodle",auth, api.userapi.followproduct);
+  app.get("/api/user/unfollow/:prodle",auth, api.userapi.unfollowproduct);
+  
   app.get('/api/subscription/:plantype',api.subscriptionapi.getSubscriptionPlanbyType);
   app.post("/api/userinvites",auth,api.userapi.userInvites);
   app.get("/api/resetpassword/:token",api.userapi.passwordUrlAction);

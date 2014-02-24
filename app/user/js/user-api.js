@@ -461,7 +461,7 @@ exports.makePayment=function(req,res){
 }
 
 
-exports.followunfollowproduct=function(req,res){
+exports.followproduct=function(req,res){
   // var userdata=req.body.user;
   var user=new User();
 
@@ -470,19 +470,44 @@ exports.followunfollowproduct=function(req,res){
   // var orgid=req.params.orgid;
   logger.emit("log","prodle"+prodle+"\no\nsessionid:"+sessionuserid);
   // var product= new Product();
-  user.removeAllListeners("failedFollowUnFollowProduct");
-  user.on("failedFollowUnFollowProduct",function(err){
+  user.removeAllListeners("failedFollowProduct");
+  user.on("failedFollowProduct",function(err){
     logger.emit("error", err.error.message,req.user.email);
     res.send(err);
   });
-  user.removeAllListeners("successfulFollowUnFollowProduct");
-  user.on("successfulFollowUnFollowProduct",function(result){
+  user.removeAllListeners("successfulFollowProduct");
+  user.on("successfulFollowProduct",function(result){
     logger.emit("info", result.success.message,req.user.email);
     // callback(null,result);
     res.send(result);
   });
     
- user.followunfollowproduct(prodle,sessionuserid);
+ user.followproduct(prodle,sessionuserid);
+
+}
+
+exports.unfollowproduct=function(req,res){
+  // var userdata=req.body.user;
+  var user=new User();
+
+  var sessionuserid=req.user.userid;
+  var prodle=req.params.prodle;
+  // var orgid=req.params.orgid;
+  logger.emit("log","prodle"+prodle+"\no\nsessionid:"+sessionuserid);
+  // var product= new Product();
+  user.removeAllListeners("failedUnFollowProduct");
+  user.on("failedUnFollowProduct",function(err){
+    logger.emit("error", err.error.message,req.user.email);
+    res.send(err);
+  });
+  user.removeAllListeners("successfulUnFollowProduct");
+  user.on("successfulUnFollowProduct",function(result){
+    logger.emit("info", result.success.message,req.user.email);
+    // callback(null,result);
+    res.send(result);
+  });
+    
+ user.unfollowproduct(prodle,sessionuserid);
 
 }
 exports.checkUsernameExists=function(req,res){

@@ -511,12 +511,24 @@ var _getProductTrending=function(self){
 		}else if(!trenddata){
 			self.emit("failedGetProudctTrends",{"error":{"message":"No trend data is available"}});
 		}else{
+			productModel.findOne({prodle:trenddata.prodle},{orgid:1,name:1,_id:0}).exec(function(err,productdata){
+				if(err){
+					self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product"}});
+				}else if(!productdata){
+					self.emit("failedGetProudctTrends",{"error":{"message":"prodle is wrong"}});
+				}else{					
+					////////////////////////////////
+					_successfulGetProductTrends(self,productdata);
+					//////////////////////////////////
+				}
+			})
 			///////////////////////////////////////////
-			_successfulGetProductTrends(self,trenddata);
+			// _successfulGetProductTrends(self,trenddata);
 			///////////////////////////////////////////
 		}
 	})
 };
+
 
 var _successfulGetProductTrends=function(self,trenddata){
 	logger.emit("log","_successfulGetProductTrends");
