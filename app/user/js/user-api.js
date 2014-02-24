@@ -200,7 +200,7 @@ exports.signin = function(req, res) {
 }
 passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'password'},
   function(email, password, done) {
-    userModel.findOne({$or:[{email: email.toLowerCase()},{username:email.toLowerCase()}],status:"active"},{email:1,password:1,org:1,userid:1,username:1,verified:1,isAdmin:1}, function(err, user) {
+    userModel.findOne({$or:[{email: email.toLowerCase()},{username:email.toLowerCase()}],status:"active"},{email:1,password:1,org:1,userid:1,username:1,verified:1,isAdmin:1,prodousertype:1}, function(err, user) {
       if (err){
        return done(err); 
       }
