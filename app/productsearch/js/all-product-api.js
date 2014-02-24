@@ -35,7 +35,7 @@ exports.allProduct = function(req,res){
 			}else{
 				for(var i=0;i<doc.length;i++){
 					doc_arr.push(doc[i]);
-					prod_name_arr.push(doc[i].name);
+					prod_name_arr.push("O-"+doc[i].name);
 					// console.log("doc_arr " +doc_arr);
 				}
 			}
@@ -52,7 +52,7 @@ exports.allProduct = function(req,res){
 				// var prod_name_arr = [];
 				for(var i=0;i<doc.length;i++){
 					doc_arr.push(doc[i]);
-					prod_name_arr.push(doc[i].name);
+					prod_name_arr.push("P-"+doc[i].name);
 				}
 				//////////////////////////////////
 				_successfulGetAllProduct(self,doc_arr,prod_name_arr);

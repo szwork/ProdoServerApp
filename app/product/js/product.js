@@ -504,21 +504,21 @@ Product.prototype.getProductTrending = function() {
 };
 
 var _getProductTrending=function(self){
-	console.log("_getProductTrending");
-	TrendingModel.find({},{prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
+	// console.log("_getProductTrending");
+	TrendingModel.find({},{prodle:1,commentcount:1,followedcount:1,_id:0}).sort({commentcount:-1,followedcount:-1}).limit(5).exec(function(err,trenddata){
 		if(err){
 			self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
 		}else if(!trenddata){
 			self.emit("failedGetProudctTrends",{"error":{"message":"No trend data is available"}});
 		}else{
-			////////////////////////////////
+			///////////////////////////////////////////
 			_successfulGetProductTrends(self,trenddata);
-			//////////////////////////////////
+			///////////////////////////////////////////
 		}
 	})
 };
+
 var _successfulGetProductTrends=function(self,trenddata){
 	logger.emit("log","_successfulGetProductTrends");
 	self.emit("successfulGetProductTrends", {"success":{"message":"Product Trends Getting Suceessfully","ProductTrends":trenddata}});
 }
-
