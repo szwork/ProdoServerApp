@@ -15,10 +15,23 @@ var logger = require("../../common/js/logger");
 
 //Feature trending Model
 var featureTrendingSchema = mongoose.Schema({
-  prodle:{type:String},
-  commentcount:{type:Number,default:0},
-  followedcount:{type:Number,default:0}
+	name:{type:String},
+	orgid:{type:String},
+  	prodle:{type:String},
+  	commentcount:{type:Number,default:0},
+  	followedcount:{type:Number,default:0}
 });
+
+// featureTrendingSchema.pre('save', function(next) {
+//   console.log("calling to trending save pre");  
+//   var trend = this;
+//   logger.emit("log","trending in pre"+user);
+//   trend.name=;
+//   trend.orgid=;
+//   logger.emit("log","trend"+user.userid);
+  
+  
+// });
 //Seed a feature trending
  featureTrendingSchema.set('redisCache', true);
  featureTrendingSchema.set('expires', 90);

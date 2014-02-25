@@ -42,16 +42,23 @@ var updateLatestProductCommentCount=function(prodle){
 		if(err){
 			logger.emit("log","Error in updation latest comment count");
 		}else if(!trenddata){
-			// logger.emit("error","No comment of product type");
-			var trend={prodle:prodle,commentcount:1,followedcount:0};
-            var trend_data = new TrendingModel(trend);
-			trend_data.save(function(err,analyticsdata){
-            	if(err){
-               	 	console.log("Error in db to save trending data" + err);
-            	}else{
-                	console.log("Trending for Latest comment added sucessfully" + analyticsdata);
-            	}
-        	})
+			productModel.findOne({prodle:prodle},{prodle:1,orgid:1,name:1,_id:0}).exec(function(err,productdata){
+				if(err){
+					logger.emit({"error":{"code":"ED001","message":"Error in db to get product"}});
+				}else if(!productdata){
+					logger.emit({"error":{"message":"prodle is wrong"}});
+				}else{
+					var trend={prodle:prodle,commentcount:1,followedcount:0,name:productdata.name,orgid:productdata.orgid};
+					var trend_data = new TrendingModel(trend);
+					trend_data.save(function(err,analyticsdata){
+		            	if(err){
+		               	 	console.log("Error in db to save trending data" + err);
+		            	}else{
+		                	console.log("Trending for Latest comment added sucessfully" + analyticsdata);
+		            	}
+		        	})
+				}
+			});            
 		}else{			
         	TrendingModel.update({prodle:prodle},{$inc:{commentcount:1}},function(err,latestupatestatus){
 				if(err){
