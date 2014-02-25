@@ -26,7 +26,7 @@ var updateLatestProductComment=function(prodle){
 					logger.emit("error","Error in updation latest 5 product comment");
 				}else if(latestupatestatus==1){
 					logger.emit("log","Latest 5 product comments updated");
-					updateLatestProductCommentCount(prodle);
+					// updateLatestProductCommentCount(prodle);
 				}else{
 					logger.emit("error","Given product id is wrong to update latest 5 comments");
 				}
@@ -344,6 +344,7 @@ var _updateFeatureAnalytics = function(prodle,analytics,product){
 
 
 var _successfulAddComment=function(self,newcomment){
+	updateLatestProductCommentCount(newcomment.prodle);
 	logger.emit("log","successfulAddComment");
 	self.emit("successfulAddComment",{"success":{"message":"Gave comment to product sucessfully","product_comment":newcomment}})
 }
@@ -385,9 +386,9 @@ var _deleteComment=function(self,commentid){
 		}else{
   
 			if(comment.type="product"){
-       updateLatestProductComment(comment.prodle);
+       			updateLatestProductComment(comment.prodle);
 			}else{
-       //updateLatestWarrantyComment
+       			//updateLatestWarrantyComment
 			}
 			/////////////////////////////
 			_successfulCommentDeletion(self,comment.prodle);
@@ -409,7 +410,7 @@ var updateLatestProductCommentDecCount=function(prodle){
 		if(err){
 			logger.emit("error","Error in updation latest comment count");
 		}else if(latestupatestatus==1){
-			logger.emit("log","Latest comment count for products updated");
+			logger.emit("log","Latest comment count(Decrement) for products updated");
 		}else{
 			logger.emit("error","Given product id is wrong to update latest comment count");
 		}
