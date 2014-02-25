@@ -42,7 +42,7 @@ var updateLatestProductCommentCount=function(prodle){
 		if(err){
 			logger.emit("log","Error in updation latest comment count");
 		}else if(!trenddata){
-			productModel.findOne({prodle:prodle},{prodle:1,orgid:1,name:1,_id:0}).exec(function(err,productdata){
+			ProductModel.findOne({prodle:prodle},{prodle:1,orgid:1,name:1,_id:0}).exec(function(err,productdata){
 				if(err){
 					logger.emit({"error":{"code":"ED001","message":"Error in db to get product"}});
 				}else if(!productdata){

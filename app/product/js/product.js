@@ -505,15 +505,15 @@ Product.prototype.getProductTrending = function() {
 
 var _getProductTrending=function(self){
 	// console.log("_getProductTrending");
-	TrendingModel.find({},{prodle:1,commentcount:1,followedcount:1,_id:0}).sort({commentcount:-1,followedcount:-1}).limit(5).exec(function(err,trenddata){
+	TrendingModel.find({},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({commentcount:-1,followedcount:-1}).limit(5).exec(function(err,trenddata){
 		if(err){
 			self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
 		}else if(!trenddata){
 			self.emit("failedGetProudctTrends",{"error":{"message":"No trend data is available"}});
 		}else{
-			_getProdNameorgIDByProdle(self,trenddata);					
+			// _getProdNameorgIDByProdle(self,trenddata);					
 			///////////////////////////////////////////
-			// _successfulGetProductTrends(self,trenddata);
+			_successfulGetProductTrends(self,trenddata);
 			///////////////////////////////////////////
 		}
 	})
@@ -534,7 +534,7 @@ var _getProdNameorgIDByProdle=function(self,trenddata){
 				// console.log("trenArr " + trenArr);
 				// console.log("productdata : " + productdata);				
 				////////////////////////////////
-				_successfulGetProductTrends(self,trending);
+				_successfulGetProductTrends(self,productdata);
 				//////////////////////////////////
 			}
 		});
