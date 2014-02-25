@@ -1299,7 +1299,6 @@ var _successfullMakePayment=function(self){
 User.prototype.followproduct=function(prodle,sessionuserid){
 	var self=this;
 	_checkprodleForFollow(self,prodle,sessionuserid);
-	// _followunfollowproduct(self,prodle,sessionuserid);
 }
 var _checkprodleForFollow=function(self,prodle,sessionuserid){
 	productModel.findOne({prodle:prodle},function(err,checkprodlestatus){
@@ -1397,16 +1396,23 @@ var updateLatestProductFollowedCount=function(product){
 		if(err){
 			logger.emit("log","Error in updation latest product followed count");
 		}else if(!trenddata){
-			// logger.emit("error","No comment of product type");
-			var trend={prodle:product.prodle,commentcount:0,followedcount:1};
-            var trend_data = new TrendingModel(trend);
-			trend_data.save(function(err,analyticsdata){
-            	if(err){
-               	 	console.log("Error in db to save trending data" + err);
-            	}else{
-                	console.log("Trending for Latest product followed added sucessfully" + analyticsdata);
-            	}
-        	})
+			productModel.findOne({prodle:product.prodle},{prodle:1,orgid:1,name:1,_id:0}).exec(function(err,productdata){
+				if(err){
+					logger.emit({"error":{"code":"ED001","message":"Error in db to get product"}});
+				}else if(!productdata){
+					logger.emit({"error":{"message":"prodle is wrong"}});
+				}else{
+					var trend={prodle:productdata.prodle,commentcount:0,followedcount:1,name:productdata.name,orgid:productdata.orgid};
+					var trend_data = new TrendingModel(trend);
+					trend_data.save(function(err,analyticsdata){
+		            	if(err){
+		               	 	console.log("Error in db to save trending data" + err);
+		            	}else{
+		                	console.log("Trending for Latest product followed added sucessfully" + analyticsdata);
+		            	}
+		        	})
+				}
+			});			
 		}else{
 			TrendingModel.update({prodle:product.prodle},{$inc:{followedcount:1}},function(err,latestupatestatus){
 				if(err){
