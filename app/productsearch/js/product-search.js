@@ -160,7 +160,8 @@ var _validateProductSearchData = function(self,productsearchdata) {
 							orgid_arr.push(doc[i].orgid);
 						}
 						if(productsearchdata.Product_Name=="" && productsearchdata.Model_Number=="" && productsearchdata.Feature=="" && productsearchdata.Category==""){
-							_successfulOrgSearch(self,doc);
+							// _successfulOrgSearch(self,doc);
+							_getProdleOfOrganisation(self,doc);
 						}else{
 							query.orgid={$in:orgid_arr};
 							_searchProduct(self,productsearchdata,searchCriteria,query);
@@ -193,6 +194,23 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 var _successfulProductSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
 	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Products Found","doc":doc}});
+}
+
+var _getProdleOfOrganisation = function(self,doc){
+	var org_array=[];
+	for(var i=0;i<doc.length;i++){
+		org_array.push(doc[i].orgid);
+	}
+
+	ProductModel.find({orgid:{$in:org_array}},{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,productdata){
+		if(err){
+			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
+		}else if(productdata.length==0){
+			self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"No products found for this organisation"}});
+		}else{			
+	  		_successfulOrgSearch(self,productdata);		  		
+	  	}
+	})
 }
 
 var _successfulOrgSearch = function(self,doc){
