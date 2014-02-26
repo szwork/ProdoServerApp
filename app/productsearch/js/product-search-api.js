@@ -30,3 +30,28 @@ exports.searchProduct = function(req,res){
 	productsearch.searchProduct(productsearchdata);	
 }
 
+exports.getOrgProducts = function(req,res){
+  var sessionuserid = req.user.userid;
+  var orgdata = req.body;
+  // var orgid = req.params.orgid;
+  // var orgname = req.params.orgname;
+  // var orgid = orgdata.orgid;
+  // var orgname = orgdata.orgname;
+  // console.log(orgid+" "+orgname);
+  
+  var productsearch = new ProductSearch();
+  // logger.emit("log","\norgid : "+orgid+"\nsessionid : "+sessionuserid);
+  productsearch.removeAllListeners("failedGetOrgProduct");
+  productsearch.on("failedGetOrgProduct",function(err){
+    logger.emit("error", err.error.message,sessionuserid);
+    res.send(err);
+  });
+  productsearch.removeAllListeners("successfulGetOrgProduct");
+  productsearch.on("successfulGetOrgProduct",function(doc){
+    logger.emit("info", doc.success.message,sessionuserid);
+    // console.log("L " + doc.success.doc.length);
+    res.send(doc);
+  });
+
+  productsearch.getOrgProducts(orgdata); 
+}

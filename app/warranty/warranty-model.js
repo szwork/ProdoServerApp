@@ -35,7 +35,6 @@ var warrantySchema = mongoose.Schema({
  expirydate:{type:Date},
  warranty_removedate:{type:Date},
  warranty_tranferable:{type:Boolean}
-
 });
 
 

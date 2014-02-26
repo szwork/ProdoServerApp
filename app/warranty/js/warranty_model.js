@@ -19,38 +19,49 @@ var logger = require("../../common/js/logger")
 ////////////
 //Product Warranty Data Model
 var warrantySchema = mongoose.Schema({
-  prodle:{type:String, required: true, unique: true},
+  warranty_id:{type:String},
+  prodle:{type:String,required:true,unique:true},
   orgprodid:{type:String},
-  name: { type: String },
+  name:{type:String},
   display_name:{type:String},
   model_no:{type:Date},
   model_name:{type:String},
+  purchase_date:{type:Date},
+  expirydate:{type:Date},
+  invoice_image:{type:String},//path of invoice image
   phone:{type:String},
   serial_no:{type:String},
-  description: { type: String},
-  introduction_date: { type: String},
+  description:{type:String},
+  introduction_date:{type:String},
   sale_discontinuation_date:{type:date},
-  support_discontinuation_date: { type:date },
-  banneddate: { type: date },
-  product_images: [{prodle:{type:String,ref:"product"}}], 
-  features: [{prodle:{type:String,ref:"product"}}], 
-  substitutes: [{prodle:{type:String,ref:"product"}}], 
-  incompatability: [{prodle:{type:String,ref:"product"}}], 
-  category: [{prodle:{type:String,ref:"product"}}],  
+  support_discontinuation_date:{type:date},
+  banneddate:{type:date},
+  product_images:[{prodle:{type:String,ref:"product"}}], 
+  features:[{prodle:{type:String,ref:"product"}}], 
+  substitutes:[{prodle:{type:String,ref:"product"}}], 
+  incompatability:[{prodle:{type:String,ref:"product"}}], 
+  category:[{prodle:{type:String,ref:"product"}}],  
   status:{type:String,default:"active"},
-  modified_date:
-  createddate:
-  removeddate:
+  modified_date:{type:Date},
+  createddate:{type:Date},
+  removeddate:{type:Date},
   comments_shown:5
-  product_comments: [{prodle:{type:String,ref:"comments"}}], 
+  product_comments:[{prodle:{type:String,ref:"comments"}}], 
 });
 
-//Seed a product
+warrantySchema.pre('save', function(next) {
+  var warranty = this;
+  warranty.warranty_id = shortId.generate();  
+  console.log("Warranty pre "+warranty);
+  next(); 
+})
+
+//Seed a warranty
+warrantySchema.set('redisCache', true);
+warrantySchema.set('expires', 6000);
+
 var Warranty = mongoose.model('Warranty', warrantySchema);
-
 module.exports = Warranty;
-
-
 
 =========
 WARRANTY

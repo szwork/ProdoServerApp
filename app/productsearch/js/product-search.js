@@ -172,9 +172,6 @@ var _validateProductSearchData = function(self,productsearchdata) {
 	  	// _searchProduct(self,productsearchdata,searchCriteria,query);
 }
 
-// function _getOrgIdByOrgName(self,Organization_Name){
-// 	console.log("OrgName " +Organization_Name);	
-// }
 
 var _searchProduct = function(self,productsearchdata,searchCriteria,query){
     if(searchCriteria.length!=0){
@@ -201,4 +198,43 @@ var _successfulProductSearch = function(self,doc){
 var _successfulOrgSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
 	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Organisations Found","doc":doc}});
+}
+
+ProductSearch.prototype.getOrgProducts = function(orgdata){
+	console.log("OrgId : " + orgdata.orgid + " OrgName " + orgdata.orgname);
+	var self=this;
+	// var productsearchdata=this.product;
+	_validateOrgData(self,orgdata);
+	
+}
+
+var _validateOrgData = function(self,orgdata){
+	// console.log("_getAllOrgProducts " + JSON.stringify(orgdata));
+	if(orgdata==undefined){
+		self.emit("failedGetOrgProduct",{"error":{"code":"AV001","message":"Please provide data to get org products"}});
+	}else if(orgdata.orgname==undefined){
+		self.emit("failedGetOrgProduct",{"error":{"code":"AV001","message":"Please pass orgname"}});
+	} else if(orgdata.orgid==undefined){
+	  	self.emit("failedGetOrgProduct",{"error":{"code":"AV001","message":"please pass orgid"}});
+	}else{
+	  	_getAllOrgProducts(self,orgdata);	   	
+	}
+}
+
+var _getAllOrgProducts = function(self,orgdata){
+	
+	ProductModel.find({orgid:orgdata.orgid},{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,doc){
+		if(err){
+			self.emit("failedGetOrgProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
+		}else if(doc.length==0){
+			self.emit("successfulGetOrgProduct",{"success":{"message":"No products found for this organisation"}});
+		}else{
+	  		_successfulAllOrgProducts(self,doc,orgdata);
+	  	}
+	})
+}
+
+var _successfulAllOrgProducts = function(self,doc,orgdata){
+	logger.emit("log","_successfulGetOrgProduct");
+	self.emit("successfulGetOrgProduct",{"success":{"message":"Following products found for "+orgdata.orgname,"doc":doc}});
 }

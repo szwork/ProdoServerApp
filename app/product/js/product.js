@@ -504,8 +504,8 @@ Product.prototype.getProductTrending = function() {
 };
 
 var _getProductTrending=function(self){
-	// console.log("_getProductTrending");
-	TrendingModel.find({},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({commentcount:-1,followedcount:-1}).limit(5).exec(function(err,trenddata){
+	console.log("_getProductTrending");
+	TrendingModel.find({},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
 		if(err){
 			self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
 		}else if(!trenddata){
@@ -517,28 +517,6 @@ var _getProductTrending=function(self){
 		}
 	})
 };
-
-// var _getProdNameorgIDByProdle=function(self,trenddata){
-// 	var trenArr = [];
-// 	for(var i=0;i<trenddata.length;i++){
-// 		trenArr.push(trenddata);
-// 	}
-// 	for(var i=0;i<trenddata.length;i++){		
-// 		productModel.findOne({prodle:trenddata[i].prodle},{prodle:1,orgid:1,name:1,_id:0}).exec(function(err,productdata){
-// 			if(err){
-// 				self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product"}});
-// 			}else if(!productdata){
-// 				self.emit("failedGetProudctTrends",{"error":{"message":"prodle is wrong"}});
-// 			}else{
-// 				// console.log("trenArr " + trenArr);
-// 				// console.log("productdata : " + productdata);				
-// 				////////////////////////////////
-// 				_successfulGetProductTrends(self,productdata);
-// 				//////////////////////////////////
-// 			}
-// 		});
-// 	}
-// }
 
 var _successfulGetProductTrends=function(self,trenddata){
 	logger.emit("log","_successfulGetProductTrends");
