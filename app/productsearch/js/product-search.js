@@ -197,20 +197,57 @@ var _successfulProductSearch = function(self,doc){
 }
 
 var _getProdleOfOrganisation = function(self,doc){
-	var org_array=[];
-	for(var i=0;i<doc.length;i++){
-		org_array.push(doc[i].orgid);
+	var orgid_arr = [];
+	var orgdetails = {};
+	// console.log("Doc " + doc[0].orgid);
+	var initialvalue=0;
+	var doc1=[];
+	_getOrgProdle(self,doc,initialvalue,doc1)
+	// for(var i=0;i<doc.length;i++){
+	// 	ProductModel.find({orgid:doc[0].orgid},{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,productdata){
+	// 		if(err){
+	// 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
+	// 		}else if(productdata.length==0){
+	// 			self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"No products found for this organisation"}});
+	// 		}else{
+	// 			orgdetails = {doc:doc,prodle:productdata.productdata};
+	// 			orgid_arr.push(orgdetails);
+	// 	  		// _successfulAllOrgProducts(self,productdata,orgdata);
+	// 	  		console.log("orgid_arr " + JSON.stringify(orgid_arr));
+	// 	  	}
+	// 	})
+	// }
+	
+}
+var _getOrgProdle = function(self,doc,i,doc1){
+	logger.emit("log",doc);
+	logger.emit("log","doc length"+doc.length+"i:"+i);
+
+    if(doc.length>i){
+	ProductModel.findOne({orgid:doc[i].orgid},{prodle:1,_id:0}).exec(function(err,productdata){
+			if(err){
+				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
+			}else if(productdata){
+				console.log("pddddd"+productdata);
+				doc[i].prodle=productdata.prodle;
+				
+				doc1.push({name:doc[i].name,orgid:doc[i].orgid,prodle:productdata.prodle})
+				console.log("test"+JSON.stringify(doc1));
+				_getOrgProdle(self,doc,++i,doc1)
+			}else{
+				// orgdetails = {doc:doc,prodle:productdata.productdata};
+				// orgid_arr.push(orgdetails);
+		  // 		// _successfulAllOrgProducts(self,productdata,orgdata);
+		  // 		console.log("orgid_arr " + JSON.stringify(orgid_arr));
+		  doc1.push({name:doc[i].name,orgid:doc[i].orgid})
+		  _getOrgProdle(self,doc,++i,doc1)
+		  	}
+		})
+	}else{
+		_successfulOrgSearch(self,doc1)
 	}
 
-	ProductModel.find({orgid:{$in:org_array}},{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,productdata){
-		if(err){
-			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
-		}else if(productdata.length==0){
-			self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"No products found for this organisation"}});
-		}else{			
-	  		_successfulOrgSearch(self,productdata);		  		
-	  	}
-	})
+
 }
 
 var _successfulOrgSearch = function(self,doc){

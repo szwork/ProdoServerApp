@@ -10,6 +10,7 @@ var logger=require("../../common/js/logger");
 exports.allProduct = function(req,res){
 	var self=this;
 	var product_data = req.body;
+	console.log("######## product_data " + JSON.stringify(product_data));
 	var product_name=product_data.name;
 	var orgid = product_data.orgid;
 	var product_name_or_arr=[];
