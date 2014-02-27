@@ -223,7 +223,7 @@ var _deleteProduct=function(self,orgid,prodle){
 		}else{
 			////////////////////////////////
 			_changeProductStatusInTrending(self,prodle);
-			_successfulDeleteProduct(self);
+			// _successfulDeleteProduct(self);
 			//////////////////////////////////
 		}
 	})
@@ -231,13 +231,14 @@ var _deleteProduct=function(self,orgid,prodle){
 
 var _changeProductStatusInTrending = function(self,prodle){
 	console.log("## changeProductStatusInTrending ##");
-	TrendingModel.update({prodle:prodle},{$set:{status:"deactive"}},function(err,status){
+	TrendingModel.update({prodle:prodle},{$set:{status:"deactive"}}).lean().exec(function(err,status){
 		if(err){
-			logger.emit("log","Error in db to update status in trending");
-		}else if(status==0){
-			logger.emit("log","Prodle is wrong for update trending status");
+			self.emit("failedDeleteProduct",{"error":{"code":"ED001","message":"Error in db to update product status in trending" + err}});
+		}else if(status!=1){
+			self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Prodle is wrong for update trending status"}});
 		}else{
 			logger.emit("log","Status updated successfully in trending");
+			_successfulDeleteProduct(self);
 		}
 	})
 }

@@ -133,8 +133,29 @@ var _validateUpdateWarrantyData = function(self,userid,prodle){
 	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass expiry date"}});
 	}else if(warrantydata.description==undefined){
 	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass description "}});
-	}else{
-		
-	  	// _checkProdleIsValid(self,warrantydata);	   	
+	}else{		
+	  	_updateUserWarranty(self,userid,prodle,warrantydata);
 	}
 };
+
+var _updateUserWarranty = function(self,userid,prodle,warrantydata){
+	var d = new Date();
+	console.log("Date " + d);
+	warrantydata.modified_date = d;
+	WarrantyModel.update({userid:userid,prodle:prodle},{$set:warrantydata}).lean().exec(function(err,warrantyupdatestatus){
+		if(err){
+			self.emit("failedUpdateProduct",{"error":{"code":"ED001","message":"Error in db to update warranty"}});
+		}else if(warrantyupdatestatus!=1){
+			self.emit("failedUpdateProduct",{"error":{"code":"AP001","message":"userid or prodle is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulUpdateWarranty(self);
+			//////////////////////////////////
+		}
+	})
+}
+
+var _successfulUpdateWarranty = function(self){
+	logger.emit("log","_successfulUpdateProduct");
+	self.emit("successfulWarrantyUpdation", {"success":{"message":"Warranty Updated Successfully"}});
+}
