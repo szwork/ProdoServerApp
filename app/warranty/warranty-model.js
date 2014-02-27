@@ -37,11 +37,6 @@ var warrantySchema = mongoose.Schema({
  warranty_tranferable:{type:Boolean}
 });
 
-
-	
-
-
-
 warrantySchema.statics.findAndModify = function (query, sort, doc, options, callback) {
     return this.collection.findAndModify(query, sort, doc, options, callback);
 };

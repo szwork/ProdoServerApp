@@ -10,7 +10,7 @@ var logger=require("../../common/js/logger");
 exports.allProduct = function(req,res){
 	var self=this;
 	var product_data = req.body;
-	console.log("######## product_data " + JSON.stringify(product_data));
+	// console.log("######## product_data " + JSON.stringify(product_data));
 	var product_name=product_data.name;
 	var orgid = product_data.orgid;
 	var product_name_or_arr=[];
@@ -66,7 +66,6 @@ exports.allProduct = function(req,res){
 		});
 	}
 	
-	
 	var _successfulGetAllProduct = function(self,doc,prod_name_arr){
 		logger.emit("log","_successfulGetAllProduct");
 		var s = {"success":{"message":"Getting Product details Successfully","doc":doc},"name":{"message":"Product Name","doc":prod_name_arr}};
@@ -74,6 +73,8 @@ exports.allProduct = function(req,res){
 	}
 	
 }
+
+
 // exports._searchProduct = function(req,res){
 // 	var productsearchdata = req.body.productsearchdata;
 // 	console.log(JSON.stringify(productsearchdata));

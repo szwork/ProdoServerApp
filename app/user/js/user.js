@@ -100,7 +100,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 	}
 };
 var _addProductsFollowedByUser = function(self,userdata,host){
-	productModel.findOne({"name":"Prodonus"},{prodle:1,orgid:1}).lean().exec(function(err,product){
+	productModel.findOne({"name":new RegExp('^'+"Prodonus", "i")},{prodle:1,orgid:1}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
 		}else if(product){
@@ -1623,7 +1623,7 @@ var _getMyProductsFollowed = function(self,prodle){
 	}else{
 		prodles_array.push(prodles.s);
 	}
-	productModel.find({"prodle" :{$in:prodles_array}},{name:1,prodle:1,orgid:1,product_logo:1,_id:0}).lean().exec(function(err,products){
+	productModel.find({"prodle" :{$in:prodles_array},status:{$ne:"deactive"}},{name:1,prodle:1,orgid:1,product_logo:1,_id:0}).lean().exec(function(err,products){
 		if(err){
 			self.emit("failedProductsFollowed",{"error":{"code":"ED001","message":"Error in db to find all users"}});
 		}else if(products.length==0){

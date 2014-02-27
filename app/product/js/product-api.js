@@ -182,17 +182,17 @@ exports.deleteProduct=function(req,res){
     res.send(result);
     // eventEmitter.removeListener(this);
   });
-   if(req.user.org.orgid!=orgid){
-    logger.emit("log","Given orgid is not match with session userid");
-    product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}});
-  }else if(req.user.org.isAdmin==false){
-    logger.emit("log","You are not an admin to delete product");
-    product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}}); 
-  }else{
+  //  if(req.user.org.orgid!=orgid){
+  //   logger.emit("log","Given orgid is not match with session userid");
+  //   product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}});
+  // }else if(req.user.org.isAdmin==false){
+  //   logger.emit("log","You are not an admin to delete product");
+  //   product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}}); 
+  // }else{
     /////////////////////////////////
     product.deleteProduct(orgid,prodle);
     //////////////////////////////// 
-  }
+  // }
 }
 exports.deleteProductImage=function(req,res){
   logger.emit("log","///////Calling to delete Products///////");

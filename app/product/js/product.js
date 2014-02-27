@@ -222,16 +222,31 @@ var _deleteProduct=function(self,orgid,prodle){
 			self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"product id is wrong"}});
 		}else{
 			////////////////////////////////
+			_changeProductStatusInTrending(self,prodle);
 			_successfulDeleteProduct(self);
 			//////////////////////////////////
 		}
 	})
 };
 
+var _changeProductStatusInTrending = function(self,prodle){
+	console.log("## changeProductStatusInTrending ##");
+	TrendingModel.update({prodle:prodle},{$set:{status:"deactive"}},function(err,status){
+		if(err){
+			logger.emit("log","Error in db to update status in trending");
+		}else if(status==0){
+			logger.emit("log","Prodle is wrong for update trending status");
+		}else{
+			logger.emit("log","Status updated successfully in trending");
+		}
+	})
+}
+
 var _successfulDeleteProduct=function(self){
 	logger.emit("log","_successfulDeleteProduct");
 	self.emit("successfulDeleteProduct", {"success":{"message":"Delete Product Successfully"}});
 }
+
 Product.prototype.deleteProductImage = function(prodleimageids,prodle,orgid) {
 	var self=this;
 	if(prodleimageids==undefined){
@@ -505,7 +520,7 @@ Product.prototype.getProductTrending = function() {
 
 var _getProductTrending=function(self){
 	console.log("_getProductTrending");
-	TrendingModel.find({},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
+	TrendingModel.find({status:{$ne:"deactive"}},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
 		if(err){
 			self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
 		}else if(!trenddata){
