@@ -118,6 +118,7 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 		if(userdata.prodousertype=="individual"){
 			userdata.usertype="individual";
 		}
+		userdata.username=userdata.username.toLowerCase();
 		var user=userModel(userdata);
 	    user.save(function(err,user){
 	    	console.log("after save"+user);
@@ -522,7 +523,7 @@ var _isSubscribed=function(self,user){
 
 	// }
 	// _checkUserIsSubscribed(user,function(user))
-	if(user.prodousertype="business" && user.org==undefined){
+	if(user.prodousertype=="business" && user.org==undefined){
 	  self.emit("failedUserSignin",{"error":{"code":"AW001","message":"Please add an organization ","user":user}}); 
 	}else if(user.isSubscribed==false){
 		self.emit("failedUserSignin",{"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}}); 
