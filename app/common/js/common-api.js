@@ -278,7 +278,7 @@ uploadFile=function(file,dirname,action,sessionuser,callback){
     })
     
   }else if(action.warranty!=undefined){//warranty uploads
-    
+
     __warrantyInvoiceImgBuffer(action,file,dirname,action,sessionuser,function(err,result){
       if(err){
          callback(err)
@@ -726,53 +726,34 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
                 console.log(written+" bytes are written from buffer");
-                var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-                 var bucketFolder;
-                 var params;
-                 // writebuffer= new Buffer(file_buffer, "base64");
-                if(sessionuser.org.orgid==null){
-                  callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
-                }else{
-                  if(action.productlogo.userid!=sessionuser.userid){
-                    callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
-                  }else if(sessionuser.org.orgid!=action.productlogo.orgid){
-                    callback({"error":{"code":"EA001","message":"You are not authorized to add product logo"}});
-                  }else if(sessionuser.org.isAdmin==false){
-                    callback({"error":{"code":"EA001","message":"You are not authorized to add product logo"}});
-                  }else{
-                    ProductModel.findOne({prodle:action.productlogo.prodle},{orgid:1},function(err,product){
-                      if(err){
-                        callback({"error":{"code":"EDOO1","message":"productFileUpload:Dberror"+err}});
-                      }else if(!product){
-                        callback({"error":{"message":"Wrong Prodle"}});
+                    var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                     var bucketFolder;
+                     var params;
+                     // writebuffer= new Buffer(file_buffer, "base64");
+                    
+                      if(action.userid!=sessionuser.userid){
+                        callback({"error":{"code":"EA001","message":"You are not an authorized to change user avatar"}});   
                       }else{
-                        if(product.orgid!=action.productlogo.orgid){
-                           callback({"error":{"code":"EA001","message":"It is not your product to add product logo"}});
-                        }else{
-                          bucketFolder="prodonus/org/"+action.productlogo.orgid+"/product/"+action.productlogo.prodle;
-                          params = {
-                                   Bucket: bucketFolder,
-                                   Key: action.productlogo.orgid+action.productlogo.prodle+s3filekey,
-                                   Body: writebuffer,
-                                   //ACL: 'public-read-write',
-                                   ContentType: file_type
-                          };
-                          warrantyInvoiceImgUpload(action.productlogo.prodle,params,function(err,result){
-                            if(err){
-                              callback(err);
-                            }else{
-                             callback(null,result);
-                            }
-                            fs.close(fd, function() {
-                             exec("rm -rf '"+fileName+"'");
-                                console.log('File saved successful!');
-                            });
-                         })
-                        }
+                        bucketFolder="prodonus/user/"+action.user.userid;
+                        params = {
+                             Bucket: bucketFolder,
+                             Key: action.user.userid+s3filekey,
+                             Body: writebuffer,
+                             //ACL: 'public-read-write',
+                             ContentType: file_type
+                        };
+                        warrantyInvoiceImgUpload(action.user.userid,params,function(err,result){
+                          if(err){
+                            callback(err);
+                          }else{
+                            callback(null,result);
+                          }
+                          fs.close(fd, function() {
+                            exec("rm -rf '"+fileName+"'");
+                              console.log('File saved successful!');
+                          });
+                        })
                       }
-                    })
-                  }
-                }
               }
             })
           }
