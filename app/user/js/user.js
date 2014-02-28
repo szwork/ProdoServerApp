@@ -118,6 +118,7 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 		if(userdata.prodousertype=="individual"){
 			userdata.usertype="individual";
 		}
+		userdata.username=userdata.username.toLowerCase();
 		var user=userModel(userdata);
 	    user.save(function(err,user){
 	    	console.log("after save"+user);
@@ -277,8 +278,8 @@ var _verifyToken = function(self,token) {
         }
       })
     }else{
-    	
-    	self.emit("tokenredirect","#/message/regeneratetoken");
+    		
+    	self.emit("tokenredirect","user/regeneratetoken");
     }
   })
 };
@@ -369,7 +370,7 @@ var _sendWelcomeEmail = function (self,user) {
  var _successfulUserActivation = function(self) {
 		//validate the user data
 		logger.emit("info","successfulUserActivation");
-		self.emit("tokenredirect","#/message/activateaccount");
+		self.emit("tokenredirect","user/activateaccount");
 	}
 
 //signinfi
@@ -390,8 +391,8 @@ var _validateSignin=function(self,userdata){
 	}else if(userdata.password==undefined){
 		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please enter password"}});
 	}else{
-		console.log("signin2");
-		///////////////////////
+		
+		
 		//_passportauthenticate(self,userdata);
 		self.emit("passportauthenticate",userdata);
 		///////////////////////
@@ -408,9 +409,9 @@ userModel.findOne({userid:user.userid},function(err,userdata){
 	}else if(!userdata){
 		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please enter password"}});
 	}else{
-	///////////////////////////
-	_isOTPUser(self,userdata);
-	/////////////////////
+		///////////////////////////
+		_isOTPUser(self,userdata);
+		/////////////////////
 	}
 })
 
@@ -504,7 +505,7 @@ var _isOTPUser=function(self,user){
 			// if(userdata.isOtpPassword==true){
 			// 	self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
 			// }else{
-
+        logger.emit("log","Userdata"+userdata);
 		/////////////////////////
 		_isSubscribed(self,userdata);
 		/////////////////////////
@@ -522,8 +523,10 @@ var _isSubscribed=function(self,user){
 
 	// }
 	// _checkUserIsSubscribed(user,function(user))
-	if(user.isSubscribed==false){
-		 self.emit("failedUserSignin",{"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}}); 
+	if(user.prodousertype=="business" && user.org==undefined){
+	  self.emit("failedUserSignin",{"error":{"code":"AW001","message":"Please add an organization ","user":user}}); 
+	}else if(user.isSubscribed==false){
+		self.emit("failedUserSignin",{"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}}); 
 	}else{
 		/////////////////////////////////
 		_isSubscriptionExpired(self,user);
@@ -864,16 +867,17 @@ var _requestRecaptchaService=function(self,reCaptcha,clientip){
   			self.emit("failedRecaptcha",{"error":{"message":"please check your internet connection"}});
   		}else if (response.statusCode != 200) {
   			self.emit("failedRecaptcha",{"error":{"code":"AR001","message":"Google reCaptcha server issue"}});
-  		}
-  		var responsedata=S(body);
-  		if(responsedata.contains("true")){
-  			self.emit("successfulRecaptcha",{"success":{"message":"Recaptcha Successfully"}});
-  			//successfulRecaptcha
-  		}else{
-  			var errmessage=responsedata.replaceAll("false","").s;
+  		}else if(body){
+	  		var responsedata=S(body);
+	  		if(responsedata.contains("true")){
+	  			self.emit("successfulRecaptcha",{"success":{"message":"Recaptcha Successfully"}});
+	  			//successfulRecaptcha
+	  		}else{
+	  			var errmessage=responsedata.replaceAll("false","").s;
 				self.emit("failedRecaptcha",{"error":{"message":errmessage}});
-  		}
-  });
+	  		}
+	  	}
+	});
 };
 
 User.prototype.regenerateVerificationUrl = function(email,host){
@@ -1691,7 +1695,7 @@ var _passwordUrlAction=function(self,token){
     if (err){
     	self.emit("failedPasswordUrlAction",{"error":{"code":"ED001","message":"Server Issue Please try after sometimes"}})
     }else if(!forgotpasswordtoken){
-    	self.emit("passwordtokenredirect","#/message/passwordtokenexpired");
+    	self.emit("passwordtokenredirect","user/passwordregeneratetoken");
     }else{
     	userModel.findOne({userid:forgotpasswordtoken._userId}, function (err, user) {
         if (err){

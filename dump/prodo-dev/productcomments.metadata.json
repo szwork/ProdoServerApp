@@ -1,1 +1,0 @@
-{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "prodo-dev.productcomments", "name" : "_id_" } ] }
