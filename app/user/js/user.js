@@ -390,8 +390,8 @@ var _validateSignin=function(self,userdata){
 	}else if(userdata.password==undefined){
 		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please enter password"}});
 	}else{
-		console.log("signin2");
-		///////////////////////
+		
+		
 		//_passportauthenticate(self,userdata);
 		self.emit("passportauthenticate",userdata);
 		///////////////////////
@@ -408,9 +408,9 @@ userModel.findOne({userid:user.userid},function(err,userdata){
 	}else if(!userdata){
 		self.emit("failedUserSignin",{"error":{"code":"AV001","message":"please enter password"}});
 	}else{
-	///////////////////////////
-	_isOTPUser(self,userdata);
-	/////////////////////
+		///////////////////////////
+		_isOTPUser(self,userdata);
+		/////////////////////
 	}
 })
 
@@ -504,7 +504,7 @@ var _isOTPUser=function(self,user){
 			// if(userdata.isOtpPassword==true){
 			// 	self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
 			// }else{
-
+        logger.emit("log","Userdata"+userdata);
 		/////////////////////////
 		_isSubscribed(self,userdata);
 		/////////////////////////
@@ -522,8 +522,10 @@ var _isSubscribed=function(self,user){
 
 	// }
 	// _checkUserIsSubscribed(user,function(user))
-	if(user.isSubscribed==false){
-		 self.emit("failedUserSignin",{"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}}); 
+	if(user.prodousertype="business" && user.org==undefined){
+	  self.emit("failedUserSignin",{"error":{"code":"AW001","message":"Please add an organization ","user":user}}); 
+	}else if(user.isSubscribed==false){
+		self.emit("failedUserSignin",{"error":{"code":"AS001","message":"User is not subscribed to any plan","user":user}}); 
 	}else{
 		/////////////////////////////////
 		_isSubscriptionExpired(self,user);
@@ -864,16 +866,17 @@ var _requestRecaptchaService=function(self,reCaptcha,clientip){
   			self.emit("failedRecaptcha",{"error":{"message":"please check your internet connection"}});
   		}else if (response.statusCode != 200) {
   			self.emit("failedRecaptcha",{"error":{"code":"AR001","message":"Google reCaptcha server issue"}});
-  		}
-  		var responsedata=S(body);
-  		if(responsedata.contains("true")){
-  			self.emit("successfulRecaptcha",{"success":{"message":"Recaptcha Successfully"}});
-  			//successfulRecaptcha
-  		}else{
-  			var errmessage=responsedata.replaceAll("false","").s;
+  		}else if(body){
+	  		var responsedata=S(body);
+	  		if(responsedata.contains("true")){
+	  			self.emit("successfulRecaptcha",{"success":{"message":"Recaptcha Successfully"}});
+	  			//successfulRecaptcha
+	  		}else{
+	  			var errmessage=responsedata.replaceAll("false","").s;
 				self.emit("failedRecaptcha",{"error":{"message":errmessage}});
-  		}
-  });
+	  		}
+	  	}
+	});
 };
 
 User.prototype.regenerateVerificationUrl = function(email,host){
