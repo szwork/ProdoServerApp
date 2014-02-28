@@ -277,8 +277,8 @@ var _verifyToken = function(self,token) {
         }
       })
     }else{
-    	
-    	self.emit("tokenredirect","#/message/regeneratetoken");
+    		
+    	self.emit("tokenredirect","user/regeneratetoken");
     }
   })
 };
@@ -369,7 +369,7 @@ var _sendWelcomeEmail = function (self,user) {
  var _successfulUserActivation = function(self) {
 		//validate the user data
 		logger.emit("info","successfulUserActivation");
-		self.emit("tokenredirect","#/message/activateaccount");
+		self.emit("tokenredirect","user/activateaccount");
 	}
 
 //signinfi
@@ -1658,7 +1658,7 @@ var _passwordUrlAction=function(self,token){
     if (err){
     	self.emit("failedPasswordUrlAction",{"error":{"code":"ED001","message":"Server Issue Please try after sometimes"}})
     }else if(!forgotpasswordtoken){
-    	self.emit("passwordtokenredirect","#/message/passwordtokenexpired");
+    	self.emit("passwordtokenredirect","user/passwordregeneratetoken");
     }else{
     	userModel.findOne({userid:forgotpasswordtoken._userId}, function (err, user) {
         if (err){
