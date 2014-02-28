@@ -731,10 +731,10 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                      var params;
                      // writebuffer= new Buffer(file_buffer, "base64");
                     
-                      if(action.userid!=sessionuser.userid){
-                        callback({"error":{"code":"EA001","message":"You are not an authorized to change user avatar"}});   
+                      if(action.warranty.userid!=sessionuser.userid){
+                        callback({"error":{"code":"EA001","message":"You are not an authorized to change user warranty invoice image"}});   
                       }else{
-                        bucketFolder="prodonus/user/"+action.user.userid;
+                        bucketFolder="prodonus/user/"+action.warranty.userid;
                         params = {
                              Bucket: bucketFolder,
                              Key: action.user.userid+s3filekey,
@@ -742,7 +742,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                              //ACL: 'public-read-write',
                              ContentType: file_type
                         };
-                        warrantyInvoiceImgUpload(action.user.userid,params,function(err,result){
+                        warrantyInvoiceImgUpload(action.warranty.userid,params,function(err,result){
                           if(err){
                             callback(err);
                           }else{
