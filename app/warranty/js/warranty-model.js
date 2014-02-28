@@ -30,7 +30,7 @@ var warrantySchema = mongoose.Schema({
   status:{type:String,default:"active"},
   modified_date:{type:Date},
   createddate:{type:Date,default:Date.now},
-  removeddate:{type:Date},
+  removedate:{type:Date},
   userid:{type:String,ref:"User"},
   // dealer_id:{type:String,ref:"Organization"},  
   description:{type:String},  
@@ -39,7 +39,7 @@ var warrantySchema = mongoose.Schema({
 warrantySchema.pre('save', function(next) {
   var warranty = this;
   warranty.warranty_id = shortId.generate();  
-  console.log("Warranty pre " + warranty);
+  // console.log("Warranty pre " + warranty);
   next(); 
 })
 

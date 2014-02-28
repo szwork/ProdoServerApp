@@ -198,6 +198,8 @@ exports.uploadFiles=function(io,__dirname){
           socket.emit("orgUploadResponse",{"error":{"message":"Please pass file details or action details"}});
         }else if(action.product!=undefined){
           socket.emit("productUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+        }else if(action.warranty!=undefined){
+          socket.emit("warrantyUploadResponse",{"error":{"message":"Please pass file details or action details"}});
         }else{
           socket.emit("productLogoResponse",{"error":{"message":"Please pass file details or action details"}});
         } 
@@ -213,6 +215,8 @@ exports.uploadFiles=function(io,__dirname){
               socket.emit("orgUploadResponse",err);
             }else if(action.product!=undefined){
               socket.emit("productUploadResponse",err);
+            }else if(action.warranty!=undefined){
+              socket.emit("warrantyUploadResponse",err);
             }else if(action.productlogo!=undefined){
                socket.emit("productUploadLogoResponse",err);
             }else{
@@ -225,6 +229,8 @@ exports.uploadFiles=function(io,__dirname){
               socket.emit("orgUploadResponse",null,uploadresult);
             }else if(action.product!=undefined){
               socket.emit("productUploadResponse",null,uploadresult);
+            }else if(action.warranty!=undefined){
+              socket.emit("warrantyUploadResponse",null,uploadresult);
             }else if(action.productlogo!=undefined){
               socket.emit("productUploadLogoResponse",null,uploadresult);
             }else if(action.orglogo!=undefined){
@@ -264,6 +270,16 @@ uploadFile=function(file,dirname,action,sessionuser,callback){
     
   }else if(action.product!=undefined){//product uploads
     __productFileBuffer(action,file,dirname,action,sessionuser,function(err,result){
+      if(err){
+         callback(err)
+      }else{
+        callback(null,result)
+      }
+    })
+    
+  }else if(action.warranty!=undefined){//warranty uploads
+    
+    __warrantyInvoiceImgBuffer(action,file,dirname,action,sessionuser,function(err,result){
       if(err){
          callback(err)
       }else{
@@ -680,6 +696,91 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
     })
   }
 }
+
+var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,callback){
+  var file_name=file.filename;
+  var file_buffer=file.filebuffer;
+  var file_length=file.filelength;  
+  var file_type=file.filetype;
+
+  var ext = path.extname(fileName||'').split('.');
+  ext=ext[ext.length - 1];
+  var fileName = dirname + '/tmp/uploads/' + file_name;
+ if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
+    callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
+  }else if(file_length>500000){
+    callback({"error":{"message":"You can upload  image of size less than 1mb"}});
+  }else{
+    easyimg.info(fileName,function(err,info){
+      logger.emit("log","error"+err);
+      if(info.width<100 && info.height<128){
+        callback({"error":{"message":"Please upload image of atleast width and height 700 and 300 respectively"}})
+      }else{
+        fs.open(fileName, 'a', 0755, function(err, fd) {
+          if (err) {
+            callback({"error":{"message":"uploadFile fs.open:"+err}})
+          }else{
+           
+            fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+              if(err){
+                callback({"error":{"message":"uploadFile fs.write:"+err}})
+              }else{
+                console.log(written+" bytes are written from buffer");
+                var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                 var bucketFolder;
+                 var params;
+                 // writebuffer= new Buffer(file_buffer, "base64");
+                if(sessionuser.org.orgid==null){
+                  callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
+                }else{
+                  if(action.productlogo.userid!=sessionuser.userid){
+                    callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
+                  }else if(sessionuser.org.orgid!=action.productlogo.orgid){
+                    callback({"error":{"code":"EA001","message":"You are not authorized to add product logo"}});
+                  }else if(sessionuser.org.isAdmin==false){
+                    callback({"error":{"code":"EA001","message":"You are not authorized to add product logo"}});
+                  }else{
+                    ProductModel.findOne({prodle:action.productlogo.prodle},{orgid:1},function(err,product){
+                      if(err){
+                        callback({"error":{"code":"EDOO1","message":"productFileUpload:Dberror"+err}});
+                      }else if(!product){
+                        callback({"error":{"message":"Wrong Prodle"}});
+                      }else{
+                        if(product.orgid!=action.productlogo.orgid){
+                           callback({"error":{"code":"EA001","message":"It is not your product to add product logo"}});
+                        }else{
+                          bucketFolder="prodonus/org/"+action.productlogo.orgid+"/product/"+action.productlogo.prodle;
+                          params = {
+                                   Bucket: bucketFolder,
+                                   Key: action.productlogo.orgid+action.productlogo.prodle+s3filekey,
+                                   Body: writebuffer,
+                                   //ACL: 'public-read-write',
+                                   ContentType: file_type
+                          };
+                          warrantyInvoiceImgUpload(action.productlogo.prodle,params,function(err,result){
+                            if(err){
+                              callback(err);
+                            }else{
+                             callback(null,result);
+                            }
+                            fs.close(fd, function() {
+                             exec("rm -rf '"+fileName+"'");
+                                console.log('File saved successful!');
+                            });
+                         })
+                        }
+                      }
+                    })
+                  }
+                }
+              }
+            })
+          }
+        })
+      }
+    })
+  }
+}
 var userFileUpload=function(userid,awsparams,callback){
 
   s3bucket.putObject(awsparams, function(err, data) {
@@ -804,6 +905,32 @@ var orgLogoUpload=function(orgid,awsparams,callback){
               callback(null,{"success":{"message":"Organization logo changes  Successfully","image":url}})
             }else{
               callback({"error":{"code":"AO002","message":"Wrong orgid"+orgid}});
+            }
+          })
+        }
+      });
+    }
+  })  
+}
+
+var warrantyInvoiceImgUpload=function(prodle,awsparams,callback){
+  s3bucket.putObject(awsparams, function(err, data) {
+    if (err) {
+      callback({"error":{"message":"s3bucket.putObject:-productLogoUpload"+err}})
+    } else {
+      logger.emit("log","fileupload saved");
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject',params1, function (err, url) {
+        if(err){
+          callback({"error":{"message":"productLogoUpload:Error in getting getSignedUrl"+err}});
+        }else{
+          ProductModel.update({prodle:prodle},{$set:{product_logo:url}},function(err,productuploadstatus){
+            if(err){
+              callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
+            }else if(productuploadstatus==1){
+              callback(null,{"success":{"message":"Product images uploaded Successfully","image":url}})
+            }else{
+              callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
             }
           })
         }
