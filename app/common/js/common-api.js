@@ -27,6 +27,7 @@ var path=require("path");
 var userModel=require('../../user/js/user-model');
 var OrgModel=require('../../org/js/org-model');
 var ProductModel=require('../../product/js/product-model');
+var WarrantyModel = require('../../warranty/js/warranty-model');
 var exec = require('child_process').exec;
 var CONFIG = require('config').Prodonus;
 var easyimg = require('easyimage');
@@ -742,7 +743,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                              //ACL: 'public-read-write',
                              ContentType: file_type
                         };
-                        warrantyInvoiceImgUpload(action.warranty.userid,params,function(err,result){
+                        warrantyInvoiceImgUpload(action.warranty.warranty_id,params,function(err,result){
                           if(err){
                             callback(err);
                           }else{
@@ -894,24 +895,24 @@ var orgLogoUpload=function(orgid,awsparams,callback){
   })  
 }
 
-var warrantyInvoiceImgUpload=function(prodle,awsparams,callback){
+var warrantyInvoiceImgUpload=function(warranty_id,awsparams,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
-      callback({"error":{"message":"s3bucket.putObject:-productLogoUpload"+err}})
+      callback({"error":{"message":"s3bucket.putObject:-warrantyInvoiceImgUpload"+err}})
     } else {
       logger.emit("log","fileupload saved");
       var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
       s3bucket.getSignedUrl('getObject',params1, function (err, url) {
         if(err){
-          callback({"error":{"message":"productLogoUpload:Error in getting getSignedUrl"+err}});
+          callback({"error":{"message":"warrantyInvoiceImgUpload:Error in getting getSignedUrl "+err}});
         }else{
-          ProductModel.update({prodle:prodle},{$set:{product_logo:url}},function(err,productuploadstatus){
+          WarrantyModel.update({warranty_id:warranty_id},{$set:{invoice_image:url}},function(err,warrantyuploadstatus){
             if(err){
-              callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
-            }else if(productuploadstatus==1){
-              callback(null,{"success":{"message":"Product images uploaded Successfully","image":url}})
+              callback({"error":{"code":"EDOO1","message":"warrantyInvoiceImgUpload:Dberror "+err}});
+            }else if(warrantyuploadstatus==1){
+              callback(null,{"success":{"message":"Warranty invoice image uploaded Successfully","image":url}})
             }else{
-              callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
+              callback({"error":{"code":"AP001","message":"Wrong warranty_id"+warranty_id}});
             }
           })
         }
