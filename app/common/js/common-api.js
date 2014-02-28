@@ -737,7 +737,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                         bucketFolder="prodonus/user/"+action.warranty.userid;
                         params = {
                              Bucket: bucketFolder,
-                             Key: action.user.userid+s3filekey,
+                             Key: action.warranty.userid+s3filekey,
                              Body: writebuffer,
                              //ACL: 'public-read-write',
                              ContentType: file_type
