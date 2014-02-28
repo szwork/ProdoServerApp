@@ -35,13 +35,7 @@ var warrantySchema = mongoose.Schema({
  expirydate:{type:Date},
  warranty_removedate:{type:Date},
  warranty_tranferable:{type:Boolean}
-
 });
-
-
-	
-
-
 
 warrantySchema.statics.findAndModify = function (query, sort, doc, options, callback) {
     return this.collection.findAndModify(query, sort, doc, options, callback);

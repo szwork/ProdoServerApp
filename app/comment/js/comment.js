@@ -26,7 +26,7 @@ var updateLatestProductComment=function(prodle){
 					logger.emit("error","Error in updation latest 5 product comment");
 				}else if(latestupatestatus==1){
 					logger.emit("log","Latest 5 product comments updated");
-					updateLatestProductCommentCount(prodle);
+					// updateLatestProductCommentCount(prodle);
 				}else{
 					logger.emit("error","Given product id is wrong to update latest 5 comments");
 				}
@@ -42,17 +42,24 @@ var updateLatestProductCommentCount=function(prodle){
 		if(err){
 			logger.emit("log","Error in updation latest comment count");
 		}else if(!trenddata){
-			// logger.emit("error","No comment of product type");
-			var trend={prodle:prodle,commentcount:1,followedcount:0};
-            var trend_data = new TrendingModel(trend);
-			trend_data.save(function(err,analyticsdata){
-            	if(err){
-               	 	console.log("Error in db to save trending data" + err);
-            	}else{
-                	console.log("Trending for Latest comment added sucessfully" + analyticsdata);
-            	}
-        	})
-		}else{			
+			ProductModel.findOne({prodle:prodle},{prodle:1,orgid:1,name:1,_id:0}).exec(function(err,productdata){
+				if(err){
+					logger.emit({"error":{"code":"ED001","message":"Error in db to get product"}});
+				}else if(!productdata){
+					logger.emit({"error":{"message":"prodle is wrong"}});
+				}else{
+					var trend={prodle:prodle,commentcount:1,followedcount:0,name:productdata.name,orgid:productdata.orgid};
+					var trend_data = new TrendingModel(trend);
+					trend_data.save(function(err,analyticsdata){
+		            	if(err){
+		               	 	console.log("Error in db to save trending data" + err);
+		            	}else{
+		                	console.log("Trending for Latest comment added sucessfully" + analyticsdata);
+		            	}
+		        	})
+				}
+			});            
+		}else{
         	TrendingModel.update({prodle:prodle},{$inc:{commentcount:1}},function(err,latestupatestatus){
 				if(err){
 					logger.emit("error","Error in updation latest comment count");
@@ -337,6 +344,7 @@ var _updateFeatureAnalytics = function(prodle,analytics,product){
 
 
 var _successfulAddComment=function(self,newcomment){
+	updateLatestProductCommentCount(newcomment.prodle);
 	logger.emit("log","successfulAddComment");
 	self.emit("successfulAddComment",{"success":{"message":"Gave comment to product sucessfully","product_comment":newcomment}})
 }
@@ -378,21 +386,37 @@ var _deleteComment=function(self,commentid){
 		}else{
   
 			if(comment.type="product"){
-       updateLatestProductComment(comment.prodle);
+       			updateLatestProductComment(comment.prodle);
 			}else{
-       //updateLatestWarrantyComment
+       			//updateLatestWarrantyComment
 			}
 			/////////////////////////////
-			_successfulCommentDeletion(self);
+			_successfulCommentDeletion(self,comment.prodle);
 			////////////////////////////
 		}
 	})
 }
-var _successfulCommentDeletion = function(self) {
+
+var _successfulCommentDeletion = function(self,prodle) {
 		//validate the user data
-		logger.emit("log","_successfulCommentDeletion");
+	updateLatestProductCommentDecCount(prodle);
+	logger.emit("log","_successfulCommentDeletion");
   	self.emit("successfulCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
-	}
+}
+
+var updateLatestProductCommentDecCount=function(prodle){
+	
+    TrendingModel.update({prodle:prodle},{$inc:{commentcount:-1}},function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest comment count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest comment count(Decrement) for products updated");
+		}else{
+			logger.emit("error","Given product id is wrong to update latest comment count");
+		}
+	})	
+}
+
 Comment.prototype.loadMoreComment = function(sessionuserid,commentid) {
 	var self=this;
 

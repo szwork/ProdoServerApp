@@ -1,5 +1,4 @@
-/*
-* Overview: Warranty Data Model
+/* Overview: Warranty Data Model
 * Dated:
 * Author: Ramesh Kunhiraman
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
@@ -16,42 +15,54 @@ var commonapi=require('../../common/js/common-api');
 var shortId = require('shortid');
 var logger = require("../../common/js/logger")
 
-////////////
+/////////////////////////////
 //Product Warranty Data Model
 var warrantySchema = mongoose.Schema({
-  prodle:{type:String, required: true, unique: true},
+  warranty_id:{type:String},
+  prodle:{type:String,required:true,unique:true},
   orgprodid:{type:String},
-  name: { type: String },
+  name:{type:String},
   display_name:{type:String},
-  model_no:{type:Date},
+  model_no:{type:String},
   model_name:{type:String},
-  phone:{type:String},
+  purchase_date:{type:Date},
+  expirydate:{type:Date},
+  invoice_image:{type:String},//path of invoice image
+  phone:{type:String,default:null},
   serial_no:{type:String},
-  description: { type: String},
-  introduction_date: { type: String},
-  sale_discontinuation_date:{type:date},
-  support_discontinuation_date: { type:date },
-  banneddate: { type: date },
-  product_images: [{prodle:{type:String,ref:"product"}}], 
-  features: [{prodle:{type:String,ref:"product"}}], 
-  substitutes: [{prodle:{type:String,ref:"product"}}], 
-  incompatability: [{prodle:{type:String,ref:"product"}}], 
-  category: [{prodle:{type:String,ref:"product"}}],  
+  description:{type:String},
+  introduction_date:{type:String},
+  sale_discontinuation_date:{type:Date},
+  support_discontinuation_date:{type:Date},
+  banneddate:{type:Date},
+  product_images:[{prodle:{type:String,ref:"product"}}],
+  features:[{prodle:{type:String,ref:"product"}}], 
+  substitutes:[{prodle:{type:String,ref:"product"}}], 
+  incompatability:[{prodle:{type:String,ref:"product"}}], 
+  category:[{prodle:{type:String,ref:"product"}}],  
   status:{type:String,default:"active"},
-  modified_date:
-  createddate:
-  removeddate:
-  comments_shown:5
-  product_comments: [{prodle:{type:String,ref:"comments"}}], 
+  modified_date:{type:Date},
+  createddate:{type:Date,default:Date.now},
+  removeddate:{type:Date},
+  // comments_shown:5
+  // product_comments:[{prodle:{type:String,ref:"comments"}}], 
 });
 
-//Seed a product
-var Warranty = mongoose.model('Warranty', warrantySchema);
+warrantySchema.pre('save', function(next) {
+  var warranty = this;
+  warranty.warranty_id = shortId.generate();  
+  console.log("Warranty pre "+warranty);
+  next(); 
+})
 
+//Seed a warranty
+warrantySchema.set('redisCache', true);
+warrantySchema.set('expires', 6000);
+
+var Warranty = mongoose.model('Warranty', warrantySchema);
 module.exports = Warranty;
 
-
-
+/*
 =========
 WARRANTY
 =========
@@ -91,3 +102,4 @@ Warranty status, expiry notification
 
 warranty is confined to the first purchaser of the product only and is not transferrable
 repairs are carried by company authorized personnel
+*/

@@ -15,9 +15,12 @@ var logger = require("../../common/js/logger");
 
 //Feature trending Model
 var featureTrendingSchema = mongoose.Schema({
-  prodle:{type:String},
-  commentcount:{type:Number,default:0},
-  followedcount:{type:Number,default:0}
+	name:{type:String},
+	orgid:{type:String},
+  	prodle:{type:String},
+  	commentcount:{type:Number,default:0},
+  	followedcount:{type:Number,default:0},
+  	status:{type:String,default:"active"}//deactive
 });
 //Seed a feature trending
  featureTrendingSchema.set('redisCache', true);

@@ -222,16 +222,32 @@ var _deleteProduct=function(self,orgid,prodle){
 			self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"product id is wrong"}});
 		}else{
 			////////////////////////////////
-			_successfulDeleteProduct(self);
+			_changeProductStatusInTrending(self,prodle);
+			// _successfulDeleteProduct(self);
 			//////////////////////////////////
 		}
 	})
 };
 
+var _changeProductStatusInTrending = function(self,prodle){
+	console.log("## changeProductStatusInTrending ##");
+	TrendingModel.update({prodle:prodle},{$set:{status:"deactive"}}).lean().exec(function(err,status){
+		if(err){
+			self.emit("failedDeleteProduct",{"error":{"code":"ED001","message":"Error in db to update product status in trending" + err}});
+		}else if(status!=1){
+			self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Prodle is wrong for update trending status"}});
+		}else{
+			logger.emit("log","Status updated successfully in trending");
+			_successfulDeleteProduct(self);
+		}
+	})
+}
+
 var _successfulDeleteProduct=function(self){
 	logger.emit("log","_successfulDeleteProduct");
 	self.emit("successfulDeleteProduct", {"success":{"message":"Delete Product Successfully"}});
 }
+
 Product.prototype.deleteProductImage = function(prodleimageids,prodle,orgid) {
 	var self=this;
 	if(prodleimageids==undefined){
@@ -505,20 +521,20 @@ Product.prototype.getProductTrending = function() {
 
 var _getProductTrending=function(self){
 	console.log("_getProductTrending");
-	TrendingModel.find({},{prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
+	TrendingModel.find({status:{$ne:"deactive"}},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
 		if(err){
 			self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
 		}else if(!trenddata){
 			self.emit("failedGetProudctTrends",{"error":{"message":"No trend data is available"}});
 		}else{
-			////////////////////////////////
+			///////////////////////////////////////////
 			_successfulGetProductTrends(self,trenddata);
-			//////////////////////////////////
+			///////////////////////////////////////////
 		}
 	})
 };
+
 var _successfulGetProductTrends=function(self,trenddata){
 	logger.emit("log","_successfulGetProductTrends");
 	self.emit("successfulGetProductTrends", {"success":{"message":"Product Trends Getting Suceessfully","ProductTrends":trenddata}});
 }
-
