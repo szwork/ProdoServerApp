@@ -281,7 +281,7 @@ exports.deleteUser = function(req, res) {
      user.deleteUser(userid);
   }else{
     user.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
-}
+  }
 }
 //get user details
 exports.getUser = function(req, res) {

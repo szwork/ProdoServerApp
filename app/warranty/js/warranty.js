@@ -37,8 +37,8 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please provide data to add warranty"}});
 	}else if(warrantydata.prodle==undefined){
 		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please pass prdouct id"}});
-	}else if(warrantydata.userid==undefined){
-		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please provide userid"}});		
+	// }else if(warrantydata.userid==undefined){
+		// self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please provide userid"}});		
 	}else if(warrantydata.name==undefined){
 		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
 	}else if(warrantydata.model_no==undefined){
@@ -59,6 +59,7 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 };
 
 var _checkProdleIsValid = function(self,warrantydata,sessionuserid){
+
 	ProductModel.findOne({prodle:warrantydata.prodle},function(err,productdata){
 		if(err){
 			self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":" function:_checkProdleIsValid \nError in db to find product err message: "+err}})
@@ -66,38 +67,55 @@ var _checkProdleIsValid = function(self,warrantydata,sessionuserid){
 			self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Wrong prodle"}})
 		}else{
 			///////////////////////////////////
-			_checkWarrantyAlreadyExist(self,warrantydata);
+			_checkWarrantyAlreadyExist(self,warrantydata,sessionuserid);
 			///////////////////////////////////
 		}
 	})
 }
 
-var _checkWarrantyAlreadyExist = function(self,warrantydata){
+var _checkWarrantyAlreadyExist = function(self,warrantydata,sessionuserid){
+	warrantydata.userid = sessionuserid;
 	WarrantyModel.findOne({prodle:warrantydata.prodle,userid:warrantydata.userid},function(err,warranty){
 		if(err){
 			self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":"Error in db to find warranty err message: "+err}})
 		}else if(!warranty){
 			///////////////////////////////////
-			_addUserWarranty(self,warrantydata);
+			_addUserWarranty(self,warrantydata,sessionuserid);
 			///////////////////////////////////			
 		}else{
-			self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Warranty Already Exist"}})		
+			self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Warranty Already Exist"}});
 		}
 	})	
 }
 
-var _addUserWarranty = function(self,warrantydata){
+var _addUserWarranty = function(self,warrantydata,sessionuserid){
+
+	var purchaseDate = new Date(warrantydata.purchase_date);
+	var expiryDate = new Date(warrantydata.expirydate);
+	// console.log("Date " + purchaseDate);
+	// var day = purchaseDate.getDate();
+	purchaseDate.setDate(purchaseDate.getDate()+1);
+	expiryDate.setDate(expiryDate.getDate()+1);
+	// console.log("NewDate " + purchaseDate);
+	if(purchaseDate == "Invalid Date"){
+		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Invalid purchase date"}});
+	}else if(expiryDate == "Invalid Date"){
+		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Invalid expiry date"}});
+	}else{
+		warrantydata.purchase_date = purchaseDate;
+		warrantydata.expirydate = expiryDate;
+		var warranty = new WarrantyModel(warrantydata);
+		warranty.save(function(err,warranty_data){
+		 	if(err){
+		  		self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":"Error in db to add new warranty "+ err}});	
+		  	}else{
+		  		////////////////////////////
+		  		_successfulWarrantyAdd(self);
+		  		////////////////////////////
+		  	}
+		})	
+	}
 	
-	var warranty = new WarrantyModel(warrantydata);
-	warranty.save(function(err,warranty_data){
-	 	if(err){
-	  		self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":"Error in db to add new warranty "+ err}});	
-	  	}else{
-	  		////////////////////////////
-	  		_successfulWarrantyAdd(self);
-	  		////////////////////////////
-	  	}
-	})	
 }
 
 var _successfulWarrantyAdd = function(self){
@@ -109,9 +127,9 @@ Warranty.prototype.updateUserWarranty = function(userid,prodle){
 	var self = this;
 	var warrantydata = this.warranty;
 	// console.log("WarrantyData : " + JSON.stringify(warrantydata));
-	////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////
 	_validateUpdateWarrantyData(self,userid,prodle);
-	//////////////////////////////////////////////////////////
+	////////////////////////////////////////////////
 }
 
 var _validateUpdateWarrantyData = function(self,userid,prodle){
@@ -132,16 +150,16 @@ var _validateUpdateWarrantyData = function(self,userid,prodle){
 	}else if(warrantydata.expirydate==undefined){
 	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass expiry date"}});
 	}else if(warrantydata.description==undefined){
-	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass description "}});
+	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass description"}});
 	}else{		
 	  	_updateUserWarranty(self,userid,prodle,warrantydata);
 	}
 };
 
 var _updateUserWarranty = function(self,userid,prodle,warrantydata){
-	var d = new Date();
-	console.log("Date " + d);
-	warrantydata.modified_date = d;
+	var modifieddate = new Date();
+	// console.log("Date " + modifieddate);
+	warrantydata.modified_date = modifieddate;
 	WarrantyModel.update({userid:userid,prodle:prodle},{$set:warrantydata}).lean().exec(function(err,warrantyupdatestatus){
 		if(err){
 			self.emit("failedUpdateProduct",{"error":{"code":"ED001","message":"Error in db to update warranty"}});
@@ -150,7 +168,7 @@ var _updateUserWarranty = function(self,userid,prodle,warrantydata){
 		}else{
 			////////////////////////////////
 			_successfulUpdateWarranty(self);
-			//////////////////////////////////
+			////////////////////////////////
 		}
 	})
 }
@@ -158,4 +176,56 @@ var _updateUserWarranty = function(self,userid,prodle,warrantydata){
 var _successfulUpdateWarranty = function(self){
 	logger.emit("log","_successfulUpdateProduct");
 	self.emit("successfulWarrantyUpdation", {"success":{"message":"Warranty Updated Successfully"}});
+}
+
+Warranty.prototype.deleteUserWarranty = function(userid,warranty_id){	
+	var self = this;
+	////////////////////////////////////////////
+	_deleteUserWarranty(self,userid,warranty_id);
+	////////////////////////////////////////////
+}
+
+var _deleteUserWarranty = function(self,userid,warranty_id){
+	console.log("Delete UserId " + userid + " Warranty_id " + warranty_id);
+	WarrantyModel.update({userid:userid,warranty_id:warranty_id},{$set:{removedate:new Date(),status:'deactive'}},function(err,userupdatestatus){
+		if(err){
+			self.emit("failedDeleteUserWarranty",{"error":{"code":"ED001","message":"Error in db to update user data"}});
+		}else if(userupdatestatus!=1){
+			self.emit("failedDeleteUserWarranty",{"error":{"code":"AU005","message":"Provided userid or Warranty is wrong"}});
+		}else{
+			/////////////////////////////////////
+			_successfulUserWarrantyDeletion(self);
+			/////////////////////////////////////
+		}
+	})
+}
+
+var _successfulUserWarrantyDeletion = function(self){
+	logger.emit("log","_successfulDeleteUserWarranty");
+	self.emit("successfulDeleteUserWarranty", {"success":{"message":"User Warranty Deleted Successfully"}});
+}
+
+Warranty.prototype.getUserWarranty = function(userid,warranty_id){
+	var self = this;
+	/////////////////////////////////////////
+	_getUserWarranty(self,userid,warranty_id);
+	/////////////////////////////////////////
+}
+
+var _getUserWarranty = function(self,userid,warranty_id){
+	console.log("_getUserWarranty " + userid+" "+warranty_id);
+	WarrantyModel.findOne({userid:userid,warranty_id:warranty_id,status:{$ne:"deactive"}},function(err,warranty){
+		if(err){
+			self.emit("failedGetUserWarranty",{"error":{"code":"ED001","message":"Error in db to find warranty err message: "+err}})
+		}else if(!warranty){
+			self.emit("failedGetUserWarranty",{"error":{"code":"AV001","message":"User warranty does not exist"}})
+		}else{
+			_successfulGetUserWarranty(self,warranty);
+		}
+	});
+}
+
+var _successfulGetUserWarranty = function(self,doc){
+	logger.emit("log","_successfulGetUserWarranty");
+	self.emit("successfulGetUserWarranty", {"success":{"message":"Getting Warranty details Successfully","Warranty":doc}});
 }
