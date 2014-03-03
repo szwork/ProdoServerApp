@@ -54,7 +54,7 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 	}else if(warrantydata.description==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass description "}});
 	}else{
-	  	_checkProdleIsValid(self,warrantydata,sessionuserid);	   	
+	  	_checkProdleIsValid(self,warrantydata,sessionuserid);
 	}
 };
 

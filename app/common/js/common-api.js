@@ -192,7 +192,7 @@ exports.uploadFiles=function(io,__dirname){
       ///////////////
       if(action==null || action==undefined){
          logger.emit("error","uploadFiles doesn't know action");
-       }else if(file==undefined ){ 
+      }else if(file==undefined ){ 
         if(action.user!=undefined){
           socket.emit("userUploadResponse",{"error":{"message":"Please pass file details or action details"}});
         }else if(action.org!=undefined){
@@ -910,9 +910,9 @@ var warrantyInvoiceImgUpload=function(warranty_id,awsparams,callback){
             if(err){
               callback({"error":{"code":"EDOO1","message":"warrantyInvoiceImgUpload:Dberror "+err}});
             }else if(warrantyuploadstatus==1){
-              callback(null,{"success":{"message":"Warranty invoice image uploaded Successfully","image":url}})
+              callback(null,{"success":{"message":"Warranty invoice image uploaded successfully","image":url}})
             }else{
-              callback({"error":{"code":"AP001","message":"Wrong warranty_id"+warranty_id}});
+              callback({"error":{"code":"AP001","message":"Wrong warranty_id "+warranty_id}});
             }
           })
         }
