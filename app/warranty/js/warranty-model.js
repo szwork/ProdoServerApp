@@ -19,7 +19,7 @@ var logger = require("../../common/js/logger")
 //Product Warranty Data Model
 var warrantySchema = mongoose.Schema({
   warranty_id:{type:String},
-  prodle:{type:String,required:true}, 
+  prodle:{type:String,required:true},
   name:{type:String},
   model_name:{type:String},
   model_no:{type:String},
@@ -32,7 +32,6 @@ var warrantySchema = mongoose.Schema({
   createddate:{type:Date,default:Date.now},
   removedate:{type:Date},
   userid:{type:String,ref:"User"},
-  // dealer_id:{type:String,ref:"Organization"},  
   description:{type:String},  
 });
 
