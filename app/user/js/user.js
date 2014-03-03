@@ -279,7 +279,7 @@ var _verifyToken = function(self,token) {
       })
     }else{
     		
-    	self.emit("tokenredirect","user/regeneratetoken");
+    	self.emit("tokenredirect","#/user/regeneratetoken");
     }
   })
 };
@@ -370,7 +370,7 @@ var _sendWelcomeEmail = function (self,user) {
  var _successfulUserActivation = function(self) {
 		//validate the user data
 		logger.emit("info","successfulUserActivation");
-		self.emit("tokenredirect","user/activateaccount");
+		self.emit("tokenredirect","#/user/activateaccount");
 	}
 
 //signinfi
