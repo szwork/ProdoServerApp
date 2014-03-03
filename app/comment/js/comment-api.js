@@ -1,5 +1,7 @@
 var Comment=require("./comment");
 var logger=require("../../common/js/logger");
+
+
 // var io=require("../../../prodonus-app");
 // exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
   
