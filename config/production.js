@@ -4,6 +4,7 @@ module.exports = {
       dbHost: "localhost",
       dbPort: "27017",
       debug:false,
+      amazonbucket:'prodonus/production',
       serverName:"www.prodonus.com",
       recaptchaPrivateKey:"6LdDj-oSAAAAAJcAYticzZ4NSZ4KzQc9ZbamEHUL",
       recaptchaUrl:"http://www.google.com/recaptcha/api/verify",

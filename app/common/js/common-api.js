@@ -33,6 +33,7 @@ var CONFIG = require('config').Prodonus;
 var easyimg = require('easyimage');
 var img_format_array=["jpeg","JPEG","JPG","GIF","BMP","jpg","gif","bmp"];
 var S=require("string");
+var sourceBucketFolder=CONFIG.amazonbucket;
 // logger.emit("log","userModel"+userModel);
 // logger.emit("log","orgModel"+OrgModel);
 
