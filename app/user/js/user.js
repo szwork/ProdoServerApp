@@ -777,13 +777,18 @@ var _validateSendPasswordSetting=function(self,host){
 };
 var _isProdonusRegisteredEmailId=function(self,email,host){
 	logger.emit("log","_isProdonusRegisteredEmailId");
-	userModel.findOne({email:email},{userid:1,email:1,firstname:1,lastname:1,fullname:1}).lean().exec(function(err,user){
+	userModel.findOne({email:email},{userid:1,email:1,firstname:1,lastname:1,fullname:1,verified:1}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find users"}});
 		}else if(user){
-			////////////////////////////////////
-			_createPasswordTokenSetting(self,user,host);
-			///////////////////////////////////
+			if(user.verified==false){
+				self.emit("failedSendPasswordSetting",{"error":{"code":"AU003","message":"Your account is not verified ,So first verify your account"}});
+			}else{
+			   ////////////////////////////////////
+			   _createPasswordTokenSetting(self,user,host);
+			  ///////////////////////////////////	
+			}
+			
 		}else{
 			self.emit("failedSendPasswordSetting",{"error":{"code":"AU004","message":"Please give prodonus registered email id"}});
 			

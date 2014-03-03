@@ -206,18 +206,21 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
       }
       if (!user) {//to check user is exist or not
         return done(null, false, {code:"AU001", message: 'User does not exists' }); 
-      } else if(user.verified==false){
-        return done(null,false,{code:"AU003",message:"Please verifiy or resend verification email"});
-      }else{
-      user.comparePassword(password, function(err, isMatch){
-        if ( err ){
-          return done(err);
-        } else if( isMatch ) {          
-          return done(null, user);
-        }else{
-          logger.emit("error","Invalid password",user.userid);
-          return done(null, false, {code:"AU002", message: 'Invalid password' });
-        }
+      } else{
+        user.comparePassword(password, function(err, isMatch){
+          if ( err ){
+            return done(err);
+          } else if( isMatch ) {   
+             if(user.verified==false){
+              return done(null,false,{code:"AU003",message:"Please verifiy or resend verification email"});   
+             }else{
+              return done(null, user);  
+             }       
+            
+          }else{
+            logger.emit("error","Invalid password",user.userid);
+            return done(null, false, {code:"AU002", message: 'Invalid password' });
+          }
       });
     }
     });
