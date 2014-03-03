@@ -511,7 +511,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
                         if(product.orgid!=action.product.orgid){
                           callback({"error":{"code":"EA001","message":"It's not your product to add product images"}});
                         }else{
-                          bucketFolder="prodonus/org/"+action.product.orgid+"/product/"+action.product.prodle;
+                          bucketFolder=amazonbucket+"/org/"+action.product.orgid+"/product/"+action.product.prodle;
                           params = {
                             Bucket: bucketFolder,
                             Key: action.product.orgid+action.product.prodle+s3filekey,
