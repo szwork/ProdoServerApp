@@ -21,7 +21,10 @@ var CONFIG = require('config').Prodonus;
 var shortId = require('shortid');
 var S=require('string');
 // var CommentModel=require("./comment-model");
-
+var AWS = require('aws-sdk');
+AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
+AWS.config.update({region:'ap-southeast-1'});
+var s3bucket = new AWS.S3();
 var Product = function(productdata) {
 	this.product = productdata;
 };
@@ -272,12 +275,31 @@ var _deleteProductImage=function(self,prodleimageids,prodle,orgid){
      }else{
      	prodle_imagearray.push(prodleimageids.s)
      }
-	productModel.update({orgid:orgid,prodle:prodle,"product_images.imageid":{$in:prodle_imagearray}},{$pull:{product_images:{imageid:{$in:prodle_imagearray}}}},function(err,deleteimagestatus){
+	productModel.findAndModify({orgid:orgid,prodle:prodle,"product_images.imageid":{$in:prodle_imagearray}},[],{$pull:{product_images:{imageid:{$in:prodle_imagearray}}}},{new:false},function(err,deleteimagestatus){
 		if(err){
 			self.emit("failedDeleteProductImage",{"error":{"code":"ED001","message":"function:_deleteProductImage\nError in db to "}});
-		}else if(deleteimagestatus==0){
+		}else if(!deleteimagestatus){
 			self.emit("failedDeleteProductImage",{"error":{"message":"orgid or prodle or given prodleimageids is wrong "}});
 		}else{
+			var product_images=deleteimagestatus.product_images;
+			var object_array=[];
+			for(var i=0;i<product_images.length;i++){
+				object_array.push({Key:product_images[i].key});
+			}
+			var delete_aws_params={
+				Bucket: product_images[0].bucket, // required
+  			Delete: { // required
+    				Objects: object_array,
+      			Quiet: true || false
+      		}
+      	}
+      s3bucket.deleteObjects(delete_aws_params, function(err, data) {
+			  if (err){
+			  	logger.emit("error","Product images not deleted from amazon s3 prodle:"+prodle)
+			  } else{
+			  	logger.emit("log","Product images deleted from amazon s3 product prodle:"+prodle);
+			  } 
+			})
 			//////////////////////////////////
 			_successfulDeleteProductImage(self);
 			/////////////////////////////////////

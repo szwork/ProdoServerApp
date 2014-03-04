@@ -317,7 +317,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   var file_length=file.filelength;  
   var file_type=file.filetype;
   // logger.emit("log","file details"+JSON.stringify(file));
-  var ext = path.extname(fileName||'').split('.');
+  var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
   console.log("filename"+fileName);
@@ -389,7 +389,7 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   var file_length=file.filelength;  
   var file_type=file.filetype;
 
-  var ext = path.extname(fileName||'').split('.');
+  var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
   
@@ -415,6 +415,7 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
               }else{
                 console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                logger.emit("log","s3filekey:"+s3filekey+" ext:"+ext);
                  var bucketFolder;
                  var params;
                  // writebuffer= new Buffer(file_buffer, "base64");
@@ -465,7 +466,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
   var file_length=file.filelength;  
   var file_type=file.filetype;
 
-  var ext = path.extname(fileName||'').split('.');
+  var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
   if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
@@ -549,7 +550,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
   var file_length=file.filelength;  
   var file_type=file.filetype;
 
- var ext = path.extname(fileName||'').split('.');
+ var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
   if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
@@ -620,7 +621,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
   var file_length=file.filelength;  
   var file_type=file.filetype;
 
-  var ext = path.extname(fileName||'').split('.');
+  var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
@@ -705,7 +706,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
   var file_length=file.filelength;  
   var file_type=file.filetype;
 
-  var ext = path.extname(fileName||'').split('.');
+  var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
@@ -776,12 +777,22 @@ var userFileUpload=function(userid,awsparams,callback){
           // logger.emit("error","userFileUpload:Error in getting getSignedUrl"+err);
           callback({"error":{"message":"userFileUpload:Error in getting getSignedUrl"+err}});
         }else{
-          var newprofileurl=url;
-        
-          userModel.update({userid:userid},{$set:{profile_pic:newprofileurl}},function(err,profilepicupdatestatus){
+          var newprofileurl={bucket:params1.Bucket,key:params1.Key,image:url};
+          
+          userModel.findAndModify({userid:userid},[],{$set:{profile_pic:newprofileurl}},{new:false},function(err,userprofiledata){
             if(err){
               callback({"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
-            }else if(profilepicupdatestatus==1){
+            }else if(userprofiledata){
+              var userprofile=userprofiledata.profile_pic;
+              var awsdeleteparams={Bucket:userprofile.bucket,Key:userprofile.key};
+              logger.emit("log",awsdeleteparams);
+              s3bucket.deleteObject(awsdeleteparams, function(err, deleteuserlogostatus) {
+                if (err) {
+                  logger.emit("error","Profile pic not deleted from amzon s3 bucket "+err,userprofiledata.userid);
+                }else if(deleteuserlogostatus){
+                  logger.emit("log","Profile pic delete from Amazon S3");
+                }
+              })
               callback(null,{"success":{"message":"User Profile Pic Updated Successfully","image":newprofileurl}})
             }else{
               callback({"error":{"code":"AU003","message":"Provided userid is wrong"+userid}});
@@ -804,7 +815,7 @@ var orgFileUpload=function(orgid,awsparams,callback){
           callback({"error":{"message":"orgFileUpload:Error in getting getSignedUrl"+err}});
         }else{
          // var newprofileurl=url;
-         var image_data={image:url,imageid:generateId()}
+         var image_data={bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId()}
           OrgModel.update({orgid:orgid},{$push:{org_images:image_data}},function(err,orguploadstatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
@@ -830,7 +841,7 @@ var productFileUpload=function(prodle,awsparams,callback){
         if(err){
           callback({"error":{"message":"productFileUpload:Error in getting getSignedUrl"+err}});
         }else{
-          var image_data={image:url,imageid:generateId()}
+          var image_data={bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId()}
           ProductModel.update({prodle:prodle},{$push:{product_images:image_data}},function(err,productuploadstatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
@@ -856,10 +867,20 @@ var productLogoUpload=function(prodle,awsparams,callback){
         if(err){
           callback({"error":{"message":"productLogoUpload:Error in getting getSignedUrl"+err}});
         }else{
-          ProductModel.update({prodle:prodle},{$set:{product_logo:url}},function(err,productuploadstatus){
+          var product_logo_object={bucket:params1.Bucket,key:params1.Key,image:url};
+          ProductModel.findAndModify({prodle:prodle},[],{$set:{product_logo:product_logo_object}},{new:false},function(err,productuploadstatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
-            }else if(productuploadstatus==1){
+            }else if(productlogodata){
+              var productlogo=productlogodata.product_logo;
+              var awsdeleteparams={Bucket:productlogo.bucket,Key:productlogo.key};
+              s3bucket.deleteObject(awsdeleteparams, function(err, deleteuserlogostatus) {
+                if (err) {
+                  logger.emit("error"," product not  deleted from amzon s3 bucket for prodle"+productlogodata.prodle);
+                }else if(deleteproductlogostatus){
+                  logger.emit("log","product logo deleted from Amazon S3");
+                }
+              })
               callback(null,{"success":{"message":"Product images uploaded Successfully","image":url}})
             }else{
               callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
@@ -881,10 +902,20 @@ var orgLogoUpload=function(orgid,awsparams,callback){
         if(err){
           callback({"error":{"message":"orgLogoUpload:Error in getting getSignedUrl"+err}});
         }else{
-          OrgModel.update({orgid:orgid},{$set:{org_logo:url}},function(err,orglogostatus){
+          var org_logo_object={bucket:params1.Bucket,key:params1.Key,image:url};
+          OrgModel.findAndModify({orgid:orgid},[],{$set:{org_logo:org_logo_object}},{new:false},function(err,orglogodata){
             if(err){
               callback({"error":{"code":"EDOO1","message":"orgLogoUpload:Dberror"+err}});
-            }else if(orglogostatus==1){
+            }else if(orglogodata){
+              var orglogo=orglogodata.org_logo;
+              var awsdeleteparams={Bucket:orglogo.bucket,Key:orglogo.key};
+              s3bucket.deleteObject(awsdeleteparams, function(err, deleteorglogostatus) {
+                if (err) {
+                  logger.emit("error","organization logo not  deleted from amzon s3 bucket for orgid"+orglogodata.orgid);
+                }else if(deleteorglogostatus){
+                  logger.emit("log","orglogo  deleted from Amazon S3");
+                }
+              })
               callback(null,{"success":{"message":"Organization logo changes  Successfully","image":url}})
             }else{
               callback({"error":{"code":"AO002","message":"Wrong orgid"+orgid}});
@@ -907,7 +938,8 @@ var warrantyInvoiceImgUpload=function(warranty_id,awsparams,callback){
         if(err){
           callback({"error":{"message":"warrantyInvoiceImgUpload:Error in getting getSignedUrl "+err}});
         }else{
-          WarrantyModel.update({warranty_id:warranty_id},{$set:{invoice_image:url}},function(err,warrantyuploadstatus){
+          var warrany_invoice_object={bucket:params1.Bucket,key:params1.Key,image:url}
+          WarrantyModel.update({warranty_id:warranty_id},{$set:{invoice_image:warrany_invoice_object}},function(err,warrantyuploadstatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"warrantyInvoiceImgUpload:Dberror "+err}});
             }else if(warrantyuploadstatus==1){

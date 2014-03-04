@@ -13,6 +13,10 @@ var BusinessOpportunityModel=require("../../businessopportunity/js/business-oppo
 var commonapi=require("../../common/js/common-api");
 var CONFIG = require('config').Prodonus;
 var PaymentModel=require("../../subscription/js/payment-model");
+var AWS = require('aws-sdk');
+AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
+AWS.config.update({region:'ap-southeast-1'});
+var s3bucket = new AWS.S3();
 var Organization = function(organizationdata) {
 	this.organization=organizationdata;
 };
@@ -673,12 +677,36 @@ var _deleteOrgImage=function(self,orgimageids,orgid){
    }else{
    		org_imagearray.push(orgimageids.s);
    }
-	orgModel.update({orgid:orgid,"org_images.imageid":{$in:org_imagearray}},{$pull:{org_images:{imageid:{$in:org_imagearray}}}},function(err,deleteimagestatus){
+	orgModel.findAndModify({orgid:orgid,"org_images.imageid":{$in:org_imagearray}},[],{$pull:{org_images:{imageid:{$in:org_imagearray}}}},{new:false},function(err,deleteimagestatus){
 		if(err){
 			self.emit("failedDeleteOrgImage",{"error":{"code":"ED001","message":"function:_deleteOrgImage\nError in db to "}});
-		}else if(deleteimagestatus==0){
+		}else if(!deleteimagestatus){
 			self.emit("failedDeleteOrgImage",{"error":{"message":"orgid or given orgimageids is wrong "}});
 		}else{
+			var org_images=deleteimagestatus.org_images;
+			// org_images=JSON.parse(org_images);
+			logger.emit("log","dd"+JSON.stringify(org_images));
+			var object_array=[];
+			for(var i=0;i<org_images.length;i++){
+				object_array.push({Key:org_images[i].key});
+				console.log("test"+org_images[i]);
+			}
+			logger.emit("log","object_array:"+JSON.stringify(object_array));
+			var delete_aws_params={
+				Bucket: org_images[0].bucket, // required
+  			Delete: { // required
+    				Objects: object_array,
+      			Quiet: true || false
+      		}
+      	}
+      	logger.emit('log',"delete_aws_params:"+JSON.stringify(delete_aws_params));
+      s3bucket.deleteObjects(delete_aws_params, function(err, data) {
+			  if (err){
+			  	logger.emit("error","Org images not deleted from amazon s3 orgid:"+orgid)
+			  } else{
+			  	logger.emit("log","Organization images deleted from amazon s3 orgid:"+orgid);
+			  } 
+			})
 			//////////////////////////////////
 			_successfulDeleteOrgImage(self);
 			/////////////////////////////////////

@@ -29,7 +29,7 @@ var CommentSchema = mongoose.Schema({
   dateremoved:{type:Date},   
   commenttext:{type:String},   
   tags:[{type:String,ref:"Tags"}],
-  comment_image:[{imageid:{type:String},image:{type:String}}]
+  comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]
   
 });
 CommentSchema.set('redisCache', true);

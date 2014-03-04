@@ -40,7 +40,7 @@ var commentSchema = mongoose.Schema({
   dateremoved:{type:Date},   
   commenttext:{type:String},   
   tags:[{type:String,ref:"Tags"}], 
-  comment_image:[{imageid:{type:String},image:{type:String}}]
+  comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]
 });
 
 ////////////
@@ -49,7 +49,7 @@ var productSchema = mongoose.Schema({
   prodle:{type:String,unique: true},
   orgid:{type:String,ref:"Organization"},//means manufacturer
   orgprodid:{type:String},
-  product_logo:{type:String},
+  product_logo:{bucket:String,key:String,image:{type:String}},
   name: { type: String },/**/
   display_name:{type:String},/**/
   model_no:{type:String},/**/
@@ -60,7 +60,7 @@ var productSchema = mongoose.Schema({
   sale_discontinuation_date:{type:Date},
   support_discontinuation_date: { type:Date },
   banneddate: { type: Date },
-  product_images: [{image:{type:String},imageid:{type:String}}], 
+  product_images: [{bucket:String,key:String,image:{type:String},imageid:{type:String}}], 
   category: [{prodle:{type:String,ref:"product"}}], 
   features: [productFeatureSchema], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 
@@ -85,7 +85,9 @@ productSchema.pre('save', function(next) {
 //Seed a product
  productSchema.set('redisCache', true);
  productSchema.set('expires', 6000);
- 
+ productSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+    return this.collection.findAndModify(query, sort, doc, options, callback);
+};
 var Product = mongoose.model('products', productSchema);
 
 module.exports = Product;

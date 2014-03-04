@@ -459,11 +459,11 @@ exports.orginvites = function(req,res) {
 
 //delete a particular organization
 
-exports.deleteOrgImage=function(req,res){s
+exports.deleteOrgImage=function(req,res){
  
   var sessionuserid=req.user.userid;
   
-  var orgimageids=req.params.orgimageids;
+  var orgimageids=req.query.orgimageids;
   var orgid=req.params.orgid;
   logger.emit("log","prodle\nsessionuserid"+sessionuserid+" prodleimageid:"+orgimageids+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(orgimageids));
   
