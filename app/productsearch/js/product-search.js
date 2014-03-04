@@ -230,7 +230,9 @@ var _getOrgProdle = function(self,doc,i,doc1){
 			}else if(productdata){
 				console.log("ProductData1 " + productdata.length);
 				if(productdata.length==0){
-					doc1.push({name:doc[i].name,orgid:doc[i].orgid,products:"",description:"No products exist for this organisation"});	
+					var products = [{name:""},{prodle:""},{description:"No products exist for this organisation"}];
+					// products.push();
+					doc1.push({name:doc[i].name,orgid:doc[i].orgid,products:products});	
 				}else{
 					doc1.push({name:doc[i].name,orgid:doc[i].orgid,products:productdata});
 				}
