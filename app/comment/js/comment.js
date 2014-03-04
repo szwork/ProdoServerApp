@@ -12,6 +12,8 @@ var AWS = require('aws-sdk');
 var fs=require("fs");
 var path=require("path");
 var exec = require('child_process').exec;
+var CONFIG = require('config').Prodonus;
+var amazonbucket=CONFIG.amazonbucket;
 var TagReferenceDictionary = require("../../tagreffdictionary/js/tagreffdictionary-model");
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
@@ -188,7 +190,7 @@ var commentdata={type:"product",comment_image:{filetype:filedata.type,filename:f
 						var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
 				    var bucketFolder;
 				    var params;
-				    bucketFolder="prodonus/org/"+product.orgid+"/product"+product.prodle+"/comment";
+				    bucketFolder=amazonbucket+"/org/"+product.orgid+"/product"+product.prodle+"/comment";
 		      	 params = {
 		             Bucket: bucketFolder,
 		             Key: product.orgid+product.prodle+s3filekey,

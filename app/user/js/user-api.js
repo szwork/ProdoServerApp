@@ -206,18 +206,21 @@ passport.use( new LocalStrategy({ usernameField: 'email', passwordField: 'passwo
       }
       if (!user) {//to check user is exist or not
         return done(null, false, {code:"AU001", message: 'User does not exists' }); 
-      } else if(user.verified==false){
-        return done(null,false,{code:"AU003",message:"Please verifiy or resend verification email"});
-      }else{
-      user.comparePassword(password, function(err, isMatch){
-        if ( err ){
-          return done(err);
-        } else if( isMatch ) {          
-          return done(null, user);
-        }else{
-          logger.emit("error","Invalid password",user.userid);
-          return done(null, false, {code:"AU002", message: 'Invalid password' });
-        }
+      } else{
+        user.comparePassword(password, function(err, isMatch){
+          if ( err ){
+            return done(err);
+          } else if( isMatch ) {   
+             if(user.verified==false){
+              return done(null,false,{code:"AU003",message:"Please verifiy or resend verification email"});   
+             }else{
+              return done(null, user);  
+             }       
+            
+          }else{
+            logger.emit("error","Invalid password",user.userid);
+            return done(null, false, {code:"AU002", message: 'Invalid password' });
+          }
       });
     }
     });
@@ -655,7 +658,7 @@ exports.passwordUrlAction=function(req,res){
         res.send(html.s);
       }else{
         var redirect_data="<html><body><script>";
-        redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/user/resetpassword')},3000);";
+        redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/#/user/resetpassword')},3000);";
         redirect_data+="</script>Please wait redirect to reset password &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
         res.send(redirect_data);
       }

@@ -33,6 +33,7 @@ var CONFIG = require('config').Prodonus;
 var easyimg = require('easyimage');
 var img_format_array=["jpeg","JPEG","JPG","GIF","BMP","jpg","gif","bmp"];
 var S=require("string");
+var amazonbucket=CONFIG.amazonbucket;
 // logger.emit("log","userModel"+userModel);
 // logger.emit("log","orgModel"+OrgModel);
 
@@ -352,7 +353,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                       if(action.user.userid!=sessionuser.userid){
                         callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
                       }else{
-                        bucketFolder="prodonus/user/"+action.user.userid;
+                        bucketFolder=amazonbucket+"/user/"+action.user.userid;
                         params = {
                              Bucket: bucketFolder,
                              Key: action.user.userid+s3filekey,
@@ -428,7 +429,7 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                     callback({"error":{"code":"EA001","message":"You are not authorized to add organization images"}});
                   }else{
                     console.log("organization image upload");
-                    bucketFolder="prodonus/org/"+action.org.orgid;
+                    bucketFolder=amazonbucket+"/org/"+action.org.orgid;
                     console.log("key"+action.org.orgid+s3filekey);
                     params = {
                       Bucket: bucketFolder,
@@ -510,7 +511,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
                         if(product.orgid!=action.product.orgid){
                           callback({"error":{"code":"EA001","message":"It's not your product to add product images"}});
                         }else{
-                          bucketFolder="prodonus/org/"+action.product.orgid+"/product/"+action.product.prodle;
+                          bucketFolder=amazonbucket+"/org/"+action.product.orgid+"/product/"+action.product.prodle;
                           params = {
                             Bucket: bucketFolder,
                             Key: action.product.orgid+action.product.prodle+s3filekey,
@@ -584,7 +585,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
                   }else if(sessionuser.org.isAdmin==false){
                     callback({"error":{"code":"EA001","message":"You are not authorized to add product logo"}});
                   }else{
-                    bucketFolder="prodonus/org/"+action.orglogo.orgid;
+                    bucketFolder=amazonbucket+"/org/"+action.orglogo.orgid;
                     params = {
                              Bucket: bucketFolder,
                              Key: action.orglogo.orgid+s3filekey,
@@ -665,7 +666,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
                         if(product.orgid!=action.productlogo.orgid){
                            callback({"error":{"code":"EA001","message":"It is not your product to add product logo"}});
                         }else{
-                          bucketFolder="prodonus/org/"+action.productlogo.orgid+"/product/"+action.productlogo.prodle;
+                          bucketFolder=amazonbucket+"/org/"+action.productlogo.orgid+"/product/"+action.productlogo.prodle;
                           params = {
                                    Bucket: bucketFolder,
                                    Key: action.productlogo.orgid+action.productlogo.prodle+s3filekey,
@@ -735,7 +736,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                       if(action.warranty.userid!=sessionuser.userid){
                         callback({"error":{"code":"EA001","message":"You are not an authorized to change user warranty invoice image"}});   
                       }else{
-                        bucketFolder="prodonus/user/"+action.warranty.userid;
+                        bucketFolder=amazonbucket+"/user/"+action.warranty.userid;
                         params = {
                              Bucket: bucketFolder,
                              Key: action.warranty.userid+s3filekey,
