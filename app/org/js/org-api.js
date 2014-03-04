@@ -182,8 +182,8 @@ exports.updateOrganization = function(req, res) {
         // organization.removeAllListeners();
         res.send(result);
       });
-     var isAdmin=req.user.org.isAdmin;
-     if(req.user.org.orgid==orgid || isAdmin) {
+      var isAdmin=req.user.org.isAdmin;
+     if(req.user.isAdmin || isAdmin) {
       //////////////////////
       organization.deleteOrganization(orgid,sessionuserid);
      }else{

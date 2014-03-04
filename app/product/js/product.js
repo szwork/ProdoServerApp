@@ -50,6 +50,8 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	   		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
 	   	} else if(productdata.description==undefined){
 	    	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
+	  	 }else if(productdata.model_no==undefined){
+	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass model_no"}});
 	  	 }else{
 
 
@@ -63,6 +65,20 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
 			}else if(product){
 				self.emit("failedProductAdd",{"error":{"message":"product name already exist please give another name "}});	
+			}else{
+				////////////////////////////////////////////////////
+				checkModelNumberIsAlreadExist(self,productdata,orgid);
+				//////////////////////////////////////////////////
+				
+			}
+		})
+	}
+	var checkModelNumberIsAlreadExist=function(self,productdata,orgid){
+		productModel.findOne({model_no:productdata.model_no},function(err,product){
+			if(err){
+				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});			
+			}else if(product){
+				self.emit("failedProductAdd",{"error":{"message":"product with model number already exists"}});	
 			}else{
 				/////////////////////////////
 	   		_addProduct(self,productdata,orgid);
