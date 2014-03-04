@@ -62,7 +62,7 @@ var OrganizationSchema = mongoose.Schema({
     //type means org is also a consumer orgtypid of consumer & also of company
     name: { type:String ,require:true},
     description: { type:String },
-    org_logo:{type:String},
+    org_logo:{bucket:{type:String},key:{type:String},image:{type:String}},
     prodo_setupdate: { type:Date,default:Date.now()}, /*the date the company was setup on prodonus*/
     prodo_closedate: { type:Date },/* the date the company was closed on Prodonus*/
     location:[LocationSchema],
@@ -75,7 +75,7 @@ var OrganizationSchema = mongoose.Schema({
       planexpirydate:Date
     },
     payment:{paymentid:{type:String,default:null}},
-    org_images:[{image:{type:String},imageid:{type:String}}], 
+    org_images:[{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}}], 
     orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
     terms:{type:Boolean},
     broadcast:[{message:{type:String},expirydate:{type:Date},datecreated:{type:Date}}]
@@ -91,7 +91,9 @@ OrganizationSchema.pre('save', function(next) {
  OrganizationSchema.set('expires', 90);
  // mongooseRedisCache(mongoose)
    
-
+OrganizationSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+  return this.collection.findAndModify(query, sort, doc, options, callback);
+};
 var Organization = mongoose.model('organization', OrganizationSchema);
  
 module.exports = Organization;

@@ -25,7 +25,7 @@ var warrantySchema = mongoose.Schema({
  warranty_type:{type:String},//extended or standard
  purchase_date:{type:Date},
  userid:{type:String,ref:"User"},
- invoice_image:{type:String},//path of invoice image
+ invoice_image:{bucket:String,key:String,image:{type:String}},//path of invoice image
  dealer_id:{type:String,ref:"Organization"},
  warranty_conditions:[{condition:{type:String}}],
  warranty_applicability:[{region:{type:String}}],//available on multiple regions
