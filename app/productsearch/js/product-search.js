@@ -150,7 +150,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 				}
 				var Q = {status:{$in:["active","init"]},name:{$in:org_or_array}};
 				// console.log("QQQQQ " + JSON.stringify(Q));
-				OrganizationModel.find(Q,{name:1,orgid:1,_id:0}).exec(function(err,doc){
+				OrganizationModel.find(Q,{name:1,orgid:1,_id:0}).limit(5).exec(function(err,doc){
 					if(err){
 						self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get orgid by orgname"}});
 					}else if(doc.length==0){
@@ -228,12 +228,15 @@ var _getOrgProdle = function(self,doc,i,doc1){
 			if(err){
 				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
 			}else if(productdata){
-				console.log("ProductData1 " +productdata);
-				// console.log("pddddd"+productdata);
-				// doc[i].prodle=productdata.prodle;
-				
-				doc1.push({name:doc[i].name,orgid:doc[i].orgid,products:productdata});
-				console.log("test "+JSON.stringify(doc1));
+				console.log("ProductData1 " + productdata.length);
+				if(productdata.length==0){
+					var products = [{name:""},{prodle:""},{description:"No products exist for this organisation"}];
+					// products.push();
+					doc1.push({name:doc[i].name,orgid:doc[i].orgid,products:products});	
+				}else{
+					doc1.push({name:doc[i].name,orgid:doc[i].orgid,products:productdata});
+				}
+				// console.log("test "+JSON.stringify(doc1));
 				_getOrgProdle(self,doc,++i,doc1);
 			}else{
 				console.log("ProductData2 " +productdata);
