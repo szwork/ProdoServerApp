@@ -180,7 +180,7 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
     }
     
 	console.log(query);
-	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,doc){
+	ProductModel.find(query,{name:1,prodle:1,orgid:1,description:1,_id:0}).limit(50).exec(function(err,doc){
 		if(err){
 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"+err}});
 		}else if(doc.length==0){
@@ -197,26 +197,9 @@ var _successfulProductSearch = function(self,doc){
 }
 
 var _getProdleOfOrganisation = function(self,doc){
-	// var orgid_arr = [];
-	// var orgdetails = {};
-	// console.log("Doc " + doc[0].orgid);
 	var initialvalue=0;
 	var doc1=[];
 	_getOrgProdle(self,doc,initialvalue,doc1);
-	// for(var i=0;i<doc.length;i++){
-	// 	ProductModel.find({orgid:doc[0].orgid},{name:1,prodle:1,orgid:1,_id:0}).limit(50).exec(function(err,productdata){
-	// 		if(err){
-	// 			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
-	// 		}else if(productdata.length==0){
-	// 			self.emit("failedToSearchProduct",{"error":{"code":"AD001","message":"No products found for this organisation"}});
-	// 		}else{
-	// 			orgdetails = {doc:doc,prodle:productdata.productdata};
-	// 			orgid_arr.push(orgdetails);
-	// 	  		// _successfulAllOrgProducts(self,productdata,orgdata);
-	// 	  		console.log("orgid_arr " + JSON.stringify(orgid_arr));
-	// 	  	}
-	// 	})
-	// }	
 }
 
 var _getOrgProdle = function(self,doc,i,doc1){
@@ -224,15 +207,15 @@ var _getOrgProdle = function(self,doc,i,doc1){
 	// logger.emit("log","doc length"+doc.length+"i:"+i);
 
     if(doc.length>i){
-		ProductModel.find({orgid:doc[i].orgid},{prodle:1,name:1,description:1,_id:0}).exec(function(err,productdata){
+		ProductModel.find({status:{$ne:"deactive"},orgid:doc[i].orgid},{prodle:1,name:1,description:1,_id:0}).exec(function(err,productdata){
 			if(err){
 				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
 			}else if(productdata){
 				console.log("ProductData1 " + productdata.length);
 				if(productdata.length==0){
-					var products = [{name:""},{prodle:""},{description:"No products exist for this organisation"}];
+					var products = [{name:"",prodle:"",description:""}];
 					// products.push();
-					doc1.push({name:doc[i].name,orgid:doc[i].orgid,products:products});	
+					doc1.push({name:doc[i].name,orgid:doc[i].orgid,info:"No products exist for this organisation",products:products});	
 				}else{
 					doc1.push({name:doc[i].name,orgid:doc[i].orgid,products:productdata});
 				}
@@ -251,7 +234,6 @@ var _getOrgProdle = function(self,doc,i,doc1){
 
 var _successfulOrgSearch = function(self,doc){
 	logger.emit("log","_successfulProductSearch");
-
 	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Organisations Found","doc":doc}});
 }
 
