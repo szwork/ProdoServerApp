@@ -71,19 +71,17 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata){
 				}else if(user){
 					logger.emit("log","_hasAlreadyOrganization");
 					//////////////////////////////////////////////////////////////////////
-					_applyDefulatOrganizationTrialPlan(self,organizationdata,sessionuserid);
-					///////////////////////////////////////////////////////////////////
-					
-				
+					_applyDefaultOrganisationTrialPlan(self,organizationdata,sessionuserid);
+					///////////////////////////////////////////////////////////////////				
 				}else{
 					self.emit("failedOrgAdd",{"error":{"code":"AO001","message":"You can add only one organization"}});
 				}
 		})
 	}
-var _applyDefulatOrganizationTrialPlan=function(self,organizationdata,sessionuserid){
+var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuserid){
 	SubscriptionModel.findOne({plantype:S(organizationdata.orgtype).toLowerCase().s,"planpaymentcommitment.amount":0},function(err,subscription){
 		if(err){
-			logger.emit("error","Database Issue:_applyDefulatOrganizationTrialPlan "+err);
+			logger.emit("error","Database Issue:_applyDefaultOrganisationTrialPlan "+err);
 		  self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Database issue"}});
 		}else if(!subscription){
 			self.emit("failedOrgAdd",{"error":{"code":"AS001","message":"trial plan for "+organizationdata.orgtype+" does'nt exists"}});
@@ -99,7 +97,7 @@ var _applyDefulatOrganizationTrialPlan=function(self,organizationdata,sessionuse
 			var payment_data=new PaymentModel({userid:sessionuserid,price:subscription.planpaymentcommitment.amount});
 			payment_data.save(function(err,payment){
 				if(err){
-					logger.emit("error","Database Issue:_applyDefulatOrganizationTrialPlan "+err);
+					logger.emit("error","Database Issue:_applyDefaultOrganisationTrialPlan "+err);
 					self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Database Issue"}});
 				}else{
 					organizationdata.subscription=subscription_set;
