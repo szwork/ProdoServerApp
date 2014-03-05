@@ -429,6 +429,34 @@ var _orgMemberRemove=function(self,orgid){
 		}
 	})
 }
+var _sendOrgRemoveNotificationToOrgMember=function(self,orgid){
+	orgModel.findOne({orgid:orgid},function(err,organization){
+		if(err){
+			logger.error("error","Database Issue /_sendOrgRemoveNotificationToOrgMember"+err)
+		}else if(!organization){
+			logger.emit("error"," _sendOrgRemoveNotificationToOrgMember orgid is wrong ")
+		}else{
+			var orggroupmembers=[];
+			var usergrp=organization.usergrp;
+			for(var i=0;i<usergrp.length;i++){
+				var grpmembers=usergrp[i].grpmembers;
+				for(var j=0;j<grpmembers.length;j++){
+					orggroupmembers.push(grpmembers[j]);
+				}
+			}
+			userModel.find({userid:{$in:orggroupmembers}},function(err,orgusers){
+				if(err){
+					logger.error("error","Database Issue /_sendOrgRemoveNotificationToOrgMember"+err)
+				}else if(orgusers.length==0){
+					logger.emit("log","There is no organization members to send notification");
+				}else{
+					
+				}
+			})
+
+		}
+	})
+}
 var _allProductRemove=function(self,orgid){
 	productModel.update({orgid:orgid},{$set:{status:"deactive"}},{multi:true},function(err,allorgproductdeletestatus){
 		if(err){
