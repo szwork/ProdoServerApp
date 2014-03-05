@@ -4,6 +4,7 @@ var userModel = require('../../user/js/user-model');
 var orgModel=require("./org-model");
 var logger=require("../../common/js/logger");
 var S=require("string");
+var productModel=require("../../product/js/product-model");
 var EmailTemplateModel=require('../../common/js/email-template-model');
 var orgHistoryModel=require("./org-history-model");
 var __=require("underscore");
@@ -397,6 +398,70 @@ var _deleteOrganizationHistory=function(self,orgid,sessionuserid){
 	orghistorydata.save(function(err,orghistorydata){
 		if(err){
 			self.emit("failedOrgDeletion",{"error":{"code":"ED001","message":"Error in db to history model update"}});
+		}else{
+			//////////////////////////////
+			_orgMemberRemove(self,orgid);
+			/////////////////////////
+			/////////////////////////////////////
+			_successfulOrganizationDeletion(self);
+			////////////////////////////////////
+		}
+	})
+}
+var _orgMemberRemove=function(self,orgid){
+	userModel.update({"org.orgid":orgid},{$set:{status:"deactive"}},{multi:true},function(err,deleteorgmemberstatus){
+		if(err){
+			logger.emit("error","Database Issue _orgMemberRemove orgid:"+orgid+":"+err)
+			self.emit("failedOrgDeletion",{"error":{"code":"ED001","message":"Database Issue"}});
+		}else if(deleteorgmemberstatus==0){
+			// logger.emit("error","Database Issue _orgMemberRemove orgid:"+orgid+":"+err)
+			self.emit("failedOrgDeletion",{"error":{"message":"There is not organization member exists"}});
+		}else{
+			///////////////////////////////
+			_sendOrgRemoveNotificationToOrgMember(self,orgid);
+			////////////////////////////
+			/////////////////////////////////////
+			_allProductRemove(self,orgid);
+			///////////////////////////////////
+			
+		}
+	})
+}
+var _sendOrgRemoveNotificationToOrgMember=function(self,orgid){
+	orgModel.findOne({orgid:orgid},function(err,organization){
+		if(err){
+			logger.error("error","Database Issue /_sendOrgRemoveNotificationToOrgMember"+err)
+		}else if(!organization){
+			logger.emit("error"," _sendOrgRemoveNotificationToOrgMember orgid is wrong ")
+		}else{
+			var orggroupmembers=[];
+			var usergrp=organization.usergrp;
+			for(var i=0;i<usergrp.length;i++){
+				var grpmembers=usergrp[i].grpmembers;
+				for(var j=0;j<grpmembers.length;j++){
+					orggroupmembers.push(grpmembers[j]);
+				}
+			}
+			userModel.find({userid:{$in:orggroupmembers}},function(err,orgusers){
+				if(err){
+					logger.error("error","Database Issue /_sendOrgRemoveNotificationToOrgMember"+err)
+				}else if(orgusers.length==0){
+					logger.emit("log","There is no organization members to send notification");
+				}else{
+					
+				}
+			})
+
+		}
+	})
+}
+var _allProductRemove=function(self,orgid){
+	productModel.update({orgid:orgid},{$set:{status:"deactive"}},{multi:true},function(err,allorgproductdeletestatus){
+		if(err){
+			logger.emit("error","Database Issue _allProductRemove orgid:"+orgid+":"+err)
+			self.emit("failedOrgDeletion",{"error":{"code":"ED001","message":"Database Issue"}});
+		}else if(allorgproductdeletestatus==0){
+			self.emit("failedOrgDeletion",{"error":{"message":"There is no organization product exists"}});
 		}else{
 			/////////////////////////////////////
 			_successfulOrganizationDeletion(self);

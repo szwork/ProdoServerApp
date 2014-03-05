@@ -868,13 +868,13 @@ var productLogoUpload=function(prodle,awsparams,callback){
           callback({"error":{"message":"productLogoUpload:Error in getting getSignedUrl"+err}});
         }else{
           var product_logo_object={bucket:params1.Bucket,key:params1.Key,image:url};
-          ProductModel.findAndModify({prodle:prodle},[],{$set:{product_logo:product_logo_object}},{new:false},function(err,productuploadstatus){
+          ProductModel.findAndModify({prodle:prodle},[],{$set:{product_logo:product_logo_object}},{new:false},function(err,productlogodata){
             if(err){
               callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
             }else if(productlogodata){
               var productlogo=productlogodata.product_logo;
               var awsdeleteparams={Bucket:productlogo.bucket,Key:productlogo.key};
-              s3bucket.deleteObject(awsdeleteparams, function(err, deleteuserlogostatus) {
+              s3bucket.deleteObject(awsdeleteparams, function(err, deleteproductlogostatus) {
                 if (err) {
                   logger.emit("error"," product not  deleted from amzon s3 bucket for prodle"+productlogodata.prodle);
                 }else if(deleteproductlogostatus){
