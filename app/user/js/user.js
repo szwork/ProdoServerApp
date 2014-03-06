@@ -782,7 +782,7 @@ var _isProdonusRegisteredEmailId=function(self,email,host){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find users"}});
 		}else if(user){
 			if(user.verified==false){
-				self.emit("failedSendPasswordSetting",{"error":{"code":"AU003","message":"Your account is not verified ,So first verify your account"}});
+				self.emit("failedSendPasswordSetting",{"error":{"code":"AU003","message":"Plase verify your account, it is not yet activated"}});
 			}else{
 			   ////////////////////////////////////
 			   _createPasswordTokenSetting(self,user,host);
