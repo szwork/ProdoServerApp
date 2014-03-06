@@ -56,9 +56,11 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
 		  }else if(organizationdata.orgtype=="manufcaturer" && organizationdata.terms==false ){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
-		  }else{
+		  }else if(["manufcaturer","company"].indexOf(organizationdata.orgtype.toLowerCase())<0){
+		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"Organization type must be Manufcaturer or Company"}});
+			}else{
 
-		    	logger.emit("log","_validated");
+					logger.emit("log","_validated");
 					//this.emit("validated", organizationdata);
 					////////////////////////////////////////////////////////////
 					_hasAlreadyOrganization(self,organizationdata,sessionuserid,subscriptiondata);
