@@ -22,8 +22,14 @@ var updateLatestProductComment=function(prodle){
 	CommentModel.find({type:"product",status:"active",prodle:prodle},{prodle:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
 		if(err){
 			logger.emit("log","Error in updation latest 5 product comment");
-		}else if(comment.length!=0){
-			ProductModel.update({prodle:prodle},{$set:{product_comments:comment}},function(err,latestupatestatus){
+		}else {
+			var comment_array;
+			if(comment.length==0){
+				comment_array=[];
+			}else{
+				comment_array=comment;
+			}
+			ProductModel.update({prodle:prodle},{$set:{product_comments:comment_array}},function(err,latestupatestatus){
 				if(err){
 					logger.emit("error","Error in updation latest 5 product comment");
 				}else if(latestupatestatus==1){
@@ -33,8 +39,6 @@ var updateLatestProductComment=function(prodle){
 					logger.emit("error","Given product id is wrong to update latest 5 comments");
 				}
 			})
-		}else{
-			logger.emit("error","No comment of product type");
 		}
 	})
 }
