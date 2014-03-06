@@ -133,7 +133,7 @@ exports.addOrganization = function(req,res){
   
   var sessionuserid=req.user.userid;
   if(req.user.prodousertype=="individual"){
-    organization.emit("failedOrgUpdation",{"error":{"code":"EA001","message":"You have not authorize to add organization for individual"}})
+    organization.emit("failedOrgAdd",{"error":{"code":"EA001","message":"You have not authorize to add organization for individual"}})
   }else{
       organization.addOrganization(sessionuserid,subscriptiondata);
   }
