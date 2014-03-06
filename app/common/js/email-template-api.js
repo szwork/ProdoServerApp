@@ -75,6 +75,11 @@ exports.loadEmailTemplate=function(req,res){
 			templatetype: "passwordchange",
 			subject: "Your password has been changed",
 			description: "Dear <user>,<br><br>This notice is to inform that your password has been changed.Your current password is <b>newpassword<b>.If you feel this action has occurred in error or you need further assistance, please write to our support staff at support@prodonus.com <br><br>Sincerely,<br><br>Prodonus Team"
+		},
+		{
+			templatetype: "orgdeletenotification",
+			subject: "Your Organization <orgname> has been unsubscribed from prodonus",
+			description: "Dear <name>,<br><br>This notice is to inform that your organization <orgname> has choose to unsubscribe with prodonus. As a result your accounts have been deactivated and would be later deleted as per company's maintenance activity.<br><br>If you feel this action has occurred in error or you need further assistance, please write to our support staff at support@prodonus.com or contact your organization admin for Prodonus.<br><br>Thanks again for being a Prodonus customer.<br><br>Sincerely,<br><br>Prodonus Team"
 		}]
 
 

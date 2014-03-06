@@ -52,7 +52,9 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata){
 		    self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please select organization type"}});
 		  }else if(organizationdata.location==undefined){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please give a location details"}});
-		  }else if(organizationdata.terms==false){
+		  }else if(organizationdata.orgtype=="manufcaturer" && organizationdata.terms==undefined){
+		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
+		  }else if(organizationdata.orgtype=="manufcaturer" && organizationdata.terms==false ){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
 		  }else{
 
@@ -450,10 +452,27 @@ var _sendOrgRemoveNotificationToOrgMember=function(self,orgid){
 				}else if(orgusers.length==0){
 					logger.emit("log","There is no organization members to send notification");
 				}else{
-					
+					var orguserdata=[];
+					for(var i=0;i<orgusers.length;i++){
+						if(orgusers[i].firstname==undefined){
+							orguserdata.push({name:orgusers[i].username,email:orgusers[i].email,orgname:orgusers[i].org.orgname});
+						}else{
+							orguserdata.push({name:orgusers[i].firstname,email:orgusers[i].email,orgname:orgusers[i].org.orgname});
+						}
+						EmailTemplateModel.findOne({templatetype:"orgdeletenotification"},function(err,emailtemplate){
+							if(err){
+								logger.error("error","Database Issue fun:_sendOrgRemoveNotificationToOrgMember "+err);
+							}else if(!emailtemplate){
+								logger.error("error","emailtemplate for orgdeletenotification doesnt exists");
+							}else{
+								for(var i=0;i<orguserdata.length;i++){
+									self.emit("orgdeletenotification",orguserdata[i],emailtemplate);
+								}
+							}
+						})
+					}
 				}
 			})
-
 		}
 	})
 }

@@ -182,6 +182,29 @@ exports.updateOrganization = function(req, res) {
         // organization.removeAllListeners();
         res.send(result);
       });
+      organization.removeAllListeners("orgdeletenotification");
+      organization.on("orgdeletenotification",function(orguser,emailtemplate){
+        var template_description=emailtemplate.description;
+        var html=S(template_description); 
+        html=html.replaceAll("<email>",orguser.email);
+        html=html.replaceAll("<orgname>",orguser.orgname);
+        html=html.replaceAll("<name>",orguser.name)
+        var subject=S(emailtemplate.subject);
+        subject=subject.replaceAll("<orgname>",orguser.orgname);
+        var message = {
+          from: "Prodonus  <noreply@prodonus.com>", // sender address
+          to: orguser.email, // list of receivers
+          subject:subject.s, // Subject line
+          html: html.s // html body
+        };
+        commonapi.sendMail(message,CONFIG.smtp_general,function(result){
+          if (result == "failure") {
+             logger.emit("error","Error in sending org delete notification to mail to "+orguser.email,req.user.userid);
+          }else {
+            logger.emit("log","org delete notification mail sent to "+message.to); 
+          }
+        })
+      });
       var isAdmin=req.user.org.isAdmin;
      if(req.user.isAdmin || isAdmin) {
       //////////////////////
