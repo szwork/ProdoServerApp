@@ -21,7 +21,7 @@ var generateTimeId = require('time-uuid');
 var fs = require('fs');
 
 var AWS = require('aws-sdk');
-
+var resize=require('resize');
 var generateId = require('time-uuid');
 var path=require("path");
 var userModel=require('../../user/js/user-model');
@@ -322,7 +322,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   var fileName = dirname + '/tmp/uploads/' + file_name;
   console.log("filename"+fileName);
   logger.emit("log","ext"+file_type);
-  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
+  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains("png") ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
   }else if(file_length>500000){
     callback({"error":{"message":"You can upload  image of size less than 1mb"}});
@@ -340,10 +340,10 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                 easyimg.rescrop({src:fileName, dst:fileName,width:100,height:128,cropwidth:100, cropheight:128},function(err, image) {
-                  if (err){
-                    callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
-                  }else{
+                 // easyimg.rescrop({src:fileName, dst:fileName,width:100,height:128,cropwidth:100, cropheight:128},function(err, image) {
+                 //  if (err){
+                 //    callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
+                 //  }else{
                     console.log(written+" bytes are written from buffer");
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                      var bucketFolder;
@@ -373,8 +373,8 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                           });
                         })
                       }
-                    }
-                  })
+                  //   }
+                  // })
                 }
               })
             }
