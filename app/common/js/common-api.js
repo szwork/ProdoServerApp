@@ -789,7 +789,7 @@ var userFileUpload=function(userid,awsparams,callback){
               var userprofile=userprofiledata.profile_pic;
               if(userprofile==undefined){
                   logger.emit("log","First time logo changed");
-              }ele{
+              }else{
                 var awsdeleteparams={Bucket:userprofile.bucket,Key:userprofile.key};
                 logger.emit("log",awsdeleteparams);
                 s3bucket.deleteObject(awsdeleteparams, function(err, deleteuserlogostatus) {
