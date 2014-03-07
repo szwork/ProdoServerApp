@@ -787,15 +787,19 @@ var userFileUpload=function(userid,awsparams,callback){
               callback({"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
             }else if(userprofiledata){
               var userprofile=userprofiledata.profile_pic;
-              var awsdeleteparams={Bucket:userprofile.bucket,Key:userprofile.key};
-              logger.emit("log",awsdeleteparams);
-              s3bucket.deleteObject(awsdeleteparams, function(err, deleteuserlogostatus) {
-                if (err) {
-                  logger.emit("error","Profile pic not deleted from amzon s3 bucket "+err,userprofiledata.userid);
-                }else if(deleteuserlogostatus){
-                  logger.emit("log","Profile pic delete from Amazon S3");
-                }
-              })
+              if(userprofile==undefined){
+                  logger.emit("log","First time logo changed");
+              }ele{
+                var awsdeleteparams={Bucket:userprofile.bucket,Key:userprofile.key};
+                logger.emit("log",awsdeleteparams);
+                s3bucket.deleteObject(awsdeleteparams, function(err, deleteuserlogostatus) {
+                  if (err) {
+                    logger.emit("error","Profile pic not deleted from amzon s3 bucket "+err,userprofiledata.userid);
+                  }else if(deleteuserlogostatus){
+                    logger.emit("log","Profile pic delete from Amazon S3");
+                  }
+                }) 
+              }
               callback(null,{"success":{"message":"User Profile Pic Updated Successfully","image":newprofileurl}})
             }else{
               callback({"error":{"code":"AU003","message":"Provided userid is wrong"+userid}});
@@ -876,14 +880,19 @@ var productLogoUpload=function(prodle,awsparams,callback){
               callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
             }else if(productlogodata){
               var productlogo=productlogodata.product_logo;
-              var awsdeleteparams={Bucket:productlogo.bucket,Key:productlogo.key};
-              s3bucket.deleteObject(awsdeleteparams, function(err, deleteproductlogostatus) {
-                if (err) {
-                  logger.emit("error"," product not  deleted from amzon s3 bucket for prodle"+productlogodata.prodle);
-                }else if(deleteproductlogostatus){
-                  logger.emit("log","product logo deleted from Amazon S3");
-                }
-              })
+              if(productlogo==undefined){
+                logger.emit("log","First time check for product logo");
+              }else{
+                var awsdeleteparams={Bucket:productlogo.bucket,Key:productlogo.key};
+                s3bucket.deleteObject(awsdeleteparams, function(err, deleteproductlogostatus) {
+                  if (err) {
+                    logger.emit("error"," product not  deleted from amzon s3 bucket for prodle"+productlogodata.prodle);
+                  }else if(deleteproductlogostatus){
+                    logger.emit("log","product logo deleted from Amazon S3");
+                  }
+                })  
+              }
+              
               callback(null,{"success":{"message":"Product images uploaded Successfully","image":url}})
             }else{
               callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
@@ -911,14 +920,19 @@ var orgLogoUpload=function(orgid,awsparams,callback){
               callback({"error":{"code":"EDOO1","message":"orgLogoUpload:Dberror"+err}});
             }else if(orglogodata){
               var orglogo=orglogodata.org_logo;
-              var awsdeleteparams={Bucket:orglogo.bucket,Key:orglogo.key};
-              s3bucket.deleteObject(awsdeleteparams, function(err, deleteorglogostatus) {
-                if (err) {
-                  logger.emit("error","organization logo not  deleted from amzon s3 bucket for orgid"+orglogodata.orgid);
-                }else if(deleteorglogostatus){
-                  logger.emit("log","orglogo  deleted from Amazon S3");
-                }
-              })
+              if(orglogo==undefined){
+                logger.emit("log","first time product logog chanes");
+              }else{
+                var awsdeleteparams={Bucket:org_logo_object.bucket,Key:org_logo_object.key};
+                s3bucket.deleteObject(awsdeleteparams, function(err, deleteorglogostatus) {
+                  if (err) {
+                    logger.emit("error","organization logo not  deleted from amzon s3 bucket for orgid"+orglogodata.orgid);
+                  }else if(deleteorglogostatus){
+                    logger.emit("log","orglogo  deleted from Amazon S3");
+                  }
+                }) 
+              }
+              
               callback(null,{"success":{"message":"Organization logo changes  Successfully","image":url}})
             }else{
               callback({"error":{"code":"AO002","message":"Wrong orgid"+orgid}});

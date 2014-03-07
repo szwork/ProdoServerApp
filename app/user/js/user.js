@@ -1584,12 +1584,12 @@ var _profileInfoProductFollowdAndRecommends=function(self,user){
 	for(var i=0;i<user.products_recommends.length;i++){
 		product_recommends_array.push(user.products_recommends[i].prodle);	
 	}
-	productModel.find({prodle:{$in:product_followed_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductfollowed){
+	productModel.find({status:{$ne:"deactive"},prodle:{$in:product_followed_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductfollowed){
 		if(err){
 			self.emit("failedUserGetUserProfile",{"error":{"code":"ED001","message":"No user exists"}});
 		}else {
 			user.products_followed=userproductfollowed;
-			productModel.find({prodle:{$in:product_recommends_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductrecommends){
+			productModel.find({status:{$ne:"deactive"},prodle:{$in:product_recommends_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductrecommends){
 				if(err){
 					self.emit("failedUserGetUserProfile",{"error":{"code":"ED001","message":"No user exists"}});
 				}else {
