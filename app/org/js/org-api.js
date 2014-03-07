@@ -133,7 +133,7 @@ exports.addOrganization = function(req,res){
   
   var sessionuserid=req.user.userid;
   if(req.user.prodousertype=="individual"){
-    organization.emit("failedOrgUpdation",{"error":{"code":"EA001","message":"You have not authorize to add organization for individual"}})
+    organization.emit("failedOrgAdd",{"error":{"code":"EA001","message":"You have not authorize to add organization for individual"}})
   }else{
       organization.addOrganization(sessionuserid,subscriptiondata);
   }
@@ -142,6 +142,7 @@ exports.addOrganization = function(req,res){
 exports.updateOrganization = function(req, res) {
   var orgid=req.params.orgid;
   var orgdata=req.body.organization;
+  logger.emit("log","req body updateOrganization:"+JSON.stringify(req.body));
   var organization = new Organization(orgdata);
   var sessionuserid=req.user.userid;
   organization.removeAllListeners("failedOrgUpdation");
@@ -160,7 +161,7 @@ exports.updateOrganization = function(req, res) {
     var isAdmin=req.user.org.isAdmin;
     if(req.user.org.orgid==orgid || isAdmin)
     {
-      organization.updateOrganization(orgid);
+      organization.updateOrganization(orgid,req.user.userid);
     }else{
        organization.emit("failedOrgUpdation",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
     }
@@ -181,6 +182,29 @@ exports.updateOrganization = function(req, res) {
         logger.emit("info", result.success.message);
         // organization.removeAllListeners();
         res.send(result);
+      });
+      organization.removeAllListeners("orgdeletenotification");
+      organization.on("orgdeletenotification",function(orguser,emailtemplate){
+        var template_description=emailtemplate.description;
+        var html=S(template_description); 
+        html=html.replaceAll("<email>",orguser.email);
+        html=html.replaceAll("<orgname>",orguser.orgname);
+        html=html.replaceAll("<name>",orguser.name)
+        var subject=S(emailtemplate.subject);
+        subject=subject.replaceAll("<orgname>",orguser.orgname);
+        var message = {
+          from: "Prodonus  <noreply@prodonus.com>", // sender address
+          to: orguser.email, // list of receivers
+          subject:subject.s, // Subject line
+          html: html.s // html body
+        };
+        commonapi.sendMail(message,CONFIG.smtp_general,function(result){
+          if (result == "failure") {
+             logger.emit("error","Error in sending org delete notification to mail to "+orguser.email,req.user.userid);
+          }else {
+            logger.emit("log","org delete notification mail sent to "+message.to); 
+          }
+        })
       });
       var isAdmin=req.user.org.isAdmin;
      if(req.user.isAdmin || isAdmin) {

@@ -21,7 +21,7 @@ var generateTimeId = require('time-uuid');
 var fs = require('fs');
 
 var AWS = require('aws-sdk');
-
+// var resize=require('resize');
 var generateId = require('time-uuid');
 var path=require("path");
 var userModel=require('../../user/js/user-model');
@@ -191,6 +191,9 @@ exports.uploadFiles=function(io,__dirname){
     socket.on('uploadFiles', function(file,action) {
       // console.log("calling to Upload files");
       ///////////////
+      logger.emit("log","File info"+JSON.stringify(file));
+      logger.emit("log","action info"+JSON.stringify(action));
+      
       if(action==null || action==undefined){
          logger.emit("error","uploadFiles doesn't know action");
       }else if(file==undefined ){ 
@@ -207,7 +210,7 @@ exports.uploadFiles=function(io,__dirname){
         } 
       }else{
         var user=socket.handshake.user;
-        logger.emit("log","socket session user"+user);
+        // logger.emit("log","socket session user"+user);
         uploadFile(file,__dirname,action,user,function(err,uploadresult){
           if(err){
             logger.emit("error",err.error.message,sessionuserid)
@@ -322,7 +325,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   var fileName = dirname + '/tmp/uploads/' + file_name;
   console.log("filename"+fileName);
   logger.emit("log","ext"+file_type);
-  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
+  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains("png") ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
   }else if(file_length>500000){
     callback({"error":{"message":"You can upload  image of size less than 1mb"}});
@@ -340,11 +343,11 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                 easyimg.rescrop({src:fileName, dst:fileName,width:100,height:128,cropwidth:100, cropheight:128},function(err, image) {
-                  if (err){
-                    callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
-                  }else{
-                    console.log(written+" bytes are written from buffer");
+                 // easyimg.rescrop({src:fileName, dst:fileName,width:100,height:128,cropwidth:100, cropheight:128},function(err, image) {
+                 //  if (err){
+                 //    callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
+                 //  }else{
+                    // console.log(written+" bytes are written from buffer");
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                      var bucketFolder;
                      var params;
@@ -373,8 +376,8 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                           });
                         })
                       }
-                    }
-                  })
+                  //   }
+                  // })
                 }
               })
             }
@@ -413,7 +416,7 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                 logger.emit("log","s3filekey:"+s3filekey+" ext:"+ext);
                  var bucketFolder;
@@ -490,7 +493,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                 var bucketFolder;
                 var params;
@@ -571,7 +574,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                  var bucketFolder;
                  var params;
@@ -643,7 +646,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                  var bucketFolder;
                  var params;
@@ -728,7 +731,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                      var bucketFolder;
                      var params;
@@ -784,15 +787,19 @@ var userFileUpload=function(userid,awsparams,callback){
               callback({"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
             }else if(userprofiledata){
               var userprofile=userprofiledata.profile_pic;
-              var awsdeleteparams={Bucket:userprofile.bucket,Key:userprofile.key};
-              logger.emit("log",awsdeleteparams);
-              s3bucket.deleteObject(awsdeleteparams, function(err, deleteuserlogostatus) {
-                if (err) {
-                  logger.emit("error","Profile pic not deleted from amzon s3 bucket "+err,userprofiledata.userid);
-                }else if(deleteuserlogostatus){
-                  logger.emit("log","Profile pic delete from Amazon S3");
-                }
-              })
+              if(userprofile==undefined){
+                  logger.emit("log","First time logo changed");
+              }ele{
+                var awsdeleteparams={Bucket:userprofile.bucket,Key:userprofile.key};
+                logger.emit("log",awsdeleteparams);
+                s3bucket.deleteObject(awsdeleteparams, function(err, deleteuserlogostatus) {
+                  if (err) {
+                    logger.emit("error","Profile pic not deleted from amzon s3 bucket "+err,userprofiledata.userid);
+                  }else if(deleteuserlogostatus){
+                    logger.emit("log","Profile pic delete from Amazon S3");
+                  }
+                }) 
+              }
               callback(null,{"success":{"message":"User Profile Pic Updated Successfully","image":newprofileurl}})
             }else{
               callback({"error":{"code":"AU003","message":"Provided userid is wrong"+userid}});
@@ -873,14 +880,19 @@ var productLogoUpload=function(prodle,awsparams,callback){
               callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
             }else if(productlogodata){
               var productlogo=productlogodata.product_logo;
-              var awsdeleteparams={Bucket:productlogo.bucket,Key:productlogo.key};
-              s3bucket.deleteObject(awsdeleteparams, function(err, deleteproductlogostatus) {
-                if (err) {
-                  logger.emit("error"," product not  deleted from amzon s3 bucket for prodle"+productlogodata.prodle);
-                }else if(deleteproductlogostatus){
-                  logger.emit("log","product logo deleted from Amazon S3");
-                }
-              })
+              if(productlogo==undefined){
+                logger.emit("log","First time check for product logo");
+              }else{
+                var awsdeleteparams={Bucket:productlogo.bucket,Key:productlogo.key};
+                s3bucket.deleteObject(awsdeleteparams, function(err, deleteproductlogostatus) {
+                  if (err) {
+                    logger.emit("error"," product not  deleted from amzon s3 bucket for prodle"+productlogodata.prodle);
+                  }else if(deleteproductlogostatus){
+                    logger.emit("log","product logo deleted from Amazon S3");
+                  }
+                })  
+              }
+              
               callback(null,{"success":{"message":"Product images uploaded Successfully","image":url}})
             }else{
               callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
@@ -908,14 +920,19 @@ var orgLogoUpload=function(orgid,awsparams,callback){
               callback({"error":{"code":"EDOO1","message":"orgLogoUpload:Dberror"+err}});
             }else if(orglogodata){
               var orglogo=orglogodata.org_logo;
-              var awsdeleteparams={Bucket:orglogo.bucket,Key:orglogo.key};
-              s3bucket.deleteObject(awsdeleteparams, function(err, deleteorglogostatus) {
-                if (err) {
-                  logger.emit("error","organization logo not  deleted from amzon s3 bucket for orgid"+orglogodata.orgid);
-                }else if(deleteorglogostatus){
-                  logger.emit("log","orglogo  deleted from Amazon S3");
-                }
-              })
+              if(orglogo==undefined){
+                logger.emit("log","first time product logog chanes");
+              }else{
+                var awsdeleteparams={Bucket:org_logo_object.bucket,Key:org_logo_object.key};
+                s3bucket.deleteObject(awsdeleteparams, function(err, deleteorglogostatus) {
+                  if (err) {
+                    logger.emit("error","organization logo not  deleted from amzon s3 bucket for orgid"+orglogodata.orgid);
+                  }else if(deleteorglogostatus){
+                    logger.emit("log","orglogo  deleted from Amazon S3");
+                  }
+                }) 
+              }
+              
               callback(null,{"success":{"message":"Organization logo changes  Successfully","image":url}})
             }else{
               callback({"error":{"code":"AO002","message":"Wrong orgid"+orgid}});

@@ -60,7 +60,7 @@ var userSchema = mongoose.Schema({
   adddate:{ type:Date,default:Date.now },
   updatedate:{ type:Date},
   removedate:{ type:Date},
-  profile_pic:{bucket:{type:String},key:String,image:{type:String,default:null}},
+  profile_pic:{bucket:{type:String},key:String,image:{type:String}},
   isAdmin:{type:Boolean,default:false},
   prodousertype:{type:String}
 });

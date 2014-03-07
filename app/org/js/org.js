@@ -52,11 +52,15 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata){
 		    self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please select organization type"}});
 		  }else if(organizationdata.location==undefined){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please give a location details"}});
-		  }else if(organizationdata.terms==false){
+		  }else if(organizationdata.orgtype=="manufacturer" && organizationdata.terms==undefined){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
-		  }else{
+		  }else if(organizationdata.orgtype=="manufacturer" && organizationdata.terms==false ){
+		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
+		  }else if(["manufacturer","company"].indexOf(organizationdata.orgtype.toLowerCase())<0){
+		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"Organization type must be Manufcaturer or Company"}});
+			}else{
 
-		    	logger.emit("log","_validated");
+					logger.emit("log","_validated");
 					//this.emit("validated", organizationdata);
 					////////////////////////////////////////////////////////////
 					_hasAlreadyOrganization(self,organizationdata,sessionuserid,subscriptiondata);
@@ -212,7 +216,7 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 	      	var userdata=[];
 	      	for(var i=0;i<newusers.length;i++)
 	     		{
-						userdata[i]={email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid}};
+				    userdata[i]={email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid}};
 	      	}
 	        userModel.create(userdata,function(err,inviteuserdata){
 	          if(err){
@@ -324,18 +328,69 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 		}else if(orgdata.subscription!=undefined ||orgdata.payment!=undefined || orgdata.usergrp!=undefined || orgdata.orgid!=undefined ||orgdata.org_logo!=undefined ||orgdata.location!=undefined ){
 			self.emit("failedOrgUpdation",{"error":{"code":"ED002","message":"You can not change this information of organization"}});
 		}else{
-			////////////////////////////////////////
-			_updateOrganization(self,orgid,orgdata,sessionuserid);
-			///////////////////////////////////////
+			_isOrgdataContainsName(self,orgid,orgdata,sessionuserid);
+			// ////////////////////////////////////////
+			// _updateOrganization(self,orgid,orgdata,sessionuserid);
+			// ///////////////////////////////////////
 		}
 };
-
+var _isOrgdataContainsName=function(self,orgid,orgdata,sessionuserid){
+	if(orgdata.name!=undefined){
+		if(orgdata.password==undefined || orgdata.password==""){
+	 		self.emit("failedOrgUpdation",{"error":{"code":"AV001","message":"Please provide password to update organization name"}});	
+	 	}else{
+	 		/////////////////////////////////////
+	 		_updateOrganizationName(self,orgid,orgdata,sessionuserid);
+	 		/////////////////////////////////////
+	 	}
+	}else{
+		///////////////////////////////////
+			_updateOrganization(self,orgid,orgdata,sessionuserid);
+			//////////////////////////////////
+	}
+}
+var _updateOrganizationName=function(self,orgid,orgdata,sessionuserid){
+userModel.findOne({userid:sessionuserid,status:"active"},function(err,user){
+		if(err){
+			self.emit("failedOrgUpdation",{"error":{"code":"ED001","message":"DB error:_updateUsername"+err}});	
+		}else if(!user){
+			self.emit("failedOrgUpdation",{"error":{"code":"AU005","message":"Userid wrong"}});	
+		}else{
+			user.comparePassword(orgdata.password, function(err, isMatch){
+	      if (err){
+	        self.emit("failedOrgUpdation",{"error":{"message":"Database Issue"}});	
+	      } else if( !isMatch ) {
+	      	self.emit("failedOrgUpdation",{"error":{"message":"Wrong password"}});	
+	      }else{
+	       	// delete userdata.password;
+	       ///////////////////////////////////
+			_updateOrganization(self,orgid,orgdata,sessionuserid);
+ 			//////////////////////////////////
+	      }
+	    });
+		}
+	})
+}
+// var 	_checkOrgNameIsExistForUpdate=function(self,orgid,orgdata,sessionuserid){
+// 	orgModel.findOne({name:orgdata.name},{name:1},function(err,org){
+// 		if(err){
+// 			self.emit("failedOrgUpdation",{"error":{"code":"ED001","message":"DB error:failedOrgUpdation"+err}});	
+// 		}else if(org){
+// 			self.emit("failedOrgUpdation",{"error":{"message":"Organization name already exists "}});	
+// 		}else{
+// 			///////////////////////////////////
+// 			_updateOrganization(self,orgid,orgdata,sessionuserid);
+// 			//////////////////////////////////
+// 		}
+// 	})
+// }
 var _updateOrganization=function(self,orgid,orgdata,sessionuserid){
 	
 	logger.emit("log","_updateOrganization");
 	orgModel.update({orgid:orgid},{$set:orgdata},function(err,organizationupdatestatus){
 		if(err){
-			self.emit("failedOrgUpdation",{"error":{"code":"ED001","message":"Error in db to update user data"}});
+			logger.emit("error","Database Issue:_updateOrganization"+err,sessionuserid)
+			self.emit("failedOrgUpdation",{"error":{"code":"ED001","message":"Database Issue"}});
 		}else if(organizationupdatestatus!=1){
 			self.emit("failedOrgUpdation",{"error":{"code":"AU002","message":"Provided orgid is wrong"}});
 		}else{
@@ -448,10 +503,27 @@ var _sendOrgRemoveNotificationToOrgMember=function(self,orgid){
 				}else if(orgusers.length==0){
 					logger.emit("log","There is no organization members to send notification");
 				}else{
-					
+					var orguserdata=[];
+					for(var i=0;i<orgusers.length;i++){
+						if(orgusers[i].firstname==undefined){
+							orguserdata.push({name:orgusers[i].username,email:orgusers[i].email,orgname:orgusers[i].org.orgname});
+						}else{
+							orguserdata.push({name:orgusers[i].firstname,email:orgusers[i].email,orgname:orgusers[i].org.orgname});
+						}
+						EmailTemplateModel.findOne({templatetype:"orgdeletenotification"},function(err,emailtemplate){
+							if(err){
+								logger.error("error","Database Issue fun:_sendOrgRemoveNotificationToOrgMember "+err);
+							}else if(!emailtemplate){
+								logger.error("error","emailtemplate for orgdeletenotification doesnt exists");
+							}else{
+								for(var i=0;i<orguserdata.length;i++){
+									self.emit("orgdeletenotification",orguserdata[i],emailtemplate);
+								}
+							}
+						})
+					}
 				}
 			})
-
 		}
 	})
 }

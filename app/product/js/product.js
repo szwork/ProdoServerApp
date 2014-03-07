@@ -20,6 +20,7 @@ var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var shortId = require('shortid');
 var S=require('string');
+var shortId = require('shortid');
 // var CommentModel=require("./comment-model");
 var AWS = require('aws-sdk');
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
@@ -60,47 +61,48 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	   }
 	};
 	var _checkProductNameIsSame=function(self,productdata,orgid){
-		productModel.findOne({name:productdata.name},function(err,product){
+		productModel.findOne({name:productdata.name,model_no:productdata.model_no},function(err,product){
 			if(err){
 				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
 			}else if(product){
-				self.emit("failedProductAdd",{"error":{"message":"product name already exist please give another name "}});	
+				if(product.orgid==orgid ){//product is already associated with orgid
+					if(product.status=="active"){
+						self.emit("failedProductAdd",{"error":{"message":"Product is already associated with your organization "}})
+					}else{
+						//////////////////////////////////////////////
+						_addProduct(self,productdata,orgid);
+						/////////////////////////////////////////
+					}
+				}else{
+					self.emit("failedProductAdd",{"error":{"message":"Product is already associated with other manufacturer"}})
+				}				
 			}else{
-				////////////////////////////////////////////////////
-				checkModelNumberIsAlreadExist(self,productdata,orgid);
-				//////////////////////////////////////////////////
+
+			/////////////////////////////
+	   		_addProduct(self,productdata,orgid);
+	   		///////////////////////
 				
 			}
 		})
 	}
-	var checkModelNumberIsAlreadExist=function(self,productdata,orgid){
-		productModel.findOne({model_no:productdata.model_no},function(err,product){
-			if(err){
-				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});			
-			}else if(product){
-				self.emit("failedProductAdd",{"error":{"message":"product with model number already exists"}});	
-			}else{
-				/////////////////////////////
-	   		_addProduct(self,productdata,orgid);
-	   		///////////////////////
-			}
-		})
-	}
+	
 	var _addProduct=function(self,productdata,orgid){
 
 		productdata.orgid=orgid;
+		productdata.status="active";
+		productdata.prodle=shortId.generate();  
 		productdata.features=[{featurename:productdata.name,featuredescription:"product features"}];
 	    var product=new productModel(productdata);
-	    product.save(function(err,product_data){
-		  	if(err){
-		  		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
-		  	}else{
-		  		///////////////////////
+	    productModel.update({orgid:orgid,model_no:productdata.model_no},{$set:productdata},{upsert:true},function(err,addstatus){
+	    	if(err){
+	    		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
+	    	}else{
+	    		///////////////////////
 		  		_successfulProductAdd(self);
 		  		//////////////////////////
-		  	  
-		  	}
-	  	})
+	    	}
+	    })
+	   
 
 	}
 	var _successfulProductAdd=function(self){
@@ -253,10 +255,7 @@ var _changeProductStatusInTrending = function(self,prodle){
 	TrendingModel.update({prodle:prodle},{$set:{status:"deactive"}}).lean().exec(function(err,status){
 		if(err){
 			self.emit("failedDeleteProduct",{"error":{"code":"ED001","message":"Error in db to update product status in trending" + err}});
-		// }else if(status!=1){
-		// 	// self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Prodle is not exist for trending status"}});
-		// 	_successfulDeleteProduct(self);
-		}else{
+	  	}else{
 			// logger.emit("log","Status updated successfully in trending");
 			_successfulDeleteProduct(self);
 		}
