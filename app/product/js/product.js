@@ -253,10 +253,11 @@ var _changeProductStatusInTrending = function(self,prodle){
 	TrendingModel.update({prodle:prodle},{$set:{status:"deactive"}}).lean().exec(function(err,status){
 		if(err){
 			self.emit("failedDeleteProduct",{"error":{"code":"ED001","message":"Error in db to update product status in trending" + err}});
-		}else if(status!=1){
-			self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Prodle is wrong for update trending status"}});
+		// }else if(status!=1){
+		// 	// self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Prodle is not exist for trending status"}});
+		// 	_successfulDeleteProduct(self);
 		}else{
-			logger.emit("log","Status updated successfully in trending");
+			// logger.emit("log","Status updated successfully in trending");
 			_successfulDeleteProduct(self);
 		}
 	})

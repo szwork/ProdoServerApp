@@ -74,7 +74,7 @@ exports.loadEmailTemplate=function(req,res){
 		{
 			templatetype: "passwordchange",
 			subject: "Your password has been changed",
-			description: "Dear <user>,<br><br>This notice is to inform that your password has been changed.Your current password is <b>newpassword<b>.If you feel this action has occurred in error or you need further assistance, please write to our support staff at support@prodonus.com <br><br>Sincerely,<br><br>Prodonus Team"
+			description: "Dear <user>,<br><br>This notice is to inform that your password has been changed.Your current password is <b><newpassword><b>.If you feel this action has occurred in error or you need further assistance, please write to our support staff at support@prodonus.com <br><br>Sincerely,<br><br>Prodonus Team"
 		}]
 
 

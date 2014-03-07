@@ -1332,7 +1332,7 @@ var _checkAlreadyFollowProductOrNot=function(self,product,sessionuserid){
 		}else if(!userdata){
 			_followproduct(self,product,sessionuserid);				
 		}else{
-			self.emit("failedFollowProduct",{"error":{"code":"AD001","message":"User already followed this  product"}});
+			self.emit("failedFollowProduct",{"error":{"code":"AD001","message":"You are already followed this product"}});
 		}
 	})
 }
@@ -1378,7 +1378,7 @@ var _checkAlreadyunfollowProductOrNot=function(self,product,sessionuserid){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(!userdata){
-			self.emit("failedUnFollowProduct",{"error":{"code":"AD001","message":"User already unfollowed this product"}});
+			self.emit("failedUnFollowProduct",{"error":{"code":"AD001","message":"You are already unfollowed this product"}});
 		}else{
 			_unfollowproduct(self,product,sessionuserid);
 		}
@@ -1582,12 +1582,12 @@ var _profileInfoProductFollowdAndRecommends=function(self,user){
 	for(var i=0;i<user.products_recommends.length;i++){
 		product_recommends_array.push(user.products_recommends[i].prodle);	
 	}
-	productModel.find({prodle:{$in:product_followed_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductfollowed){
+	productModel.find({status:{$ne:"deactive"},prodle:{$in:product_followed_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductfollowed){
 		if(err){
 			self.emit("failedUserGetUserProfile",{"error":{"code":"ED001","message":"No user exists"}});
 		}else {
 			user.products_followed=userproductfollowed;
-			productModel.find({prodle:{$in:product_recommends_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductrecommends){
+			productModel.find({status:{$ne:"deactive"},prodle:{$in:product_recommends_array}},{_id:0,prodle:1,orgid:1,name:1,product_logo:1},function(err,userproductrecommends){
 				if(err){
 					self.emit("failedUserGetUserProfile",{"error":{"code":"ED001","message":"No user exists"}});
 				}else {
