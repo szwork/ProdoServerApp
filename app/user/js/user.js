@@ -1334,7 +1334,7 @@ var _checkAlreadyFollowProductOrNot=function(self,product,sessionuserid){
 		}else if(!userdata){
 			_followproduct(self,product,sessionuserid);				
 		}else{
-			self.emit("failedFollowProduct",{"error":{"code":"AD001","message":"User already followed this  product"}});
+			self.emit("failedFollowProduct",{"error":{"code":"AD001","message":"You are already followed this product"}});
 		}
 	})
 }
@@ -1380,7 +1380,7 @@ var _checkAlreadyunfollowProductOrNot=function(self,product,sessionuserid){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedUnFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
 		}else if(!userdata){
-			self.emit("failedUnFollowProduct",{"error":{"code":"AD001","message":"User already unfollowed this product"}});
+			self.emit("failedUnFollowProduct",{"error":{"code":"AD001","message":"You are already unfollowed this product"}});
 		}else{
 			_unfollowproduct(self,product,sessionuserid);
 		}
