@@ -1,128 +1,128 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install', 'resize' ]
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install', '-g', 'resize' ]
 2 info using npm@1.3.14
 3 info using node@v0.10.22
 4 verbose node symlink /usr/bin/node
-5 warn package.json fs@0.0.0 fs is also the name of a node core module.
-6 warn package.json fs@0.0.0 No repository field.
-7 warn package.json querystring@0.2.0 querystring is also the name of a node core module.
-8 verbose readDependencies using package.json deps
-9 verbose cache add [ 'resize@*', null ]
-10 verbose cache add name=undefined spec="resize@*" args=["resize@*",null]
-11 verbose parsed url { protocol: null,
-11 verbose parsed url   slashes: null,
-11 verbose parsed url   auth: null,
-11 verbose parsed url   host: null,
-11 verbose parsed url   port: null,
-11 verbose parsed url   hostname: null,
-11 verbose parsed url   hash: null,
-11 verbose parsed url   search: null,
-11 verbose parsed url   query: null,
-11 verbose parsed url   pathname: 'resize@*',
-11 verbose parsed url   path: 'resize@*',
-11 verbose parsed url   href: 'resize@*' }
-12 verbose cache add name="resize" spec="*" args=["resize","*"]
-13 verbose parsed url { protocol: null,
-13 verbose parsed url   slashes: null,
-13 verbose parsed url   auth: null,
-13 verbose parsed url   host: null,
-13 verbose parsed url   port: null,
-13 verbose parsed url   hostname: null,
-13 verbose parsed url   hash: null,
-13 verbose parsed url   search: null,
-13 verbose parsed url   query: null,
-13 verbose parsed url   pathname: '*',
-13 verbose parsed url   path: '*',
-13 verbose parsed url   href: '*' }
-14 verbose addNamed [ 'resize', '*' ]
-15 verbose addNamed [ null, '*' ]
-16 silly lockFile 65e3069e-resize resize@*
-17 verbose lock resize@* /home/giantleap/.npm/65e3069e-resize.lock
-18 silly addNameRange { name: 'resize', range: '*', hasData: false }
-19 verbose url raw resize
-20 verbose url resolving [ 'https://registry.npmjs.org/', './resize' ]
-21 verbose url resolved https://registry.npmjs.org/resize
-22 info trying registry request attempt 1 at 18:28:15
-23 verbose etag "8OSF7IZSQ45MBRX7ZTV5V182A"
-24 http GET https://registry.npmjs.org/resize
-25 http 304 https://registry.npmjs.org/resize
-26 silly registry.get cb [ 304,
-26 silly registry.get   { date: 'Thu, 06 Mar 2014 12:58:16 GMT',
-26 silly registry.get     server: 'Apache',
-26 silly registry.get     via: '1.1 varnish',
-26 silly registry.get     'last-modified': 'Thu, 06 Mar 2014 12:58:16 GMT',
-26 silly registry.get     'cache-control': 'max-age=1',
-26 silly registry.get     etag: '"8OSF7IZSQ45MBRX7ZTV5V182A"',
-26 silly registry.get     'x-served-by': 'cache-sv61-SJC3',
-26 silly registry.get     'x-cache': 'MISS',
-26 silly registry.get     'x-cache-hits': '0',
-26 silly registry.get     'x-timer': 'S1394110696.665245771,VS0,VE84',
-26 silly registry.get     vary: 'Accept',
-26 silly registry.get     'content-length': '0',
-26 silly registry.get     'keep-alive': 'timeout=10, max=50',
-26 silly registry.get     connection: 'Keep-Alive' } ]
-27 verbose etag resize from cache
-28 silly addNameRange number 2 { name: 'resize', range: '*', hasData: true }
-29 silly addNameRange versions [ 'resize',
-29 silly addNameRange   [ '0.0.1',
-29 silly addNameRange     '0.0.2',
-29 silly addNameRange     '0.0.3',
-29 silly addNameRange     '0.1.0',
-29 silly addNameRange     '0.2.0',
-29 silly addNameRange     '0.3.0',
-29 silly addNameRange     '0.4.0',
-29 silly addNameRange     '0.4.1',
-29 silly addNameRange     '0.5.0',
-29 silly addNameRange     '0.6.0',
-29 silly addNameRange     '0.6.1',
-29 silly addNameRange     '0.7.0',
-29 silly addNameRange     '0.7.1',
-29 silly addNameRange     '0.7.2' ] ]
-30 verbose addNamed [ 'resize', '0.7.2' ]
-31 verbose addNamed [ '0.7.2', '0.7.2' ]
+5 verbose cache add [ 'resize', null ]
+6 verbose cache add name=undefined spec="resize" args=["resize",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: 'resize',
+7 verbose parsed url   path: 'resize',
+7 verbose parsed url   href: 'resize' }
+8 silly lockFile 73db013b-resize resize
+9 verbose lock resize /home/giantleap/.npm/73db013b-resize.lock
+10 silly lockFile 73db013b-resize resize
+11 silly lockFile 73db013b-resize resize
+12 verbose addNamed [ 'resize', '' ]
+13 verbose addNamed [ null, '*' ]
+14 silly lockFile 192f879a-resize resize@
+15 verbose lock resize@ /home/giantleap/.npm/192f879a-resize.lock
+16 silly addNameRange { name: 'resize', range: '*', hasData: false }
+17 verbose url raw resize
+18 verbose url resolving [ 'https://registry.npmjs.org/', './resize' ]
+19 verbose url resolved https://registry.npmjs.org/resize
+20 info trying registry request attempt 1 at 11:28:39
+21 verbose etag "8OSF7IZSQ45MBRX7ZTV5V182A"
+22 http GET https://registry.npmjs.org/resize
+23 http 304 https://registry.npmjs.org/resize
+24 silly registry.get cb [ 304,
+24 silly registry.get   { date: 'Fri, 07 Mar 2014 05:58:40 GMT',
+24 silly registry.get     server: 'Apache',
+24 silly registry.get     via: '1.1 varnish',
+24 silly registry.get     'last-modified': 'Fri, 07 Mar 2014 05:58:40 GMT',
+24 silly registry.get     'cache-control': 'max-age=1',
+24 silly registry.get     etag: '"8OSF7IZSQ45MBRX7ZTV5V182A"',
+24 silly registry.get     'x-served-by': 'cache-sv63-SJC3',
+24 silly registry.get     'x-cache': 'MISS',
+24 silly registry.get     'x-cache-hits': '0',
+24 silly registry.get     'x-timer': 'S1394171920.536231279,VS0,VE162',
+24 silly registry.get     vary: 'Accept',
+24 silly registry.get     'content-length': '0',
+24 silly registry.get     'keep-alive': 'timeout=10, max=50',
+24 silly registry.get     connection: 'Keep-Alive' } ]
+25 verbose etag resize from cache
+26 silly addNameRange number 2 { name: 'resize', range: '*', hasData: true }
+27 silly addNameRange versions [ 'resize',
+27 silly addNameRange   [ '0.0.1',
+27 silly addNameRange     '0.0.2',
+27 silly addNameRange     '0.0.3',
+27 silly addNameRange     '0.1.0',
+27 silly addNameRange     '0.2.0',
+27 silly addNameRange     '0.3.0',
+27 silly addNameRange     '0.4.0',
+27 silly addNameRange     '0.4.1',
+27 silly addNameRange     '0.5.0',
+27 silly addNameRange     '0.6.0',
+27 silly addNameRange     '0.6.1',
+27 silly addNameRange     '0.7.0',
+27 silly addNameRange     '0.7.1',
+27 silly addNameRange     '0.7.2' ] ]
+28 verbose addNamed [ 'resize', '0.7.2' ]
+29 verbose addNamed [ '0.7.2', '0.7.2' ]
+30 silly lockFile 68c84bfd-resize-0-7-2 resize@0.7.2
+31 verbose lock resize@0.7.2 /home/giantleap/.npm/68c84bfd-resize-0-7-2.lock
 32 silly lockFile 68c84bfd-resize-0-7-2 resize@0.7.2
-33 verbose lock resize@0.7.2 /home/giantleap/.npm/68c84bfd-resize-0-7-2.lock
-34 silly lockFile 68c84bfd-resize-0-7-2 resize@0.7.2
-35 silly lockFile 68c84bfd-resize-0-7-2 resize@0.7.2
-36 silly lockFile 65e3069e-resize resize@*
-37 silly lockFile 65e3069e-resize resize@*
-38 silly resolved [ { name: 'resize',
-38 silly resolved     version: '0.7.2',
-38 silly resolved     description: 'Image resizer',
-38 silly resolved     keywords: [ 'image', 'resize' ],
-38 silly resolved     author: { name: 'TJ Holowaychuk', email: 'tj@learnboost.com' },
-38 silly resolved     dependencies: { graphicsmagick2: '0.1.2', debug: '*' },
-38 silly resolved     main: 'index',
-38 silly resolved     engines: { node: '*' },
-38 silly resolved     readme: '\n# resize\n\n  Image resizer built with node-canvas.\n\n## Installation\n\n    $ npm install resize\n\n## resize(path | buffer, width, height, callback)\n\n```js\nvar resize = require(\'resize\');\nresize(\'/path/to/image.png\', 300, 500, function(err, buf){});\nresize(imageBuffer, 100, 100, function(err, buf){});\n```\n\n## License \n\n(The MIT License)\n\nCopyright (c) 2011 TJ Holowaychuk &lt;tj@learnboost.com&gt;\n\nPermission is hereby granted, free of charge, to any person obtaining\na copy of this software and associated documentation files (the\n\'Software\'), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish,\ndistribute, sublicense, and/or sell copies of the Software, and to\npermit persons to whom the Software is furnished to do so, subject to\nthe following conditions:\n\nThe above copyright notice and this permission notice shall be\nincluded in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \'AS IS\', WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\nIN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\nCLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\nTORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\nSOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.',
-38 silly resolved     readmeFilename: 'Readme.md',
-38 silly resolved     _id: 'resize@0.7.2',
-38 silly resolved     _from: 'resize@*' } ]
-39 info install resize@0.7.2 into /home/giantleap/Documents/projects/prodonus-server-app
-40 info installOne resize@0.7.2
-41 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize unbuild
-42 verbose tar unpack /home/giantleap/.npm/resize/0.7.2/package.tgz
-43 silly lockFile 92689a69-s-server-app-node-modules-resize tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
-44 verbose lock tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize /home/giantleap/.npm/92689a69-s-server-app-node-modules-resize.lock
-45 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
-46 verbose lock tar:///home/giantleap/.npm/resize/0.7.2/package.tgz /home/giantleap/.npm/7abbe35c-eap-npm-resize-0-7-2-package-tgz.lock
-47 silly gunzTarPerm modes [ '755', '644' ]
-48 silly gunzTarPerm extractEntry package.json
-49 silly gunzTarPerm extractEntry .npmignore
-50 silly gunzTarPerm extractEntry index.js
-51 silly gunzTarPerm extractEntry test.js
-52 silly gunzTarPerm extractEntry History.md
-53 silly gunzTarPerm extractEntry Makefile
-54 silly gunzTarPerm extractEntry Readme.md
-55 silly lockFile 92689a69-s-server-app-node-modules-resize tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
-56 silly lockFile 92689a69-s-server-app-node-modules-resize tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
-57 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
-58 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
-59 info preinstall resize@0.7.2
-60 verbose readDependencies using package.json deps
-61 verbose readDependencies using package.json deps
-62 verbose cache add [ 'graphicsmagick2@0.1.2', null ]
-63 verbose cache add name=undefined spec="graphicsmagick2@0.1.2" args=["graphicsmagick2@0.1.2",null]
+33 silly lockFile 68c84bfd-resize-0-7-2 resize@0.7.2
+34 silly lockFile 192f879a-resize resize@
+35 silly lockFile 192f879a-resize resize@
+36 silly resolved [ { name: 'resize',
+36 silly resolved     version: '0.7.2',
+36 silly resolved     description: 'Image resizer',
+36 silly resolved     keywords: [ 'image', 'resize' ],
+36 silly resolved     author: { name: 'TJ Holowaychuk', email: 'tj@learnboost.com' },
+36 silly resolved     dependencies: { graphicsmagick2: '0.1.2', debug: '*' },
+36 silly resolved     main: 'index',
+36 silly resolved     engines: { node: '*' },
+36 silly resolved     readme: '\n# resize\n\n  Image resizer built with node-canvas.\n\n## Installation\n\n    $ npm install resize\n\n## resize(path | buffer, width, height, callback)\n\n```js\nvar resize = require(\'resize\');\nresize(\'/path/to/image.png\', 300, 500, function(err, buf){});\nresize(imageBuffer, 100, 100, function(err, buf){});\n```\n\n## License \n\n(The MIT License)\n\nCopyright (c) 2011 TJ Holowaychuk &lt;tj@learnboost.com&gt;\n\nPermission is hereby granted, free of charge, to any person obtaining\na copy of this software and associated documentation files (the\n\'Software\'), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish,\ndistribute, sublicense, and/or sell copies of the Software, and to\npermit persons to whom the Software is furnished to do so, subject to\nthe following conditions:\n\nThe above copyright notice and this permission notice shall be\nincluded in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \'AS IS\', WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\nIN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\nCLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\nTORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\nSOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.',
+36 silly resolved     readmeFilename: 'Readme.md',
+36 silly resolved     _id: 'resize@0.7.2',
+36 silly resolved     _from: 'resize@' } ]
+37 info install resize@0.7.2 into /usr/lib
+38 info installOne resize@0.7.2
+39 info /usr/lib/node_modules/resize unbuild
+40 verbose tar unpack /home/giantleap/.npm/resize/0.7.2/package.tgz
+41 silly lockFile a550bfc9-tar-usr-lib-node-modules-resize tar:///usr/lib/node_modules/resize
+42 verbose lock tar:///usr/lib/node_modules/resize /home/giantleap/.npm/a550bfc9-tar-usr-lib-node-modules-resize.lock
+43 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
+44 verbose lock tar:///home/giantleap/.npm/resize/0.7.2/package.tgz /home/giantleap/.npm/7abbe35c-eap-npm-resize-0-7-2-package-tgz.lock
+45 silly gunzTarPerm modes [ '755', '644' ]
+46 silly gunzTarPerm extractEntry package.json
+47 silly gunzTarPerm extractEntry .npmignore
+48 silly gunzTarPerm extractEntry index.js
+49 silly gunzTarPerm extractEntry test.js
+50 silly gunzTarPerm extractEntry History.md
+51 silly gunzTarPerm extractEntry Makefile
+52 silly gunzTarPerm extractEntry Readme.md
+53 silly lockFile a550bfc9-tar-usr-lib-node-modules-resize tar:///usr/lib/node_modules/resize
+54 silly lockFile a550bfc9-tar-usr-lib-node-modules-resize tar:///usr/lib/node_modules/resize
+55 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
+56 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
+57 info preinstall resize@0.7.2
+58 verbose readDependencies using package.json deps
+59 verbose readDependencies using package.json deps
+60 verbose cache add [ 'graphicsmagick2@0.1.2', null ]
+61 verbose cache add name=undefined spec="graphicsmagick2@0.1.2" args=["graphicsmagick2@0.1.2",null]
+62 verbose parsed url { protocol: null,
+62 verbose parsed url   slashes: null,
+62 verbose parsed url   auth: null,
+62 verbose parsed url   host: null,
+62 verbose parsed url   port: null,
+62 verbose parsed url   hostname: null,
+62 verbose parsed url   hash: null,
+62 verbose parsed url   search: null,
+62 verbose parsed url   query: null,
+62 verbose parsed url   pathname: 'graphicsmagick2@0.1.2',
+62 verbose parsed url   path: 'graphicsmagick2@0.1.2',
+62 verbose parsed url   href: 'graphicsmagick2@0.1.2' }
+63 verbose cache add name="graphicsmagick2" spec="0.1.2" args=["graphicsmagick2","0.1.2"]
 64 verbose parsed url { protocol: null,
 64 verbose parsed url   slashes: null,
 64 verbose parsed url   auth: null,
@@ -132,28 +132,28 @@
 64 verbose parsed url   hash: null,
 64 verbose parsed url   search: null,
 64 verbose parsed url   query: null,
-64 verbose parsed url   pathname: 'graphicsmagick2@0.1.2',
-64 verbose parsed url   path: 'graphicsmagick2@0.1.2',
-64 verbose parsed url   href: 'graphicsmagick2@0.1.2' }
-65 verbose cache add name="graphicsmagick2" spec="0.1.2" args=["graphicsmagick2","0.1.2"]
-66 verbose parsed url { protocol: null,
-66 verbose parsed url   slashes: null,
-66 verbose parsed url   auth: null,
-66 verbose parsed url   host: null,
-66 verbose parsed url   port: null,
-66 verbose parsed url   hostname: null,
-66 verbose parsed url   hash: null,
-66 verbose parsed url   search: null,
-66 verbose parsed url   query: null,
-66 verbose parsed url   pathname: '0.1.2',
-66 verbose parsed url   path: '0.1.2',
-66 verbose parsed url   href: '0.1.2' }
-67 verbose addNamed [ 'graphicsmagick2', '0.1.2' ]
-68 verbose addNamed [ '0.1.2', '0.1.2' ]
-69 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
-70 verbose lock graphicsmagick2@0.1.2 /home/giantleap/.npm/92c5db15-graphicsmagick2-0-1-2.lock
-71 verbose cache add [ 'debug@*', null ]
-72 verbose cache add name=undefined spec="debug@*" args=["debug@*",null]
+64 verbose parsed url   pathname: '0.1.2',
+64 verbose parsed url   path: '0.1.2',
+64 verbose parsed url   href: '0.1.2' }
+65 verbose addNamed [ 'graphicsmagick2', '0.1.2' ]
+66 verbose addNamed [ '0.1.2', '0.1.2' ]
+67 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
+68 verbose lock graphicsmagick2@0.1.2 /home/giantleap/.npm/92c5db15-graphicsmagick2-0-1-2.lock
+69 verbose cache add [ 'debug@*', null ]
+70 verbose cache add name=undefined spec="debug@*" args=["debug@*",null]
+71 verbose parsed url { protocol: null,
+71 verbose parsed url   slashes: null,
+71 verbose parsed url   auth: null,
+71 verbose parsed url   host: null,
+71 verbose parsed url   port: null,
+71 verbose parsed url   hostname: null,
+71 verbose parsed url   hash: null,
+71 verbose parsed url   search: null,
+71 verbose parsed url   query: null,
+71 verbose parsed url   pathname: 'debug@*',
+71 verbose parsed url   path: 'debug@*',
+71 verbose parsed url   href: 'debug@*' }
+72 verbose cache add name="debug" spec="*" args=["debug","*"]
 73 verbose parsed url { protocol: null,
 73 verbose parsed url   slashes: null,
 73 verbose parsed url   auth: null,
@@ -163,241 +163,228 @@
 73 verbose parsed url   hash: null,
 73 verbose parsed url   search: null,
 73 verbose parsed url   query: null,
-73 verbose parsed url   pathname: 'debug@*',
-73 verbose parsed url   path: 'debug@*',
-73 verbose parsed url   href: 'debug@*' }
-74 verbose cache add name="debug" spec="*" args=["debug","*"]
-75 verbose parsed url { protocol: null,
-75 verbose parsed url   slashes: null,
-75 verbose parsed url   auth: null,
-75 verbose parsed url   host: null,
-75 verbose parsed url   port: null,
-75 verbose parsed url   hostname: null,
-75 verbose parsed url   hash: null,
-75 verbose parsed url   search: null,
-75 verbose parsed url   query: null,
-75 verbose parsed url   pathname: '*',
-75 verbose parsed url   path: '*',
-75 verbose parsed url   href: '*' }
-76 verbose addNamed [ 'debug', '*' ]
-77 verbose addNamed [ null, '*' ]
-78 silly lockFile 3ac45eff-debug debug@*
-79 verbose lock debug@* /home/giantleap/.npm/3ac45eff-debug.lock
-80 silly addNameRange { name: 'debug', range: '*', hasData: false }
-81 verbose url raw graphicsmagick2/0.1.2
-82 verbose url resolving [ 'https://registry.npmjs.org/', './graphicsmagick2/0.1.2' ]
-83 verbose url resolved https://registry.npmjs.org/graphicsmagick2/0.1.2
-84 info trying registry request attempt 1 at 18:28:17
-85 verbose etag "2SMVBANGAEHTQMYO2PGC37SN3"
-86 http GET https://registry.npmjs.org/graphicsmagick2/0.1.2
-87 verbose url raw debug
-88 verbose url resolving [ 'https://registry.npmjs.org/', './debug' ]
-89 verbose url resolved https://registry.npmjs.org/debug
-90 info trying registry request attempt 1 at 18:28:17
-91 verbose etag "2S4D9TUHX23FL0E3OWJEDXYI4"
-92 http GET https://registry.npmjs.org/debug
-93 http 304 https://registry.npmjs.org/debug
-94 silly registry.get cb [ 304,
-94 silly registry.get   { date: 'Thu, 06 Mar 2014 12:58:17 GMT',
-94 silly registry.get     server: 'Apache',
-94 silly registry.get     via: '1.1 varnish',
-94 silly registry.get     'last-modified': 'Thu, 06 Mar 2014 12:58:18 GMT',
-94 silly registry.get     'cache-control': 'max-age=1',
-94 silly registry.get     etag: '"2S4D9TUHX23FL0E3OWJEDXYI4"',
-94 silly registry.get     'x-served-by': 'cache-sv61-SJC3',
-94 silly registry.get     'x-cache': 'HIT',
-94 silly registry.get     'x-cache-hits': '1',
-94 silly registry.get     'x-timer': 'S1394110697.983312845,VS0,VE73',
-94 silly registry.get     vary: 'Accept',
-94 silly registry.get     'content-length': '0',
-94 silly registry.get     'keep-alive': 'timeout=10, max=50',
-94 silly registry.get     connection: 'Keep-Alive' } ]
-95 verbose etag debug from cache
-96 silly addNameRange number 2 { name: 'debug', range: '*', hasData: true }
-97 silly addNameRange versions [ 'debug',
-97 silly addNameRange   [ '0.0.1',
-97 silly addNameRange     '0.1.0',
-97 silly addNameRange     '0.2.0',
-97 silly addNameRange     '0.3.0',
-97 silly addNameRange     '0.4.0',
-97 silly addNameRange     '0.4.1',
-97 silly addNameRange     '0.5.0',
-97 silly addNameRange     '0.6.0',
-97 silly addNameRange     '0.7.0',
-97 silly addNameRange     '0.7.1',
-97 silly addNameRange     '0.7.2',
-97 silly addNameRange     '0.7.3',
-97 silly addNameRange     '0.7.4' ] ]
-98 verbose addNamed [ 'debug', '0.7.4' ]
-99 verbose addNamed [ '0.7.4', '0.7.4' ]
-100 silly lockFile 16160008-debug-0-7-4 debug@0.7.4
-101 verbose lock debug@0.7.4 /home/giantleap/.npm/16160008-debug-0-7-4.lock
-102 http 304 https://registry.npmjs.org/graphicsmagick2/0.1.2
-103 silly registry.get cb [ 304,
-103 silly registry.get   { date: 'Thu, 06 Mar 2014 12:58:17 GMT',
-103 silly registry.get     server: 'Apache',
-103 silly registry.get     via: '1.1 varnish',
-103 silly registry.get     'last-modified': 'Thu, 06 Mar 2014 12:58:18 GMT',
-103 silly registry.get     'cache-control': 'max-age=1',
-103 silly registry.get     etag: '"2SMVBANGAEHTQMYO2PGC37SN3"',
-103 silly registry.get     'x-served-by': 'cache-sv95-SJC3',
-103 silly registry.get     'x-cache': 'MISS',
-103 silly registry.get     'x-cache-hits': '0',
-103 silly registry.get     'x-timer': 'S1394110697.974626064,VS0,VE87',
-103 silly registry.get     vary: 'Accept',
-103 silly registry.get     'content-length': '0',
-103 silly registry.get     'keep-alive': 'timeout=10, max=50',
-103 silly registry.get     connection: 'Keep-Alive' } ]
-104 verbose etag graphicsmagick2/0.1.2 from cache
+73 verbose parsed url   pathname: '*',
+73 verbose parsed url   path: '*',
+73 verbose parsed url   href: '*' }
+74 verbose addNamed [ 'debug', '*' ]
+75 verbose addNamed [ null, '*' ]
+76 silly lockFile 3ac45eff-debug debug@*
+77 verbose lock debug@* /home/giantleap/.npm/3ac45eff-debug.lock
+78 silly addNameRange { name: 'debug', range: '*', hasData: false }
+79 verbose url raw graphicsmagick2/0.1.2
+80 verbose url resolving [ 'https://registry.npmjs.org/', './graphicsmagick2/0.1.2' ]
+81 verbose url resolved https://registry.npmjs.org/graphicsmagick2/0.1.2
+82 info trying registry request attempt 1 at 11:28:41
+83 verbose etag "2SMVBANGAEHTQMYO2PGC37SN3"
+84 http GET https://registry.npmjs.org/graphicsmagick2/0.1.2
+85 verbose url raw debug
+86 verbose url resolving [ 'https://registry.npmjs.org/', './debug' ]
+87 verbose url resolved https://registry.npmjs.org/debug
+88 info trying registry request attempt 1 at 11:28:41
+89 verbose etag "2S4D9TUHX23FL0E3OWJEDXYI4"
+90 http GET https://registry.npmjs.org/debug
+91 http 304 https://registry.npmjs.org/graphicsmagick2/0.1.2
+92 silly registry.get cb [ 304,
+92 silly registry.get   { date: 'Fri, 07 Mar 2014 05:58:42 GMT',
+92 silly registry.get     server: 'Apache',
+92 silly registry.get     via: '1.1 varnish',
+92 silly registry.get     'last-modified': 'Fri, 07 Mar 2014 05:58:42 GMT',
+92 silly registry.get     'cache-control': 'max-age=1',
+92 silly registry.get     etag: '"2SMVBANGAEHTQMYO2PGC37SN3"',
+92 silly registry.get     'x-served-by': 'cache-sv94-SJC3',
+92 silly registry.get     'x-cache': 'MISS',
+92 silly registry.get     'x-cache-hits': '0',
+92 silly registry.get     'x-timer': 'S1394171922.135791779,VS0,VE99',
+92 silly registry.get     vary: 'Accept',
+92 silly registry.get     'content-length': '0',
+92 silly registry.get     'keep-alive': 'timeout=10, max=50',
+92 silly registry.get     connection: 'Keep-Alive' } ]
+93 verbose etag graphicsmagick2/0.1.2 from cache
+94 http 304 https://registry.npmjs.org/debug
+95 silly registry.get cb [ 304,
+95 silly registry.get   { date: 'Fri, 07 Mar 2014 05:58:42 GMT',
+95 silly registry.get     server: 'Apache',
+95 silly registry.get     via: '1.1 varnish',
+95 silly registry.get     'last-modified': 'Fri, 07 Mar 2014 05:58:42 GMT',
+95 silly registry.get     'cache-control': 'max-age=1',
+95 silly registry.get     etag: '"2S4D9TUHX23FL0E3OWJEDXYI4"',
+95 silly registry.get     'x-served-by': 'cache-sv63-SJC3',
+95 silly registry.get     'x-cache': 'HIT',
+95 silly registry.get     'x-cache-hits': '1',
+95 silly registry.get     'x-timer': 'S1394171922.204472542,VS0,VE83',
+95 silly registry.get     vary: 'Accept',
+95 silly registry.get     'content-length': '0',
+95 silly registry.get     'keep-alive': 'timeout=10, max=50',
+95 silly registry.get     connection: 'Keep-Alive' } ]
+96 verbose etag debug from cache
+97 silly addNameRange number 2 { name: 'debug', range: '*', hasData: true }
+98 silly addNameRange versions [ 'debug',
+98 silly addNameRange   [ '0.0.1',
+98 silly addNameRange     '0.1.0',
+98 silly addNameRange     '0.2.0',
+98 silly addNameRange     '0.3.0',
+98 silly addNameRange     '0.4.0',
+98 silly addNameRange     '0.4.1',
+98 silly addNameRange     '0.5.0',
+98 silly addNameRange     '0.6.0',
+98 silly addNameRange     '0.7.0',
+98 silly addNameRange     '0.7.1',
+98 silly addNameRange     '0.7.2',
+98 silly addNameRange     '0.7.3',
+98 silly addNameRange     '0.7.4' ] ]
+99 verbose addNamed [ 'debug', '0.7.4' ]
+100 verbose addNamed [ '0.7.4', '0.7.4' ]
+101 silly lockFile 16160008-debug-0-7-4 debug@0.7.4
+102 verbose lock debug@0.7.4 /home/giantleap/.npm/16160008-debug-0-7-4.lock
+103 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
+104 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
 105 silly lockFile 16160008-debug-0-7-4 debug@0.7.4
 106 silly lockFile 16160008-debug-0-7-4 debug@0.7.4
 107 silly lockFile 3ac45eff-debug debug@*
 108 silly lockFile 3ac45eff-debug debug@*
-109 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
-110 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
-111 silly resolved [ { name: 'debug',
-111 silly resolved     version: '0.7.4',
-111 silly resolved     repository: { type: 'git', url: 'git://github.com/visionmedia/debug.git' },
-111 silly resolved     description: 'small debugging utility',
-111 silly resolved     keywords: [ 'debug', 'log', 'debugger' ],
-111 silly resolved     author: { name: 'TJ Holowaychuk', email: 'tj@vision-media.ca' },
-111 silly resolved     dependencies: {},
-111 silly resolved     devDependencies: { mocha: '*' },
-111 silly resolved     main: 'lib/debug.js',
-111 silly resolved     browser: './debug.js',
-111 silly resolved     engines: { node: '*' },
-111 silly resolved     files: [ 'lib/debug.js', 'debug.js', 'index.js' ],
-111 silly resolved     component: { scripts: [Object] },
-111 silly resolved     readme: '# debug\n\n  tiny node.js debugging utility modelled after node core\'s debugging technique.\n\n## Installation\n\n```\n$ npm install debug\n```\n\n## Usage\n\n With `debug` you simply invoke the exported function to generate your debug function, passing it a name which will determine if a noop function is returned, or a decorated `console.error`, so all of the `console` format string goodies you\'re used to work fine. A unique color is selected per-function for visibility.\n \nExample _app.js_:\n\n```js\nvar debug = require(\'debug\')(\'http\')\n  , http = require(\'http\')\n  , name = \'My App\';\n\n// fake app\n\ndebug(\'booting %s\', name);\n\nhttp.createServer(function(req, res){\n  debug(req.method + \' \' + req.url);\n  res.end(\'hello\\n\');\n}).listen(3000, function(){\n  debug(\'listening\');\n});\n\n// fake worker of some kind\n\nrequire(\'./worker\');\n```\n\nExample _worker.js_:\n\n```js\nvar debug = require(\'debug\')(\'worker\');\n\nsetInterval(function(){\n  debug(\'doing some work\');\n}, 1000);\n```\n\n The __DEBUG__ environment variable is then used to enable these based on space or comma-delimited names. Here are some examples:\n\n  ![debug http and worker](http://f.cl.ly/items/18471z1H402O24072r1J/Screenshot.png)\n\n  ![debug worker](http://f.cl.ly/items/1X413v1a3M0d3C2c1E0i/Screenshot.png)\n\n## Millisecond diff\n\n  When actively developing an application it can be useful to see when the time spent between one `debug()` call and the next. Suppose for example you invoke `debug()` before requesting a resource, and after as well, the "+NNNms" will show you how much time was spent between calls.\n\n  ![](http://f.cl.ly/items/2i3h1d3t121M2Z1A3Q0N/Screenshot.png)\n\n  When stderr is not a TTY, `Date#toUTCString()` is used, making it more useful for logging the debug information as shown below:\n  _(NOTE: Debug now uses stderr instead of stdout, so the correct shell command for this example is actually `DEBUG=* node example/worker 2> out &`)_\n  \n  ![](http://f.cl.ly/items/112H3i0e0o0P0a2Q2r11/Screenshot.png)\n  \n## Conventions\n\n If you\'re using this in one or more of your libraries, you _should_ use the name of your library so that developers may toggle debugging as desired without guessing names. If you have more than one debuggers you _should_ prefix them with your library name and use ":" to separate features. For example "bodyParser" from Connect would then be "connect:bodyParser". \n\n## Wildcards\n\n  The "*" character may be used as a wildcard. Suppose for example your library has debuggers named "connect:bodyParser", "connect:compress", "connect:session", instead of listing all three with `DEBUG=connect:bodyParser,connect.compress,connect:session`, you may simply do `DEBUG=connect:*`, or to run everything using this module simply use `DEBUG=*`.\n\n  You can also exclude specific debuggers by prefixing them with a "-" character.  For example, `DEBUG=* -connect:*` would include all debuggers except those starting with "connect:".\n\n## Browser support\n\n Debug works in the browser as well, currently persisted by `localStorage`. For example if you have `worker:a` and `worker:b` as shown below, and wish to debug both type `debug.enable(\'worker:*\')` in the console and refresh the page, this will remain until you disable with `debug.disable()`. \n\n```js\na = debug(\'worker:a\');\nb = debug(\'worker:b\');\n\nsetInterval(function(){\n  a(\'doing some work\');\n}, 1000);\n\nsetInterval(function(){\n  a(\'doing some work\');\n}, 1200);\n```\n\n## License \n\n(The MIT License)\n\nCopyright (c) 2011 TJ Holowaychuk &lt;tj@vision-media.ca&gt;\n\nPermission is hereby granted, free of charge, to any person obtaining\na copy of this software and associated documentation files (the\n\'Software\'), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish,\ndistribute, sublicense, and/or sell copies of the Software, and to\npermit persons to whom the Software is furnished to do so, subject to\nthe following conditions:\n\nThe above copyright notice and this permission notice shall be\nincluded in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \'AS IS\', WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\nIN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\nCLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\nTORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\nSOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n',
-111 silly resolved     readmeFilename: 'Readme.md',
-111 silly resolved     bugs: { url: 'https://github.com/visionmedia/debug/issues' },
-111 silly resolved     homepage: 'https://github.com/visionmedia/debug',
-111 silly resolved     _id: 'debug@0.7.4',
-111 silly resolved     _from: 'debug@*' },
-111 silly resolved   { name: 'graphicsmagick2',
-111 silly resolved     description: 'Bindings to the graphicsmagick library.',
-111 silly resolved     version: '0.1.2',
-111 silly resolved     author: { name: 'Izaak Schroeder' },
-111 silly resolved     repository:
-111 silly resolved      { type: 'git',
-111 silly resolved        url: 'git://github.com/LearnBoost/node-graphicsmagick.git' },
-111 silly resolved     engine: 'node >= 0.6.0',
-111 silly resolved     scripts: { install: 'node-gyp rebuild' },
-111 silly resolved     gypfile: true,
-111 silly resolved     readme: '= Graphics Magick =\r\n\r\n{{{\r\n\tnpm install graphicsmagick\r\n}}}\r\n\r\nThis package contains Graphics Magick bindings for node.js.\r\n',
-111 silly resolved     readmeFilename: 'README.creole',
-111 silly resolved     bugs: { url: 'https://github.com/LearnBoost/node-graphicsmagick/issues' },
-111 silly resolved     homepage: 'https://github.com/LearnBoost/node-graphicsmagick',
-111 silly resolved     _id: 'graphicsmagick2@0.1.2',
-111 silly resolved     _from: 'graphicsmagick2@0.1.2' } ]
-112 info install debug@0.7.4 into /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
-113 info install graphicsmagick2@0.1.2 into /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
-114 info installOne debug@0.7.4
-115 info installOne graphicsmagick2@0.1.2
-116 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug unbuild
-117 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2 unbuild
-118 verbose tar unpack /home/giantleap/.npm/debug/0.7.4/package.tgz
-119 silly lockFile c17e1a04-odules-resize-node-modules-debug tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
-120 verbose lock tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug /home/giantleap/.npm/c17e1a04-odules-resize-node-modules-debug.lock
-121 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
-122 verbose lock tar:///home/giantleap/.npm/debug/0.7.4/package.tgz /home/giantleap/.npm/93d662c7-leap-npm-debug-0-7-4-package-tgz.lock
-123 verbose tar unpack /home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
-124 silly lockFile 082f654b-ize-node-modules-graphicsmagick2 tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
-125 verbose lock tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2 /home/giantleap/.npm/082f654b-ize-node-modules-graphicsmagick2.lock
-126 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
-127 verbose lock tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz /home/giantleap/.npm/b8a89ebb-raphicsmagick2-0-1-2-package-tgz.lock
-128 silly gunzTarPerm modes [ '755', '644' ]
-129 silly gunzTarPerm modes [ '755', '644' ]
-130 silly gunzTarPerm extractEntry package.json
-131 silly gunzTarPerm extractEntry package.json
-132 silly gunzTarPerm extractEntry debug.js
-133 silly gunzTarPerm extractEntry index.js
-134 silly gunzTarPerm extractEntry .npmignore
-135 silly gunzTarPerm extractEntry test.js
-136 silly gunzTarPerm extractEntry Readme.md
-137 silly gunzTarPerm extractEntry lib/debug.js
-138 silly gunzTarPerm extractEntry GraphicsMagick.cc
-139 silly gunzTarPerm extractEntry History.md
-140 silly gunzTarPerm extractEntry README.creole
-141 silly gunzTarPerm extractEntry binding.gyp
-142 silly gunzTarPerm extractEntry build/GraphicsMagick.target.mk
-143 silly gunzTarPerm extractEntry build/Makefile
-144 silly lockFile c17e1a04-odules-resize-node-modules-debug tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
-145 silly lockFile c17e1a04-odules-resize-node-modules-debug tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
-146 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
-147 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
-148 silly gunzTarPerm extractEntry build/Release/.deps/Release/GraphicsMagick.node.d
-149 silly gunzTarPerm extractEntry build/Release/.deps/Release/obj.target/GraphicsMagick/GraphicsMagick.o.d
-150 info preinstall debug@0.7.4
-151 verbose readDependencies using package.json deps
-152 verbose readDependencies using package.json deps
-153 silly resolved []
-154 verbose about to build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
-155 info build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
-156 verbose linkStuff [ false,
-156 verbose linkStuff   false,
-156 verbose linkStuff   false,
-156 verbose linkStuff   '/home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules' ]
-157 info linkStuff debug@0.7.4
-158 verbose linkBins debug@0.7.4
-159 verbose linkMans debug@0.7.4
-160 verbose rebuildBundles debug@0.7.4
-161 info install debug@0.7.4
-162 silly gunzTarPerm extractEntry build/Release/GraphicsMagick.node
-163 silly gunzTarPerm extractEntry build/Release/linker.lock
-164 info postinstall debug@0.7.4
-165 silly gunzTarPerm extractEntry build/Release/obj.target/GraphicsMagick/GraphicsMagick.o
-166 silly gunzTarPerm extractEntry build/binding.Makefile
-167 silly gunzTarPerm extractEntry build/config.gypi
-168 silly gunzTarPerm extractEntry build/gyp-mac-tool
-169 silly gunzTarPerm extractEntry test.jpg
-170 silly gunzTarPerm extractEntry wscript
-171 silly lockFile 082f654b-ize-node-modules-graphicsmagick2 tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
-172 silly lockFile 082f654b-ize-node-modules-graphicsmagick2 tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
-173 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
-174 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
-175 info preinstall graphicsmagick2@0.1.2
-176 verbose readDependencies using package.json deps
-177 verbose readDependencies using package.json deps
-178 silly resolved []
-179 verbose about to build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
-180 info build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
-181 verbose linkStuff [ false,
-181 verbose linkStuff   false,
-181 verbose linkStuff   false,
-181 verbose linkStuff   '/home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules' ]
-182 info linkStuff graphicsmagick2@0.1.2
-183 verbose linkBins graphicsmagick2@0.1.2
-184 verbose linkMans graphicsmagick2@0.1.2
-185 verbose rebuildBundles graphicsmagick2@0.1.2
-186 info install graphicsmagick2@0.1.2
-187 verbose unsafe-perm in lifecycle false
-188 info graphicsmagick2@0.1.2 Failed to exec install script
-189 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2 unbuild
-190 info preuninstall graphicsmagick2@0.1.2
-191 info uninstall graphicsmagick2@0.1.2
-192 verbose false,/home/giantleap/Documents/projects/prodonus-server-app/node_modules,/home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules unbuild graphicsmagick2@0.1.2
-193 info postuninstall graphicsmagick2@0.1.2
-194 verbose about to build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
-195 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize unbuild
-196 info preuninstall resize@0.7.2
-197 info uninstall resize@0.7.2
-198 verbose true,/home/giantleap/Documents/projects/prodonus-server-app/node_modules,/home/giantleap/Documents/projects/prodonus-server-app/node_modules unbuild resize@0.7.2
-199 info postuninstall resize@0.7.2
-200 error graphicsmagick2@0.1.2 install: `node-gyp rebuild`
-200 error Exit status 1
-201 error Failed at the graphicsmagick2@0.1.2 install script.
-201 error This is most likely a problem with the graphicsmagick2 package,
-201 error not with npm itself.
-201 error Tell the author that this fails on your system:
-201 error     node-gyp rebuild
-201 error You can get their info via:
-201 error     npm owner ls graphicsmagick2
-201 error There is likely additional logging output above.
-202 error System Linux 3.8.0-33-generic
-203 error command "/usr/bin/node" "/usr/bin/npm" "install" "resize"
-204 error cwd /home/giantleap/Documents/projects/prodonus-server-app
-205 error node -v v0.10.22
-206 error npm -v 1.3.14
-207 error code ELIFECYCLE
-208 verbose exit [ 1, true ]
+109 silly resolved [ { name: 'graphicsmagick2',
+109 silly resolved     description: 'Bindings to the graphicsmagick library.',
+109 silly resolved     version: '0.1.2',
+109 silly resolved     author: { name: 'Izaak Schroeder' },
+109 silly resolved     repository:
+109 silly resolved      { type: 'git',
+109 silly resolved        url: 'git://github.com/LearnBoost/node-graphicsmagick.git' },
+109 silly resolved     engine: 'node >= 0.6.0',
+109 silly resolved     scripts: { install: 'node-gyp rebuild' },
+109 silly resolved     gypfile: true,
+109 silly resolved     readme: '= Graphics Magick =\r\n\r\n{{{\r\n\tnpm install graphicsmagick\r\n}}}\r\n\r\nThis package contains Graphics Magick bindings for node.js.\r\n',
+109 silly resolved     readmeFilename: 'README.creole',
+109 silly resolved     bugs: { url: 'https://github.com/LearnBoost/node-graphicsmagick/issues' },
+109 silly resolved     homepage: 'https://github.com/LearnBoost/node-graphicsmagick',
+109 silly resolved     _id: 'graphicsmagick2@0.1.2',
+109 silly resolved     _from: 'graphicsmagick2@0.1.2' },
+109 silly resolved   { name: 'debug',
+109 silly resolved     version: '0.7.4',
+109 silly resolved     repository: { type: 'git', url: 'git://github.com/visionmedia/debug.git' },
+109 silly resolved     description: 'small debugging utility',
+109 silly resolved     keywords: [ 'debug', 'log', 'debugger' ],
+109 silly resolved     author: { name: 'TJ Holowaychuk', email: 'tj@vision-media.ca' },
+109 silly resolved     dependencies: {},
+109 silly resolved     devDependencies: { mocha: '*' },
+109 silly resolved     main: 'lib/debug.js',
+109 silly resolved     browser: './debug.js',
+109 silly resolved     engines: { node: '*' },
+109 silly resolved     files: [ 'lib/debug.js', 'debug.js', 'index.js' ],
+109 silly resolved     component: { scripts: [Object] },
+109 silly resolved     readme: '# debug\n\n  tiny node.js debugging utility modelled after node core\'s debugging technique.\n\n## Installation\n\n```\n$ npm install debug\n```\n\n## Usage\n\n With `debug` you simply invoke the exported function to generate your debug function, passing it a name which will determine if a noop function is returned, or a decorated `console.error`, so all of the `console` format string goodies you\'re used to work fine. A unique color is selected per-function for visibility.\n \nExample _app.js_:\n\n```js\nvar debug = require(\'debug\')(\'http\')\n  , http = require(\'http\')\n  , name = \'My App\';\n\n// fake app\n\ndebug(\'booting %s\', name);\n\nhttp.createServer(function(req, res){\n  debug(req.method + \' \' + req.url);\n  res.end(\'hello\\n\');\n}).listen(3000, function(){\n  debug(\'listening\');\n});\n\n// fake worker of some kind\n\nrequire(\'./worker\');\n```\n\nExample _worker.js_:\n\n```js\nvar debug = require(\'debug\')(\'worker\');\n\nsetInterval(function(){\n  debug(\'doing some work\');\n}, 1000);\n```\n\n The __DEBUG__ environment variable is then used to enable these based on space or comma-delimited names. Here are some examples:\n\n  ![debug http and worker](http://f.cl.ly/items/18471z1H402O24072r1J/Screenshot.png)\n\n  ![debug worker](http://f.cl.ly/items/1X413v1a3M0d3C2c1E0i/Screenshot.png)\n\n## Millisecond diff\n\n  When actively developing an application it can be useful to see when the time spent between one `debug()` call and the next. Suppose for example you invoke `debug()` before requesting a resource, and after as well, the "+NNNms" will show you how much time was spent between calls.\n\n  ![](http://f.cl.ly/items/2i3h1d3t121M2Z1A3Q0N/Screenshot.png)\n\n  When stderr is not a TTY, `Date#toUTCString()` is used, making it more useful for logging the debug information as shown below:\n  _(NOTE: Debug now uses stderr instead of stdout, so the correct shell command for this example is actually `DEBUG=* node example/worker 2> out &`)_\n  \n  ![](http://f.cl.ly/items/112H3i0e0o0P0a2Q2r11/Screenshot.png)\n  \n## Conventions\n\n If you\'re using this in one or more of your libraries, you _should_ use the name of your library so that developers may toggle debugging as desired without guessing names. If you have more than one debuggers you _should_ prefix them with your library name and use ":" to separate features. For example "bodyParser" from Connect would then be "connect:bodyParser". \n\n## Wildcards\n\n  The "*" character may be used as a wildcard. Suppose for example your library has debuggers named "connect:bodyParser", "connect:compress", "connect:session", instead of listing all three with `DEBUG=connect:bodyParser,connect.compress,connect:session`, you may simply do `DEBUG=connect:*`, or to run everything using this module simply use `DEBUG=*`.\n\n  You can also exclude specific debuggers by prefixing them with a "-" character.  For example, `DEBUG=* -connect:*` would include all debuggers except those starting with "connect:".\n\n## Browser support\n\n Debug works in the browser as well, currently persisted by `localStorage`. For example if you have `worker:a` and `worker:b` as shown below, and wish to debug both type `debug.enable(\'worker:*\')` in the console and refresh the page, this will remain until you disable with `debug.disable()`. \n\n```js\na = debug(\'worker:a\');\nb = debug(\'worker:b\');\n\nsetInterval(function(){\n  a(\'doing some work\');\n}, 1000);\n\nsetInterval(function(){\n  a(\'doing some work\');\n}, 1200);\n```\n\n## License \n\n(The MIT License)\n\nCopyright (c) 2011 TJ Holowaychuk &lt;tj@vision-media.ca&gt;\n\nPermission is hereby granted, free of charge, to any person obtaining\na copy of this software and associated documentation files (the\n\'Software\'), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish,\ndistribute, sublicense, and/or sell copies of the Software, and to\npermit persons to whom the Software is furnished to do so, subject to\nthe following conditions:\n\nThe above copyright notice and this permission notice shall be\nincluded in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \'AS IS\', WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\nIN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\nCLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\nTORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\nSOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n',
+109 silly resolved     readmeFilename: 'Readme.md',
+109 silly resolved     bugs: { url: 'https://github.com/visionmedia/debug/issues' },
+109 silly resolved     homepage: 'https://github.com/visionmedia/debug',
+109 silly resolved     _id: 'debug@0.7.4',
+109 silly resolved     _from: 'debug@*' } ]
+110 info install graphicsmagick2@0.1.2 into /usr/lib/node_modules/resize
+111 info install debug@0.7.4 into /usr/lib/node_modules/resize
+112 info installOne graphicsmagick2@0.1.2
+113 info installOne debug@0.7.4
+114 info /usr/lib/node_modules/resize/node_modules/graphicsmagick2 unbuild
+115 info /usr/lib/node_modules/resize/node_modules/debug unbuild
+116 verbose tar unpack /home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+117 silly lockFile 2c69b250-ize-node-modules-graphicsmagick2 tar:///usr/lib/node_modules/resize/node_modules/graphicsmagick2
+118 verbose lock tar:///usr/lib/node_modules/resize/node_modules/graphicsmagick2 /home/giantleap/.npm/2c69b250-ize-node-modules-graphicsmagick2.lock
+119 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+120 verbose lock tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz /home/giantleap/.npm/b8a89ebb-raphicsmagick2-0-1-2-package-tgz.lock
+121 verbose tar unpack /home/giantleap/.npm/debug/0.7.4/package.tgz
+122 silly lockFile 21ea29c4-odules-resize-node-modules-debug tar:///usr/lib/node_modules/resize/node_modules/debug
+123 verbose lock tar:///usr/lib/node_modules/resize/node_modules/debug /home/giantleap/.npm/21ea29c4-odules-resize-node-modules-debug.lock
+124 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
+125 verbose lock tar:///home/giantleap/.npm/debug/0.7.4/package.tgz /home/giantleap/.npm/93d662c7-leap-npm-debug-0-7-4-package-tgz.lock
+126 silly gunzTarPerm modes [ '755', '644' ]
+127 silly gunzTarPerm modes [ '755', '644' ]
+128 silly gunzTarPerm extractEntry package.json
+129 silly gunzTarPerm extractEntry package.json
+130 silly gunzTarPerm extractEntry debug.js
+131 silly gunzTarPerm extractEntry index.js
+132 silly gunzTarPerm extractEntry .npmignore
+133 silly gunzTarPerm extractEntry test.js
+134 silly gunzTarPerm extractEntry Readme.md
+135 silly gunzTarPerm extractEntry lib/debug.js
+136 silly gunzTarPerm extractEntry GraphicsMagick.cc
+137 silly gunzTarPerm extractEntry History.md
+138 silly gunzTarPerm extractEntry README.creole
+139 silly gunzTarPerm extractEntry binding.gyp
+140 silly gunzTarPerm extractEntry build/GraphicsMagick.target.mk
+141 silly gunzTarPerm extractEntry build/Makefile
+142 silly lockFile 21ea29c4-odules-resize-node-modules-debug tar:///usr/lib/node_modules/resize/node_modules/debug
+143 silly lockFile 21ea29c4-odules-resize-node-modules-debug tar:///usr/lib/node_modules/resize/node_modules/debug
+144 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
+145 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
+146 info preinstall debug@0.7.4
+147 verbose readDependencies using package.json deps
+148 verbose readDependencies using package.json deps
+149 silly resolved []
+150 verbose about to build /usr/lib/node_modules/resize/node_modules/debug
+151 info build /usr/lib/node_modules/resize/node_modules/debug
+152 verbose linkStuff [ true,
+152 verbose linkStuff   '/usr/lib/node_modules',
+152 verbose linkStuff   false,
+152 verbose linkStuff   '/usr/lib/node_modules/resize/node_modules' ]
+153 info linkStuff debug@0.7.4
+154 silly gunzTarPerm extractEntry build/Release/.deps/Release/GraphicsMagick.node.d
+155 silly gunzTarPerm extractEntry build/Release/.deps/Release/obj.target/GraphicsMagick/GraphicsMagick.o.d
+156 silly gunzTarPerm extractEntry build/Release/GraphicsMagick.node
+157 silly gunzTarPerm extractEntry build/Release/linker.lock
+158 silly gunzTarPerm extractEntry build/Release/obj.target/GraphicsMagick/GraphicsMagick.o
+159 silly gunzTarPerm extractEntry build/binding.Makefile
+160 silly gunzTarPerm extractEntry build/config.gypi
+161 silly gunzTarPerm extractEntry build/gyp-mac-tool
+162 silly gunzTarPerm extractEntry test.jpg
+163 silly gunzTarPerm extractEntry wscript
+164 verbose linkBins debug@0.7.4
+165 verbose linkMans debug@0.7.4
+166 verbose rebuildBundles debug@0.7.4
+167 info install debug@0.7.4
+168 info postinstall debug@0.7.4
+169 silly lockFile 2c69b250-ize-node-modules-graphicsmagick2 tar:///usr/lib/node_modules/resize/node_modules/graphicsmagick2
+170 silly lockFile 2c69b250-ize-node-modules-graphicsmagick2 tar:///usr/lib/node_modules/resize/node_modules/graphicsmagick2
+171 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+172 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+173 info preinstall graphicsmagick2@0.1.2
+174 verbose readDependencies using package.json deps
+175 verbose readDependencies using package.json deps
+176 silly resolved []
+177 verbose about to build /usr/lib/node_modules/resize/node_modules/graphicsmagick2
+178 info build /usr/lib/node_modules/resize/node_modules/graphicsmagick2
+179 verbose linkStuff [ true,
+179 verbose linkStuff   '/usr/lib/node_modules',
+179 verbose linkStuff   false,
+179 verbose linkStuff   '/usr/lib/node_modules/resize/node_modules' ]
+180 info linkStuff graphicsmagick2@0.1.2
+181 verbose linkBins graphicsmagick2@0.1.2
+182 verbose linkMans graphicsmagick2@0.1.2
+183 verbose rebuildBundles graphicsmagick2@0.1.2
+184 info install graphicsmagick2@0.1.2
+185 verbose unsafe-perm in lifecycle false
+186 info graphicsmagick2@0.1.2 Failed to exec install script
+187 info /usr/lib/node_modules/resize/node_modules/graphicsmagick2 unbuild
+188 info preuninstall graphicsmagick2@0.1.2
+189 info uninstall graphicsmagick2@0.1.2
+190 verbose false,/usr/lib/node_modules,/usr/lib/node_modules/resize/node_modules unbuild graphicsmagick2@0.1.2
+191 info postuninstall graphicsmagick2@0.1.2
+192 verbose about to build /usr/lib/node_modules/resize
+193 info /usr/lib/node_modules/resize unbuild
+194 info preuninstall resize@0.7.2
+195 info uninstall resize@0.7.2
+196 verbose true,/usr/lib/node_modules,/usr/lib/node_modules unbuild resize@0.7.2
+197 info postuninstall resize@0.7.2
+198 error graphicsmagick2@0.1.2 install: `node-gyp rebuild`
+198 error Exit status 1
+199 error Failed at the graphicsmagick2@0.1.2 install script.
+199 error This is most likely a problem with the graphicsmagick2 package,
+199 error not with npm itself.
+199 error Tell the author that this fails on your system:
+199 error     node-gyp rebuild
+199 error You can get their info via:
+199 error     npm owner ls graphicsmagick2
+199 error There is likely additional logging output above.
+200 error System Linux 3.8.0-33-generic
+201 error command "/usr/bin/node" "/usr/bin/npm" "install" "-g" "resize"
+202 error cwd /home/giantleap/Documents/projects/prodonus-server-app
+203 error node -v v0.10.22
+204 error npm -v 1.3.14
+205 error code ELIFECYCLE
+206 verbose exit [ 1, true ]

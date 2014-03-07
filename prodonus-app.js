@@ -77,7 +77,24 @@ app.use(express.compress());
 
 ////////////socket i.o/////////////
 var io = require('socket.io').listen(server);
+io.configure('production', function(){
+  logger.emit("log","socket config for production");
+  io.enable('browser client etag');
+  io.set('log level', 1);
 
+  io.set('transports', [
+    'websocket'
+  , 'flashsocket'
+  , 'htmlfile'
+  , 'xhr-polling'
+  , 'jsonp-polling'
+  ]);
+});
+
+io.configure('development', function(){
+  logger.emit("log","socket config for development");
+  io.set('transports', ['websocket']);
+});
 io.set('authorization', passportSocketIo.authorize({
   cookieParser: express.cookieParser,
   key:         'prodosid',       // the name of the cookie where express/connect stores its session_id

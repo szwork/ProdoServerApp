@@ -142,6 +142,7 @@ exports.addOrganization = function(req,res){
 exports.updateOrganization = function(req, res) {
   var orgid=req.params.orgid;
   var orgdata=req.body.organization;
+  logger.emit("log","req body updateOrganization:"+JSON.stringify(req.body));
   var organization = new Organization(orgdata);
   var sessionuserid=req.user.userid;
   organization.removeAllListeners("failedOrgUpdation");
@@ -160,7 +161,7 @@ exports.updateOrganization = function(req, res) {
     var isAdmin=req.user.org.isAdmin;
     if(req.user.org.orgid==orgid || isAdmin)
     {
-      organization.updateOrganization(orgid);
+      organization.updateOrganization(orgid,req.user.userid);
     }else{
        organization.emit("failedOrgUpdation",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
     }

@@ -21,7 +21,7 @@ var generateTimeId = require('time-uuid');
 var fs = require('fs');
 
 var AWS = require('aws-sdk');
-var resize=require('resize');
+// var resize=require('resize');
 var generateId = require('time-uuid');
 var path=require("path");
 var userModel=require('../../user/js/user-model');
@@ -191,6 +191,9 @@ exports.uploadFiles=function(io,__dirname){
     socket.on('uploadFiles', function(file,action) {
       // console.log("calling to Upload files");
       ///////////////
+      logger.emit("log","File info"+JSON.stringify(file));
+      logger.emit("log","action info"+JSON.stringify(action));
+      
       if(action==null || action==undefined){
          logger.emit("error","uploadFiles doesn't know action");
       }else if(file==undefined ){ 
@@ -207,7 +210,7 @@ exports.uploadFiles=function(io,__dirname){
         } 
       }else{
         var user=socket.handshake.user;
-        logger.emit("log","socket session user"+user);
+        // logger.emit("log","socket session user"+user);
         uploadFile(file,__dirname,action,user,function(err,uploadresult){
           if(err){
             logger.emit("error",err.error.message,sessionuserid)
@@ -344,7 +347,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                  //  if (err){
                  //    callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
                  //  }else{
-                    console.log(written+" bytes are written from buffer");
+                    // console.log(written+" bytes are written from buffer");
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                      var bucketFolder;
                      var params;
@@ -413,7 +416,7 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                 logger.emit("log","s3filekey:"+s3filekey+" ext:"+ext);
                  var bucketFolder;
@@ -490,7 +493,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                 var bucketFolder;
                 var params;
@@ -571,7 +574,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                  var bucketFolder;
                  var params;
@@ -643,7 +646,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                  var bucketFolder;
                  var params;
@@ -728,7 +731,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                console.log(written+" bytes are written from buffer");
+                // console.log(written+" bytes are written from buffer");
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                      var bucketFolder;
                      var params;
