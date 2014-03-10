@@ -62,13 +62,25 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata){
 
 					logger.emit("log","_validated");
 					//this.emit("validated", organizationdata);
-					////////////////////////////////////////////////////////////
-					_hasAlreadyOrganization(self,organizationdata,sessionuserid,subscriptiondata);
-					///////////////////////////////////////////////////////////
+					_isOrganizationNameAlreadyExist(self,organizationdata,sessionuserid,subscriptiondata);
+					
 		  }
 		  
    
 	};
+	var _isOrganizationNameAlreadyExist=function(self,organizationdata,sessionuserid,subscriptiondata){
+		orgModel.findOne({name:organizationdata.name},function(err,organization){
+			if(err){
+			  self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find user"}});	
+			}else if(organization){
+				self.emit("failedOrgAdd",{"error":{"message":"Orgaization name already exist"}});
+			}else{
+				////////////////////////////////////////////////////////////
+					_hasAlreadyOrganization(self,organizationdata,sessionuserid,subscriptiondata);
+					///////////////////////////////////////////////////////////
+			}
+		})
+	}
 	var _hasAlreadyOrganization=function(self,organizationdata,sessionuserid,subscriptiondata){
 		userModel.findOne({userid:sessionuserid,"org.orgid":null},{userid:1}).lean().exec(function(err,user){
 			if(err){
