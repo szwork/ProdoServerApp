@@ -923,7 +923,7 @@ var orgLogoUpload=function(orgid,awsparams,callback){
               if(orglogo==undefined){
                 logger.emit("log","first time product logog chanes");
               }else{
-                var awsdeleteparams={Bucket:org_logo_object.bucket,Key:org_logo_object.key};
+                var awsdeleteparams={Bucket:orglogo.bucket,Key:orglogo.key};
                 s3bucket.deleteObject(awsdeleteparams, function(err, deleteorglogostatus) {
                   if (err) {
                     logger.emit("error","organization logo not  deleted from amzon s3 bucket for orgid"+orglogodata.orgid);
