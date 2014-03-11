@@ -20,11 +20,11 @@ var shortId = require('shortid');
 var logger=require("../../common/js/logger")
 var userSchema = mongoose.Schema({
   userid:{type:String},
-  usertype:{type:String},//type many be individual,company or manufacturer
-  fullname:{type:String},
+  usertype:{type:String,default:null},//type many be individual,company or manufacturer
+  fullname:{type:String,default:null},
   username:{type:String,required: true, unique: true},
-  firstname: { type: String },
-  lastname:{type:String},
+  firstname: { type: String ,default:null},
+  lastname:{type:String,default:null},
   dob:{type:Date,default:null},
   gender:{type:String,default:null},
   phone:{type:String,default:null},

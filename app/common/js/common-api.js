@@ -556,7 +556,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
  var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
-  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
+  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains("png") ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
   }else if(file_length>500000){
     callback({"error":{"message":"You can upload  image of size less than 1mb"}});
@@ -627,7 +627,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
   var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
- if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
+ if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains("png")  ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
   }else if(file_length>500000){
     callback({"error":{"message":"You can upload  image of size less than 1mb"}});
