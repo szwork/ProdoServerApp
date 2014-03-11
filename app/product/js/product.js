@@ -49,14 +49,12 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 		 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please provide data to add product"}});
 		 }else if(productdata.name==undefined){
 	   		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
-	   	} else if(productdata.description==undefined){
+	   } else if(productdata.description==undefined){
 	    	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
 	  	 }else if(productdata.model_no==undefined){
 	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass model_no"}});
 	  	 }else{
-
-
-	  	_checkProductNameIsSame(self,productdata,orgid);
+			_checkProductNameIsSame(self,productdata,orgid);
 	   	
 	   }
 	};
@@ -92,22 +90,29 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 		productdata.status="active";
 		productdata.prodle=shortId.generate();  
 		productdata.features=[{featurename:productdata.name,featuredescription:"product features"}];
-	    var product=new productModel(productdata);
-	    productModel.update({orgid:orgid,model_no:productdata.model_no},{$set:productdata},{upsert:true},function(err,addstatus){
-	    	if(err){
-	    		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
-	    	}else{
-	    		///////////////////////
-		  		_successfulProductAdd(self);
-		  		//////////////////////////
-	    	}
-	    })
-	   
-
+    var product=new productModel(productdata);
+    productModel.update({orgid:orgid,model_no:productdata.model_no},{$set:productdata},{upsert:true},function(err,addstatus){
+    	if(err){
+    		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
+    	}else{
+    		productModel.findOne({orgid:orgid,model_no:productdata.model_no},function(err,product){
+    			if(err){
+    				logger.emit("error","Database Issue :fun:_addProduct"+err);
+    				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Database Issue"}});	
+    			}else if(!product){
+    				self.emit("failedProductAdd",{"error":{"message":"Product does not exists"}});		
+    			}else{
+		    		///////////////////////
+			  		_successfulProductAdd(self,product);
+			  		//////////////////////////
+    			}
+    		})
+    	}
+    })
 	}
-	var _successfulProductAdd=function(self){
+	var _successfulProductAdd=function(self,product){
 		logger.log("log","_successfulProductAdd");
-		self.emit("successfulProductAdd",{"success":{"message":"Product added sucessfully"}})
+		self.emit("successfulProductAdd",{"success":{"message":"Product added sucessfully","prodle":product.prodle}})
 	}
 // Product.prototype.commentToProduct=function(sessionuserid,prodle,commentdata){
 // 	var self=this;
