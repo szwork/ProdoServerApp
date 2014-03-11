@@ -416,7 +416,6 @@ userModel.findOne({userid:user.userid},function(err,userdata){
 		/////////////////////
 	}
 })
-
 };
 var _isOrganizationUser=function(user,callback){
 	if(user.org!=undefined && user.org.orgid!=null){
