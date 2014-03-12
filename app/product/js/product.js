@@ -197,11 +197,25 @@ var _getProduct=function(self,orgid,prodle){
 		if(err){
 			self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Error in db to find Product"}});
 		}else if(product){
+			TrendingModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}},{commentcount:1,followedcount:1,_id:0}).lean().exec(function(err,product_trend){
+				if(err){
+					logger.emit({"message":"Error in db to find ProductTrend"});
+				// }else if(product_trend){
+					// product.trending = product_trend;
+				// 	////////////////////////////////					 
+					// _successfulGetProduct(self,product);
+				// 	//////////////////////////////////
+				}else{
+					console.log("Error in Db1");
+					logger.emit({"message":"Provided prodle is wrong"});
+					product.trending = product_trend;
+					_successfulGetProduct(self,product);
+				}
+			})
 			 ////////////////////////////////
-			_successfulGetProduct(self,product);
+			// _successfulGetProduct(self,product);
 			//////////////////////////////////
-		}else{
-			
+		}else{			
 			self.emit("failedGetProduct",{"error":{"code":"AP001","message":"Provided prodle is wrong"}});
 		}
 	})
