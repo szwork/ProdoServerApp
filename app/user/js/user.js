@@ -460,21 +460,20 @@ var _isOrganizationUser=function(user,callback){
 	}
 }
 var getUserRequiredData=function(user,callback){
-    
-	var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
+   var user_senddata={userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	// console.log("log","user"+user);
   // user=JSON.stringify(user);
    console.log("org length" +Object.keys(user.org).length)
-		
+
 	if(user.org.orgid!=null && user.org.isAdmin!=null){
 		user_senddata.org=user.org;
 	}
 	logger.emit("log","user___"+JSON.stringify(user_senddata));
 	_isOrganizationUser(user_senddata,function(user_senddata){
 		console.log("subscription length"+Object.keys(user.subscription).length)
-				
+
 		if(user.subscription.planid==null){
 			user_senddata.isSubscribed=false;
 		}else{
@@ -502,18 +501,43 @@ var getUserRequiredData=function(user,callback){
 }
 var _isOTPUser=function(self,user){
 	logger.emit("log","_isOTPUser user"+user);
-	getUserRequiredData(user,function(userdata){
-			// if(userdata.isOtpPassword==true){
-			// 	self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
-			// }else{
-        logger.emit("log","Userdata"+userdata);
-		/////////////////////////
-		_isSubscribed(self,userdata);
-		/////////////////////////
-		
+	_updateLatestProductsFollowed(self,user);
 	
-		})
 	
+}
+var _updateLatestProductsFollowed=function(self,user){
+	var products_followed_prodles=[];
+    for(var i=0;i<user.products_followed.length;i++){
+    	products_followed_prodles.push(user.products_followed[i].prodle);
+    } 
+    productModel.find({prodle:{$in:products_followed_prodles},status:"active"},{prodle:1,orgid:1},function(err,products){
+    	if(err){
+    		logger.emit("error","Database Issue getUserRequiredData "+err,user.userid);
+    	}else{
+    		var products_followed=[];
+    		for(var i=0;i<products.length;i++){
+    			products_followed.push({prodle:products[i].prodle,orgid:products[i].orgid});
+    		}
+    	 user.products_followed=products_followed;
+    	////////////////
+    	//update the latest user products followed data
+    	userModel.update({userid:user.userid},{$set:{products_followed:products_followed}},function(err,userproductsfollowstatus){
+    		if(err){
+    			logger.emit("error","Database Issue getUserRequiredData"+err);
+    		}else{
+					getUserRequiredData(user,function(userdata){
+						// if(userdata.isOtpPassword==true){
+						// 	self.emit("failedUserSignin",{"error":{"code":"AU006","message":"OTP RESET Password","user":user}}); 
+						// }else{
+			        logger.emit("log","Userdata"+userdata);
+						/////////////////////////
+						_isSubscribed(self,userdata);
+						/////////////////////////
+					})
+    		}
+    	})
+  	}
+  })
 }
 
 var _isSubscribed=function(self,user){
