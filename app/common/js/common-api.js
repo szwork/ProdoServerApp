@@ -361,7 +361,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                              Bucket: bucketFolder,
                              Key: action.user.userid+s3filekey,
                              Body: writebuffer,
-                             Expires:3.15*10000000,
+                            
                              //ACL: 'public-read-write',
                              ContentType: file_type
                         };
@@ -440,7 +440,7 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                       Bucket: bucketFolder,
                       Key: action.org.orgid+s3filekey,
                       Body: writebuffer,
-                      Expires:3.15*10000000,
+                   
                          //ACL: 'public-read-write',
                       ContentType: file_type
                     };
@@ -522,7 +522,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
                             Bucket: bucketFolder,
                             Key: action.product.orgid+action.product.prodle+s3filekey,
                             Body: writebuffer,
-                            Expires:3.15*10000000,
+                           
                                  //ACL: 'public-read-write',
                             ContentType: file_type
                           };
@@ -597,7 +597,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
                              Bucket: bucketFolder,
                              Key: action.orglogo.orgid+s3filekey,
                              Body: writebuffer,
-                             Expires:3.15*10000000,
+                             
                              //ACL: 'public-read-write',
                              ContentType: file_type
                     };
@@ -679,7 +679,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
                                    Bucket: bucketFolder,
                                    Key: action.productlogo.orgid+action.productlogo.prodle+s3filekey,
                                    Body: writebuffer,
-                                   Expires:3.15*10000000,
+                                  
                                    //ACL: 'public-read-write',
                                    ContentType: file_type
                           };
@@ -750,7 +750,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                              Bucket: bucketFolder,
                              Key: action.warranty.userid+s3filekey,
                              Body: writebuffer,
-                             Expires:3.15*10000000,
+                             
                              //ACL: 'public-read-write',
                              ContentType: file_type
                         };

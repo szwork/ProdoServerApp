@@ -481,6 +481,8 @@ var getUserRequiredData=function(user,callback){
 			if(user.subscription.planexpirydate==null){
 				user_senddata.subscriptionExpired=true;
 			}else{
+				console.log("planstartdate"+user.subscription.planstartdate+"Date format"+new Date(user.subscription.planstartdate));
+				console.log("planexpirydate"+user.subscription.planexpirydate+new Date(user.subscription.planexpirydate));
 				if(new Date(user.subscription.planexpirydate)<new Date()){//subscription expired
 					user_senddata.subscriptionExpired=true;
 				}else{
