@@ -34,6 +34,7 @@ var easyimg = require('easyimage');
 var img_format_array=["jpeg","JPEG","JPG","GIF","BMP","jpg","gif","bmp"];
 var S=require("string");
 var amazonbucket=CONFIG.amazonbucket;
+var gm = require('gm').subClass({ imageMagick: true });
 // logger.emit("log","userModel"+userModel);
 // logger.emit("log","orgModel"+OrgModel);
 
@@ -362,7 +363,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                              Key: action.user.userid+s3filekey,
                              Body: writebuffer,
                             
-                             //ACL: 'public-read-write',
+                             ACL: 'public-read',
                              ContentType: file_type
                         };
                         userFileUpload(action.user.userid,params,function(err,result){
@@ -404,8 +405,8 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   }else{
     easyimg.info(fileName,function(err,info){
       logger.emit("log","error"+err);
-      if(info.width<700 && info.height<300){
-        callback({"error":{"message":"Please upload image of atleast width and height 700 and 300 respectively"}})
+      if(info.width<700 && info.height<470){
+        callback({"error":{"message":"Please upload image of atleast width and height 700 and 470 respectively"}})
       }else if((info.width/info.height)<1.5 && (info.width/info.height)>1.78 ){
         callback({"error":{"message":"Aspect ratio of image should be 16/9 or 3/2"}});
       }else{
@@ -417,46 +418,52 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                // console.log(written+" bytes are written from buffer");
-                var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-                logger.emit("log","s3filekey:"+s3filekey+" ext:"+ext);
-                 var bucketFolder;
-                 var params;
-                 // writebuffer= new Buffer(file_buffer, "base64");
-                if(sessionuser.org.orgid==null){
-                  callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
-                }else{
-                  if(action.org.userid!=sessionuser.userid){
-                    callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
-                  }else if(sessionuser.org.orgid!=action.org.orgid){
-                    callback({"error":{"code":"EA001","message":"You are not authorized to add organization images"}});
-                  }else if(sessionuser.org.isAdmin==false){
-                    callback({"error":{"code":"EA001","message":"You are not authorized to add organization images"}});
+                gm(fileName).resize(null,375).toBuffer(function (err, buffer) {
+                  if (err){
+                    logger.emit("error","__orgFileBuffer"+err);
+                    callback({"error":{"message":"Upload Issue"}})
                   }else{
-                    console.log("organization image upload");
-                    bucketFolder=amazonbucket+"/org/"+action.org.orgid;
-                    console.log("key"+action.org.orgid+s3filekey);
-                    params = {
-                      Bucket: bucketFolder,
-                      Key: action.org.orgid+s3filekey,
-                      Body: writebuffer,
-                   
-                         //ACL: 'public-read-write',
-                      ContentType: file_type
-                    };
-                    orgFileUpload(action.org.orgid,params,function(err,result){
-                      if(err){
-                        callback(err);
+                    var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                    logger.emit("log","s3filekey:"+s3filekey+" ext:"+ext);
+                    var bucketFolder;
+                    var params;
+                     // writebuffer= new Buffer(file_buffer, "base64");
+                    if(sessionuser.org.orgid==null){
+                      callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
+                    }else{
+                      if(action.org.userid!=sessionuser.userid){
+                        callback({"error":{"code":"EA001","message":"You are not an authorized to  change user avatar"}});   
+                      }else if(sessionuser.org.orgid!=action.org.orgid){
+                        callback({"error":{"code":"EA001","message":"You are not authorized to add organization images"}});
+                      }else if(sessionuser.org.isAdmin==false){
+                        callback({"error":{"code":"EA001","message":"You are not authorized to add organization images"}});
                       }else{
-                        callback(null,result);
+                        console.log("organization image upload");
+                        bucketFolder=amazonbucket+"/org/"+action.org.orgid;
+                        console.log("key"+action.org.orgid+s3filekey);
+                        params = {
+                          Bucket: bucketFolder,
+                          Key: action.org.orgid+s3filekey,
+                          Body: buffer,
+                       
+                          ACL: 'public-read',
+                          ContentType: file_type
+                        };
+                        orgFileUpload(action.org.orgid,params,function(err,result){
+                          if(err){
+                            callback(err);
+                          }else{
+                            callback(null,result);
+                          }
+                          fs.close(fd, function() {
+                            exec("rm -rf '"+fileName+"'");
+                              console.log('File saved successful!');
+                          });
+                       })
                       }
-                      fs.close(fd, function() {
-                        exec("rm -rf '"+fileName+"'");
-                          console.log('File saved successful!');
-                      });
-                   })
+                    }
                   }
-                }
+                })
               }
             })
           }
@@ -481,8 +488,8 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
   }else{
     easyimg.info(fileName,function(err,info){
       logger.emit("log","error"+err);
-      if(info.width<700 && info.height<300){
-        callback({"error":{"message":"Please upload image of atleast width and height 700 and 300 respectively"}})
+      if(info.width<700 && info.height<470){
+        callback({"error":{"message":"Please upload image of atleast width and height 700 and 470 respectively"}})
       }else if((info.width/info.height)<1.5 && (info.width/info.height)>1.78 ){
         callback({"error":{"message":"Aspect ratio of image should be 16/9 or 3/2"}});
       }else{
@@ -495,53 +502,60 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                // console.log(written+" bytes are written from buffer");
-                var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
-                var bucketFolder;
-                var params;
-                 // writebuffer= new Buffer(file_buffer, "base64");
-                if(sessionuser.org.orgid==null){
-                  callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
-                }else{
-                  if(action.product.userid!=sessionuser.userid){
-                    callback({"error":{"code":"EA001","message":"You are not an authorized to   add product images"}});   
-                  }else if(sessionuser.org.orgid!=action.product.orgid){
-                    callback({"error":{"code":"EA001","message":"You are not authorized to add product images"}});
+                gm(fileName).resize(null,375).toBuffer(function (err, buffer) {
+                  if (err){
+                    logger.emit("error","__productFileBuffer"+err);
+                    callback({"error":{"message":"Upload Issue"}})
                   }else{
-                    ProductModel.findOne({prodle:action.product.prodle},{orgid:1},function(err,product){
-                      if(err){
-                        callback({"error":{"code":"EDOO1","message":"productFileUpload:Dberror"+err}});
-                      }else if(!product){
-                        callback({"error":{"message":"Wrong Prodle"}});
+                // console.log(written+" bytes are written from buffer");
+                    var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                    var bucketFolder;
+                    var params;
+                     // writebuffer= new Buffer(file_buffer, "base64");
+                    if(sessionuser.org.orgid==null){
+                      callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
+                    }else{
+                      if(action.product.userid!=sessionuser.userid){
+                        callback({"error":{"code":"EA001","message":"You are not an authorized to   add product images"}});   
+                      }else if(sessionuser.org.orgid!=action.product.orgid){
+                        callback({"error":{"code":"EA001","message":"You are not authorized to add product images"}});
                       }else{
-                        if(product.orgid!=action.product.orgid){
-                          callback({"error":{"code":"EA001","message":"It's not your product to add product images"}});
-                        }else{
-                          bucketFolder=amazonbucket+"/org/"+action.product.orgid+"/product/"+action.product.prodle;
-                          params = {
-                            Bucket: bucketFolder,
-                            Key: action.product.orgid+action.product.prodle+s3filekey,
-                            Body: writebuffer,
-                           
-                                 //ACL: 'public-read-write',
-                            ContentType: file_type
-                          };
-                          productFileUpload(action.product.prodle,params,function(err,result){
-                            if(err){
-                             callback(err);
+                        ProductModel.findOne({prodle:action.product.prodle},{orgid:1},function(err,product){
+                          if(err){
+                            callback({"error":{"code":"EDOO1","message":"productFileUpload:Dberror"+err}});
+                          }else if(!product){
+                            callback({"error":{"message":"Wrong Prodle"}});
+                          }else{
+                            if(product.orgid!=action.product.orgid){
+                              callback({"error":{"code":"EA001","message":"It's not your product to add product images"}});
                             }else{
-                             callback(null,result);
+                              bucketFolder=amazonbucket+"/org/"+action.product.orgid+"/product/"+action.product.prodle;
+                              params = {
+                                Bucket: bucketFolder,
+                                Key: action.product.orgid+action.product.prodle+s3filekey,
+                                Body: buffer,
+                               
+                                ACL: 'public-read',
+                                ContentType: file_type
+                              };
+                              productFileUpload(action.product.prodle,params,function(err,result){
+                                if(err){
+                                 callback(err);
+                                }else{
+                                 callback(null,result);
+                                }
+                                fs.close(fd, function() {
+                                 exec("rm -rf '"+fileName+"'");
+                                    console.log('File saved successful!');
+                                });
+                              })
                             }
-                            fs.close(fd, function() {
-                             exec("rm -rf '"+fileName+"'");
-                                console.log('File saved successful!');
-                            });
-                          })
-                        }
+                          }
+                        })
                       }
-                    })
+                    }
                   }
-                }
+                })
               }
             })
           }
@@ -598,7 +612,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
                              Key: action.orglogo.orgid+s3filekey,
                              Body: writebuffer,
                              
-                             //ACL: 'public-read-write',
+                             ACL: 'public-read',
                              ContentType: file_type
                     };
                     orgLogoUpload(action.orglogo.orgid,params,function(err,result){
@@ -680,7 +694,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
                                    Key: action.productlogo.orgid+action.productlogo.prodle+s3filekey,
                                    Body: writebuffer,
                                   
-                                   //ACL: 'public-read-write',
+                                   ACL: 'public-read',
                                    ContentType: file_type
                           };
                           productLogoUpload(action.productlogo.prodle,params,function(err,result){
@@ -750,8 +764,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                              Bucket: bucketFolder,
                              Key: action.warranty.userid+s3filekey,
                              Body: writebuffer,
-                             
-                             //ACL: 'public-read-write',
+                             ACL: 'public-read',
                              ContentType: file_type
                         };
                         warrantyInvoiceImgUpload(action.warranty.warranty_id,params,function(err,result){
