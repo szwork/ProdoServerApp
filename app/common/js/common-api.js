@@ -369,7 +369,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                              ACL: 'public-read',
                              ContentType: file_type
                         };
-                        userFileUpload(action.user.userid,params,function(err,result){
+                        userFileUpload(action.user.userid,params,file_name,function(err,result){
                           if(err){
                             callback(err);
                           }else{
@@ -626,7 +626,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
                              ACL: 'public-read',
                              ContentType: file_type
                     };
-                    orgLogoUpload(action.orglogo.orgid,params,function(err,result){
+                    orgLogoUpload(action.orglogo.orgid,params,file_name,function(err,result){
                       if(err){
                         callback(err);
                       }else{
@@ -710,7 +710,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
                                    ACL: 'public-read',
                                    ContentType: file_type
                           };
-                          productLogoUpload(action.productlogo.prodle,params,function(err,result){
+                          productLogoUpload(action.productlogo.prodle,params,file_name,function(err,result){
                             if(err){
                               callback(err);
                             }else{
@@ -803,7 +803,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
     })
   }
 }
-var userFileUpload=function(userid,awsparams,callback){
+var userFileUpload=function(userid,awsparams,filename,callback){
 
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
@@ -835,7 +835,7 @@ var userFileUpload=function(userid,awsparams,callback){
                   }
                 }) 
               }
-              callback(null,{"success":{"message":"User Profile Pic Updated Successfully","image":newprofileurl}})
+              callback(null,{"success":{"message":"User Profile Pic Updated Successfully","image":newprofileurl,"filename":filename}})
             }else{
               callback({"error":{"code":"AU003","message":"Provided userid is wrong"+userid}});
             }
@@ -898,7 +898,7 @@ var productFileUpload=function(prodle,awsparams,filename,callback){
     }
   })  
 }
-var productLogoUpload=function(prodle,awsparams,callback){
+var productLogoUpload=function(prodle,awsparams,filename,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
       callback({"error":{"message":"s3bucket.putObject:-productLogoUpload"+err}})
@@ -928,7 +928,7 @@ var productLogoUpload=function(prodle,awsparams,callback){
                 })  
               }
               
-              callback(null,{"success":{"message":"Product images uploaded Successfully","image":url}})
+              callback(null,{"success":{"message":"Product images uploaded Successfully","image":url,"filename":filename}})
             }else{
               callback({"error":{"code":"AP001","message":"Wrong prodle"+prodle}});
             }
@@ -938,7 +938,7 @@ var productLogoUpload=function(prodle,awsparams,callback){
     }
   })  
 }
-var orgLogoUpload=function(orgid,awsparams,callback){
+var orgLogoUpload=function(orgid,awsparams,filename,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
       callback({"error":{"message":"s3bucket.putObject:-orgLogoUpload"+err}})
@@ -968,7 +968,7 @@ var orgLogoUpload=function(orgid,awsparams,callback){
                 }) 
               }
               
-              callback(null,{"success":{"message":"Organization logo changes  Successfully","image":url}})
+              callback(null,{"success":{"message":"Organization logo changes  Successfully","image":url,"filename":filename}})
             }else{
               callback({"error":{"code":"AO002","message":"Wrong orgid"+orgid}});
             }

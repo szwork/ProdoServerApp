@@ -1153,9 +1153,9 @@ var _sendOtherOrganizationInvitation=function(self,orgid,otherorginvites,session
 									{
 										var host=S(otherorginvites[i].email).substring(otherorginvites[i].email.indexOf("@")+1,otherorginvites[i].email.indexOf(".",otherorginvites[i].email.indexOf("@")))
 										logger.emit("log",email_providerlist.indexOf(host.s));
-										if(otherorginvites[i].email!=undefined && email_providerlist.indexOf(host.s)<0){
-							  			self.emit("sendotherorginvite",otherorginvite_emailtemplate,otherorginvites[i],user,organization);
-							  		}
+										if(otherorginvites[i].email!=undefined ){
+							  			  self.emit("sendotherorginvite",otherorginvite_emailtemplate,otherorginvites[i],user,organization);
+							  			}
 									}
 									///////////////////////////////////////////////////////////////
 									_addOtherOrganizationInviteIntoBusinessOpportunity(self,otherorginvites,user);
