@@ -21,6 +21,7 @@ var CONFIG = require('config').Prodonus;
 var shortId = require('shortid');
 var S=require('string');
 var shortId = require('shortid');
+var __=require("underscore");
 // var CommentModel=require("./comment-model");
 var AWS = require('aws-sdk');
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
@@ -29,7 +30,9 @@ var s3bucket = new AWS.S3();
 var Product = function(productdata) {
 	this.product = productdata;
 };
-
+function isArray(what) {
+    return Object.prototype.toString.call(what) === '[object Array]';
+}
 var regxemail = /\S+@\S+\.\S+/; 
 Product.prototype = new events.EventEmitter;
 module.exports = Product;
@@ -53,8 +56,16 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	    	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
 	  	 }else if(productdata.model_no==undefined){
 	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass model_no"}});
+	  	 }else if(productdata.category==undefined || productdata.category==""){
+	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Pleae pass category"}});
+	  	 }else if( !isArray(productdata.category)){
+	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"category should be an array"}});
+	  	 }else if(productdata.category.length==0){
+	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one category"}});
 	  	 }else{
+	  	 	////////////////////////////////////////////////
 			_checkProductNameIsSame(self,productdata,orgid);
+			///////////////////////////////////////////////
 	   	
 	   }
 	};
@@ -594,4 +605,31 @@ var _getProductTrending=function(self){
 var _successfulGetProductTrends=function(self,trenddata){
 	logger.emit("log","_successfulGetProductTrends");
 	self.emit("successfulGetProductTrends", {"success":{"message":"Product Trends Getting Suceessfully","ProductTrends":trenddata}});
+}
+Product.prototype.getAllCategoryTags = function() {
+	var self=this;
+	////////////////////////////
+	_getAllCategoryTags(self);
+	///////////////////////////
+};
+var _getAllCategoryTags=function(self){
+	productModel.find({$where:"this.category.length>0"},{category:1,_id:0},function(err,categorytags){
+		if(err){
+			logger.emit("error","Database Issue _getAllCategoryTags "+err)
+			self.emit("failedGetAllCategoryTags",{"error":{"message":"Database Issue"}})
+		}else if(categorytags.length==0){
+			self.emit("failedGetAllCategoryTags",{"error":{"message":"No Category Tags Exists"}})
+		}else{
+			var categorytgsarray=[];
+			for(var i=0;i<categorytags.length;i++){
+				categorytgsarray=__.union(categorytags[i].category,categorytgsarray);
+			}
+			///////////////////////////////////
+			_successfullGetAllCategoryTags(self,categorytgsarray);
+			///////////////////////////////////
+		}
+	})
+}
+var _successfullGetAllCategoryTags=function(self,categorytgsarray){
+	self.emit("successfulGetAllCategoryTags",{"success":{"message":"Getting All Category Tags Successfully","categorytags":categorytgsarray}})
 }

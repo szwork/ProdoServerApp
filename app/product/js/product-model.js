@@ -61,7 +61,7 @@ var productSchema = mongoose.Schema({
   support_discontinuation_date: { type:Date },
   banneddate: { type: Date },
   product_images: [{bucket:String,key:String,image:{type:String},imageid:{type:String}}], 
-  category: [{prodle:{type:String,ref:"product"}}], 
+  category:[{type:String}], 
   features: [productFeatureSchema], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 
   incompatability: [{prodle:{type:String,ref:"product"}}], 
