@@ -557,7 +557,7 @@ var _allProductRemove=function(self,orgid){
 }
 
 var _removeAllProductTrending = function(self,orgid){
-	TrendModel.remove({orgid:orgid},{multi:true},function(err,allorgproductdeletestatus){
+	TrendModel.remove({orgid:orgid},function(err,allorgproductdeletestatus){
 		if(err){
 			logger.emit("error","Database Issue _removeAllProductTrending orgid:"+orgid+":"+err);
 		}else if(allorgproductdeletestatus==0){
