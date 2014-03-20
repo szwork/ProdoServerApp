@@ -442,7 +442,7 @@ var _loadMoreComment=function(self,sessionuserid,commentid){
 				if(err){
 					self.emit("failedLoadMoreComment",{"error":{"code":"ED001","message":"_loadMoreComment: Error in db to delete comment"+err}});
 				}else if(nextcomments.length==0){
-					self.emit("failedLoadMoreComment",{"error":{"code":"AC002","message":"no more comment"}});
+					self.emit("failedLoadMoreComment",{"error":{"code":"AC002","message":"No More Comment(s)"}});
 				}else{
 					///////////////////////////////////
 					_successfullLoadMoreComments(self,nextcomments);

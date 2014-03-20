@@ -33,6 +33,7 @@
     "mongoose-redis-cache":"*",
     "underscore":"*",
     "natural":"*",
-    "resize":"*"
+    "resize":"*",
+    "gm":"*"
   }
 }

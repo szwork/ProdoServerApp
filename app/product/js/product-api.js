@@ -415,3 +415,22 @@ exports.getProductTrending=function(req,res){
     product.getProductTrending();
     //////////////////////////////////  
 }
+exports.getAllCategoryTags=function(req,res){
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedGetAllCategoryTags");
+    product.on("failedGetAllCategoryTags",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("successfulGetAllCategoryTags");
+  product.on("successfulGetAllCategoryTags",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    ///////////////////////////////////
+    product.getAllCategoryTags();
+    ////////////////////////////////  
+}

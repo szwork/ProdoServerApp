@@ -557,7 +557,7 @@ exports.userInvites=function(req,res){
     var subject=S(userinvite_template.subject);
     var template=S(userinvite_template.description);
     template=template.replaceAll("<email>",user.email);
-    template=template.replaceAll("<username>",user.username);
+    template=template.replaceAll("<fromusername>",user.username);
      template=template.replaceAll("<name>",inivtedata.name);
     var message = {
         from: "Prodonus  <noreply@prodonus.com>", // sender address
