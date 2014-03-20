@@ -46,7 +46,7 @@ exports.allProduct = function(req,res){
 		// 	}
 		// });
 		/***********SEARCH FROM PRODUCTS MODEL**********/
-		ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).limit(5).exec(function(err,doc){
+		ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 			if(err){
 				res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
 			}else if(doc.length==0){
