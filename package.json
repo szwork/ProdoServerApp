@@ -10,6 +10,8 @@
     "express": "3.x",
     "mongoose": "*",
     "mongodb" : "*",
+    "mongoose-shortid":"*",
+    "mongoose-redis-cache":"*",
     "passport" : "*",
     "passport-local" : "*",
     "node-uuid" : "*",
@@ -17,7 +19,6 @@
     "bcrypt" : "*",
     "string":"*",
     "time-uuid":"*",
-    "mongoose-shortid":"*",
     "config":"*",
     "winston-mongodb":"*",
     "winston":"latest",
@@ -30,10 +31,8 @@
     "passport.socketio":"*",
     "connect":"*",
     "connect-redis":"*",
-    "mongoose-redis-cache":"*",
     "underscore":"*",
     "natural":"*",
-    "resize":"*",
-    "gm":"*"
+    "easyimage":"*"
   }
 }
