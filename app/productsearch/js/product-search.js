@@ -122,9 +122,9 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		var category_or_array=[];
 		 		for(var i=0;i<category_array.length;i++){
 		 			category_or_array.push(new RegExp('^'+category_array[i].substr(0,1), "i"));
-		 			searchCriteria.push({"category.prodle": new RegExp(category_array[i], "i")});
+		 			searchCriteria.push({"category": new RegExp(category_array[i], "i")});
 		 		}
-		 		query["category.prodle"]={$in:category_or_array};
+		 		query["category"]={$in:category_or_array};
 	  		}
 	  	}
 

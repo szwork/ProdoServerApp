@@ -5,6 +5,7 @@ var orgModel=require("./org-model");
 var logger=require("../../common/js/logger");
 var S=require("string");
 var productModel=require("../../product/js/product-model");
+var TrendModel = require("../../featuretrending/js/feature-trending-model");
 var EmailTemplateModel=require('../../common/js/email-template-model');
 var orgHistoryModel=require("./org-history-model");
 var __=require("underscore");
@@ -549,10 +550,26 @@ var _allProductRemove=function(self,orgid){
 		}else{
 			/////////////////////////////////////
 			_successfulOrganizationDeletion(self);
+			_removeAllProductTrending(self,orgid);
 			////////////////////////////////////
 		}
 	})
 }
+
+var _removeAllProductTrending = function(self,orgid){
+	TrendModel.remove({orgid:orgid},function(err,allorgproductdeletestatus){
+		if(err){
+			logger.emit("error","Database Issue _removeAllProductTrending orgid:"+orgid+":"+err);
+		}else if(allorgproductdeletestatus==0){
+			logger.emit("error","Wrong orgid to delete trend data");
+		}else{
+			/////////////////////////////////////
+			logger.emit("info","trend data delete for this organisation");
+			////////////////////////////////////
+		}
+	})
+}
+
 var _successfulOrganizationDeletion = function(self) {
 		//validate the user data
 		logger.emit("log","_successfulOrganizationDeletion");
