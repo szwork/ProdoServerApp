@@ -34,7 +34,7 @@ var easyimg = require('easyimage');
 var img_format_array=["jpeg","JPEG","JPG","GIF","BMP","jpg","gif","bmp"];
 var S=require("string");
 var amazonbucket=CONFIG.amazonbucket;
-var gm = require('gm').subClass({ imageMagick: true });
+// var gm = require('gm').subClass({ imageMagick: true });
 // logger.emit("log","userModel"+userModel);
 // logger.emit("log","orgModel"+OrgModel);
 
@@ -421,11 +421,11 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                gm(fileName).resize(null,370).toBuffer(function (err, buffer) {
-                  if (err){
-                    logger.emit("error","__orgFileBuffer"+err);
-                    callback({"error":{"message":"Upload Issue"}})
-                  }else{
+                // gm(fileName).resize(null,370).toBuffer(function (err, buffer) {
+                //   if (err){
+                //     logger.emit("error","__orgFileBuffer"+err);
+                //     callback({"error":{"message":"Upload Issue"}})
+                //   }else{
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                     logger.emit("log","s3filekey:"+s3filekey+" ext:"+ext);
                     var bucketFolder;
@@ -451,7 +451,7 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                         params = {
                           Bucket: bucketFolder,
                           Key: action.org.orgid+s3filekey,
-                          Body: buffer,
+                          Body: writebuffer,
                           // Expires:new Date(expirydate),
                           ACL: 'public-read',
                           ContentType: file_type
@@ -469,8 +469,8 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                        })
                       }
                     }
-                  }
-                })
+                //   }
+                // })
               }
             })
           }
@@ -509,11 +509,11 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                gm(fileName).resize(null,375).toBuffer(function (err, buffer) {
-                  if (err){
-                    logger.emit("error","__productFileBuffer"+err);
-                    callback({"error":{"message":"Upload Issue"}})
-                  }else{
+                // gm(fileName).resize(null,375).toBuffer(function (err, buffer) {
+                //   if (err){
+                //     logger.emit("error","__productFileBuffer"+err);
+                //     callback({"error":{"message":"Upload Issue"}})
+                //   }else{
                 // console.log(written+" bytes are written from buffer");
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                     var bucketFolder;
@@ -542,7 +542,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
                               params = {
                                 Bucket: bucketFolder,
                                 Key: action.product.orgid+action.product.prodle+s3filekey,
-                                Body: buffer,
+                                Body: writebuffer,
                                 Expires:expirydate,
                                 ACL: 'public-read',
                                 ContentType: file_type
@@ -563,8 +563,8 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
                         })
                       }
                     }
-                  }
-                })
+                //   }
+                // })
               }
             })
           }

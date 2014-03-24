@@ -1,0 +1,773 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install' ]
+2 info using npm@1.4.3
+3 info using node@v0.10.26
+4 verbose node symlink /usr/bin/node
+5 verbose readDependencies using package.json deps
+6 verbose install where, deps [ '/home/giantleap/Documents/projects/prodonus-server-app',
+6 verbose install   [ 'express',
+6 verbose install     'mongoose',
+6 verbose install     'mongodb',
+6 verbose install     'passport',
+6 verbose install     'passport-local',
+6 verbose install     'node-uuid',
+6 verbose install     'nodemailer',
+6 verbose install     'bcrypt',
+6 verbose install     'string',
+6 verbose install     'time-uuid',
+6 verbose install     'mongoose-shortid',
+6 verbose install     'config',
+6 verbose install     'winston-mongodb',
+6 verbose install     'winston',
+6 verbose install     'redis',
+6 verbose install     'shortid',
+6 verbose install     'request',
+6 verbose install     'querystring',
+6 verbose install     'socket.io',
+6 verbose install     'aws-sdk',
+6 verbose install     'passport.socketio',
+6 verbose install     'connect',
+6 verbose install     'connect-redis',
+6 verbose install     'mongoose-redis-cache',
+6 verbose install     'underscore',
+6 verbose install     'natural',
+6 verbose install     'resize',
+6 verbose install     'gm' ] ]
+7 info preinstall prodonus-app@0.0.1
+8 warn package.json fs@0.0.0 fs is also the name of a node core module.
+9 warn package.json fs@0.0.0 No repository field.
+10 warn package.json querystring@0.2.0 querystring is also the name of a node core module.
+11 verbose readDependencies using package.json deps
+12 verbose already installed skipping mongoose-shortid@* /home/giantleap/Documents/projects/prodonus-server-app
+13 verbose already installed skipping config@* /home/giantleap/Documents/projects/prodonus-server-app
+14 verbose already installed skipping winston-mongodb@* /home/giantleap/Documents/projects/prodonus-server-app
+15 verbose cache add [ 'winston@latest', null ]
+16 verbose cache add name=undefined spec="winston@latest" args=["winston@latest",null]
+17 verbose parsed url { protocol: null,
+17 verbose parsed url   slashes: null,
+17 verbose parsed url   auth: null,
+17 verbose parsed url   host: null,
+17 verbose parsed url   port: null,
+17 verbose parsed url   hostname: null,
+17 verbose parsed url   hash: null,
+17 verbose parsed url   search: null,
+17 verbose parsed url   query: null,
+17 verbose parsed url   pathname: 'winston@latest',
+17 verbose parsed url   path: 'winston@latest',
+17 verbose parsed url   href: 'winston@latest' }
+18 verbose cache add name="winston" spec="latest" args=["winston","latest"]
+19 verbose parsed url { protocol: null,
+19 verbose parsed url   slashes: null,
+19 verbose parsed url   auth: null,
+19 verbose parsed url   host: null,
+19 verbose parsed url   port: null,
+19 verbose parsed url   hostname: null,
+19 verbose parsed url   hash: null,
+19 verbose parsed url   search: null,
+19 verbose parsed url   query: null,
+19 verbose parsed url   pathname: 'latest',
+19 verbose parsed url   path: 'latest',
+19 verbose parsed url   href: 'latest' }
+20 verbose addNamed [ 'winston', 'latest' ]
+21 verbose addNamed [ null, null ]
+22 verbose already installed skipping redis@* /home/giantleap/Documents/projects/prodonus-server-app
+23 verbose already installed skipping shortid@* /home/giantleap/Documents/projects/prodonus-server-app
+24 silly lockFile 5cafa890-winston-latest winston@latest
+25 verbose lock winston@latest /home/giantleap/.npm/5cafa890-winston-latest.lock
+26 verbose already installed skipping request@* /home/giantleap/Documents/projects/prodonus-server-app
+27 verbose already installed skipping querystring@* /home/giantleap/Documents/projects/prodonus-server-app
+28 verbose already installed skipping socket.io@* /home/giantleap/Documents/projects/prodonus-server-app
+29 verbose already installed skipping aws-sdk@* /home/giantleap/Documents/projects/prodonus-server-app
+30 verbose already installed skipping passport.socketio@* /home/giantleap/Documents/projects/prodonus-server-app
+31 verbose already installed skipping connect@* /home/giantleap/Documents/projects/prodonus-server-app
+32 verbose already installed skipping connect-redis@* /home/giantleap/Documents/projects/prodonus-server-app
+33 verbose already installed skipping mongoose-redis-cache@* /home/giantleap/Documents/projects/prodonus-server-app
+34 verbose already installed skipping underscore@* /home/giantleap/Documents/projects/prodonus-server-app
+35 verbose already installed skipping natural@* /home/giantleap/Documents/projects/prodonus-server-app
+36 verbose cache add [ 'resize@*', null ]
+37 verbose cache add name=undefined spec="resize@*" args=["resize@*",null]
+38 verbose parsed url { protocol: null,
+38 verbose parsed url   slashes: null,
+38 verbose parsed url   auth: null,
+38 verbose parsed url   host: null,
+38 verbose parsed url   port: null,
+38 verbose parsed url   hostname: null,
+38 verbose parsed url   hash: null,
+38 verbose parsed url   search: null,
+38 verbose parsed url   query: null,
+38 verbose parsed url   pathname: 'resize@*',
+38 verbose parsed url   path: 'resize@*',
+38 verbose parsed url   href: 'resize@*' }
+39 verbose cache add name="resize" spec="*" args=["resize","*"]
+40 verbose parsed url { protocol: null,
+40 verbose parsed url   slashes: null,
+40 verbose parsed url   auth: null,
+40 verbose parsed url   host: null,
+40 verbose parsed url   port: null,
+40 verbose parsed url   hostname: null,
+40 verbose parsed url   hash: null,
+40 verbose parsed url   search: null,
+40 verbose parsed url   query: null,
+40 verbose parsed url   pathname: '*',
+40 verbose parsed url   path: '*',
+40 verbose parsed url   href: '*' }
+41 verbose addNamed [ 'resize', '*' ]
+42 verbose addNamed [ null, '*' ]
+43 silly lockFile 65e3069e-resize resize@*
+44 verbose lock resize@* /home/giantleap/.npm/65e3069e-resize.lock
+45 verbose already installed skipping gm@* /home/giantleap/Documents/projects/prodonus-server-app
+46 verbose already installed skipping express@3.x /home/giantleap/Documents/projects/prodonus-server-app
+47 info addNameTag [ 'winston', 'latest' ]
+48 verbose already installed skipping mongoose@* /home/giantleap/Documents/projects/prodonus-server-app
+49 silly addNameRange { name: 'resize', range: '*', hasData: false }
+50 verbose url raw winston
+51 verbose url resolving [ 'https://registry.npmjs.org/', './winston' ]
+52 verbose url resolved https://registry.npmjs.org/winston
+53 info trying registry request attempt 1 at 11:39:26
+54 http GET https://registry.npmjs.org/winston
+55 verbose already installed skipping node-uuid@* /home/giantleap/Documents/projects/prodonus-server-app
+56 verbose already installed skipping mongodb@* /home/giantleap/Documents/projects/prodonus-server-app
+57 verbose already installed skipping nodemailer@* /home/giantleap/Documents/projects/prodonus-server-app
+58 verbose already installed skipping passport@* /home/giantleap/Documents/projects/prodonus-server-app
+59 verbose already installed skipping bcrypt@* /home/giantleap/Documents/projects/prodonus-server-app
+60 verbose already installed skipping passport-local@* /home/giantleap/Documents/projects/prodonus-server-app
+61 verbose already installed skipping string@* /home/giantleap/Documents/projects/prodonus-server-app
+62 verbose already installed skipping time-uuid@* /home/giantleap/Documents/projects/prodonus-server-app
+63 verbose url raw resize
+64 verbose url resolving [ 'https://registry.npmjs.org/', './resize' ]
+65 verbose url resolved https://registry.npmjs.org/resize
+66 info trying registry request attempt 1 at 11:39:26
+67 verbose etag "8OSF7IZSQ45MBRX7ZTV5V182A"
+68 http GET https://registry.npmjs.org/resize
+69 http 200 https://registry.npmjs.org/resize
+70 silly registry.get cb [ 200,
+70 silly registry.get   { date: 'Fri, 21 Mar 2014 06:09:28 GMT',
+70 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B)',
+70 silly registry.get     etag: '"7GQ7WAQG8BOUL1CHFFX83E7H0"',
+70 silly registry.get     'content-type': 'application/json',
+70 silly registry.get     via: '1.1 varnish',
+70 silly registry.get     'cache-control': 'max-age=1',
+70 silly registry.get     'content-length': '29238',
+70 silly registry.get     'accept-ranges': 'bytes',
+70 silly registry.get     age: '0',
+70 silly registry.get     'x-served-by': 'cache-v43-ASH, cache-sv60-SJC3',
+70 silly registry.get     'x-cache': 'MISS, MISS',
+70 silly registry.get     'x-cache-hits': '0, 0',
+70 silly registry.get     'x-timer': 'S1395382167.807471991,VS0,VS-26,VE317,VE414',
+70 silly registry.get     vary: 'Accept',
+70 silly registry.get     'keep-alive': 'timeout=10, max=50',
+70 silly registry.get     connection: 'Keep-Alive' } ]
+71 silly addNameRange number 2 { name: 'resize', range: '*', hasData: true }
+72 silly addNameRange versions [ 'resize',
+72 silly addNameRange   [ '0.0.1',
+72 silly addNameRange     '0.0.2',
+72 silly addNameRange     '0.0.3',
+72 silly addNameRange     '0.1.0',
+72 silly addNameRange     '0.2.0',
+72 silly addNameRange     '0.3.0',
+72 silly addNameRange     '0.4.0',
+72 silly addNameRange     '0.4.1',
+72 silly addNameRange     '0.5.0',
+72 silly addNameRange     '0.6.0',
+72 silly addNameRange     '0.6.1',
+72 silly addNameRange     '0.7.0',
+72 silly addNameRange     '0.7.1',
+72 silly addNameRange     '0.7.2' ] ]
+73 verbose addNamed [ 'resize', '0.7.2' ]
+74 verbose addNamed [ '0.7.2', '0.7.2' ]
+75 silly lockFile 68c84bfd-resize-0-7-2 resize@0.7.2
+76 verbose lock resize@0.7.2 /home/giantleap/.npm/68c84bfd-resize-0-7-2.lock
+77 silly lockFile 68c84bfd-resize-0-7-2 resize@0.7.2
+78 silly lockFile 68c84bfd-resize-0-7-2 resize@0.7.2
+79 silly lockFile 65e3069e-resize resize@*
+80 silly lockFile 65e3069e-resize resize@*
+81 http 200 https://registry.npmjs.org/winston
+82 silly registry.get cb [ 200,
+82 silly registry.get   { date: 'Fri, 21 Mar 2014 06:09:27 GMT',
+82 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B)',
+82 silly registry.get     etag: '"4VWHNO8G40MJA0854Z5XU3TYN"',
+82 silly registry.get     'content-type': 'application/json',
+82 silly registry.get     via: '1.1 varnish',
+82 silly registry.get     'cache-control': 'max-age=1',
+82 silly registry.get     'content-length': '247267',
+82 silly registry.get     'accept-ranges': 'bytes',
+82 silly registry.get     age: '17',
+82 silly registry.get     'x-served-by': 'cache-v42-ASH, cache-sv62-SJC3',
+82 silly registry.get     'x-cache': 'MISS, HIT',
+82 silly registry.get     'x-cache-hits': '0, 1',
+82 silly registry.get     'x-timer': 'S1395365595.244005442,VS0,VS9,VE122,VE16572725',
+82 silly registry.get     vary: 'Accept',
+82 silly registry.get     'keep-alive': 'timeout=10, max=50',
+82 silly registry.get     connection: 'Keep-Alive' } ]
+83 verbose addNamed [ 'winston', '0.7.2' ]
+84 verbose addNamed [ '0.7.2', '0.7.2' ]
+85 silly lockFile 66ac613a-winston-0-7-2 winston@0.7.2
+86 verbose lock winston@0.7.2 /home/giantleap/.npm/66ac613a-winston-0-7-2.lock
+87 silly lockFile 8c95f5af-js-org-winston-winston-0-7-2-tgz https://registry.npmjs.org/winston/-/winston-0.7.2.tgz
+88 verbose lock https://registry.npmjs.org/winston/-/winston-0.7.2.tgz /home/giantleap/.npm/8c95f5af-js-org-winston-winston-0-7-2-tgz.lock
+89 verbose addRemoteTarball [ 'https://registry.npmjs.org/winston/-/winston-0.7.2.tgz',
+89 verbose addRemoteTarball   '2570ae1aa1d8a9401e8d5a88362e1cf936550ceb' ]
+90 info retry fetch attempt 1 at 11:39:30
+91 verbose fetch to= /home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/tmp.tgz
+92 http GET https://registry.npmjs.org/winston/-/winston-0.7.2.tgz
+93 http 200 https://registry.npmjs.org/winston/-/winston-0.7.2.tgz
+94 verbose tar unpack /home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/tmp.tgz
+95 silly lockFile 72dfbfee-0034-0-38279573316685855-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package
+96 verbose lock tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package /home/giantleap/.npm/72dfbfee-0034-0-38279573316685855-package.lock
+97 silly lockFile fce9d468-0034-0-38279573316685855-tmp-tgz tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/tmp.tgz
+98 verbose lock tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/tmp.tgz /home/giantleap/.npm/fce9d468-0034-0-38279573316685855-tmp-tgz.lock
+99 silly gunzTarPerm modes [ '755', '644' ]
+100 silly gunzTarPerm extractEntry package.json
+101 silly gunzTarPerm extractEntry .npmignore
+102 silly gunzTarPerm extractEntry README.md
+103 silly gunzTarPerm extractEntry LICENSE
+104 silly gunzTarPerm extractEntry .travis.yml
+105 silly gunzTarPerm extractEntry CHANGELOG.md
+106 silly gunzTarPerm extractEntry docs/transports.md
+107 silly gunzTarPerm extractEntry examples/couchdb.js
+108 silly gunzTarPerm extractEntry examples/custom-levels.js
+109 silly gunzTarPerm extractEntry examples/exception.js
+110 silly gunzTarPerm extractEntry examples/raw-mode.js
+111 silly gunzTarPerm extractEntry examples/webhook-post.js
+112 silly gunzTarPerm extractEntry lib/winston.js
+113 silly gunzTarPerm extractEntry lib/winston/common.js
+114 silly gunzTarPerm extractEntry lib/winston/config.js
+115 silly gunzTarPerm extractEntry lib/winston/container.js
+116 silly gunzTarPerm extractEntry lib/winston/exception.js
+117 silly gunzTarPerm extractEntry lib/winston/logger.js
+118 silly gunzTarPerm extractEntry lib/winston/transports.js
+119 silly gunzTarPerm extractEntry lib/winston/config/cli-config.js
+120 silly gunzTarPerm extractEntry lib/winston/config/npm-config.js
+121 silly gunzTarPerm extractEntry lib/winston/config/syslog-config.js
+122 silly gunzTarPerm extractEntry lib/winston/transports/console.js
+123 silly gunzTarPerm extractEntry lib/winston/transports/daily-rotate-file.js
+124 silly gunzTarPerm extractEntry lib/winston/transports/file.js
+125 silly gunzTarPerm extractEntry lib/winston/transports/http.js
+126 silly gunzTarPerm extractEntry lib/winston/transports/memory.js
+127 silly gunzTarPerm extractEntry lib/winston/transports/transport.js
+128 silly gunzTarPerm extractEntry lib/winston/transports/webhook.js
+129 silly gunzTarPerm extractEntry test/cli-test.js
+130 silly gunzTarPerm extractEntry test/custom-timestamp-test.js
+131 silly gunzTarPerm extractEntry test/exception-test.js
+132 silly gunzTarPerm extractEntry test/logger-test.js
+133 silly gunzTarPerm extractEntry test/helpers.js
+134 silly gunzTarPerm extractEntry test/container-test.js
+135 silly gunzTarPerm extractEntry test/log-rewriter-test.js
+136 silly gunzTarPerm extractEntry test/logger-levels-test.js
+137 silly gunzTarPerm extractEntry test/winston-test.js
+138 silly gunzTarPerm extractEntry test/log-exception-test.js
+139 silly gunzTarPerm extractEntry test/fixtures/.gitkeep
+140 silly gunzTarPerm extractEntry test/fixtures/keys/agent2-cert.pem
+141 silly gunzTarPerm extractEntry test/fixtures/keys/agent2-key.pem
+142 silly gunzTarPerm extractEntry test/fixtures/logs/.gitkeep
+143 silly gunzTarPerm extractEntry test/fixtures/scripts/default-exceptions.js
+144 silly gunzTarPerm extractEntry test/fixtures/scripts/exit-on-error.js
+145 silly gunzTarPerm extractEntry test/fixtures/scripts/log-exceptions.js
+146 silly gunzTarPerm extractEntry test/fixtures/scripts/unhandle-exceptions.js
+147 silly gunzTarPerm extractEntry test/transports/console-test.js
+148 silly gunzTarPerm extractEntry test/transports/daily-rotate-file-test.js
+149 silly gunzTarPerm extractEntry test/transports/file-maxfiles-test.js
+150 silly gunzTarPerm extractEntry test/transports/file-maxsize-test.js
+151 silly gunzTarPerm extractEntry test/transports/file-test.js
+152 silly gunzTarPerm extractEntry test/transports/memory-test.js
+153 silly gunzTarPerm extractEntry test/transports/transport.js
+154 silly gunzTarPerm extractEntry test/transports/webhook-test.js
+155 silly lockFile 72dfbfee-0034-0-38279573316685855-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package
+156 silly lockFile 72dfbfee-0034-0-38279573316685855-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package
+157 silly lockFile fce9d468-0034-0-38279573316685855-tmp-tgz tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/tmp.tgz
+158 silly lockFile fce9d468-0034-0-38279573316685855-tmp-tgz tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/tmp.tgz
+159 verbose tar pack [ '/home/giantleap/.npm/winston/0.7.2/package.tgz',
+159 verbose tar pack   '/home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package' ]
+160 verbose tarball /home/giantleap/.npm/winston/0.7.2/package.tgz
+161 verbose folder /home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package
+162 silly lockFile 72dfbfee-0034-0-38279573316685855-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package
+163 verbose lock tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package /home/giantleap/.npm/72dfbfee-0034-0-38279573316685855-package.lock
+164 silly lockFile 98ebf5e0-ap-npm-winston-0-7-2-package-tgz tar:///home/giantleap/.npm/winston/0.7.2/package.tgz
+165 verbose lock tar:///home/giantleap/.npm/winston/0.7.2/package.tgz /home/giantleap/.npm/98ebf5e0-ap-npm-winston-0-7-2-package-tgz.lock
+166 silly lockFile 72dfbfee-0034-0-38279573316685855-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package
+167 silly lockFile 72dfbfee-0034-0-38279573316685855-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382170034-0.38279573316685855/package
+168 silly lockFile 98ebf5e0-ap-npm-winston-0-7-2-package-tgz tar:///home/giantleap/.npm/winston/0.7.2/package.tgz
+169 silly lockFile 98ebf5e0-ap-npm-winston-0-7-2-package-tgz tar:///home/giantleap/.npm/winston/0.7.2/package.tgz
+170 silly lockFile 9a3d7626-ntleap-npm-winston-0-7-2-package /home/giantleap/.npm/winston/0.7.2/package
+171 verbose lock /home/giantleap/.npm/winston/0.7.2/package /home/giantleap/.npm/9a3d7626-ntleap-npm-winston-0-7-2-package.lock
+172 silly lockFile 9a3d7626-ntleap-npm-winston-0-7-2-package /home/giantleap/.npm/winston/0.7.2/package
+173 silly lockFile 9a3d7626-ntleap-npm-winston-0-7-2-package /home/giantleap/.npm/winston/0.7.2/package
+174 verbose tar unpack /home/giantleap/.npm/winston/0.7.2/package.tgz
+175 silly lockFile c4f9fa8b-ntleap-npm-winston-0-7-2-package tar:///home/giantleap/.npm/winston/0.7.2/package
+176 verbose lock tar:///home/giantleap/.npm/winston/0.7.2/package /home/giantleap/.npm/c4f9fa8b-ntleap-npm-winston-0-7-2-package.lock
+177 silly lockFile 98ebf5e0-ap-npm-winston-0-7-2-package-tgz tar:///home/giantleap/.npm/winston/0.7.2/package.tgz
+178 verbose lock tar:///home/giantleap/.npm/winston/0.7.2/package.tgz /home/giantleap/.npm/98ebf5e0-ap-npm-winston-0-7-2-package-tgz.lock
+179 silly gunzTarPerm modes [ '755', '644' ]
+180 silly gunzTarPerm extractEntry package.json
+181 silly gunzTarPerm extractEntry .npmignore
+182 silly gunzTarPerm extractEntry README.md
+183 silly gunzTarPerm extractEntry LICENSE
+184 silly gunzTarPerm extractEntry .travis.yml
+185 silly gunzTarPerm extractEntry CHANGELOG.md
+186 silly gunzTarPerm extractEntry docs/transports.md
+187 silly gunzTarPerm extractEntry examples/couchdb.js
+188 silly gunzTarPerm extractEntry examples/custom-levels.js
+189 silly gunzTarPerm extractEntry examples/exception.js
+190 silly gunzTarPerm extractEntry examples/raw-mode.js
+191 silly gunzTarPerm extractEntry examples/webhook-post.js
+192 silly gunzTarPerm extractEntry lib/winston.js
+193 silly gunzTarPerm extractEntry lib/winston/common.js
+194 silly gunzTarPerm extractEntry lib/winston/config.js
+195 silly gunzTarPerm extractEntry lib/winston/container.js
+196 silly gunzTarPerm extractEntry lib/winston/exception.js
+197 silly gunzTarPerm extractEntry lib/winston/logger.js
+198 silly gunzTarPerm extractEntry lib/winston/transports.js
+199 silly gunzTarPerm extractEntry lib/winston/config/cli-config.js
+200 silly gunzTarPerm extractEntry lib/winston/config/npm-config.js
+201 silly gunzTarPerm extractEntry lib/winston/config/syslog-config.js
+202 silly gunzTarPerm extractEntry lib/winston/transports/console.js
+203 silly gunzTarPerm extractEntry lib/winston/transports/daily-rotate-file.js
+204 silly gunzTarPerm extractEntry lib/winston/transports/file.js
+205 silly gunzTarPerm extractEntry lib/winston/transports/http.js
+206 silly gunzTarPerm extractEntry lib/winston/transports/memory.js
+207 silly gunzTarPerm extractEntry lib/winston/transports/transport.js
+208 silly gunzTarPerm extractEntry lib/winston/transports/webhook.js
+209 silly gunzTarPerm extractEntry test/cli-test.js
+210 silly gunzTarPerm extractEntry test/custom-timestamp-test.js
+211 silly gunzTarPerm extractEntry test/exception-test.js
+212 silly gunzTarPerm extractEntry test/logger-test.js
+213 silly gunzTarPerm extractEntry test/helpers.js
+214 silly gunzTarPerm extractEntry test/container-test.js
+215 silly gunzTarPerm extractEntry test/log-rewriter-test.js
+216 silly gunzTarPerm extractEntry test/logger-levels-test.js
+217 silly gunzTarPerm extractEntry test/winston-test.js
+218 silly gunzTarPerm extractEntry test/log-exception-test.js
+219 silly gunzTarPerm extractEntry test/fixtures/.gitkeep
+220 silly gunzTarPerm extractEntry test/fixtures/keys/agent2-cert.pem
+221 silly gunzTarPerm extractEntry test/fixtures/keys/agent2-key.pem
+222 silly gunzTarPerm extractEntry test/fixtures/logs/.gitkeep
+223 silly gunzTarPerm extractEntry test/fixtures/scripts/default-exceptions.js
+224 silly gunzTarPerm extractEntry test/fixtures/scripts/exit-on-error.js
+225 silly gunzTarPerm extractEntry test/fixtures/scripts/log-exceptions.js
+226 silly gunzTarPerm extractEntry test/fixtures/scripts/unhandle-exceptions.js
+227 silly gunzTarPerm extractEntry test/transports/console-test.js
+228 silly gunzTarPerm extractEntry test/transports/daily-rotate-file-test.js
+229 silly gunzTarPerm extractEntry test/transports/file-maxfiles-test.js
+230 silly gunzTarPerm extractEntry test/transports/file-maxsize-test.js
+231 silly gunzTarPerm extractEntry test/transports/file-test.js
+232 silly gunzTarPerm extractEntry test/transports/memory-test.js
+233 silly gunzTarPerm extractEntry test/transports/transport.js
+234 silly gunzTarPerm extractEntry test/transports/webhook-test.js
+235 silly lockFile c4f9fa8b-ntleap-npm-winston-0-7-2-package tar:///home/giantleap/.npm/winston/0.7.2/package
+236 silly lockFile c4f9fa8b-ntleap-npm-winston-0-7-2-package tar:///home/giantleap/.npm/winston/0.7.2/package
+237 silly lockFile 98ebf5e0-ap-npm-winston-0-7-2-package-tgz tar:///home/giantleap/.npm/winston/0.7.2/package.tgz
+238 silly lockFile 98ebf5e0-ap-npm-winston-0-7-2-package-tgz tar:///home/giantleap/.npm/winston/0.7.2/package.tgz
+239 verbose chmod /home/giantleap/.npm/winston/0.7.2/package.tgz 644
+240 verbose chown /home/giantleap/.npm/winston/0.7.2/package.tgz [ 1000, 1000 ]
+241 silly lockFile 8c95f5af-js-org-winston-winston-0-7-2-tgz https://registry.npmjs.org/winston/-/winston-0.7.2.tgz
+242 silly lockFile 8c95f5af-js-org-winston-winston-0-7-2-tgz https://registry.npmjs.org/winston/-/winston-0.7.2.tgz
+243 silly lockFile 66ac613a-winston-0-7-2 winston@0.7.2
+244 silly lockFile 66ac613a-winston-0-7-2 winston@0.7.2
+245 silly lockFile 5cafa890-winston-latest winston@latest
+246 silly lockFile 5cafa890-winston-latest winston@latest
+247 info already installed winston@0.7.2
+248 silly resolved [ { name: 'resize',
+248 silly resolved     version: '0.7.2',
+248 silly resolved     description: 'Image resizer',
+248 silly resolved     keywords: [ 'image', 'resize' ],
+248 silly resolved     author: { name: 'TJ Holowaychuk', email: 'tj@learnboost.com' },
+248 silly resolved     dependencies: { graphicsmagick2: '0.1.2', debug: '*' },
+248 silly resolved     main: 'index',
+248 silly resolved     engines: { node: '*' },
+248 silly resolved     readme: '\n# resize\n\n  Image resizer built with node-canvas.\n\n## Installation\n\n    $ npm install resize\n\n## resize(path | buffer, width, height, callback)\n\n```js\nvar resize = require(\'resize\');\nresize(\'/path/to/image.png\', 300, 500, function(err, buf){});\nresize(imageBuffer, 100, 100, function(err, buf){});\n```\n\n## License \n\n(The MIT License)\n\nCopyright (c) 2011 TJ Holowaychuk &lt;tj@learnboost.com&gt;\n\nPermission is hereby granted, free of charge, to any person obtaining\na copy of this software and associated documentation files (the\n\'Software\'), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish,\ndistribute, sublicense, and/or sell copies of the Software, and to\npermit persons to whom the Software is furnished to do so, subject to\nthe following conditions:\n\nThe above copyright notice and this permission notice shall be\nincluded in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \'AS IS\', WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\nIN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\nCLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\nTORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\nSOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.',
+248 silly resolved     readmeFilename: 'Readme.md',
+248 silly resolved     _id: 'resize@0.7.2',
+248 silly resolved     _from: 'resize@*' } ]
+249 info install resize@0.7.2 into /home/giantleap/Documents/projects/prodonus-server-app
+250 info installOne resize@0.7.2
+251 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize unbuild
+252 verbose tar unpack /home/giantleap/.npm/resize/0.7.2/package.tgz
+253 silly lockFile 92689a69-s-server-app-node-modules-resize tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
+254 verbose lock tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize /home/giantleap/.npm/92689a69-s-server-app-node-modules-resize.lock
+255 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
+256 verbose lock tar:///home/giantleap/.npm/resize/0.7.2/package.tgz /home/giantleap/.npm/7abbe35c-eap-npm-resize-0-7-2-package-tgz.lock
+257 silly gunzTarPerm modes [ '755', '644' ]
+258 silly gunzTarPerm extractEntry package.json
+259 silly gunzTarPerm extractEntry .npmignore
+260 silly gunzTarPerm extractEntry index.js
+261 silly gunzTarPerm extractEntry test.js
+262 silly gunzTarPerm extractEntry History.md
+263 silly gunzTarPerm extractEntry Makefile
+264 silly gunzTarPerm extractEntry Readme.md
+265 silly lockFile 92689a69-s-server-app-node-modules-resize tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
+266 silly lockFile 92689a69-s-server-app-node-modules-resize tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
+267 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
+268 silly lockFile 7abbe35c-eap-npm-resize-0-7-2-package-tgz tar:///home/giantleap/.npm/resize/0.7.2/package.tgz
+269 info preinstall resize@0.7.2
+270 verbose readDependencies using package.json deps
+271 verbose readDependencies using package.json deps
+272 verbose cache add [ 'graphicsmagick2@0.1.2', null ]
+273 verbose cache add name=undefined spec="graphicsmagick2@0.1.2" args=["graphicsmagick2@0.1.2",null]
+274 verbose parsed url { protocol: null,
+274 verbose parsed url   slashes: null,
+274 verbose parsed url   auth: null,
+274 verbose parsed url   host: null,
+274 verbose parsed url   port: null,
+274 verbose parsed url   hostname: null,
+274 verbose parsed url   hash: null,
+274 verbose parsed url   search: null,
+274 verbose parsed url   query: null,
+274 verbose parsed url   pathname: 'graphicsmagick2@0.1.2',
+274 verbose parsed url   path: 'graphicsmagick2@0.1.2',
+274 verbose parsed url   href: 'graphicsmagick2@0.1.2' }
+275 verbose cache add name="graphicsmagick2" spec="0.1.2" args=["graphicsmagick2","0.1.2"]
+276 verbose parsed url { protocol: null,
+276 verbose parsed url   slashes: null,
+276 verbose parsed url   auth: null,
+276 verbose parsed url   host: null,
+276 verbose parsed url   port: null,
+276 verbose parsed url   hostname: null,
+276 verbose parsed url   hash: null,
+276 verbose parsed url   search: null,
+276 verbose parsed url   query: null,
+276 verbose parsed url   pathname: '0.1.2',
+276 verbose parsed url   path: '0.1.2',
+276 verbose parsed url   href: '0.1.2' }
+277 verbose addNamed [ 'graphicsmagick2', '0.1.2' ]
+278 verbose addNamed [ '0.1.2', '0.1.2' ]
+279 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
+280 verbose lock graphicsmagick2@0.1.2 /home/giantleap/.npm/92c5db15-graphicsmagick2-0-1-2.lock
+281 verbose cache add [ 'debug@*', null ]
+282 verbose cache add name=undefined spec="debug@*" args=["debug@*",null]
+283 verbose parsed url { protocol: null,
+283 verbose parsed url   slashes: null,
+283 verbose parsed url   auth: null,
+283 verbose parsed url   host: null,
+283 verbose parsed url   port: null,
+283 verbose parsed url   hostname: null,
+283 verbose parsed url   hash: null,
+283 verbose parsed url   search: null,
+283 verbose parsed url   query: null,
+283 verbose parsed url   pathname: 'debug@*',
+283 verbose parsed url   path: 'debug@*',
+283 verbose parsed url   href: 'debug@*' }
+284 verbose cache add name="debug" spec="*" args=["debug","*"]
+285 verbose parsed url { protocol: null,
+285 verbose parsed url   slashes: null,
+285 verbose parsed url   auth: null,
+285 verbose parsed url   host: null,
+285 verbose parsed url   port: null,
+285 verbose parsed url   hostname: null,
+285 verbose parsed url   hash: null,
+285 verbose parsed url   search: null,
+285 verbose parsed url   query: null,
+285 verbose parsed url   pathname: '*',
+285 verbose parsed url   path: '*',
+285 verbose parsed url   href: '*' }
+286 verbose addNamed [ 'debug', '*' ]
+287 verbose addNamed [ null, '*' ]
+288 silly lockFile 3ac45eff-debug debug@*
+289 verbose lock debug@* /home/giantleap/.npm/3ac45eff-debug.lock
+290 silly addNameRange { name: 'debug', range: '*', hasData: false }
+291 verbose url raw graphicsmagick2/0.1.2
+292 verbose url resolving [ 'https://registry.npmjs.org/', './graphicsmagick2/0.1.2' ]
+293 verbose url resolved https://registry.npmjs.org/graphicsmagick2/0.1.2
+294 info trying registry request attempt 1 at 11:39:32
+295 verbose etag "2SMVBANGAEHTQMYO2PGC37SN3"
+296 http GET https://registry.npmjs.org/graphicsmagick2/0.1.2
+297 verbose url raw debug
+298 verbose url resolving [ 'https://registry.npmjs.org/', './debug' ]
+299 verbose url resolved https://registry.npmjs.org/debug
+300 info trying registry request attempt 1 at 11:39:32
+301 verbose etag "2S4D9TUHX23FL0E3OWJEDXYI4"
+302 http GET https://registry.npmjs.org/debug
+303 http 200 https://registry.npmjs.org/graphicsmagick2/0.1.2
+304 silly registry.get cb [ 200,
+304 silly registry.get   { date: 'Fri, 21 Mar 2014 06:09:33 GMT',
+304 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R14B04)',
+304 silly registry.get     etag: '"8T31QE7CVLPHVDRO60NSY4JOC"',
+304 silly registry.get     'content-type': 'application/json',
+304 silly registry.get     via: '1.1 varnish',
+304 silly registry.get     'cache-control': 'max-age=1',
+304 silly registry.get     'content-length': '984',
+304 silly registry.get     'accept-ranges': 'bytes',
+304 silly registry.get     age: '0',
+304 silly registry.get     'x-served-by': 'cache-v36-ASH, cache-sv95-SJC3',
+304 silly registry.get     'x-cache': 'MISS, MISS',
+304 silly registry.get     'x-cache-hits': '0, 0',
+304 silly registry.get     'x-timer': 'S1395382173.415353060,VS0,VS-43,VE56,VE174',
+304 silly registry.get     vary: 'Accept',
+304 silly registry.get     'keep-alive': 'timeout=10, max=50',
+304 silly registry.get     connection: 'Keep-Alive' } ]
+305 silly lockFile 2b850bf2-agick2-graphicsmagick2-0-1-2-tgz https://registry.npmjs.org/graphicsmagick2/-/graphicsmagick2-0.1.2.tgz
+306 verbose lock https://registry.npmjs.org/graphicsmagick2/-/graphicsmagick2-0.1.2.tgz /home/giantleap/.npm/2b850bf2-agick2-graphicsmagick2-0-1-2-tgz.lock
+307 verbose addRemoteTarball [ 'https://registry.npmjs.org/graphicsmagick2/-/graphicsmagick2-0.1.2.tgz',
+307 verbose addRemoteTarball   '8cbceb16d8cfa6a1d88ae9d7d9efd2fb258751fd' ]
+308 info retry fetch attempt 1 at 11:39:33
+309 verbose fetch to= /home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/tmp.tgz
+310 http GET https://registry.npmjs.org/graphicsmagick2/-/graphicsmagick2-0.1.2.tgz
+311 http 200 https://registry.npmjs.org/debug
+312 silly registry.get cb [ 200,
+312 silly registry.get   { date: 'Fri, 21 Mar 2014 06:09:33 GMT',
+312 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B)',
+312 silly registry.get     etag: '"5HTNPJKOOONWJ5MZTDYKIG585"',
+312 silly registry.get     'content-type': 'application/json',
+312 silly registry.get     via: '1.1 varnish',
+312 silly registry.get     'cache-control': 'max-age=1',
+312 silly registry.get     'content-length': '33850',
+312 silly registry.get     'accept-ranges': 'bytes',
+312 silly registry.get     age: '106',
+312 silly registry.get     'x-served-by': 'cache-v43-ASH, cache-sv62-SJC3',
+312 silly registry.get     'x-cache': 'HIT, HIT',
+312 silly registry.get     'x-cache-hits': '1, 1',
+312 silly registry.get     'x-timer': 'S1395364842.433517456,VS0,VS-26,VE-26,VE17331090',
+312 silly registry.get     vary: 'Accept',
+312 silly registry.get     'keep-alive': 'timeout=10, max=50',
+312 silly registry.get     connection: 'Keep-Alive' } ]
+313 silly addNameRange number 2 { name: 'debug', range: '*', hasData: true }
+314 silly addNameRange versions [ 'debug',
+314 silly addNameRange   [ '0.0.1',
+314 silly addNameRange     '0.1.0',
+314 silly addNameRange     '0.2.0',
+314 silly addNameRange     '0.3.0',
+314 silly addNameRange     '0.4.0',
+314 silly addNameRange     '0.4.1',
+314 silly addNameRange     '0.5.0',
+314 silly addNameRange     '0.6.0',
+314 silly addNameRange     '0.7.0',
+314 silly addNameRange     '0.7.1',
+314 silly addNameRange     '0.7.2',
+314 silly addNameRange     '0.7.3',
+314 silly addNameRange     '0.7.4' ] ]
+315 verbose addNamed [ 'debug', '0.7.4' ]
+316 verbose addNamed [ '0.7.4', '0.7.4' ]
+317 silly lockFile 16160008-debug-0-7-4 debug@0.7.4
+318 verbose lock debug@0.7.4 /home/giantleap/.npm/16160008-debug-0-7-4.lock
+319 silly lockFile 16160008-debug-0-7-4 debug@0.7.4
+320 silly lockFile 16160008-debug-0-7-4 debug@0.7.4
+321 silly lockFile 3ac45eff-debug debug@*
+322 silly lockFile 3ac45eff-debug debug@*
+323 http 200 https://registry.npmjs.org/graphicsmagick2/-/graphicsmagick2-0.1.2.tgz
+324 verbose tar unpack /home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/tmp.tgz
+325 silly lockFile 35484d52-73753-0-2589025045745075-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package
+326 verbose lock tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package /home/giantleap/.npm/35484d52-73753-0-2589025045745075-package.lock
+327 silly lockFile ec7564d2-73753-0-2589025045745075-tmp-tgz tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/tmp.tgz
+328 verbose lock tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/tmp.tgz /home/giantleap/.npm/ec7564d2-73753-0-2589025045745075-tmp-tgz.lock
+329 silly gunzTarPerm modes [ '755', '644' ]
+330 silly gunzTarPerm extractEntry package.json
+331 silly gunzTarPerm extractEntry .npmignore
+332 silly gunzTarPerm extractEntry test.js
+333 silly gunzTarPerm extractEntry binding.gyp
+334 silly gunzTarPerm extractEntry build/binding.Makefile
+335 silly gunzTarPerm extractEntry build/config.gypi
+336 silly gunzTarPerm extractEntry build/GraphicsMagick.target.mk
+337 silly gunzTarPerm extractEntry build/gyp-mac-tool
+338 silly gunzTarPerm extractEntry build/Makefile
+339 silly gunzTarPerm extractEntry build/Release/.deps/Release/GraphicsMagick.node.d
+340 silly gunzTarPerm extractEntry build/Release/.deps/Release/obj.target/GraphicsMagick/GraphicsMagick.o.d
+341 silly gunzTarPerm extractEntry build/Release/GraphicsMagick.node
+342 silly gunzTarPerm extractEntry build/Release/linker.lock
+343 silly gunzTarPerm extractEntry build/Release/obj.target/GraphicsMagick/GraphicsMagick.o
+344 silly gunzTarPerm extractEntry GraphicsMagick.cc
+345 silly gunzTarPerm extractEntry History.md
+346 silly gunzTarPerm extractEntry README.creole
+347 silly gunzTarPerm extractEntry test.jpg
+348 silly gunzTarPerm extractEntry wscript
+349 silly lockFile 35484d52-73753-0-2589025045745075-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package
+350 silly lockFile 35484d52-73753-0-2589025045745075-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package
+351 silly lockFile ec7564d2-73753-0-2589025045745075-tmp-tgz tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/tmp.tgz
+352 silly lockFile ec7564d2-73753-0-2589025045745075-tmp-tgz tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/tmp.tgz
+353 verbose tar pack [ '/home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz',
+353 verbose tar pack   '/home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package' ]
+354 verbose tarball /home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+355 verbose folder /home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package
+356 silly lockFile 35484d52-73753-0-2589025045745075-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package
+357 verbose lock tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package /home/giantleap/.npm/35484d52-73753-0-2589025045745075-package.lock
+358 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+359 verbose lock tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz /home/giantleap/.npm/b8a89ebb-raphicsmagick2-0-1-2-package-tgz.lock
+360 silly lockFile 35484d52-73753-0-2589025045745075-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package
+361 silly lockFile 35484d52-73753-0-2589025045745075-package tar:///home/giantleap/tmp/npm-3756-PuLsoRza/1395382173753-0.2589025045745075/package
+362 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+363 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+364 silly lockFile ab69de92-pm-graphicsmagick2-0-1-2-package /home/giantleap/.npm/graphicsmagick2/0.1.2/package
+365 verbose lock /home/giantleap/.npm/graphicsmagick2/0.1.2/package /home/giantleap/.npm/ab69de92-pm-graphicsmagick2-0-1-2-package.lock
+366 silly lockFile ab69de92-pm-graphicsmagick2-0-1-2-package /home/giantleap/.npm/graphicsmagick2/0.1.2/package
+367 silly lockFile ab69de92-pm-graphicsmagick2-0-1-2-package /home/giantleap/.npm/graphicsmagick2/0.1.2/package
+368 verbose tar unpack /home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+369 silly lockFile d92d6ba0-pm-graphicsmagick2-0-1-2-package tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package
+370 verbose lock tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package /home/giantleap/.npm/d92d6ba0-pm-graphicsmagick2-0-1-2-package.lock
+371 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+372 verbose lock tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz /home/giantleap/.npm/b8a89ebb-raphicsmagick2-0-1-2-package-tgz.lock
+373 silly gunzTarPerm modes [ '755', '644' ]
+374 silly gunzTarPerm extractEntry package.json
+375 silly gunzTarPerm extractEntry .npmignore
+376 silly gunzTarPerm extractEntry test.js
+377 silly gunzTarPerm extractEntry GraphicsMagick.cc
+378 silly gunzTarPerm extractEntry History.md
+379 silly gunzTarPerm extractEntry README.creole
+380 silly gunzTarPerm extractEntry binding.gyp
+381 silly gunzTarPerm extractEntry build/GraphicsMagick.target.mk
+382 silly gunzTarPerm extractEntry build/Makefile
+383 silly gunzTarPerm extractEntry build/Release/.deps/Release/GraphicsMagick.node.d
+384 silly gunzTarPerm extractEntry build/Release/.deps/Release/obj.target/GraphicsMagick/GraphicsMagick.o.d
+385 silly gunzTarPerm extractEntry build/Release/GraphicsMagick.node
+386 silly gunzTarPerm extractEntry build/Release/linker.lock
+387 silly gunzTarPerm extractEntry build/Release/obj.target/GraphicsMagick/GraphicsMagick.o
+388 silly gunzTarPerm extractEntry build/binding.Makefile
+389 silly gunzTarPerm extractEntry build/config.gypi
+390 silly gunzTarPerm extractEntry build/gyp-mac-tool
+391 silly gunzTarPerm extractEntry test.jpg
+392 silly gunzTarPerm extractEntry wscript
+393 silly lockFile d92d6ba0-pm-graphicsmagick2-0-1-2-package tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package
+394 silly lockFile d92d6ba0-pm-graphicsmagick2-0-1-2-package tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package
+395 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+396 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+397 verbose chmod /home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz 644
+398 verbose chown /home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz [ 1000, 1000 ]
+399 silly lockFile 2b850bf2-agick2-graphicsmagick2-0-1-2-tgz https://registry.npmjs.org/graphicsmagick2/-/graphicsmagick2-0.1.2.tgz
+400 silly lockFile 2b850bf2-agick2-graphicsmagick2-0-1-2-tgz https://registry.npmjs.org/graphicsmagick2/-/graphicsmagick2-0.1.2.tgz
+401 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
+402 silly lockFile 92c5db15-graphicsmagick2-0-1-2 graphicsmagick2@0.1.2
+403 silly resolved [ { name: 'debug',
+403 silly resolved     version: '0.7.4',
+403 silly resolved     repository: { type: 'git', url: 'git://github.com/visionmedia/debug.git' },
+403 silly resolved     description: 'small debugging utility',
+403 silly resolved     keywords: [ 'debug', 'log', 'debugger' ],
+403 silly resolved     author: { name: 'TJ Holowaychuk', email: 'tj@vision-media.ca' },
+403 silly resolved     dependencies: {},
+403 silly resolved     devDependencies: { mocha: '*' },
+403 silly resolved     main: 'lib/debug.js',
+403 silly resolved     browser: './debug.js',
+403 silly resolved     engines: { node: '*' },
+403 silly resolved     files: [ 'lib/debug.js', 'debug.js', 'index.js' ],
+403 silly resolved     component: { scripts: [Object] },
+403 silly resolved     readme: '# debug\n\n  tiny node.js debugging utility modelled after node core\'s debugging technique.\n\n## Installation\n\n```\n$ npm install debug\n```\n\n## Usage\n\n With `debug` you simply invoke the exported function to generate your debug function, passing it a name which will determine if a noop function is returned, or a decorated `console.error`, so all of the `console` format string goodies you\'re used to work fine. A unique color is selected per-function for visibility.\n \nExample _app.js_:\n\n```js\nvar debug = require(\'debug\')(\'http\')\n  , http = require(\'http\')\n  , name = \'My App\';\n\n// fake app\n\ndebug(\'booting %s\', name);\n\nhttp.createServer(function(req, res){\n  debug(req.method + \' \' + req.url);\n  res.end(\'hello\\n\');\n}).listen(3000, function(){\n  debug(\'listening\');\n});\n\n// fake worker of some kind\n\nrequire(\'./worker\');\n```\n\nExample _worker.js_:\n\n```js\nvar debug = require(\'debug\')(\'worker\');\n\nsetInterval(function(){\n  debug(\'doing some work\');\n}, 1000);\n```\n\n The __DEBUG__ environment variable is then used to enable these based on space or comma-delimited names. Here are some examples:\n\n  ![debug http and worker](http://f.cl.ly/items/18471z1H402O24072r1J/Screenshot.png)\n\n  ![debug worker](http://f.cl.ly/items/1X413v1a3M0d3C2c1E0i/Screenshot.png)\n\n## Millisecond diff\n\n  When actively developing an application it can be useful to see when the time spent between one `debug()` call and the next. Suppose for example you invoke `debug()` before requesting a resource, and after as well, the "+NNNms" will show you how much time was spent between calls.\n\n  ![](http://f.cl.ly/items/2i3h1d3t121M2Z1A3Q0N/Screenshot.png)\n\n  When stderr is not a TTY, `Date#toUTCString()` is used, making it more useful for logging the debug information as shown below:\n  _(NOTE: Debug now uses stderr instead of stdout, so the correct shell command for this example is actually `DEBUG=* node example/worker 2> out &`)_\n  \n  ![](http://f.cl.ly/items/112H3i0e0o0P0a2Q2r11/Screenshot.png)\n  \n## Conventions\n\n If you\'re using this in one or more of your libraries, you _should_ use the name of your library so that developers may toggle debugging as desired without guessing names. If you have more than one debuggers you _should_ prefix them with your library name and use ":" to separate features. For example "bodyParser" from Connect would then be "connect:bodyParser". \n\n## Wildcards\n\n  The "*" character may be used as a wildcard. Suppose for example your library has debuggers named "connect:bodyParser", "connect:compress", "connect:session", instead of listing all three with `DEBUG=connect:bodyParser,connect.compress,connect:session`, you may simply do `DEBUG=connect:*`, or to run everything using this module simply use `DEBUG=*`.\n\n  You can also exclude specific debuggers by prefixing them with a "-" character.  For example, `DEBUG=* -connect:*` would include all debuggers except those starting with "connect:".\n\n## Browser support\n\n Debug works in the browser as well, currently persisted by `localStorage`. For example if you have `worker:a` and `worker:b` as shown below, and wish to debug both type `debug.enable(\'worker:*\')` in the console and refresh the page, this will remain until you disable with `debug.disable()`. \n\n```js\na = debug(\'worker:a\');\nb = debug(\'worker:b\');\n\nsetInterval(function(){\n  a(\'doing some work\');\n}, 1000);\n\nsetInterval(function(){\n  a(\'doing some work\');\n}, 1200);\n```\n\n## License \n\n(The MIT License)\n\nCopyright (c) 2011 TJ Holowaychuk &lt;tj@vision-media.ca&gt;\n\nPermission is hereby granted, free of charge, to any person obtaining\na copy of this software and associated documentation files (the\n\'Software\'), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish,\ndistribute, sublicense, and/or sell copies of the Software, and to\npermit persons to whom the Software is furnished to do so, subject to\nthe following conditions:\n\nThe above copyright notice and this permission notice shall be\nincluded in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \'AS IS\', WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\nIN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\nCLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\nTORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\nSOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n',
+403 silly resolved     readmeFilename: 'Readme.md',
+403 silly resolved     bugs: { url: 'https://github.com/visionmedia/debug/issues' },
+403 silly resolved     homepage: 'https://github.com/visionmedia/debug',
+403 silly resolved     _id: 'debug@0.7.4',
+403 silly resolved     _from: 'debug@*' },
+403 silly resolved   { name: 'graphicsmagick2',
+403 silly resolved     description: 'Bindings to the graphicsmagick library.',
+403 silly resolved     version: '0.1.2',
+403 silly resolved     author: { name: 'Izaak Schroeder' },
+403 silly resolved     repository:
+403 silly resolved      { type: 'git',
+403 silly resolved        url: 'git://github.com/LearnBoost/node-graphicsmagick.git' },
+403 silly resolved     engine: 'node >= 0.6.0',
+403 silly resolved     scripts: { install: 'node-gyp rebuild' },
+403 silly resolved     gypfile: true,
+403 silly resolved     readme: '= Graphics Magick =\r\n\r\n{{{\r\n\tnpm install graphicsmagick\r\n}}}\r\n\r\nThis package contains Graphics Magick bindings for node.js.\r\n',
+403 silly resolved     readmeFilename: 'README.creole',
+403 silly resolved     bugs: { url: 'https://github.com/LearnBoost/node-graphicsmagick/issues' },
+403 silly resolved     homepage: 'https://github.com/LearnBoost/node-graphicsmagick',
+403 silly resolved     _id: 'graphicsmagick2@0.1.2',
+403 silly resolved     dist: { shasum: '0a01f3ec96a94d1447b28549c3507401eef4a9b6' },
+403 silly resolved     _from: 'graphicsmagick2@0.1.2',
+403 silly resolved     _resolved: 'https://registry.npmjs.org/graphicsmagick2/-/graphicsmagick2-0.1.2.tgz' } ]
+404 info install debug@0.7.4 into /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
+405 info install graphicsmagick2@0.1.2 into /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
+406 info installOne debug@0.7.4
+407 info installOne graphicsmagick2@0.1.2
+408 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug unbuild
+409 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2 unbuild
+410 verbose tar unpack /home/giantleap/.npm/debug/0.7.4/package.tgz
+411 silly lockFile c17e1a04-odules-resize-node-modules-debug tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
+412 verbose lock tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug /home/giantleap/.npm/c17e1a04-odules-resize-node-modules-debug.lock
+413 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
+414 verbose lock tar:///home/giantleap/.npm/debug/0.7.4/package.tgz /home/giantleap/.npm/93d662c7-leap-npm-debug-0-7-4-package-tgz.lock
+415 verbose tar unpack /home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+416 silly lockFile 082f654b-ize-node-modules-graphicsmagick2 tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
+417 verbose lock tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2 /home/giantleap/.npm/082f654b-ize-node-modules-graphicsmagick2.lock
+418 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+419 verbose lock tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz /home/giantleap/.npm/b8a89ebb-raphicsmagick2-0-1-2-package-tgz.lock
+420 silly gunzTarPerm modes [ '755', '644' ]
+421 silly gunzTarPerm modes [ '755', '644' ]
+422 silly gunzTarPerm extractEntry package.json
+423 silly gunzTarPerm extractEntry package.json
+424 silly gunzTarPerm extractEntry .npmignore
+425 silly gunzTarPerm extractEntry test.js
+426 silly gunzTarPerm extractEntry debug.js
+427 silly gunzTarPerm extractEntry index.js
+428 silly gunzTarPerm extractEntry GraphicsMagick.cc
+429 silly gunzTarPerm extractEntry History.md
+430 silly gunzTarPerm extractEntry Readme.md
+431 silly gunzTarPerm extractEntry lib/debug.js
+432 silly gunzTarPerm extractEntry README.creole
+433 silly gunzTarPerm extractEntry binding.gyp
+434 silly gunzTarPerm extractEntry build/GraphicsMagick.target.mk
+435 silly gunzTarPerm extractEntry build/Makefile
+436 silly lockFile c17e1a04-odules-resize-node-modules-debug tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
+437 silly lockFile c17e1a04-odules-resize-node-modules-debug tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
+438 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
+439 silly lockFile 93d662c7-leap-npm-debug-0-7-4-package-tgz tar:///home/giantleap/.npm/debug/0.7.4/package.tgz
+440 silly gunzTarPerm extractEntry build/Release/.deps/Release/GraphicsMagick.node.d
+441 silly gunzTarPerm extractEntry build/Release/.deps/Release/obj.target/GraphicsMagick/GraphicsMagick.o.d
+442 info preinstall debug@0.7.4
+443 verbose readDependencies using package.json deps
+444 verbose readDependencies using package.json deps
+445 silly resolved []
+446 verbose about to build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
+447 info build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/debug
+448 verbose linkStuff [ false,
+448 verbose linkStuff   false,
+448 verbose linkStuff   false,
+448 verbose linkStuff   '/home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules' ]
+449 info linkStuff debug@0.7.4
+450 verbose linkBins debug@0.7.4
+451 verbose linkMans debug@0.7.4
+452 verbose rebuildBundles debug@0.7.4
+453 info install debug@0.7.4
+454 silly gunzTarPerm extractEntry build/Release/GraphicsMagick.node
+455 silly gunzTarPerm extractEntry build/Release/linker.lock
+456 info postinstall debug@0.7.4
+457 silly gunzTarPerm extractEntry build/Release/obj.target/GraphicsMagick/GraphicsMagick.o
+458 silly gunzTarPerm extractEntry build/binding.Makefile
+459 silly gunzTarPerm extractEntry build/config.gypi
+460 silly gunzTarPerm extractEntry build/gyp-mac-tool
+461 silly gunzTarPerm extractEntry test.jpg
+462 silly gunzTarPerm extractEntry wscript
+463 silly lockFile 082f654b-ize-node-modules-graphicsmagick2 tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
+464 silly lockFile 082f654b-ize-node-modules-graphicsmagick2 tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
+465 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+466 silly lockFile b8a89ebb-raphicsmagick2-0-1-2-package-tgz tar:///home/giantleap/.npm/graphicsmagick2/0.1.2/package.tgz
+467 info preinstall graphicsmagick2@0.1.2
+468 verbose readDependencies using package.json deps
+469 verbose readDependencies using package.json deps
+470 silly resolved []
+471 verbose about to build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
+472 info build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2
+473 verbose linkStuff [ false,
+473 verbose linkStuff   false,
+473 verbose linkStuff   false,
+473 verbose linkStuff   '/home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules' ]
+474 info linkStuff graphicsmagick2@0.1.2
+475 verbose linkBins graphicsmagick2@0.1.2
+476 verbose linkMans graphicsmagick2@0.1.2
+477 verbose rebuildBundles graphicsmagick2@0.1.2
+478 info install graphicsmagick2@0.1.2
+479 verbose unsafe-perm in lifecycle true
+480 info graphicsmagick2@0.1.2 Failed to exec install script
+481 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules/graphicsmagick2 unbuild
+482 info preuninstall graphicsmagick2@0.1.2
+483 info uninstall graphicsmagick2@0.1.2
+484 verbose false,/home/giantleap/Documents/projects/prodonus-server-app/node_modules,/home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize/node_modules unbuild graphicsmagick2@0.1.2
+485 info postuninstall graphicsmagick2@0.1.2
+486 verbose about to build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize
+487 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/resize unbuild
+488 info preuninstall resize@0.7.2
+489 info uninstall resize@0.7.2
+490 verbose true,/home/giantleap/Documents/projects/prodonus-server-app/node_modules,/home/giantleap/Documents/projects/prodonus-server-app/node_modules unbuild resize@0.7.2
+491 info postuninstall resize@0.7.2
+492 error graphicsmagick2@0.1.2 install: `node-gyp rebuild`
+492 error Exit status 1
+493 error Failed at the graphicsmagick2@0.1.2 install script.
+493 error This is most likely a problem with the graphicsmagick2 package,
+493 error not with npm itself.
+493 error Tell the author that this fails on your system:
+493 error     node-gyp rebuild
+493 error You can get their info via:
+493 error     npm owner ls graphicsmagick2
+493 error There is likely additional logging output above.
+494 error System Linux 3.8.0-33-generic
+495 error command "/usr/bin/node" "/usr/bin/npm" "install"
+496 error cwd /home/giantleap/Documents/projects/prodonus-server-app
+497 error node -v v0.10.26
+498 error npm -v 1.4.3
+499 error code ELIFECYCLE
+500 verbose exit [ 1, true ]
