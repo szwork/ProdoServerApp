@@ -23,6 +23,7 @@ exports.init = function (app) {
   app.put('/api/organization/:orgid',auth, api.orgapi.updateOrganization);//update
    app.get('/api/organization',auth,api.orgapi.getAllOrganization); //read
   app.get('/api/organization/:orgid',auth, api.orgapi.getOrganization);//read
+  app.post('/api/orgdelreq/:orgid',auth,api.orgapi.requestToDeleteOrganization);
  
   app.delete('/api/organization/:orgid',auth, api.orgapi.deleteOrganization);//delete
   ///organization address

@@ -446,15 +446,44 @@ var _successfulOrganizationUpdation = function(self) {
 	
 		self.emit("successfulOrgUpdation", {"success":{"message":"Organization Updated Successfully"}});
 	}
+
+Organization.prototype.requestToDeleteOrganization = function(orgid,sessionuserid) {
+		var self=this;	
+		////////////////////////////////////////
+		_requestToDeleteOrganization(self,orgid,sessionuserid);
+		///////////////////////////////////////		
+};
+
+var _requestToDeleteOrganization=function(self,orgid,sessionuserid){	
+	logger.emit("log","_requestToDeleteOrganization");
+	orgModel.findOne({orgid:orgid},function(err,organization){
+		if(err){
+			self.emit("failedOrgDeletRequest",{"error":{"code":"ED001","message":"Error in db to deleteuser data"}});
+		}else if(organization){
+			if(organization.org_delreqsend == false){
+				EmailTemplateModel.findOne({templatetype:"orgdeletereqnotification"},function(err,emailtemplate){
+					if(err){
+						logger.error("error","Database Issue fun:_sendOrgRemoveNotificationToOrgMember "+err);
+					}else if(!emailtemplate){
+						logger.error("error","emailtemplate for orgdeletereqnotification doesnt exists");
+					}else{
+						self.emit("orgdeletereqnotification",organization,emailtemplate);
+					}
+				})
+			}else{
+				self.emit("successfulOrgDeleteRequest",{"success":{"message":"Delete request for this organization has been already sent"}});
+			}			
+		}else{
+			self.emit("failedOrgDeletRequest",{"error":{"code":"AO002","message":"Provided orgid is wrong"}});
+		}
+	})
+}
+
 Organization.prototype.deleteOrganization = function(orgid,sessionuserid) {
-		var self=this;
-		
-		
-	
+		var self=this;	
 		////////////////////////////////////////
 		_deleteOrganization(self,orgid,sessionuserid);
-		///////////////////////////////////////
-		
+		///////////////////////////////////////		
 };
 
 var _deleteOrganization=function(self,orgid,sessionuserid){

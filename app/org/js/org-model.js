@@ -78,6 +78,7 @@ var OrganizationSchema = mongoose.Schema({
     org_images:[{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}}], 
     orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
     terms:{type:Boolean},
+    org_delreqsend:{type:Boolean,default:false},
     broadcast:[{message:{type:String},expirydate:{type:Date},datecreated:{type:Date}}]
 
 });
