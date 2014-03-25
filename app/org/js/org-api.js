@@ -167,6 +167,73 @@ exports.updateOrganization = function(req, res) {
     }
     
 }
+
+exports.requestToDeleteOrganization = function(req, res) {
+  var orgid=req.params.orgid;
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedOrgDeletRequest");
+      organization.on("failedOrgDeletRequest",function(err){
+        logger.emit("error", err.error.message,req.user.userid);
+        // organization.removeAllListeners();
+        res.send(err);
+      });
+     organization.removeAllListeners("successfulOrgDeleteRequest");
+      organization.on("successfulOrgDeleteRequest",function(result){
+        logger.emit("info", result.success.message);
+        // organization.removeAllListeners();
+        res.send(result);
+      });
+      organization.removeAllListeners("orgdeletereqnotification");
+      organization.on("orgdeletereqnotification",function(orguser,emailtemplate){
+        console.log("organization : "+orguser);
+        var template_description=emailtemplate.description;
+        var html=S(template_description); 
+        // html=html.replaceAll("<email>",orguser.email);
+        html=html.replaceAll("<orgname>",orguser.name);
+        // html=html.replaceAll("<name>",orguser.name)
+        var subject=S(emailtemplate.subject);
+        subject=subject.replaceAll("<orgname>",orguser.name);
+        var message = {
+          from: "Prodonus  <noreply@prodonus.com>", // sender address
+          // to: "Prodonus  <support@prodonus.com>", // list of receivers
+          to: "Prodonus  <dinesh@giantleapsystems.com>", // list of receivers
+          subject:subject.s, // Subject line
+          html: html.s // html body
+        };
+        // console.log("message "+ JSON.stringify(message));
+        commonapi.sendMail(message,CONFIG.smtp_general,function(result){
+          if (result == "failure") {
+             logger.emit("error","Error in sending org delete request notification to mail to "+message.to,req.user.userid);
+          }else {
+            logger.emit("log","org delete notification mail sent to "+message.to);
+            res.send(result);
+            changeOrgDeleteRequestStatus(orgid);            
+          }
+        })
+      });
+    var isAdmin=req.user.org.isAdmin;
+     if(req.user.isAdmin || isAdmin) {
+      //////////////////////
+      organization.requestToDeleteOrganization(orgid,sessionuserid);
+     }else{
+       organization.emit("failedOrgDeletRequest",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
+     }
+}
+
+var changeOrgDeleteRequestStatus = function(orgid){
+  orgModel.update({orgid:orgid},{$set:{org_delreqsend:true}},function(err,organizationdeletestatus){
+    if(err){
+      logger.emit("error","Error in db to changeOrgDeleteRequestStatus "+err);
+    }else if(organizationdeletestatus!=1){
+      logger.emit("error","Provided orgid is wrong");
+    }else{
+      logger.emit("success","Status change for org_delreqsend");
+    }
+  })
+}
+
+
  exports.deleteOrganization = function(req, res) {
   var orgid=req.params.orgid;
   var sessionuserid=req.user.userid;
@@ -542,6 +609,8 @@ exports.otherOrgInvites=function(req,res){
   organization.removeAllListeners("sendotherorginvite");
   organization.on("sendotherorginvite",function(otherorginvite_template,inivtedata,user,organization_data){
     var subject=S(otherorginvite_template.subject);
+    subject=subject.replaceAll("<fromusername>",user.username);
+    subject=subject.replaceAll("<orgname>",organization_data.name);
     var template=S(otherorginvite_template.description);
     template=template.replaceAll("<email>",user.email);
     template=template.replaceAll("<fromusername>",user.username);

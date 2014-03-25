@@ -53,7 +53,7 @@ exports.loadEmailTemplate=function(req,res){
 		},
 		{
 			templatetype: "otherorginvite",
-			subject: "Invite From Prodonus on behalf of <username>(<orgname>)",
+			subject: "Invite From Prodonus on behalf of <fromusername>(<orgname>)",
 			description: "Dear <name>,<br><br>We've got great news. Today we're excited to tell you how you can come closer to your customers, get to know their needs, understand their issues, complaints better, and also engage them to create innovative ideas, in addition to managing their warranties.<br><br>We offer a warranty and social platform for products, for all product manufacturers and their customers sharing their insights on products. Prodonus is a warranty and social network platform for products, enabling conversations, building relationships and gathering real-time market intelligence from customers. We bring business closer to customers to engage them more directly. It helps to share your concerns, complaints, compliments, innovative ideas, business perspectives and product recommendations among the manufacturing business and product consumers.<br><br>We look forward to meeting you to discuss your requirements to signup on our new platform.<br><br>All the best,<br><br><fromusername>( <orgname> )<br><br>You are receiving this email because your friend <from username> referred you to us and mentioned you might be interested to subscribe to Prodonus. If you have any further questions, please write to business@prodonus.com. We would get in touch with you."
 		},
 		{
@@ -80,6 +80,11 @@ exports.loadEmailTemplate=function(req,res){
 			templatetype: "orgdeletenotification",
 			subject: "Your Organization <orgname> has been unsubscribed from prodonus",
 			description: "Dear <name>,<br><br>This notice is to inform that your organization <orgname> has choose to unsubscribe with prodonus. As a result your accounts have been deactivated and would be later deleted as per company's maintenance activity.<br><br>If you feel this action has occurred in error or you need further assistance, please write to our support staff at support@prodonus.com or contact your organization admin for Prodonus.<br><br>Thanks again for being a Prodonus customer.<br><br>Sincerely,<br><br>Prodonus Team"
+		},
+		{
+			templatetype: "orgdeletereqnotification",
+			subject: "Organization Delete Request from <orgname>",
+			description: "Dear Prodonus Team,<br><br><orgname> has requested to be deleted from the prodonus platform. Please ensure the organization deactivation process is initiated as per the prodonus company policies. <br><br>From,<br><br><orgname>"
 		}]
 
 
