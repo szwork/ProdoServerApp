@@ -207,7 +207,7 @@ exports.requestToDeleteOrganization = function(req, res) {
              logger.emit("error","Error in sending org delete request notification to mail to "+message.to,req.user.userid);
           }else {
             logger.emit("log","org delete notification mail sent to "+message.to);
-            res.send({"success":"org delete notification mail sent"});
+            res.send({"success":{"message":"org delete notification mail sent"}});
             changeOrgDeleteRequestStatus(orgid);
           }
         })

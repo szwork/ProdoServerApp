@@ -457,7 +457,7 @@ var _requestToDeleteOrganization=function(self,orgid,sessionuserid){
 					}
 				})
 			}else{
-				self.emit("failedOrgDeletRequest",{"error":{"code":"AO002","message":"Delete request for this organization has been already sent"}});
+				self.emit("successfulOrgDeleteRequest",{"success":{"message":"Delete request for this organization has been already sent"}});
 			}			
 		}else{
 			self.emit("failedOrgDeletRequest",{"error":{"code":"AO002","message":"Provided orgid is wrong"}});
