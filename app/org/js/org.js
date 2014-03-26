@@ -830,13 +830,13 @@ var _validateUpdateOrgAddressData=function(self,orgid,orgaddressid,orgaddress){
 	}
 }
 var _updateOrgAddress=function(self,orgaddress,orgid,orgaddressid){
-	orgModel.update({orgid:orgid,"location._id":orgaddressid},{$pull:{location:{_id:orgaddressid}}},function(err,orgaddrespullstatus){
-		if(err){
-			self.emit("failedUpdateAddress",{"error":{"code":"ED001","message":"Error in db to update organization address"}});
-		}else if(orgaddrespullstatus!=1){
-			self.emit("failedUpdateAddress",{"error":{"code":"AO002","message":"Provides orgid or orgaddress id is wrong to update organization address"}});			
-		}else{
-			orgModel.update({orgid:orgid},{$push:{location:orgaddress}},function(err,orgaddrespushstatus){
+	// orgModel.update({orgid:orgid,"location._id":orgaddressid},{$pull:{location:{_id:orgaddressid}}},function(err,orgaddrespullstatus){
+	// 	if(err){
+	// 		self.emit("failedUpdateAddress",{"error":{"code":"ED001","message":"Error in db to update organization address"}});
+	// 	}else if(orgaddrespullstatus!=1){
+	// 		self.emit("failedUpdateAddress",{"error":{"code":"AO002","message":"Provides orgid or orgaddress id is wrong to update organization address"}});			
+	// 	}else{
+			orgModel.update({orgid:orgid,"location._id":orgaddressid},{$set:{"location.$.locationtype":orgaddress.locationtype,"location.$.contacts":orgaddress.contacts,"location.$.address":orgaddress.address}},function(err,orgaddrespushstatus){
 				if(err){
 					self.emit("failedUpdateAddress",{"error":{"code":"ED001","message":"Error in db to update organization address"}});		
 				}else if(orgaddrespushstatus!=1){
@@ -847,8 +847,8 @@ var _updateOrgAddress=function(self,orgaddress,orgid,orgaddressid){
 					//////////////////////////
 				}
 			})
-		}
-	})
+	// 	}
+	// })
 }
 var _successfulOrgUpdateressAdd=function(self){
 	logger.emit("log","successfulUpdateAddress");
@@ -894,7 +894,7 @@ Organization.prototype.deleteOrgImage = function(orgimageids,orgid) {
 };
 var _deleteOrgImage=function(self,orgimageids,orgid){
 	 var org_imagearray=[];
-	orgimageids=S(orgimageids);
+	// orgimageids=S(orgimageids);
 	//db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
    // if(orgimageids.contains(",")){
    // 		org_imagearray=orgimageids.split(",");
