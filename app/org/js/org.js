@@ -490,8 +490,6 @@ var _deleteOrganization=function(self,orgid,sessionuserid){
 var _deleteOrganizationHistory=function(self,orgid,sessionuserid){
 	var orghistorydata=new orgHistoryModel({orgid:orgid,updatedby:sessionuserid});
 
-	
-
 	orghistorydata.save(function(err,orghistorydata){
 		if(err){
 			self.emit("failedOrgDeletion",{"error":{"code":"ED001","message":"Error in db to history model update"}});
@@ -865,12 +863,12 @@ var _deleteOrgImage=function(self,orgimageids,orgid){
 	 var org_imagearray=[];
 	orgimageids=S(orgimageids);
 	//db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
-   if(orgimageids.contains(",")){
-   		org_imagearray=orgimageids.split(",");
-   }else{
-   		org_imagearray.push(orgimageids.s);
-   }
-	orgModel.findAndModify({orgid:orgid,"org_images.imageid":{$in:org_imagearray}},[],{$pull:{org_images:{imageid:{$in:org_imagearray}}}},{new:false},function(err,deleteimagestatus){
+   // if(orgimageids.contains(",")){
+   // 		org_imagearray=orgimageids.split(",");
+   // }else{
+   // 		org_imagearray.push(orgimageids.s);
+   // }
+	orgModel.findAndModify({orgid:orgid,"org_images.imageid":orgimageids/*{$in:org_imagearray}*/},[],{$pull:{org_images:{imageid:orgimageids/*{$in:org_imagearray}*/}}},{new:false},function(err,deleteimagestatus){
 		if(err){
 			self.emit("failedDeleteOrgImage",{"error":{"code":"ED001","message":"function:_deleteOrgImage\nError in db to "}});
 		}else if(!deleteimagestatus){

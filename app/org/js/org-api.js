@@ -196,8 +196,7 @@ exports.requestToDeleteOrganization = function(req, res) {
         subject=subject.replaceAll("<orgname>",orguser.name);
         var message = {
           from: "Prodonus  <noreply@prodonus.com>", // sender address
-          // to: "Prodonus  <support@prodonus.com>", // list of receivers
-          to: "Prodonus  <dinesh@giantleapsystems.com>", // list of receivers
+          to: "Prodonus  <support@prodonus.com>", // list of receivers
           subject:subject.s, // Subject line
           html: html.s // html body
         };
@@ -207,14 +206,13 @@ exports.requestToDeleteOrganization = function(req, res) {
              logger.emit("error","Error in sending org delete request notification to mail to "+message.to,req.user.userid);
           }else {
             logger.emit("log","org delete notification mail sent to "+message.to);
-            res.send({"success":{"message":"org delete notification mail sent"}});
+            res.send({"success":{"message":"Organization delete notification mail sent"}});
             changeOrgDeleteRequestStatus(orgid);
           }
         })
       });
     var isAdmin=req.user.org.isAdmin;
      if(req.user.isAdmin || isAdmin) {
-      //////////////////////
       organization.requestToDeleteOrganization(orgid,sessionuserid);
      }else{
        organization.emit("failedOrgDeletRequest",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
@@ -554,9 +552,9 @@ exports.deleteOrgImage=function(req,res){
  
   var sessionuserid=req.user.userid;
   
-  var orgimageids=req.query.orgimageids;
+  var orgimageid=req.params.orgimageid;
   var orgid=req.params.orgid;
-  logger.emit("log","prodle\nsessionuserid"+sessionuserid+" prodleimageid:"+orgimageids+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(orgimageids));
+  logger.emit("log","prodle\nsessionuserid"+sessionuserid+" prodleimageid:"+orgimageid+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(orgimageid));
   
   var organization= new Organization();
      // product.setMaxListeners(0); 
@@ -585,7 +583,7 @@ exports.deleteOrgImage=function(req,res){
     organization.emit("failedDeleteOrgImage",{"error":{"code":"EA001","message":"You have not authorized to delete Org image"}}); 
   }else{
     ////////////////////////////////////////////////////////////
-    organization.deleteOrgImage(orgimageids,req.user.org.orgid);
+    organization.deleteOrgImage(orgimageid,req.user.org.orgid);
     //////////////////////////////////////////////// ///////////
   }
 }
