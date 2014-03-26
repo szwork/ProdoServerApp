@@ -255,14 +255,14 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 								
 								var userdata=[];
 				      			for(var i=0;i<newusers.length;i++)
-				     			{
+     							{
 				     			  if(product){
-				     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+				     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
 				     			  }else{
-				    				userdata[i]={products_followed:[],prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+				    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
 				     			  }
-							      
-				      	        }
+			      
+      	        				}
 				        	userModel.create(userdata,function(err,inviteuserdata){
 				          		if(err){
 				            		self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"_addUserInvitees"+err}});
@@ -1039,9 +1039,9 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
       			for(var i=0;i<newusers.length;i++)
      			{
      			  if(product){
-     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
      			  }else{
-    				userdata[i]={products_followed:[],prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
      			  }
 			      
       	        }
@@ -1441,6 +1441,9 @@ var _updateUserAndRemoveFromOrg=function(self,user,orgid,grpid,usermemberid,grpn
 				}else if(orguserremovestatus==0){
 					self.emit("failedRemoveOrgGroupMembers",{"error":{"message":"orgid is wrong"}}); 
 				}else{
+					////////////////////////////////////////////////////
+                     _applyDefaultIndividualTrialPlanWhenUserRemvoeFromGroup(usermemberid)
+					////////////////////////////////////////////////
 					/////////////////////////////////////////////////////////
 						_sendMailToOrgMemberUserDelete(self,user,orgid,usermemberid,"removememberfromorganduser",orgname,grpname);
 					///////////////////////////////////////////////////////
@@ -1449,6 +1452,48 @@ var _updateUserAndRemoveFromOrg=function(self,user,orgid,grpid,usermemberid,grpn
 					//////////////////////////////////////////////////
 				}
 			});
+		}
+	})
+}
+var _applyDefaultIndividualTrialPlanWhenUserRemvoeFromGroup=function(userid){
+	userModel.findOne({userid:userid},function(err,user){
+		if(err){
+			logger.emit("error","Database Issue"+err)
+		}else if(!user){
+			logger.emit("error","userid is wrong _applyDefaultIndividualTrialPlanWhenUserRemvoeFromGroup")
+		}else{
+			SubscriptionModel.findOne({plantype:"individual","planpaymentcommitment.amount":0},function(err,subscription){
+				if(err){
+					logger.emit("error","Database Issue"+err)
+				}else if(!subscription){
+					logger.emit("There is no trial subscription plan for individual");
+				}else{
+					var planperioddescription={quarterly:3,monthly:1,yearly:12};
+					var planperiod=planperioddescription[subscription.planpaymentcommitment.commitmenttype];
+					logger.emit('log',"planperiod"+planperiod);
+
+					var currentdate=new Date();
+					// var expirydate=new Date(currentdate.setDate(currentdate.getMonth()+3));
+					var expirydate=new Date(new Date(currentdate).setMonth(currentdate.getMonth()+planperiod));
+					var subscription_set={planid:subscription.planid,planstartdate:currentdate,planexpirydate:expirydate};
+					var payment_data=new PaymentModel({userid:user.userid,price:0});
+					payment_data.save(function(err,payment){
+						if(err){
+							self.emit("failedMakePayment",{"error":{"message":"Error in db to save new payment"}});				
+						}else{
+							userModel.update({userid:user.userid},{$set:{subscription:subscription_set,payment:{paymentid:payment.paymentid}}},function(err,userpaymentupdate){
+								if(err){
+									self.emit("failedMakePayment",{"error":{"message":"Error in db to update user payment details"+err}});				
+								}else if(userpaymentupdate==0){
+									self.emit("failedMakePayment",{"error":{"message":"Userid is wrong"}});					
+								}else{
+									logger.emit("log"," Default individual Trail Plan applied");
+								}
+							})
+						}
+					})
+				}
+			})
 		}
 	})
 }
