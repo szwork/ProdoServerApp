@@ -148,9 +148,9 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
     
 	var _addOrgDetailsToUser = function(self,organization,sessionuserid,sessionuser) {
     var organizationsubscription={planid:organization.subscription.planid,planstartdate:new Date(organization.subscription.planstartdate),planexpirydate:new Date(organization.subscription.planexpirydate)};
-		userModel.update({userid:sessionuserid},{$set:{payment:{paymentid:organization.payment.paymentid},subscription:organizationsubscription,usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,isAdmin:true,orgtype:organization.orgtype,orgname:organization.orgname}}},function(err,userupdatestatus){
+		userModel.update({userid:sessionuserid},{$set:{payment:{paymentid:organization.payment.paymentid},subscription:organizationsubscription,usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,isAdmin:true,orgtype:organization.orgtype,orgname:organization.name}}},function(err,userupdatestatus){
 	 	  if(err){
-	   	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to update user"}});
+	   	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to update user"+err}});
 	  	}else if(userupdatestatus!=1){
 	    	self.emit("failedOrgAdd",{"error":{"code":"AU002","message":"Provided userid is wrong"}});
 	  	}else{
@@ -247,23 +247,35 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 	    			existingusers=__.difference(existingusers,existinguserwithorg);
 	   				var newusers=__.difference(invitees,existingusers);
 	   				newusers=__.difference(newusers,existinguserwithorg);
-	      	  if(newusers.length>0){
-		      		var userdata=[];
-			      	for(var i=0;i<newusers.length;i++)
-			     		{
-						    userdata[i]={prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}};
-			      	}
-			        userModel.create(userdata,function(err,inviteuserdata){
-			          if(err){
-			            self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"_addUserInvitees"+err}});
-			          }else if(inviteuserdata){
-			          	logger.emit("log",inviteuserdata);
-			          	var inviteusers=userdata;
-			          	/////////////////////////////////////////////////
-			           _sendEmailToInvitees(self,organization,usergrp_array,newusers,sessionuser);
-			            /////////////////////////////////////////////////
-			          }
-			        })
+	      	  		if(newusers.length>0){
+	      	  			productModel.findOne({"name":new RegExp('^'+"Prodonus", "i")},{prodle:1,orgid:1}).lean().exec(function(err,product){
+							if(err){
+								self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
+							}else{
+								
+								var userdata=[];
+				      			for(var i=0;i<newusers.length;i++)
+				     			{
+				     			  if(product){
+				     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+				     			  }else{
+				    				userdata[i]={products_followed:[],prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+				     			  }
+							      
+				      	        }
+				        	userModel.create(userdata,function(err,inviteuserdata){
+				          		if(err){
+				            		self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"_addUserInvitees"+err}});
+				          		}else if(inviteuserdata){
+				          			logger.emit("log",inviteuserdata);
+				          			var inviteusers=userdata;
+						          	/////////////////////////////////////////////////
+						           _sendEmailToInvitees(self,organization,usergrp_array,newusers,sessionuser);
+						            /////////////////////////////////////////////////
+				          		}
+				        	})
+				        	}
+						});
 	      		}else{//if the provided email id is already registered with prodonus
 			       /////////////////////////////////////////////////////////////
 			      	_sendEmailToInvitees(self,organization,usergrp_array,newusers,sessionuser);
@@ -1012,37 +1024,50 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 	        logger.emit("log","newusers:"+newusers);
 	        logger.emit("log","existingusers"+existingusers);
 	      	orgModel.findOne({orgid:orgid},function(err,organization){
-						if(err){
-							self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
-						}else if(!organization){
-							self.emit("failedOrgInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
-						}else{
-				 			if(newusers.length>0){//
-			    			var userdata=[];
-				   		  for(var i=0;i<newusers.length;i++)
-				   		  {
-				     		  userdata[i]={usertype:organization.orgtype,prodousertype:"business",email:newusers[i],org:{orgid:orgid,isAdmin:false,orgtype:organization.orgtype,orgname:organization.name},username:newusers[i],subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}};
-				    	  }
-								userModel.create(userdata,function(err,inviteuserdata){
-									if(err){
-									  self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to create invite users"+err}});
-									}else if(inviteuserdata){
-										logger.emit("log",inviteuserdata); 
-										var inviteusers=userdata;
-										/////////////////////////////////////////////////
-									 _sendInviteEmailToOrgInvitees(self,newusers,existingusers,usergrp.grpname,organization,sessionuser);
-									  /////////////////////////////////////////////////
-									}
-								})
-							}else{//if provided invites already exists 
-								logger.emit("log","provided invites emails already exists");
-								//////////////////////////////////////////////////////////////////////////////////////
-								_sendInviteEmailToOrgInvitees(self,newusers,existingusers,usergrp.grpname,organization,sessionuser);
-								/////////////////////////////////////////////////////////////////////////////
-							}
-						}
-					})
-				}
+		if(err){
+			self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
+		}else if(!organization){
+			self.emit("failedOrgInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
+		}else{
+ 			if(newusers.length>0){//
+ 				productModel.findOne({"name":new RegExp('^'+"Prodonus", "i")},{prodle:1,orgid:1}).lean().exec(function(err,product){
+					if(err){
+					self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
+				}else{
+				
+				var userdata=[];
+      			for(var i=0;i<newusers.length;i++)
+     			{
+     			  if(product){
+     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+     			  }else{
+    				userdata[i]={products_followed:[],prodousertype:"business",usertype:organization.orgtype,email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+     			  }
+			      
+      	        }
+	    			
+				userModel.create(userdata,function(err,inviteuserdata){
+					if(err){
+					  self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to create invite users"+err}});
+					}else if(inviteuserdata){
+						logger.emit("log",inviteuserdata); 
+						var inviteusers=userdata;
+						/////////////////////////////////////////////////
+					 _sendInviteEmailToOrgInvitees(self,newusers,existingusers,usergrp.grpname,organization,sessionuser);
+					  /////////////////////////////////////////////////
+					}
+				})
+					}
+				})
+			}else{//if provided invites already exists 
+				logger.emit("log","provided invites emails already exists");
+				//////////////////////////////////////////////////////////////////////////////////////
+				_sendInviteEmailToOrgInvitees(self,newusers,existingusers,usergrp.grpname,organization,sessionuser);
+				/////////////////////////////////////////////////////////////////////////////
+			}
+		}
+	})
+}
 		  })
 		};
 	})
