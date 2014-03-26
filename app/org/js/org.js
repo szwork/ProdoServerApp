@@ -1021,13 +1021,13 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 			    			var userdata=[];
 				   		  for(var i=0;i<newusers.length;i++)
 				   		  {
-				     		  userdata[i]={email:newusers[i],org:{orgid:orgid,isAdmin:false,orgtype:organization.orgtype,orgname:organization.name},username:newusers[i],subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}};
+				     		  userdata[i]={usertype:organization.orgtype,prodousertype:"business",email:newusers[i],org:{orgid:orgid,isAdmin:false,orgtype:organization.orgtype,orgname:organization.name},username:newusers[i],subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}};
 				    	  }
 								userModel.create(userdata,function(err,inviteuserdata){
 									if(err){
 									  self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to create invite users"+err}});
 									}else if(inviteuserdata){
-										logger.emit("log",inviteuserdata);
+										logger.emit("log",inviteuserdata); 
 										var inviteusers=userdata;
 										/////////////////////////////////////////////////
 									 _sendInviteEmailToOrgInvitees(self,newusers,existingusers,usergrp.grpname,organization,sessionuser);
