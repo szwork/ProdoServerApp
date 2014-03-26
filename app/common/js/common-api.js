@@ -329,7 +329,7 @@ var __userFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains("png") ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
   }else if(file_length>500000){
-    callback({"error":{"message":"You can upload  image of size less than 1mb"}});
+    callback({"error":{"message":"You can upload  image of size less than 500 kb"}});
   }else{
     easyimg.info(fileName,function(err,info){
       logger.emit("log","error"+err);
@@ -451,7 +451,7 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                         params = {
                           Bucket: bucketFolder,
                           Key: action.org.orgid+s3filekey,
-                          Body: buffer,
+                          Body: writebuffer,
                           // Expires:new Date(expirydate),
                           ACL: 'public-read',
                           ContentType: file_type
@@ -542,7 +542,7 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
                               params = {
                                 Bucket: bucketFolder,
                                 Key: action.product.orgid+action.product.prodle+s3filekey,
-                                Body: buffer,
+                                Body: writebuffer,
                                 Expires:expirydate,
                                 ACL: 'public-read',
                                 ContentType: file_type
