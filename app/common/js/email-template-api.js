@@ -64,7 +64,7 @@ exports.loadEmailTemplate=function(req,res){
 		{
 			templatetype: "removememberfromorganduser",
 			subject: "Your organization <orgname> removed from group <grpname> and Your account set to deactive",
-			description: "Dear <tousername>,<br><br>This notice is to inform; you have been deleted from the group <b><grpname></b> of <b><orgname></b> by <b><adminuser></b> and as a user of Prodonus. Your account is deactivated and would be removed permanently during our recurring maintenance batch cycle.<br><br>If you feel this action has occurred in error or you need further assistance, please write to our support staff at support@prodonus.com or better contact to your organization admin.<br><br>Thanks again for being a Prodonus customer.<br><br>Sincerely,<br><br>Prodonus Team"
+			description: "Dear <tousername>,<br><br>This notice is to inform; you have been deleted from the group <b><grpname></b> of <b><orgname></b> by <b><adminuser></b> and as a user of Prodonus  your account is deactivated and would be removed permanently during our recurring maintenance cycle.<br><br>If you feel this action has occurred in error or you need further assistance, please write to our support staff at support@prodonus.com or better contact to your organization admin.<br><br>Thanks again for being a Prodonus customer.<br><br>Sincerely,<br><br>Prodonus Team"
 		},
 		{
 			templatetype: "emailchange",

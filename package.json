@@ -30,9 +30,10 @@
     "aws-sdk":"*",
     "passport.socketio":"*",
     "connect":"*",
-    "connect-redis":"*",
+    "connect-redis":"1.4.7",
     "underscore":"*",
     "natural":"*",
-    "easyimage":"*"
+    "easyimage":"*",
+    "gm":"*"
   }
 }

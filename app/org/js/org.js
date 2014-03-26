@@ -213,6 +213,20 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 			}
 		}
 		logger.emit("log","invitee"+invitees);
+		////////////////
+		
+	// var companydomain=S(user.email).substring(user.email.indexOf("@")+1);
+	// var notvalidemails=[];
+	var invitees1=invitees
+	// var invitees=[];
+	// for(var i=0;i<invitees1.length;i++){
+	// 	if(companydomain==S(invitees1).substring(user.email.indexOf("@")+1)){
+	// 		invitees.push(invitees1[i])
+	// 	}
+	// }
+
+
+		//////////////
 		userModel.find({email:{$in:invitees}},{email:1}).lean().exec(function(err,user){
 	    if(err){
 	    	self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find users"+err}});
@@ -908,13 +922,13 @@ var _successfulDeleteOrgImage=function(self){
 	logger.emit("log","_successfulDeleteOrgImage");
 	self.emit("successfulDeleteOrgImage",{"success":{"message":"Delete Organizations Images Successfully"}});
 }
-Organization.prototype.orgInvites=function(orgid,usergrp){
+Organization.prototype.orgInvites=function(orgid,usergrp,user){
 	var self=this;
 	/////////////////////
-	_validateOrgInvites(self,orgid,usergrp);
+	_validateOrgInvites(self,orgid,usergrp,user);
 
 }
-var _validateOrgInvites=function(self,orgid,usergrp){
+var _validateOrgInvites=function(self,orgid,usergrp,user){
 
 	if(usergrp==undefined){
 		self.emit("failedOrgInvites",{"error":{"code":"AV001","message":"Please pass usergrp data"}});
@@ -926,21 +940,33 @@ var _validateOrgInvites=function(self,orgid,usergrp){
 		self.emit("failedOrgInvites",{"error":{"code":"AV001","message":"plese fill invites emails"}});
 	}else{
 		//////////////////
-		_addOrgInvitees(self,orgid,usergrp)
+		_addOrgInvitees(self,orgid,usergrp,user)
 		//////////////////
 	}
 
 }
-var _addOrgInvitees = function(self,orgid,usergrp) {
-	var invitees=[]
+var _addOrgInvitees = function(self,orgid,usergrp,user) {
+	var invitees=[];
+	var invitees1=[]
 	var j=0;
 	//to add invtiees email into array group by grpname
 	var invites=S(usergrp.invites);
+
 	if(invites.contains(",")){
-		invitees=invites.split(",");
+		invitees1=invites.split(",");
 	}else{
-		invitees.push(invites.s);
+		invitees1.push(invites.s);
 	}
+	invitees=invitees1;
+	// var companydomain=S(user.email).substring(user.email.indexOf("@")+1);
+	// var notvalidemails=[];
+	// for(var i=0;i<invitees1.length;i++){
+	// 	if(companydomain==S(invitees1).substring(user.email.indexOf("@")+1)){
+	// 		invitees.push(invitees1[i])
+	// 	}else{
+	// 		notvalidemails.push(invitees1[i]);
+	// 	}
+	// }
 	console.log("invitee"+invitees);
 	logger.emit("log","invitee"+invitees);
 	userModel.find({email:{$in:invitees}},{email:1}).lean().exec(function(err,user){
@@ -973,6 +999,7 @@ var _addOrgInvitees = function(self,orgid,usergrp) {
 				    	var userdata=[];
 					    for(var i=0;i<newusers.length;i++)
 					    {
+					      
 					      userdata[i]={email:newusers[i],org:{orgid:orgid,isAdmin:false,orgtype:organization.orgtype,orgname:organization.name},username:newusers[i]};
 					    }
 							userModel.create(userdata,function(err,inviteuserdata){
@@ -1014,15 +1041,15 @@ var _addOrgInvitees = function(self,orgid,usergrp) {
 	    			 self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find invite email templates"}});
 	  			}else if(orgusertemplate){
 	  	 			for(var i=0;i<newusers.length;i++){
-							/////////////////////////////////////////////////////////////////////////////////
-							self.emit("sendorginviteandverification", newusers[i],neworgusertemplate,organization.name,grpname);
-							////////////////////////////////////////////////////////////////////////////////	
+					    /////////////////////////////////////////////////////////////////////////////////
+						self.emit("sendorginviteandverification", newusers[i],neworgusertemplate,organization.name,grpname);
+						////////////////////////////////////////////////////////////////////////////////	
 			  		}
 			  		for(var j=0;j<existingusers.length;j++)
 			  		{
 			  			/////////////////////////////////////////////////////////////////////////////////
-							self.emit("sendorginvites", existingusers[j],orgusertemplate,organization.name,grpname);
-							////////////////////////////////////////////////////////////////////////////////
+						self.emit("sendorginvites", existingusers[j],orgusertemplate,organization.name,grpname);
+						////////////////////////////////////////////////////////////////////////////////
 			  		}	
 			  		logger.emit("log","1");
 			  	///////////////////////////////////////////
@@ -1041,7 +1068,7 @@ var _addOrgInvitees = function(self,orgid,usergrp) {
 }
 	
 var _AddUserIntoOrgGroup=function(self,newusers,existingusers,organization,grpname){
-	var useremails=__.union(newusers,existingusers);
+	var useremails=__.union(existingusers,newusers);
 	logger.emit("log","useremails"+useremails);
 	userModel.find({email:{$in:useremails}},{userid:1},function(err,user){
 		if(err){
@@ -1197,7 +1224,7 @@ var _sendOtherOrganizationInvitation=function(self,orgid,otherorginvites,session
 									{
 										var host=S(otherorginvites[i].email).substring(otherorginvites[i].email.indexOf("@")+1,otherorginvites[i].email.indexOf(".",otherorginvites[i].email.indexOf("@")))
 										logger.emit("log",email_providerlist.indexOf(host.s));
-										if(otherorginvites[i].email!=undefined ){
+										if(otherorginvites[i].email!=undefined && email_providerlist.indexOf(host.s)<0){
 							  			  self.emit("sendotherorginvite",otherorginvite_emailtemplate,otherorginvites[i],user,organization);
 							  			}
 									}
@@ -1215,27 +1242,34 @@ var _sendOtherOrganizationInvitation=function(self,orgid,otherorginvites,session
 var _addOtherOrganizationInviteIntoBusinessOpportunity=function(self,otherorginvites,user){
 
  var business_opportunity=[];
-
+    var notvalidemailids=[];
 	for(var i=0;i<otherorginvites.length;i++)
 	{
 		var host=S(otherorginvites[i].email).substring(otherorginvites[i].email.indexOf("@")+1,otherorginvites[i].email.indexOf(".",otherorginvites[i].email.indexOf("@")))
 		if(otherorginvites[i].email!=undefined && email_providerlist.indexOf(host.s)<0){
 			business_opportunity.push({invitetype:"business",from:user.email,to:otherorginvites[i].email,fromusertype:user.usertype,orgname:otherorginvites[i].orgname});
+		}else{
+			notvalidemailids.push(otherorginvites[i].email)
 		}
 	}
- 	BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){
+	if(business_opportunity.length==0){
+		self.emit("failedOtherOrgInvites",{"error":{"message":"Pleae provider company emailids"}});	
+	}else{
+		BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){
 	 	if(err){
 	 		self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Business Opportunity"+err}});	
 	 	}else{
 	 		/////////////////////////////////////////////////
-	 		_successfullOtherOrgInvites(self);
+	 		_successfullOtherOrgInvites(self,notvalidemailids);
 	 		///////////////////////////////////////////////
 	 	}
- 	})
+ 	})	
+	}
+ 	
 }
-var _successfullOtherOrgInvites=function (self) {
+var _successfullOtherOrgInvites=function (self,notvalidemailids) {
 	logger.emit("log","_successfullOtherOrgInvites");
-	self.emit("successfulOtherOrgInvites",{"success":{"message":"Other Organization invitation sent Successfully"}});
+	self.emit("successfulOtherOrgInvites",{"success":{"message":"Other Organization invitation sent Successfully","notvalidemailids":notvalidemailids}});
 }
 Organization.prototype.getMyGroupMembers=function(orgid){
 	var self=this;
@@ -1308,7 +1342,7 @@ var _checkGropMemberIsExistOrNot=function(self,user,orgid,grpid,usermemberid){
 		}else{
 			if(usergrps.length==1){
 				////////////////////////////////////
-				_deleteUserAndRemoveFromOrg(self,user,orgid,grpid,usermemberid,usergrps[0].usergrp.grpname,usergrps[0].name)	;
+				_updateUserAndRemoveFromOrg(self,user,orgid,grpid,usermemberid,usergrps[0].usergrp.grpname,usergrps[0].name)	;
 				//////////////////////////////////
 			}else{
 				/////////////////////////////////
@@ -1318,8 +1352,9 @@ var _checkGropMemberIsExistOrNot=function(self,user,orgid,grpid,usermemberid){
 		}
 	});
 }
-var _deleteUserAndRemoveFromOrg=function(self,user,orgid,grpid,usermemberid,grpname,orgname){
-	userModel.update({userid:usermemberid},{$set:{status:"deactive"}},function(err,deleteorguserstatus){
+var _updateUserAndRemoveFromOrg=function(self,user,orgid,grpid,usermemberid,grpname,orgname){
+	var org={orgid:null,orgtype:null,orgname:null,isAdmin:null};
+	userModel.update({userid:usermemberid},{$set:{org:org,usertype:"individual",prodousertype:"individual"}},function(err,deleteorguserstatus){
 		if(err){
 			self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"ED001","message":"Database Server Issue"+err}}); 
 		}else if(!deleteorguserstatus){

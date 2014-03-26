@@ -536,7 +536,7 @@ exports.orginvites = function(req,res) {
     organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}}); 
   }else{
     //////////////////////////////////////
-    organization.orgInvites(orgid,usergrp);
+    organization.orgInvites(orgid,usergrp,req.user);
     ////////////////////////////////////// 
   }
   
