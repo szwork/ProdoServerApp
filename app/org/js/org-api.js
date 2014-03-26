@@ -135,7 +135,7 @@ exports.addOrganization = function(req,res){
   if(req.user.prodousertype=="individual"){
     organization.emit("failedOrgAdd",{"error":{"code":"EA001","message":"You have not authorize to add organization for individual"}})
   }else{
-      organization.addOrganization(sessionuserid,subscriptiondata);
+      organization.addOrganization(sessionuserid,subscriptiondata,req.user);
   }
 }
  //to update an existing organization
@@ -762,8 +762,6 @@ exports.removeOrgGroupMembers=function(req,res){
   }else if(req.user.org.isAdmin==false){
     logger.emit("log","You are not an admin to see group member details");
     organization.emit("failedRemoveOrgGroupMembers",{"error":{"code":"EA001","message":"You have not authorized to remove group members"}}); 
-  }else if(sessionuserid==usermemberid){
-    organization.emit("failedRemoveOrgGroupMembers",{"error":{"code":"EA001","message":"You can not remove adming group members"}}); 
   }else{
     /////////////////////////////////
     organization.removeOrgGroupMember(req.user,orgid,grpid,usermemberid);
