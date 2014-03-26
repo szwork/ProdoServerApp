@@ -552,9 +552,9 @@ exports.deleteOrgImage=function(req,res){
  
   var sessionuserid=req.user.userid;
   
-  var orgimageid=req.params.orgimageid;
+  var orgimageids=req.query.orgimageids;
   var orgid=req.params.orgid;
-  logger.emit("log","prodle\nsessionuserid"+sessionuserid+" prodleimageid:"+orgimageid+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(orgimageid));
+  logger.emit("log","prodle\nsessionuserid"+sessionuserid+" prodleimageid:"+orgimageids+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(orgimageids));
   
   var organization= new Organization();
      // product.setMaxListeners(0); 
@@ -583,7 +583,7 @@ exports.deleteOrgImage=function(req,res){
     organization.emit("failedDeleteOrgImage",{"error":{"code":"EA001","message":"You have not authorized to delete Org image"}}); 
   }else{
     ////////////////////////////////////////////////////////////
-    organization.deleteOrgImage(orgimageid,req.user.org.orgid);
+    organization.deleteOrgImage(orgimageids,req.user.org.orgid);
     //////////////////////////////////////////////// ///////////
   }
 }
