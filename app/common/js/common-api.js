@@ -401,18 +401,18 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
   
-  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
+  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains('png') ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
-  }else if(file_length>1000000){
-    callback({"error":{"message":"You can upload  image of size less than 1mb"}});
+  }else if(file_length>2000000){
+    callback({"error":{"message":"You can upload  image of size less than 2mb"}});
   }else{
     easyimg.info(fileName,function(err,info){
       logger.emit("log","error"+err);
-      if(info.width<700 && info.height<470){
-        callback({"error":{"message":"Please upload image of atleast width and height 700 and 470 respectively"}})
-      }else if((info.width/info.height)<1.5 && (info.width/info.height)>1.78 ){
-        callback({"error":{"message":"Aspect ratio of image should be 16/9 or 3/2"}});
-      }else{
+      // if(info.width<700 && info.height<470){
+      //   callback({"error":{"message":"Please upload image of atleast width and height 700 and 470 respectively"}})
+      // }else if((info.width/info.height)<1.5 && (info.width/info.height)>1.78 ){
+      //   callback({"error":{"message":"Aspect ratio of image should be 16/9 or 3/2"}});
+      // }else{
         fs.open(fileName, 'a', 0755, function(err, fd) {
           if (err) {
             callback({"error":{"message":"uploadFile fs.open:"+err}})
@@ -421,11 +421,11 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                gm(fileName).resize(null,370).toBuffer(function (err, buffer) {
-                  if (err){
-                    logger.emit("error","__orgFileBuffer"+err);
-                    callback({"error":{"message":"Upload Issue"}})
-                  }else{
+                // gm(fileName).resize(null,370).toBuffer(function (err, buffer) {
+                //   if (err){
+                //     logger.emit("error","__orgFileBuffer"+err);
+                //     callback({"error":{"message":"Upload Issue"}})
+                //   }else{
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                     logger.emit("log","s3filekey:"+s3filekey+" ext:"+ext);
                     var bucketFolder;
@@ -469,13 +469,13 @@ var __orgFileBuffer=function(action,file,dirname,action,sessionuser,callback){
                        })
                       }
                     }
-                  }
-                })
+                //   }
+                // })
               }
             })
           }
        })
-      }
+      // }
     })
   }
 }
@@ -488,18 +488,18 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
   var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
-  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
+  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains('png') ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
-  }else if(file_length>1000000){
-    callback({"error":{"message":"You can upload  image of size less than 1mb"}});
+  }else if(file_length>2000000){
+    callback({"error":{"message":"You can upload  image of size less than 2mb"}});
   }else{
     easyimg.info(fileName,function(err,info){
       logger.emit("log","error"+err);
-      if(info.width<700 && info.height<470){
-        callback({"error":{"message":"Please upload image of atleast width and height 700 and 470 respectively"}})
-      }else if((info.width/info.height)<1.5 && (info.width/info.height)>1.78 ){
-        callback({"error":{"message":"Aspect ratio of image should be 16/9 or 3/2"}});
-      }else{
+      // if(info.width<700 && info.height<470){
+      //   callback({"error":{"message":"Please upload image of atleast width and height 700 and 470 respectively"}})
+      // }else if((info.width/info.height)<1.5 && (info.width/info.height)>1.78 ){
+      //   callback({"error":{"message":"Aspect ratio of image should be 16/9 or 3/2"}});
+      // }else{
         fs.open(fileName, 'a', 0755, function(err, fd) {
           if (err) {
             callback({"error":{"message":"uploadFile fs.open:"+err}})
@@ -509,11 +509,11 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
               if(err){
                 callback({"error":{"message":"uploadFile fs.write:"+err}})
               }else{
-                gm(fileName).resize(null,375).toBuffer(function (err, buffer) {
-                  if (err){
-                    logger.emit("error","__productFileBuffer"+err);
-                    callback({"error":{"message":"Upload Issue"}})
-                  }else{
+                // gm(fileName).resize(null,375).toBuffer(function (err, buffer) {
+                //   if (err){
+                //     logger.emit("error","__productFileBuffer"+err);
+                //     callback({"error":{"message":"Upload Issue"}})
+                //   }else{
                 console.log(written+" bytes are written from buffer");
                     var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
                     var bucketFolder;
@@ -563,13 +563,13 @@ var __productFileBuffer=function(action,file,dirname,action,sessionuser,callback
                         })
                       }
                     }
-                  }
-                })
+                //   }
+                // })
               }
             })
           }
         })
-      }
+      // }
     })
   }
 }
@@ -590,7 +590,7 @@ var __orgLogoFileBuffer=function(action,file,dirname,action,sessionuser,callback
     easyimg.info(fileName,function(err,info){
       logger.emit("log","error"+err);
       if(info.width<100 && info.height<128){
-        callback({"error":{"message":"Please upload image of atleast width and height 700 and 300 respectively"}})
+        callback({"error":{"message":"Please upload image of atleast width and height 100 and 128 respectively"}})
       }else{
         fs.open(fileName, 'a', 0755, function(err, fd) {
           if (err) {
@@ -664,7 +664,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
     easyimg.info(fileName,function(err,info){
       logger.emit("log","error"+err);
       if(info.width<100 && info.height<128){
-        callback({"error":{"message":"Please upload image of atleast width and height 700 and 300 respectively"}})
+        callback({"error":{"message":"Please upload image of atleast width and height 100 and 128 respectively"}})
       }else{
         fs.open(fileName, 'a', 0755, function(err, fd) {
           if (err) {
