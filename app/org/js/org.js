@@ -1038,12 +1038,13 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
       			for(var i=0;i<newusers.length;i++)
      			{
      			  if(product){
-     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:true,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
      			  }else{
-    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:false,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:true,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
      			  }
 			      
       	        }
+
 	    			
 				userModel.create(userdata,function(err,inviteuserdata){
 					if(err){
@@ -1122,7 +1123,7 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 var _associateOrganizationToUser=function(self,existingusers,organization,sessionuser){
 	existingusers=__.difference(existingusers,sessionuser.email);
 	console.log("existingusers  _associateOrganizationToUser"+existingusers+organization.orgname);
-	var org={orgid:organization.orgid,orgname:organization.name,orgtype:organization.orgtype,isAdmin:false};
+	var org={orgid:organization.orgid,orgname:organization.name,orgtype:organization.orgtype,isAdmin:true};
 	userModel.update({email:{$in:existingusers}},{$set:{org:org,prodousertype:"business",usertype:organization.orgtype}},{multi:true},function(err,updateuserorgstatus){
 		if(err){
 			logger.emit("error",{"error":{"message":"Database Issue"+err}});
@@ -1403,7 +1404,7 @@ var _checkGropMemberIsExistOrNot=function(self,user,orgid,grpid,usermemberid){
 		if(err){
 			self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"ED001","message":"Database Server Issue"+err}}); 	
 		}else if(orgadminuser.length>0){
-			self.emit("failedRemoveOrgGroupMembers",{"error":{"message":"You can not Remove adming user"}});
+			self.emit("failedRemoveOrgGroupMembers",{"error":{"message":"You can not Remove admin user"}});
 		}else{
 			logger.emit("log","usermemberid"+usermemberid);
 			orgModel.aggregate({$unwind:"$usergrp"},{$match:{"usergrp.grpmembers":usermemberid,orgid:orgid}},{$project:{name:1,usergrp:1}},function(err,usergrps){
@@ -1413,18 +1414,18 @@ var _checkGropMemberIsExistOrNot=function(self,user,orgid,grpid,usermemberid){
 					self.emit("failedRemoveOrgGroupMembers",{"error":{"code":"AU003","message":"Userid is wrong"}}); 
 				}else{
 					if(usergrps.length==1){
-					////////////////////////////////////
-					_updateUserAndRemoveFromOrg(self,user,orgid,grpid,usermemberid,usergrps[0].usergrp.grpname,usergrps[0].name)	;
-					//////////////////////////////////
-				}else{
-					/////////////////////////////////
-					_removeFromOrganizationGroup(self,user,orgid,grpid,usermemberid)
-					//////////////////////////////
+						////////////////////////////////////
+						_updateUserAndRemoveFromOrg(self,user,orgid,grpid,usermemberid,usergrps[0].usergrp.grpname,usergrps[0].name);
+						//////////////////////////////////
+					}else{
+						/////////////////////////////////
+						_removeFromOrganizationGroup(self,user,orgid,grpid,usermemberid)
+						//////////////////////////////
+					}
 				}
-			}
-		});
-	}
-})
+			});
+		}
+	})
 }
 var _updateUserAndRemoveFromOrg=function(self,user,orgid,grpid,usermemberid,grpname,orgname){
 	var org={orgid:null,orgtype:null,orgname:null,isAdmin:null};
@@ -1444,7 +1445,7 @@ var _updateUserAndRemoveFromOrg=function(self,user,orgid,grpid,usermemberid,grpn
                      _applyDefaultIndividualTrialPlanWhenUserRemvoeFromGroup(usermemberid)
 					////////////////////////////////////////////////
 					/////////////////////////////////////////////////////////
-						_sendMailToOrgMemberUserDelete(self,user,orgid,usermemberid,"removememberfromorganduser",orgname,grpname);
+					_sendMailToOrgMemberUserDelete(self,user,orgid,usermemberid,"removememberfromorganduser",orgname,grpname);
 					///////////////////////////////////////////////////////
 					////////////////////////////////////////////////////
 					_succesfullOrgMemberDelete(self);
@@ -1516,8 +1517,8 @@ var _removeFromOrganizationGroup=function(self,user,orgid,grpid,usermemberid){
 					////////////////////////////////////////////////////
 					_succesfullOrgMemberDelete(self);
 					//////////////////////////////////////////////////
-						/////////////////////////////////////////////////////////
-						_sendMailToOrgMemberUserDelete(self,user,orgid,usermemberid,"removememberonlyfromorg",orgrpdata[0].name,orgrpdata[0].usergrp.grpname);
+					/////////////////////////////////////////////////////////
+					_sendMailToOrgMemberUserDelete(self,user,orgid,usermemberid,"removememberonlyfromorg",orgrpdata[0].name,orgrpdata[0].usergrp.grpname);
 					///////////////////////////////////////////////////////
 
 				}
