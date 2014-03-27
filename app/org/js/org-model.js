@@ -86,6 +86,7 @@ var OrganizationSchema = mongoose.Schema({
 OrganizationSchema.pre('save', function(next) {
   var organization = this;
   organization.orgid="org"+shortId.generate();  
+  console.log();
   next(); 
   })
  OrganizationSchema.set('redisCache', true);

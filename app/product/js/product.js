@@ -258,12 +258,30 @@ var _successfulGetAllProduct=function(self,product){
 	logger.emit("log","successfulGetAllProduct");
 	self.emit("successfulGetAllProduct", {"success":{"message":"Getting All Product details Successfully","product":product}});
 }
+
 Product.prototype.deleteProduct = function(orgid,prodle) {
 	var self=this;
 	//////////////////
-	_deleteProduct(self,orgid,prodle);
+	_checkProductIsProdonus(self,orgid,prodle);
 	///////////////////
 };
+
+var _checkProductIsProdonus = function(self,orgid,prodle){
+	productModel.findOne({"name":new RegExp('^'+"Prodonus", "i")},{prodle:1,orgid:1}).lean().exec(function(err,product){
+		if(err){
+			self.emit("failedDeleteProduct",{"error":{"code":"ED001","message":"Error in db to find product details"}});
+		}else if(product){
+			if(product.prodle == prodle){
+				self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Somthing has gone wrong Prodonus Cant be delete !"}});
+			}else{
+				_deleteProduct(self,orgid,prodle);
+			}
+	    }else{	    	
+	    	self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Prodonus not found"}});
+		}
+	});
+}
+
 var _deleteProduct=function(self,orgid,prodle){
 	productModel.update({orgid:orgid,prodle:prodle},{$set:{status:"deactive"}}).lean().exec(function(err,productdeletestatus){
 		if(err){
