@@ -74,23 +74,22 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 			if(err){
 				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
 			}else if(product){
-				if(product.orgid==orgid ){//product is already associated with orgid
+				if(product.orgid==orgid){//product is already associated with orgid
 					if(product.status=="active"){
-						self.emit("failedProductAdd",{"error":{"message":"Product is already associated with your organization "}})
+						self.emit("failedProductAdd",{"error":{"message":"Product is already associated with your organization"}})
 					}else{
 						//////////////////////////////////////////////
 						_addProduct(self,productdata,orgid);
 						/////////////////////////////////////////
 					}
 				}else{
-					self.emit("failedProductAdd",{"error":{"message":"Product is already associated with other manufacturer"}})
+					_addProduct(self,productdata,orgid);
+					// self.emit("failedProductAdd",{"error":{"message":"Product is already associated with other manufacturer"}})
 				}				
 			}else{
-
-			/////////////////////////////
-	   		_addProduct(self,productdata,orgid);
-	   		///////////////////////
-				
+				/////////////////////////////
+		   		_addProduct(self,productdata,orgid);
+		   		///////////////////////				
 			}
 		})
 	}
