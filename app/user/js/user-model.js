@@ -31,7 +31,7 @@ var userSchema = mongoose.Schema({
   mobile:{type:String,default:null},
   email: { type: String, required: true, unique: true },
   password: { type: String},
-  // isOtpPassword:{type:Boolean,default:false},
+  isOtpPassword:{type:Boolean,default:false},
   verified: { type:Boolean, default:false },//after verifying email sets true
   address:{
     address1:{type:String,default:null},

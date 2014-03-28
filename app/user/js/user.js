@@ -1741,17 +1741,69 @@ var _passwordUrlAction=function(self,token){
         	self.emit("failedPasswordUrlAction",{"error":{"message":"Wrong Userid"}})
         }else{
         	/////////////////////////////////////////
-        	_successfullPasswordUrlAction(self,user);
-        	////////////////////////////////////////
-        	
+        	// _successfullPasswordUrlAction(self,user);
+        	_sendOtpEmail(self,user);
+        	////////////////////////////////////////        	
         }
       })
     }
   })
 }
+
+var _sendOtpEmail = function (self,user) {	
+   EmailTemplateModel.findOne({"templatetype":"onetimepwd"}).lean().exec(function(err,emailtemplate){
+	   	if(err){
+	   		self.emit("failedPasswordUrlAction",{"error":{"code":"ED001","message":"Error in db to find welcome emailtemplate"}});
+	   	}else if(emailtemplate){
+	   		var otp = Math.floor(Math.random()*100000000);
+	   		commonapi.getbcrypstring(otp,function(err,hashpassword){
+					if(err){
+						self.emit("failedPasswordUrlAction",{"error":{"code":"AB001","message":"Error in get bcrypt passsword"}});
+					}else{
+						userModel.update({userid:user.userid},{$set:{password:hashpassword,isOtpPassword:true}},function(err,status){
+							if(err){
+								self.emit("failedPasswordUrlAction",{"error":{"code":"ED001","message":"Error in db to reset password users"}});
+							}else if(status!=1){
+								self.emit("failedPasswordUrlAction",{"error":{"code":"AU005","message":"User does't exists"}});
+							}else{
+								var html=emailtemplate.description;
+					    	    html=S(html);
+					      		// html=html.replaceAll("<orgname>",user.org.orgname);
+					      		html=html.replaceAll("<otp>",otp);
+					      		var message = {
+							        from: "Prodonus  <noreply@prodonus.com>", // sender address
+							        to: user.email, // list of receivers
+							        subject:emailtemplate.subject, // Subject line
+							        html: html+"" // html body
+					      		};
+					      		commonapi.sendMail(message,CONFIG.smtp_general, function (result){
+							        if (result == "failure") {
+							        	self.emit("failedPasswordUrlAction",{"error":{"code":"AT001","message":"Error in to send welcome mail"}});
+							        } else {					        	
+							        	////////////////////////////////
+							           _successfullOtpSendMail(self,user);
+							           ///////////////////////////////
+							        }
+					     		});
+							}
+						})
+					}
+				})	   		
+	   	}else{
+	   		self.emit("failedPasswordUrlAction",{"error":{"code":"ED002","message":"Server setup template issue"}});
+	   	}
+	 })     
+ };
+
+var _successfullOtpSendMail = function(self,user){
+	self.emit("passwordtokenredirect",user);
+	// self.emit("successfulPasswordUrlAction",{"success":{"message":"One Time Password Mail Send Successfully"}});
+}
+
 var _successfullPasswordUrlAction=function(self,user){
 	self.emit("tokenresetpassword",user);
 }
+
 User.prototype.changeEmail = function(userid) {
 	var self=this;
 		/// /////////////////////////////

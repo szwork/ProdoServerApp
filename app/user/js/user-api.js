@@ -647,22 +647,22 @@ exports.passwordUrlAction=function(req,res){
   });
   user.removeAllListeners("successfulPasswordUrlAction");
   user.on("successfulPasswordUrlAction",function(result){
-    logger.emit("info", result.success.message,req.user.userid);
+    logger.emit("info", result.success.message);//,req.user.userid
     res.send(result);
   });
   user.removeAllListeners("tokenresetpassword");
   user.on("tokenresetpassword",function(user){
-    req.logIn(user,function(err){
-      if(err){
-        html=html.replaceAll("<message>","Server Issue");
-        res.send(html.s);
-      }else{
-        var redirect_data="<html><body><script>";
-        redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/#/user/resetpassword')},3000);";
-        redirect_data+="</script>Please wait redirect to reset password &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
-        res.send(redirect_data);
-      }
-    })     
+    // req.logIn(user,function(err){
+    //   if(err){
+    //     html=html.replaceAll("<message>","Server Issue");
+    //     res.send(html.s);
+    //   }else{
+    //     var redirect_data="<html><body><script>";
+    //     redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/#/user/resetpassword')},3000);";
+    //     redirect_data+="</script>Please wait redirect to reset password &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
+    //     res.send(redirect_data);
+    //   }
+    // })     
   });
   user.removeAllListeners("passwordtokenredirect");
   user.on("passwordtokenredirect",function(redirecturl){
@@ -673,7 +673,7 @@ exports.passwordUrlAction=function(req,res){
   //   })
   //commonapi.removeListner(user);
       var redirect_data="<html><body><script>";
-       redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
+       redirect_data+="setTimeout(function(){window.location.assign('http://"+req.get("host")+"/#/user/otp')},3000);";//"+redirecturl+"
        redirect_data+="</script>Please wait launching Prodonus &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
      //  res.writeHead(200, {'Content-Length': redirect_data.length,'Content-Type': 'text/html' });
       // //user.removeAllListeners();
