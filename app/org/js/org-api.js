@@ -528,17 +528,17 @@ exports.orginvites = function(req,res) {
     })
     
   
-  // if(req.user.org.orgid!=orgid){
-  //   logger.emit("log","Given orgid is not match with session userid");
-  //   organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}});
-  // }else if(req.user.org.isAdmin==false){
-  //   logger.emit("log","You are not an admin to add org");
-  //   organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}}); 
-  // }else{
+  if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to add org");
+    organization.emit("failedOrgInvites",{"error":{"code":"EA001","message":"You have not authorized to add Organization invites"}}); 
+  }else{
     //////////////////////////////////////
     organization.orgInvites(orgid,usergrp,req.user);
     ////////////////////////////////////// 
-  // }
+  }
   
 };//end of invites method
 
