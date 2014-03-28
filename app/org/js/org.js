@@ -966,6 +966,8 @@ var _validateOrgInvites=function(self,orgid,usergrp,user){
 		self.emit("failedOrgInvites",{"error":{"code":"AV001","message":"Please pass grpname"}});
 	}else if(usergrp.invites==undefined){
 		self.emit("failedOrgInvites",{"error":{"code":"AV001","message":"Please pass invites"}});
+	}else if(usergrp.invites.substring(0,1)==","){
+		self.emit("failedOrgInvites",{"error":{"code":"AV001","message":"Please pass valid email"}});
 	}else if(usergrp.invites.trim().length==0){
 		self.emit("failedOrgInvites",{"error":{"code":"AV001","message":"plese fill invites emails"}});
 	}else{
@@ -997,7 +999,6 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 	// 		notvalidemails.push(invitees1[i]);
 	// 	}
 	// }
-	console.log("invitee"+invitees);
 	logger.emit("log","invitee"+invitees);
 	userModel.find({email:{$in:invitees}},{email:1}).lean().exec(function(err,user){
 	  if(err){

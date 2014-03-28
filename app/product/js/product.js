@@ -408,7 +408,7 @@ var _updateProduct=function(self,orgid,prodle,productdata){
 
 var _successfulUpdateProduct=function(self){
 	logger.emit("log","_successfulUpdateProduct");
-	self.emit("successfulProductUpdation", {"success":{"message":"Update Product Successfully"}});
+	self.emit("successfulProductUpdation", {"success":{"message":"Product Updated Successfully"}});
 }
 Product.prototype.addProductFeature = function(orgid,prodle,productfeaturedata) {
 	var self=this;
@@ -461,7 +461,7 @@ var _checkFeatureNameIsAlreadyExists=function(self,orgid,prodle,productfeatureda
   		logger.emit("log","productfeature"+product_features.length);
   		logger.emit("log","productfeaturedata"+productfeaturedata.length);
   		if(product_features.length>=productfeaturedata.length){
-  			self.emit("failedAddProudctFeatures",{"error":{"message":"Feature you provided already existed"}});	
+  			self.emit("failedAddProudctFeatures",{"error":{"message":"Feature already exist"}});	
   		}else{
   			var database_features_name=[];
   		for(var i=0;i<product_features.length;i++){
