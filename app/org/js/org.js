@@ -1011,16 +1011,13 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 		invitees1.push(invites.s);
 	}
 	invitees=invitees1;
-	// var companydomain=S(user.email).substring(user.email.indexOf("@")+1);
-	// var notvalidemails=[];
-	// for(var i=0;i<invitees1.length;i++){
-	// 	if(companydomain==S(invitees1).substring(user.email.indexOf("@")+1)){
-	// 		invitees.push(invitees1[i])
-	// 	}else{
-	// 		notvalidemails.push(invitees1[i]);
-	// 	}
-	// }
-	logger.emit("log","invitee"+invitees);
+	if( usergrp.grpname=="admin" && invitees.indexOf(sessionuser.email)>=0){
+		delete invitees[invitees.indexOf(sessionuser.email)];
+	}
+	if(invitees.length==0){
+		self.emit("failedOrgInvites",{"error":{"message":"Given Email id already belong to admin group"}})
+	}else{
+		logger.emit("log","invitee"+invitees);
 	userModel.find({email:{$in:invitees}},{email:1}).lean().exec(function(err,user){
 	  if(err){
     	self.emit("failedOrgInvites",{"error":{"code":"ED001","message":"Error in db to find users"+err}});
@@ -1095,6 +1092,18 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 		  })
 		};
 	})
+	}
+	// var companydomain=S(user.email).substring(user.email.indexOf("@")+1);
+	// var notvalidemails=[];
+	// for(var i=0;i<invitees1.length;i++){
+	// 	if(companydomain==S(invitees1).substring(user.email.indexOf("@")+1)){
+	// 		invitees.push(invitees1[i])
+	// 	}else{
+	// 		notvalidemails.push(invitees1[i]);
+	// 	}
+	// }
+
+	
 }
 
 
