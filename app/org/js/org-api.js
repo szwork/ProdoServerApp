@@ -45,7 +45,7 @@ exports.addOrganization = function(req,res){
   //logger.emit("userdata"+userdata);
   organization.removeAllListeners("successfulOrgAdd");
   organization.on("successfulOrgAdd",function(result){
-    logger.emit("info",result.success.message);
+    // logger.emit("info",result.success.message);
     organization.removeAllListeners();
     res.send(result);
   });
@@ -292,7 +292,7 @@ exports.getOrganization = function(req, res) {
     });
   organization.removeAllListeners("successfulOrganizationGet");
   organization.on("successfulOrganizationGet",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
       // organization.removeAllListeners();
     res.send(result);
   });
@@ -311,7 +311,7 @@ exports.getAllOrganization = function(req, res) {
     });
  organization.removeAllListeners("successfulOrganizationGetAll");
     organization.on("successfulOrganizationGetAll",function(result){
-      logger.emit("info", result.success.message);
+      // logger.emit("info", result.success.message);
       // organization.removeAllListeners();
       res.send(result);
     });
@@ -334,7 +334,7 @@ exports.getOrgAddressByCriteria=function(req,res){
   });
   organization.removeAllListeners("successfulGetOrgAddressByCriteria");
   organization.on("successfulGetOrgAddressByCriteria",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   // if(req.user.orgid==orgid){
@@ -351,12 +351,12 @@ exports.addOrgAddress=function(req,res){
   var organization=new Organization();
   organization.removeAllListeners("failedaddOrgAddress");
   organization.on("failedaddOrgAddress",function(err){
-    logger.emit("error", err.error.message,req.user.userid);
+     logger.emit("error", err.error.message,req.user.userid);
     res.send(err);
   });
   organization.removeAllListeners("successfuladdOrgAddress");
   organization.on("successfuladdOrgAddress",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   if(req.user.org.orgid!=orgid){
@@ -386,7 +386,7 @@ exports.updateOrgAddress=function(req,res){
   });
   organization.removeAllListeners("successfulUpdateAddress");
   organization.on("successfulUpdateAddress",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   if(req.user.org.orgid!=orgid){
@@ -416,7 +416,7 @@ exports.deleteOrgAddress=function(req,res){
   });
   organization.removeAllListeners("successfulDeleteOrgAddress");
   organization.on("successfulDeleteOrgAddress",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   if(req.user.org.orgid!=orgid){
@@ -450,7 +450,7 @@ exports.orginvites = function(req,res) {
   });
   organization.removeAllListeners("successfulOrgInvites");
   organization.on("successfulOrgInvites",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   organization.removeAllListeners("sendorginviteandverification");
@@ -560,7 +560,7 @@ exports.deleteOrgImage=function(req,res){
      // product.setMaxListeners(0); 
   organization.removeAllListeners("failedDeleteOrgImage");
   organization.on("failedDeleteOrgImage",function(err){
-    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    // logger.emit("log","error:"+err.error.message+":"+sessionuserid);
     logger.emit("error", err.error.message,sessionuserid);
     // product.removeAllListeners();
     res.send(err);
@@ -569,7 +569,7 @@ exports.deleteOrgImage=function(req,res){
   organization.removeAllListeners("successfulDeleteOrgImage");
   organization.on("successfulDeleteOrgImage",function(result){
     //logger.emit("log","Getting Product details successfully");
-    logger.emit("info", result.success.message,sessionuserid);
+    // logger.emit("info", result.success.message,sessionuserid);
     // product.removeAllListeners();
 
     res.send(result);
@@ -704,7 +704,7 @@ exports.getMyGroupMembers=function(req,res){
   });
   organization.removeAllListeners("successfulGetMyGroupMembers");
   organization.on("successfulGetMyGroupMembers",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   organization.removeAllListeners("getgroupmembers");
@@ -752,7 +752,7 @@ exports.removeOrgGroupMembers=function(req,res){
   });
   organization.removeAllListeners("successfulRemoveOrgGroupMembers");
   organization.on("successfulRemoveOrgGroupMembers",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   
@@ -782,7 +782,7 @@ exports.broadcastMessage=function(req,res){
   });
   organization.removeAllListeners("successfulBroadastMessage");
   organization.on("successfulBroadastMessage",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   
@@ -812,7 +812,7 @@ exports.getBroadcastMessage=function(req,res){
   });
   organization.removeAllListeners("successfulGetBroadastMessage");
   organization.on("successfulGetBroadastMessage",function(result){
-    logger.emit("info", result.success.message);
+    // logger.emit("info", result.success.message);
     res.send(result);
   });
   

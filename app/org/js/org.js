@@ -19,6 +19,9 @@ var AWS = require('aws-sdk');
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
+function isArray(what) {
+    return Object.prototype.toString.call(what) === '[object Array]';
+}
 var Organization = function(organizationdata) {
 	this.organization=organizationdata;
 };
@@ -131,6 +134,10 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 	var _addOrganization = function(self,organizationdata,sessionuserid,subscriptiondata,sessionuser) {
 		//validate the org data
         // organizationdata.subscription={planid:subscriptiondata.planid};
+        var usergrp=organizationdata.usergrp;
+        // organizationdata.usergrp=undefined;
+        
+        organizationdata.usergrp=undefined;
 		var organization=new orgModel(organizationdata);
 		organization.save(function(err,organization1){
 	     if(err){
@@ -138,14 +145,14 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 	    }else{  
 	    	logger.emit("log","_addOrganization");
 	    	//////////////////////////////////////////////
-		    _addOrgDetailsToUser(self,organization1,sessionuserid,sessionuser);
+		    _addOrgDetailsToUser(self,organization1,sessionuserid,sessionuser,usergrp);
 		    //////////////////////////////////////1///////      
 	     }
 	  })
 	};
 
     
-	var _addOrgDetailsToUser = function(self,organization,sessionuserid,sessionuser) {
+	var _addOrgDetailsToUser = function(self,organization,sessionuserid,sessionuser,usergrp) {
     var organizationsubscription={planid:organization.subscription.planid,planstartdate:new Date(organization.subscription.planstartdate),planexpirydate:new Date(organization.subscription.planexpirydate)};
 		userModel.update({userid:sessionuserid},{$set:{payment:{paymentid:organization.payment.paymentid},subscription:organizationsubscription,usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,isAdmin:true,orgtype:organization.orgtype,orgname:organization.name}}},function(err,userupdatestatus){
 	 	  if(err){
@@ -155,13 +162,13 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 	  	}else{
 	  			logger.emit("log","_addAdminGroup");
 	  		///////////////////////////////////////////////
-	  		_addAdminGroup(self,organization,sessionuserid,sessionuser);
+	  		_addAdminGroup(self,organization,sessionuserid,sessionuser,usergrp);
 	  		///////////////////////////////////////////////
 	  	}
 		})
 	};
 
-	var _addAdminGroup = function(self,organization,sessionuserid,sessionuser) {
+	var _addAdminGroup = function(self,organization,sessionuserid,sessionuser,usergrp) {
 		//validate the org data
 		orgModel.update({ orgid:organization.orgid},{$push:{usergrp:{grpname:"admin",grpmembers:sessionuserid}}},function(err,status){
 	      if(err){
@@ -169,17 +176,20 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 	      } else if(status!=1){
 	      	self.emit("failedOrgAdd",{"error":{"code":"AO002","message":"Provided orgid doesn't exists"}});
 	      }else{
-	      	var organizationdata=self.organization;
+	      	// var organizationdata=self.organization;
 	      	var invites="";
-	      	if(organizationdata.usergrp!=undefined){
-				for(var i=0;i<organizationdata.usergrp.length;i++){
-					if(organizationdata.usergrp[i].invites.trim().length>0){
-						invites+=organizationdata.usergrp[i].invites;	
+           // logger.emit("log","organizationdata"+JSON.stringify(organizationdata));
+	      	if(usergrp!=undefined && isArray(usergrp)){
+				for(var i=0;i<usergrp.length;i++){
+					if(usergrp[i].invites.trim().length==0 && usergrp[i].grpname.trim().length==0){
+						// invites+=organizationdata.usergrp[i].invites;	
+						 usergrp.splice(i,1);
 					}
 					
 				}
 	    	}
-	      	if(invites.trim().length==0){
+	    	// logger.emit("log","organizationdata"+JSON.stringify();
+	      	if(!isArray(usergrp) && usergrp.length==0){
 		      	logger.emit("log","there is not ivtitee");
 		      	////////////////////////////////
 		      	_successfulOrgAdd(self);
@@ -187,15 +197,15 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 	      	}else{
 	      		logger.emit("log","_addUserInvitees");
 		      	///////////////////////////////////
-		      	_addUserInvitees(self,organization,sessionuser);
+		      	_addUserInvitees(self,organization,sessionuser,usergrp);
 		      	/////////////////////////////////////
 	      	}
 	      }
     })
 	};
 
-	var _addUserInvitees = function(self,organization,sessionuser) {
-		var usergrp=self.organization.usergrp;
+	var _addUserInvitees = function(self,organization,sessionuser,usergrp) {
+		// var usergrp=self.organization.usergrp;
 		var invitees=[];
 		var usergrp_array=[];
 
@@ -339,7 +349,7 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 		
 
 	var _addInviteUserToGroup = function(self,organization,usergrp_array) {
-		
+		console.log
 		for(var i=0;i<usergrp_array.length;i++){
 			////////////////////////////////////////
 			addgrpmember(self,organization,usergrp_array[i]);
@@ -363,7 +373,9 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 					newuser[p]=user[p].userid;
 					logger.emit("log","newuser["+p+"]"+user[p].userid);
 				}
-					orgModel.update({ orgid :organization.orgid,"usergrp.grpname":usergrp.grpname},{$addToSet:{"usergrp.$.grpmembers":{$each:newuser}},$set:{"usergrp.$.invites":""}},function(err,status){
+				console.log("dddddd"+usergrp);
+				 usergrp={grpname:usergrp.grpname,grpmembers:newuser}
+					orgModel.update({orgid:organization.orgid},{$push:{usergrp:usergrp}},function(err,status){
 				  	if( err ){
 				  		self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to update org to add grpmembers"}});
 				  	}else if(status==1){
