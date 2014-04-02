@@ -299,7 +299,7 @@ exports.getUser = function(req, res) {
   });
   user.removeAllListeners("successfulUserGet");
   user.on("successfulUserGet",function(result){
-    logger.emit("info", result.success.message,req.user.userid);
+    // logger.emit("info", result.success.message,req.user.userid);
     //user.removeAllListeners();
     res.send(result);
   });
@@ -320,7 +320,7 @@ exports.getAllUser = function(req, res) {
   });
   user.removeAllListeners("successfulUserGetAll");
   user.on("successfulUserGetAll",function(result){
-    logger.emit("info", result.success.message,req.user.userid);
+    // logger.emit("info", result.success.message,req.user.userid);
     //user.removeAllListeners();
     res.send(result);
   });
@@ -588,7 +588,7 @@ exports.getProfileInfo = function(req, res) {
   });
   user.removeAllListeners("successfulUserProfile");
   user.on("successfulUserProfile",function(result){
-    logger.emit("info", result.success.message,req.user.userid);
+    // logger.emit("info", result.success.message,req.user.userid);
     res.send(result);
   });
   user.getProfileInfo(userid);
@@ -606,7 +606,7 @@ exports.getMyProductsFollowed = function(req, res) {
   });
   user.removeAllListeners("successfulProductsFollowed");
   user.on("successfulProductsFollowed",function(result){
-    logger.emit("info", result.success.message,req.user.userid);
+    // logger.emit("info", result.success.message,req.user.userid);
     res.send(result);
   });
   user.getMyProductsFollowed(prodles);
@@ -624,7 +624,7 @@ exports.getMyRecommendProductsFollowed = function(req, res) {
   });
   user.removeAllListeners("successfulRecommendProductsFollowed");
   user.on("successfulRecommendProductsFollowed",function(result){
-    logger.emit("info", result.success.message,req.user.userid);
+    // logger.emit("info", result.success.message,req.user.userid);
     res.send(result);
   });
   user.getMyRecommendProductsFollowed(prodles);

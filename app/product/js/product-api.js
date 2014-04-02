@@ -101,7 +101,7 @@ exports.getProduct=function(req,res){
   product.removeAllListeners("successfulGetProduct");
   product.on("successfulGetProduct",function(result){
     logger.emit("log","Getting Product details successfully");
-    logger.emit("info", result.success.message,sessionuserid);
+    // logger.emit("info", result.success.message,sessionuserid);
     // product.removeAllListeners();
 
     res.send(result);
@@ -129,7 +129,7 @@ exports.getAllProduct=function(req,res){
     });
    product.removeAllListeners("successfulGetAllProduct");
     product.on("successfulGetAllProduct",function(result){
-      logger.emit("info", result.success.message,sessionuserid);
+      // logger.emit("info", result.success.message,sessionuserid);
       // product.removeAllListeners();
      // res.header('Cache-Control', 'no-cache');
       res.send(result);
@@ -380,7 +380,7 @@ exports.getProductFeature=function(req,res){
     });
   product.removeAllListeners("successfulGetProductFeatures");
   product.on("successfulGetProductFeatures",function(result){
-    logger.emit("info", result.success.message,sessionuserid);
+    // logger.emit("info", result.success.message,sessionuserid);
     // product.removeAllListeners();
     res.send(result);
   });
@@ -407,7 +407,7 @@ exports.getProductTrending=function(req,res){
     });
   product.removeAllListeners("successfulGetProductTrends");
   product.on("successfulGetProductTrends",function(result){
-    logger.emit("info", result.success.message,sessionuserid);
+    // logger.emit("info", result.success.message,sessionuserid);
     // product.removeAllListeners();
     res.send(result);
   });
@@ -426,7 +426,7 @@ exports.getAllCategoryTags=function(req,res){
     });
   product.removeAllListeners("successfulGetAllCategoryTags");
   product.on("successfulGetAllCategoryTags",function(result){
-    logger.emit("info", result.success.message,sessionuserid);
+    // logger.emit("info", result.success.message,sessionuserid);
     // product.removeAllListeners();
     res.send(result);
   });
