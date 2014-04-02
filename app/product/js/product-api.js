@@ -45,7 +45,7 @@ exports.addProduct=function(req,res){
    
     logger.emit("log",productdata);
     logger.emit("log","hi"+orgid +":"+req.user.org.orgid);
-    if(req.user.usertype!="manufacturer"){
+    if(req.user.usertype!="Manufacturer"){
       product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You are not manufacturer to add product"}})
     }else if(sessionorgid!=orgid){ 
       logger.emit("error","You are not an product user to add product",sessionuserid)
@@ -140,7 +140,7 @@ exports.getAllProduct=function(req,res){
     product.getAllProduct(orgid);
     
 }
-exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
+exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){ 
    // var userdata=commentdata.user;
   logger.emit("log","req boyd comment"+JSON.stringify(req.body));
  
@@ -183,17 +183,17 @@ exports.deleteProduct=function(req,res){
     res.send(result);
     // eventEmitter.removeListener(this);
   });
-  //  if(req.user.org.orgid!=orgid){
-  //   logger.emit("log","Given orgid is not match with session userid");
-  //   product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}});
-  // }else if(req.user.org.isAdmin==false){
-  //   logger.emit("log","You are not an admin to delete product");
-  //   product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}}); 
-  // }else{
+   if(req.user.org.orgid!=orgid){
+    logger.emit("log","Given orgid is not match with session userid");
+    product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to delete product");
+    product.emit("failedDeleteProduct",{"error":{"code":"EA001","message":"You have not authorized to delete product"}}); 
+  }else{
     /////////////////////////////////
     product.deleteProduct(orgid,prodle);
     //////////////////////////////// 
-  // }
+  }
 }
 exports.deleteProductImage=function(req,res){
   logger.emit("log","///////Calling to delete Products///////");
