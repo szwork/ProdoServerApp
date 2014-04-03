@@ -606,7 +606,7 @@ Product.prototype.getProductTrending = function() {
 
 var _getProductTrending=function(self){
 	console.log("_getProductTrending");
-	TrendingModel.find({status:{$ne:"deactive"},followedcount:{$gt:0},commentcount:{$gt:0}},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
+	TrendingModel.find({status:{$ne:"deactive"},followedcount:{$gt:0},commentcount:{$gt:0}},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(6).exec(function(err,trenddata){
 		if(err){
 			self.emit("failedGetProudctTrends",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
 		}else if(!trenddata){
@@ -623,12 +623,14 @@ var _successfulGetProductTrends=function(self,trenddata){
 	logger.emit("log","_successfulGetProductTrends");
 	self.emit("successfulGetProductTrends", {"success":{"message":"Product Trends Getting Suceessfully","ProductTrends":trenddata}});
 }
+
 Product.prototype.getAllCategoryTags = function() {
 	var self=this;
 	////////////////////////////
 	_getAllCategoryTags(self);
 	///////////////////////////
 };
+
 var _getAllCategoryTags=function(self){
 	productModel.find({$where:"this.category.length>0"},{category:1,_id:0},function(err,categorytags){
 		if(err){

@@ -30,11 +30,12 @@ exports.getAllTag = function(req, res) {
 	var tagreffdictionary = new TagReffDictionary();
 
 	tagreffdictionary.removeAllListeners("failedGetAllTagReffDictionary");
-  		tagreffdictionary.on("failedGetAllTagReffDictionary",function(err){
+  	tagreffdictionary.on("failedGetAllTagReffDictionary",function(err){
     	logger.emit("error", err.error.message,req.user.userid);
     	res.send(err);
   	});
 
+  	tagreffdictionary.removeAllListeners("successfulGetAllTagReffDictionary");
 	tagreffdictionary.on("successfulGetAllTagReffDictionary",function(result){
     	logger.emit("info", result.success.message);      
 		res.send(result);
