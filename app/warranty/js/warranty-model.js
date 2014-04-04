@@ -11,21 +11,23 @@
 
 var mongoose = require('../../common/js/db');
 var ObjectId = mongoose.Schema.ObjectId;
-var commonapi=require('../../common/js/common-api');
+var commonapi = require('../../common/js/common-api');
 var shortId = require('shortid');
-var logger = require("../../common/js/logger")
+var logger = require("../../common/js/logger");
 
 /////////////////////////////
 //Product Warranty Data Model
 var warrantySchema = mongoose.Schema({
   warranty_id:{type:String},
-  prodle:{type:String,required:true},
+  prodle:{type:String},
+  orgname:{type:String},  
   name:{type:String},
   model_name:{type:String},
   model_no:{type:String},
   serial_no:{type:String},  
   purchase_date:{type:Date},
   expirydate:{type:Date},
+  purchase_location:{type:String},
   invoice_image:{type:String},//path of invoice image
   status:{type:String,default:"active"},
   modified_date:{type:Date},

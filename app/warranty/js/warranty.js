@@ -49,6 +49,8 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass serial number"}});
 	}else if(warrantydata.purchase_date==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass date of purchase"}});
+	}else if(warrantydata.purchase_location==undefined){
+	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass purchase location"}});
 	}else if(warrantydata.expirydate==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass expiry date"}});
 	}else if(warrantydata.description==undefined){
@@ -137,20 +139,20 @@ var _validateUpdateWarrantyData = function(self,userid,prodle){
 	var warrantydata = self.warranty;
 	if(warrantydata==undefined){
 		self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"Please provide data to add warranty"}});
-	}else if(warrantydata.name==undefined){
-		self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
-	}else if(warrantydata.model_no==undefined){
-		self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"Please pass model number"}});
-	}else if(warrantydata.model_name==undefined){
-	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass model name"}});
-	}else if(warrantydata.serial_no==undefined){
-	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass serial number"}});
-	}else if(warrantydata.purchase_date==undefined){
-	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass date of purchase"}});
-	}else if(warrantydata.expirydate==undefined){
-	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass expiry date"}});
-	}else if(warrantydata.description==undefined){
-	  	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass description"}});
+	// }else if(warrantydata.name==undefined){
+	// 	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
+	// }else if(warrantydata.model_no==undefined){
+	// 	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"Please pass model number"}});
+	// }else if(warrantydata.model_name==undefined){
+	//   	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass model name"}});
+	// }else if(warrantydata.serial_no==undefined){
+	//   	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass serial number"}});
+	// }else if(warrantydata.purchase_date==undefined){
+	//   	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass date of purchase"}});
+	// }else if(warrantydata.expirydate==undefined){
+	//   	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass expiry date"}});
+	// }else if(warrantydata.description==undefined){
+	//   	self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"please pass description"}});
 	}else{		
 	  	_updateUserWarranty(self,userid,prodle,warrantydata);
 	}
