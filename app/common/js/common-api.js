@@ -35,6 +35,7 @@ var img_format_array=["jpeg","JPEG","JPG","GIF","BMP","jpg","gif","bmp"];
 var S=require("string");
 var amazonbucket=CONFIG.amazonbucket;
 var gm = require('gm').subClass({ imageMagick: true });
+var redisClient = require("redis").createClient();
 // logger.emit("log","userModel"+userModel);
 // logger.emit("log","orgModel"+OrgModel);
 
@@ -179,6 +180,32 @@ exports.sendMail = function(message,smtpconfig,callback){
 // //   // console.log("return sequence data"+ret);
   
 // // }
+var checkSocketSession=function(redisreply,file,action,callback){
+  var socketreply;
+  if(action.user!=undefined){ 
+    socketreply="userUploadResponse";
+  }else if(action.org!=undefined){
+    socketreply="orgUploadResponse";
+  }else if(action.product!=undefined){
+    socketreply="productUploadResponse";    
+  }else if(action.orglogo!=undefined){
+    socketreply="orgLogoResponse";    
+  }else if(action.productlogo!=undefined){
+    socketreply="productLogoResponse";
+  }else if(action.warranty!=undefined){
+    socketreply="warrantyUploadResponse";
+  }else{
+    socketreply="noemitevent";
+  }
+  // console.log("redisreply"+JSON.parse(redisreply).passport);
+  if(redisreply==null){
+    callback(socketreply,null)
+  }else if(JSON.parse(redisreply).passport.user==undefined){
+    callback(socketreply,null)
+  }else{
+    callback(null,"insession")
+  }
+}
 exports.uploadFiles=function(io,__dirname){
   io.of('/api/prodoupload').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
@@ -188,63 +215,72 @@ exports.uploadFiles=function(io,__dirname){
      //action:{org:{userid:,orgid:}}
      //action for product images upload
      //action:{product:{userid:,orgid:,prodle:}}
-    
+    // console.log("sessionid"+JSON.stringify(socket.handshake));
     socket.on('uploadFiles', function(file,action) {
-      // console.log("calling to Upload files");
-      ///////////////
-      logger.emit("log","File info"+JSON.stringify(file));
-      logger.emit("log","action info"+JSON.stringify(action));
-      
-      if(action==null || action==undefined){
-         logger.emit("error","uploadFiles doesn't know action");
-      }else if(file==undefined ){ 
-        if(action.user!=undefined){
-          socket.emit("userUploadResponse",{"error":{"message":"Please pass file details or action details"}});
-        }else if(action.org!=undefined){
-          socket.emit("orgUploadResponse",{"error":{"message":"Please pass file details or action details"}});
-        }else if(action.product!=undefined){
-          socket.emit("productUploadResponse",{"error":{"message":"Please pass file details or action details"}});
-        }else if(action.warranty!=undefined){
-          socket.emit("warrantyUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+        if(err){
+          logger.emit("log","Errrr in get sessionid client");
         }else{
-          socket.emit("productLogoResponse",{"error":{"message":"Please pass file details or action details"}});
-        } 
-      }else{
-        var user=socket.handshake.user;
-        // logger.emit("log","socket session user"+user);
-        uploadFile(file,__dirname,action,user,function(err,uploadresult){
-          if(err){
-            logger.emit("error",err.error.message,sessionuserid)
-            if(action.user!=undefined){
-               socket.emit("userUploadResponse",err);
-            }else if(action.org!=undefined){
-              socket.emit("orgUploadResponse",err);
-            }else if(action.product!=undefined){
-              socket.emit("productUploadResponse",err);
-            }else if(action.warranty!=undefined){
-              socket.emit("warrantyUploadResponse",err);
-            }else if(action.productlogo!=undefined){
-               socket.emit("productUploadLogoResponse",err);
+          checkSocketSession(reply,file,action,function(err,result){
+            if(err){
+              socket.emit(err,{"error":{"code":"AL001","message":"User Session Expired"}});
             }else{
-              socket.emit("orgUploadLogoResponse",err);
-            }
-          }else{
-            if(action.user!=undefined){
-               socket.emit("userUploadResponse",null,uploadresult);
-            }else if(action.org!=undefined){
-              socket.emit("orgUploadResponse",null,uploadresult);
-            }else if(action.product!=undefined){
-              socket.emit("productUploadResponse",null,uploadresult);
-            }else if(action.warranty!=undefined){
-              socket.emit("warrantyUploadResponse",null,uploadresult);
-            }else if(action.productlogo!=undefined){
-              socket.emit("productUploadLogoResponse",null,uploadresult);
-            }else if(action.orglogo!=undefined){
-              socket.emit("orgUploadLogoResponse",null,uploadresult); 
-            }
-          }
-       })
-      }
+              logger.emit("log","File info"+JSON.stringify(file));
+              logger.emit("log","action info"+JSON.stringify(action));
+              if(action==null || action==undefined){
+                 logger.emit("error","uploadFiles doesn't know action");
+              }else if(file==undefined ){ 
+                if(action.user!=undefined){
+                  socket.emit("userUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+                }else if(action.org!=undefined){
+                  socket.emit("orgUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+                }else if(action.product!=undefined){
+                  socket.emit("productUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+                }else if(action.warranty!=undefined){
+                  socket.emit("warrantyUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+                }else{
+                  socket.emit("productLogoResponse",{"error":{"message":"Please pass file details or action details"}});
+                } 
+              }else{
+                var user=socket.handshake.user;
+                // logger.emit("log","socket session user"+user);
+                uploadFile(file,__dirname,action,user,function(err,uploadresult){
+                  if(err){
+                    logger.emit("error",err.error.message,sessionuserid)
+                    if(action.user!=undefined){
+                       socket.emit("userUploadResponse",err);
+                    }else if(action.org!=undefined){
+                      socket.emit("orgUploadResponse",err);
+                    }else if(action.product!=undefined){
+                      socket.emit("productUploadResponse",err);
+                    }else if(action.warranty!=undefined){
+                      socket.emit("warrantyUploadResponse",err);
+                    }else if(action.productlogo!=undefined){
+                       socket.emit("productUploadLogoResponse",err);
+                    }else{
+                      socket.emit("orgUploadLogoResponse",err);
+                    }
+                  }else{
+                    if(action.user!=undefined){
+                       socket.emit("userUploadResponse",null,uploadresult);
+                    }else if(action.org!=undefined){
+                      socket.emit("orgUploadResponse",null,uploadresult);
+                    }else if(action.product!=undefined){
+                      socket.emit("productUploadResponse",null,uploadresult);
+                    }else if(action.warranty!=undefined){
+                      socket.emit("warrantyUploadResponse",null,uploadresult);
+                    }else if(action.productlogo!=undefined){
+                      socket.emit("productUploadLogoResponse",null,uploadresult);
+                    }else if(action.orglogo!=undefined){
+                      socket.emit("orgUploadLogoResponse",null,uploadresult); 
+                    }
+                  }
+               })
+              }
+            }   
+          });
+        }
+      })
     })
   })
 }
