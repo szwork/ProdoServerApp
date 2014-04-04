@@ -45,7 +45,7 @@ exports.addProduct=function(req,res){
    
     logger.emit("log",productdata);
     logger.emit("log","hi"+orgid +":"+req.user.org.orgid);
-    if(req.user.usertype!="Manufacturer"){
+    if(req.user.usertype!="manufacturer"){
       product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You are not manufacturer to add product"}})
     }else if(sessionorgid!=orgid){ 
       logger.emit("error","You are not an product user to add product",sessionuserid)
