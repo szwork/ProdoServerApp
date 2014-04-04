@@ -1012,8 +1012,11 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 	}
 	invitees=invitees1;
 	if( usergrp.grpname=="admin" && invitees.indexOf(sessionuser.email)>=0){
-		delete invitees[invitees.indexOf(sessionuser.email)];
+		
+		invitees.splice(invitees.indexOf(sessionuser.email),1);
+		
 	}
+	console.log("invitees .............."+invitees);
 	if(invitees.length==0){
 		self.emit("failedOrgInvites",{"error":{"message":"Given Email id already belong to admin group"}})
 	}else{

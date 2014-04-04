@@ -460,7 +460,7 @@ var _isOrganizationUser=function(user,callback){
 	}
 }
 var getUserRequiredData=function(user,callback){
-   var user_senddata={usertype:user.usertype,userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
+   var user_senddata={email:user.email,usertype:user.usertype,userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	// console.log("log","user"+user);
@@ -1008,24 +1008,46 @@ var _validateResetPassword=function(self,userid){
 	var userdata=self.user;
 	if(userdata==undefined){
 		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please Provide Userdata"}});
-	}else if(userdata.confirmnewpassword==undefined){
+	}else if(userdata.currentpassword==undefined){
 		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please send currentpassword"}});
+	}else if(userdata.confirmnewpassword==undefined){
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please send confirmnewpassword"}});
 	}else if(userdata.confirmnewpassword.trim().length<3 ){
-		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"please enter currentpassword"}});
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"confirmnewpassword should be greater than 3"}});
 	}else if(userdata.newpassword==undefined){
 		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Please send newpassword"}});
 	}else if(userdata.newpassword.trim().length<5){
-		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"password shoud be atleast 5 charecters"}});
+		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"newpassword shoud be atleast 5 charecters"}});
 	}else if(userdata.confirmnewpassword!=userdata.newpassword){
 		self.emit("failedUserResetPassword",{"error":{"code":"EV001","message":"Confirm Pasword Shoud be same as new password"}});
 	}else{
-
-
-		/////////////////////////////
-		_resetPassword(self,userid,userdata);
-		////////////////////////////
+        ////////////////////////////////////////////////////
+        _checkCurrentPassowrdIsCorrect(self,userid,userdata);
+        /////////////////////////////////////////
+		
 	}
 
+}
+var _checkCurrentPassowrdIsCorrect=function(self,userid,userdata){
+	userModel.findOne({userid:userid},function(err,user){
+		if(err){
+			self.emit("failedUserResetPassword",{"error":{"code":"ED001","message":"DB error:_changeEmail"+err}});	
+		}else if(!user){
+			self.emit("failedUserResetPassword",{"error":{"code":"AU005","message":"Userid wrong"}});	
+		}else{
+			user.comparePassword(userdata.currentpassword, function(err, isMatch){
+    		if (err){
+     			 self.emit("failedUserResetPassword",{"error":{"message":"Database Issue"}});	
+		    } else if( !isMatch ) {
+		    	self.emit("failedUserResetPassword",{"error":{"message":"Wrong password"}});	
+		    }else{
+		      	/////////////////////////////
+		       _resetPassword(self,userid,userdata);
+		       ////////////////////////////
+		    }
+  })
+		}
+	})
 }
 var _resetPassword=function(self,userid,userdata){
 	
@@ -1040,7 +1062,7 @@ var _resetPassword=function(self,userid,userdata){
 					logger.emit("error","Error to encrypt password _updatePassword");
 					self.emit("failedUserResetPassword",{"error":{"message":"Server Issue plese try again"}});	
 				}else{
-					userModel.update({userid:userid},{$set:{password:newencryptedpasswrod}},function(err,userpasswordchangestatus){
+					userModel.update({userid:userid},{$set:{password:newencryptedpasswrod,isOtpPassword:false}},function(err,userpasswordchangestatus){
 						if(err){
 							logger.emit("error","Database issue"+err,user.userid);
 							self.emit("failedUserResetPassword",{"error":{"message":"Database Server Issue"}});	
