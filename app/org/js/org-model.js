@@ -79,7 +79,8 @@ var OrganizationSchema = mongoose.Schema({
     orginvites:[{type:String}],//inivte by organization to other companies or manufacturer to join on prodonus
     terms:{type:Boolean},
     org_delreqsend:{type:Boolean,default:false},
-    broadcast:[{message:{type:String},expirydate:{type:Date},datecreated:{type:Date}}]
+    broadcast:[{message:{type:String},expirydate:{type:Date},datecreated:{type:Date}}],
+    keyclients:[{imageid:{type:String},clientname:{type:String},image:{type:String},bucket:{type:String},key:{type:String}}]
 
 });
 

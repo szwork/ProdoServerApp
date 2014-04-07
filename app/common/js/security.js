@@ -17,6 +17,7 @@ auth = function (req, res, next) {
   	return next(); }
   //app.set("userid","");
  // req.session.destroy();
+ req.logout();
   res.send({"error":{"code":"AL001","message":"please login to continue this operation"}});
 }
 module.exports= auth;

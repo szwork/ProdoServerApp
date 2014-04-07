@@ -194,9 +194,12 @@ var checkSocketSession=function(redisreply,file,action,callback){
     socketreply="productLogoResponse";
   }else if(action.warranty!=undefined){
     socketreply="warrantyUploadResponse";
+  }else if(action.orgkeyclient!=undefined){
+     socketreply="orgKeyClientResponse";
   }else{
     socketreply="noemitevent";
   }
+  
   // console.log("redisreply"+JSON.parse(redisreply).passport);
   if(redisreply==null){
     callback(socketreply,null)
@@ -217,6 +220,7 @@ exports.uploadFiles=function(io,__dirname){
      //action:{product:{userid:,orgid:,prodle:}}
     // console.log("sessionid"+JSON.stringify(socket.handshake));
     socket.on('uploadFiles', function(file,action) {
+      
       redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
         if(err){
           logger.emit("log","Errrr in get sessionid client");
@@ -238,9 +242,11 @@ exports.uploadFiles=function(io,__dirname){
                   socket.emit("productUploadResponse",{"error":{"message":"Please pass file details or action details"}});
                 }else if(action.warranty!=undefined){
                   socket.emit("warrantyUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+                }else if(action.orgkeyclient!=undefined){
+                  socket.emit("orgKeyClientResponse",{"error":{"message":"Please pass file details or action details"}});
                 }else{
                   socket.emit("productLogoResponse",{"error":{"message":"Please pass file details or action details"}});
-                } 
+                }
               }else{
                 var user=socket.handshake.user;
                 // logger.emit("log","socket session user"+user);
@@ -256,7 +262,9 @@ exports.uploadFiles=function(io,__dirname){
                     }else if(action.warranty!=undefined){
                       socket.emit("warrantyUploadResponse",err);
                     }else if(action.productlogo!=undefined){
-                       socket.emit("productUploadLogoResponse",err);
+                      socket.emit("productUploadLogoResponse",err);
+                    }else if(action.orgkeyclient!=undefined){ 
+                      socket.emit("orgKeyClientResponse",err);
                     }else{
                       socket.emit("orgUploadLogoResponse",err);
                     }
@@ -273,6 +281,8 @@ exports.uploadFiles=function(io,__dirname){
                       socket.emit("productUploadLogoResponse",null,uploadresult);
                     }else if(action.orglogo!=undefined){
                       socket.emit("orgUploadLogoResponse",null,uploadresult); 
+                    }else if(action.orgkeyclient!=undefined){
+                      socket.emit("orgKeyClientResponse",null,uploadresult);
                     }
                   }
                })
@@ -345,7 +355,15 @@ uploadFile=function(file,dirname,action,sessionuser,callback){
         callback(null,result)
       }
     })
-  }else {
+  }else  if(action.orgkeyclient!=undefined){
+    __orgKeyClientFileBuffer(action,file,dirname,action,sessionuser,function(err,result){
+      if(err){
+        callback(err)
+      }else{
+        callback(null,result)
+      }
+    })
+  }else{
     logger.emit("error","File Upload doesn't understand which action to perform");
   }
 }
@@ -839,6 +857,91 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
     })
   }
 }
+var __orgKeyClientFileBuffer=function(action,file,dirname,action,sessionuser,callback){
+  var file_name=file.filename;
+  var file_buffer=file.filebuffer;
+  var file_length=file.filelength;  
+  var file_type=file.filetype;
+  // logger.emit("log","file details"+JSON.stringify(file));
+  var ext = path.extname(file_name||'').split('.');
+  ext=ext[ext.length - 1];
+  var fileName = dirname + '/tmp/uploads/' + file_name;
+  console.log("filename"+fileName);
+  logger.emit("log","ext"+file_type);
+  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains("png") ){
+    callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
+  }else if(file_length>500000){
+    callback({"error":{"message":"You can upload  image of size less than 500 kb"}});
+  }else{
+    easyimg.info(fileName,function(err,info){
+      logger.emit("log","error"+err);
+      if(info.width<100 && info.height<128){
+        callback({"error":{"message":"Please upload image of atleast width and height 700 and 300 respectively"}})
+      }else{
+        fs.open(fileName, 'a', 0755, function(err, fd) {
+          if (err) {
+            callback({"error":{"message":"uploadFile fs.open:"+err}})
+          }else{
+            fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+              if(err){
+                callback({"error":{"message":"uploadFile fs.write:"+err}})
+              }else{
+                 // easyimg.rescrop({src:fileName, dst:fileName,width:100,height:128,cropwidth:100, cropheight:128},function(err, image) {
+                 //  if (err){
+                 //    callback({"error":{"message":"__orgFileBuffer thumbnail:"+err}})
+                 //  }else{
+                    // console.log(written+" bytes are written from buffer");
+                    var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                     var bucketFolder;
+                     var params;
+                     // writebuffer= new Buffer(file_buffer, "base64");
+                    
+                      if(sessionuser.org.orgid==null){
+                        callback({"error":{"code":"EA001","message":"You are not an organization user "}});   
+                      }else{
+                        if(action.orgkeyclient.userid!=sessionuser.userid){
+                          callback({"error":{"code":"EA001","message":"You are not an authorized to  add organization key client"}});   
+                        }else if(sessionuser.org.orgid!=action.orgkeyclient.orgid){
+                          callback({"error":{"code":"EA001","message":"You are not an organization user to add organization key client"}});
+                        }else if(sessionuser.org.isAdmin==false){
+                          callback({"error":{"code":"EA001","message":"You are not authorized toadd organization key client"}});
+                        }else if(action.orgkeyclient.clientname==undefined){
+                          callback({"error":{"code":"AV001","message":"Please pass org client name"}});
+                        }else{
+                          var currentdate=new Date();
+                          var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
+                          bucketFolder=amazonbucket+"/org/"+action.orgkeyclient.orgid+"/keyclient";
+                          params = {
+                             Bucket: bucketFolder,
+                             Key: action.orgkeyclient.orgid+s3filekey,
+                             Body: writebuffer,
+                             Expires:expirydate,
+                             ACL: 'public-read',
+                             ContentType: file_type
+                          };
+                        orgKeyClientFileUpload(action.orgkeyclient.orgid,params,file_name,action.orgkeyclient.clientname,function(err,result){
+                          if(err){
+                            callback(err);
+                          }else{
+                            callback(null,result);
+                          }
+                          fs.close(fd, function() {
+                            exec("rm -rf '"+fileName+"'");
+                              console.log('File saved successful!');
+                          });
+                        })
+                      }
+                  //   }
+                  // })
+                }
+              }
+              })
+            }
+          })
+        }
+      })
+    }
+  }
 var userFileUpload=function(userid,awsparams,filename,callback){
 
   s3bucket.putObject(awsparams, function(err, data) {
@@ -1034,6 +1137,32 @@ var warrantyInvoiceImgUpload=function(warranty_id,awsparams,callback){
               callback(null,{"success":{"message":"Warranty invoice image uploaded successfully","image":url}})
             }else{
               callback({"error":{"code":"AP001","message":"Wrong warranty_id "+warranty_id}});
+            }
+          })
+        }
+      });
+    }
+  })  
+}
+var orgKeyClientFileUpload =function(orgid,awsparams,filename,orgclientname,callback){
+  s3bucket.putObject(awsparams, function(err, data) {
+    if (err) {
+      callback({"error":{"message":"s3bucket.putObject:-orgLogoUpload"+err}})
+    } else {
+      logger.emit("log","fileupload saved");
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject',params1, function (err, url) {
+        if(err){
+          callback({"error":{"message":"orgLogoUpload:Error in getting getSignedUrl"+err}});
+        }else{
+          var org_key_client_object={clientname:orgclientname,bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId()};
+           OrgModel.update({orgid:orgid},{$push:{keyclients:org_key_client_object}},function(err,orgkeyclientsuploadstatus){
+            if(err){
+              callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
+            }else if(orgkeyclientsuploadstatus==1){
+              callback(null,{"success":{"message":"Org Clients uploaded successfully","filename":filename}})
+            }else{
+              callback({"error":{"code":"AO002","message":"Wrong orgid"+orgid}});
             }
           })
         }

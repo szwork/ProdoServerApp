@@ -821,3 +821,42 @@ exports.getBroadcastMessage=function(req,res){
     //////////////////////////////// 
   
 }
+exports.deleteOrgKeyClient=function(req,res){
+ 
+  var sessionuserid=req.user.userid;
+  
+  var orgkeyclientids=req.query.orgkeyclientids;
+  var orgid=req.params.orgid;
+  logger.emit("log","prodle\nsessionuserid"+sessionuserid+" orgkeyclientids:"+orgkeyclientids+"orgid:"+orgid);
+  
+  var organization= new Organization();
+     // product.setMaxListeners(0); 
+  organization.removeAllListeners("failedDeleteOrgKeyClient");
+  organization.on("failedDeleteOrgKeyClient",function(err){
+    // logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  organization.removeAllListeners("successfulDeleteOrgKeyClient");
+  organization.on("successfulDeleteOrgKeyClient",function(result){
+    //logger.emit("log","Getting Product details successfully");
+    // logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  });
+   if(req.user.org.orgid!=orgid){
+    logger.emit("error","given orgid does not match with session orgid");
+    organization.emit("failedDeleteOrgKeyClient",{"error":{"code":"EA001","message":"You have not authorized to delete Org Key Clients"}}); 
+   }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to delete product image");
+    organization.emit("failedDeleteOrgKeyClient",{"error":{"code":"EA001","message":"You have not authorized to delete Org Key Clients"}}); 
+  }else{
+    ////////////////////////////////////////////////////////////
+    organization.deleteOrgKeyClient(orgkeyclientids,req.user.org.orgid);
+    //////////////////////////////////////////////// ///////////
+  }
+}

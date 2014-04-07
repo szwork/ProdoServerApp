@@ -41,6 +41,7 @@ exports.init = function (app) {
  app.delete("/api/orggroupmember/:orgid/:grpid/:userid",auth,api.orgapi.removeOrgGroupMembers);
  app.post("/api/organization/broadcast/:orgid",auth,api.orgapi.broadcastMessage);
  app.get("/api/organization/broadcast/:orgid",auth,api.orgapi.getBroadcastMessage);
+ app.delete("/api/keyclient/org/:orgid",auth,api.orgapi.deleteOrgKeyClient);
  
 
 }
