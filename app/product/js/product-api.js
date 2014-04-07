@@ -110,6 +110,31 @@ exports.getProduct=function(req,res){
  
   product.getProduct(orgid,prodle);
 }
+
+exports.getLatestFiveProducts=function(req,res){
+  logger.emit("log","///////Calling to Get Products///////");
+  var sessionuserid ;//= req.user.userid;
+  var product= new Product();
+  // product.setMaxListeners(0); 
+  product.removeAllListeners("failedGetLatestFiveProducts");
+  product.on("failedGetLatestFiveProducts",function(err){
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  product.removeAllListeners("successfulGetLatestFiveProducts");
+  product.on("successfulGetLatestFiveProducts",function(result){
+    logger.emit("log","Getting Latest Five Products details successfully");
+    // logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  }); 
+  product.getLatestFiveProducts();
+}
+
 exports.getAllProduct=function(req,res){
     // req.setMaxListeners(0); 
    

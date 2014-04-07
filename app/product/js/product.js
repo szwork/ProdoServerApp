@@ -48,29 +48,28 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 
 	var _validateProductData = function(self,productdata,orgid,sessionuserid) {
 		//validate the org data
-		 if(productdata==undefined){
-		 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please provide data to add product"}});
-		 }else if(productdata.name==undefined){
+		if(productdata==undefined){
+			self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please provide data to add product"}});
+		}else if(productdata.name==undefined){
 	   		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
-	   } else if(productdata.description==undefined){
+	   	}else if(productdata.description==undefined){
 	    	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass product description "}});
-	  	 }else if(productdata.model_no==undefined){
-	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass model_no"}});
-	  	 }else if(productdata.category==undefined || productdata.category==""){
-	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Pleae pass category"}});
-	  	 }else if( !isArray(productdata.category)){
-	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"category should be an array"}});
-	  	 }else if(productdata.category.length==0){
-	  	 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one category"}});
-	  	 }else{
+	  	 // }else if(productdata.model_no==undefined){
+	  	 // 	self.emit("failedProductAdd",{"error":{"code":"AV001","message":"please pass model_no"}});
+	  	}else if(productdata.category==undefined || productdata.category==""){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Pleae pass category"}});
+	  	}else if( !isArray(productdata.category)){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"category should be an array"}});
+	  	}else if(productdata.category.length==0){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one category"}});
+	  	}else{
 	  	 	////////////////////////////////////////////////
 			_checkProductNameIsSame(self,productdata,orgid);
 			///////////////////////////////////////////////
-	   	
-	   }
+	    }
 	};
 	var _checkProductNameIsSame=function(self,productdata,orgid){
-		productModel.findOne({name:productdata.name,model_no:productdata.model_no},function(err,product){
+		productModel.findOne({name:productdata.name/*,model_no:productdata.model_no*/},function(err,product){
 			if(err){
 				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
 			}else if(product){
@@ -95,30 +94,29 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	}
 	
 	var _addProduct=function(self,productdata,orgid){
-
 		productdata.orgid=orgid;
 		productdata.status="active";
-		productdata.prodle=shortId.generate();  
+		// productdata.prodle=shortId.generate();  
 		productdata.features=[{featurename:productdata.name.toLowerCase(),featuredescription:"product features"}];
-    var product=new productModel(productdata);
-    productModel.update({orgid:orgid,model_no:productdata.model_no},{$set:productdata},{upsert:true},function(err,addstatus){
-    	if(err){
-    		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
-    	}else{
-    		productModel.findOne({orgid:orgid,model_no:productdata.model_no},function(err,product){
-    			if(err){
-    				logger.emit("error","Database Issue :fun:_addProduct"+err);
-    				self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Database Issue"}});	
-    			}else if(!product){
-    				self.emit("failedProductAdd",{"error":{"message":"Product does not exists"}});		
-    			}else{
-		    		///////////////////////
-			  		_successfulProductAdd(self,product);
-			  		//////////////////////////
-    			}
-    		})
-    	}
-    })
+    	var product=new productModel(productdata);
+	    product.save(function(err,addstatus){
+	    	if(err){
+	    		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
+	    	}else{
+	    		// productModel.findOne({orgid:orgid,model_no:productdata.model_no},function(err,product){
+	    		// 	if(err){
+	    		// 		logger.emit("error","Database Issue :fun:_addProduct"+err);
+	    		// 		self.emit("failedProductAdd",{"error":{"code":"ED001","message":"Database Issue"}});	
+	    		// 	}else if(!product){
+	    		// 		self.emit("failedProductAdd",{"error":{"message":"Product does not exists"}});		
+	    		// 	}else{
+			    		///////////////////////
+				  		_successfulProductAdd(self,product);
+				  		//////////////////////////
+	    		// 	}
+	    		// })
+	    	}
+	    })
 	}
 	var _successfulProductAdd=function(self,product){
 		logger.log("log","_successfulProductAdd");
@@ -230,10 +228,38 @@ var _getProduct=function(self,orgid,prodle){
 		}
 	})
 }
+
 var _successfulGetProduct=function(self,product){
 	logger.emit("log","_successfulProductGet");
 	self.emit("successfulGetProduct", {"success":{"message":"Getting Product details Successfully","product":product}});
 }
+
+Product.prototype.getLatestFiveProducts = function() {
+	var self=this;
+	/////////////////////////
+	_getLatestFiveProducts(self);
+	////////////////////////
+};
+
+var _getLatestFiveProducts=function(self){
+	productModel.find({status:{$ne:"deactive"}},{name:1,product_logo:1,display_name:1,description:1,product_images:1,_id:0}).sort({createddate:-1}).limit(5).lean().exec(function(err,product){
+		if(err){
+			self.emit("failedGetLatestFiveProducts",{"error":{"code":"ED001","message":"Error in db to find Latest Five Product"}});
+		}else if(product){
+			////////////////////////////////////
+			_successfulGetLatestFiveProducts(self,product);
+			////////////////////////////////////
+		}else{			
+			self.emit("failedGetLatestFiveProducts",{"error":{"code":"AP001","message":"Product Not Exist"}});
+		}
+	})
+}
+
+var _successfulGetLatestFiveProducts=function(self,product){
+	logger.emit("log","_successfulGetLatestFiveProducts");
+	self.emit("successfulGetLatestFiveProducts", {"success":{"message":"Getting Latest Five Product Details Successfully","Products":product}});
+}
+
 Product.prototype.getAllProduct = function(orgid) {
 	var self=this;
 	//////////////////

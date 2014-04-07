@@ -9,6 +9,7 @@ exports.init = function (app) {
   app.get("/api/product/:orgid",auth,api.productapi.getAllProduct);//get all product data
   app.get("/api/product/:orgid/:prodle",auth,api.productapi.getProduct);//get single product data
   app.put("/api/product/:orgid/:prodle",auth,api.productapi.updateProduct);//update the product data
+  app.get("/api/product",api.productapi.getLatestFiveProducts);//get latest added five products data
   app.delete("/api/product/:orgid/:prodle",auth,api.productapi.deleteProduct);//delete product
  //delete product image
  app.delete("/api/image/product/:orgid/:prodle",auth,api.productapi.deleteProductImage);
