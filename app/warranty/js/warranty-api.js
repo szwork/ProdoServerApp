@@ -37,7 +37,7 @@ exports.addUserWarranty=function(req,res){
 exports.updateUserWarranty = function(req, res) {
   var userid = req.params.userid;
   var warrantydata = req.body.warrantydata;
-  var prodle = req.params.prodle;
+  var warranty_id = req.params.warranty_id;
   var warranty = new Warranty(warrantydata);
   var sessionuserid = req.user.userid;
 
@@ -54,7 +54,7 @@ exports.updateUserWarranty = function(req, res) {
     res.send(result);
   });
     if(sessionuserid==userid){
-      warranty.updateUserWarranty(userid,prodle);
+      warranty.updateUserWarranty(userid,warranty_id);
     }else{
      warranty.emit("failedUpdateWarranty",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
     }
@@ -116,4 +116,25 @@ exports.getUserWarranty = function(req,res){
     res.send(result);
   });
   warranty.getUserWarranty(userid,warranty_id);
+}
+
+exports.getAllUserWarranty = function(req,res){
+  var userid = req.params.userid;
+  // var warranty_id = req.params.warranty_id;
+  var sessionuserid = req.user.userid;
+  var warranty = new Warranty();
+
+  warranty.removeAllListeners("failedGetAllUserWarranty");
+    warranty.on("failedGetAllUserWarranty",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // warranty.removeAllListeners();
+      res.send(err);
+    });
+  warranty.removeAllListeners("successfulGetAllUserWarranty");
+  warranty.on("successfulGetAllUserWarranty",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // warranty.removeAllListeners();
+    res.send(result);
+  });
+  warranty.getAllUserWarranty(userid);
 }

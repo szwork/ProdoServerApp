@@ -77,9 +77,9 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 					if(product.status=="active"){
 						self.emit("failedProductAdd",{"error":{"message":"Product is already associated with your organization"}})
 					}else{
-						//////////////////////////////////////////////
+						////////////////////////////////////
 						_addProduct(self,productdata,orgid);
-						/////////////////////////////////////////
+						////////////////////////////////////
 					}
 				}else{
 					_addProduct(self,productdata,orgid);
