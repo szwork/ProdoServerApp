@@ -1,7 +1,7 @@
 var Comment=require("./comment");
 var logger=require("../../common/js/logger");
 
-
+var redisClient = require("redis").createClient();
 // var io=require("../../../prodonus-app");
 // exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
   
@@ -87,7 +87,17 @@ io.of('/api/prodoapp').on('connection', function(socket) {
           socket.broadcast.emit("warrantycommentResponse"+prodle,null,result);
         }
       });
-      comment.addComment(sessionuserid,prodle,__dirname);
+      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+        if(err){
+          logger.emit("log","Errrr in get sessionid client");
+        }else if(reply==null){
+          socket.emit("addcommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+        }else if(JSON.parse(reply).passport.user==undefined){
+          socket.emit("addcommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+        }else{
+          comment.addComment(sessionuserid,prodle,__dirname);   
+        }
+      
     });
   // socket.on('uploadFiles', function(file,action) {
   //   ///action for user profile update
@@ -108,7 +118,7 @@ io.of('/api/prodoapp').on('connection', function(socket) {
   //   })
   // })
 })
-
+})
 
 
 }

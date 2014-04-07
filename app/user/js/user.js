@@ -460,7 +460,7 @@ var _isOrganizationUser=function(user,callback){
 	}
 }
 var getUserRequiredData=function(user,callback){
-   var user_senddata={email:user.email,usertype:user.usertype,userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
+   var user_senddata={isOtpPassword:user.isOtpPassword,email:user.email,usertype:user.usertype,userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	// console.log("log","user"+user);

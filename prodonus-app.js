@@ -107,7 +107,7 @@ io.set('authorization', passportSocketIo.authorize({
 
 function onAuthorizeSuccess(data, accept){
   console.log('successful connection to socket.io');
-
+  console.log("handshake data"+data);
   // The accept-callback still allows us to decide whether to
   // accept the connection or not.
   accept(null, true);

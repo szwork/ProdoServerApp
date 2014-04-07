@@ -1698,3 +1698,65 @@ var _getBroadcastMessage=function(self,orgid){
 var  _successfullGetBroadcastMessage=function(self,broadcastmessage){
 	self.emit("successfulGetBroadastMessage",{"success":{"message":"Getting Broadcast Message Successfully","broadcast":broadcastmessage}});
 }
+Organization.prototype.deleteOrgKeyClient = function(orgkeyclientids,orgid) {
+	var self=this;
+	if(orgkeyclientids==undefined){
+		self.emit("failedDeleteOrgKeyClient",{"error":{"code":"AV001","message":"Please provide orgkeyclientids "}});
+	}else if(orgkeyclientids.length==0){
+		self.emit("failedDeleteOrgKeyClient",{"error":{"message":"Given orgkeyclientids is empty "}});
+	}else{
+		///////////////////////////////////////////////////////////////////
+	_deleteOrgKeyClient(self,orgkeyclientids,orgid);
+	/////////////////////////////////////////////////////////////////	
+	}
+	
+};
+var _deleteOrgKeyClient=function(self,orgkeyclientids,orgid){
+	 var org_key_clients_array=[];
+	orgkeyclientids=S(orgkeyclientids);
+	// db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
+   if(orgkeyclientids.contains(",")){
+   		org_key_clients_array=orgkeyclientids.split(",");
+   }else{
+   		org_key_clients_array.push(orgkeyclientids.s);
+   }
+	orgModel.findAndModify({orgid:orgid,"keyclients.clientid":{$in:org_key_clients_array}},[],{$pull:{keyclients:{clientid:{$in:org_key_clients_array}}}},{new:false},function(err,deletekeyclientstatus){
+		if(err){
+			self.emit("failedDeleteOrgKeyClient",{"error":{"code":"ED001","message":"function:_deleteOrgImage\nError in db to "}});
+		}else if(!deletekeyclientstatus){
+			self.emit("failedDeleteOrgKeyClient",{"error":{"message":"orgid or given orgimageids is wrong "}});
+		}else{
+			var keyclients=deletekeyclientstatus.keyclients;
+			// org_images=JSON.parse(org_images);
+			logger.emit("log","dd"+JSON.stringify(keyclients));
+			var object_array=[];
+			for(var i=0;i<keyclients.length;i++){
+				object_array.push({Key:keyclients[i].key});
+				console.log("test"+keyclients[i]);
+			}
+			logger.emit("log","object_array:"+JSON.stringify(object_array));
+			var delete_aws_params={
+				Bucket: keyclients[0].bucket, // required
+  			Delete: { // required
+    				Objects: object_array,
+      			Quiet: true || false
+      		}
+      	}
+      	logger.emit('log',"delete_aws_params:"+JSON.stringify(delete_aws_params));
+        s3bucket.deleteObjects(delete_aws_params, function(err, data) {
+			  if (err){
+			  	logger.emit("error","Key Clients not deleted from amazon s3 orgid:"+orgid)
+			  } else{
+			  	logger.emit("log","Key Clients deleted from amazon s3 orgid:"+orgid);
+			  } 
+			})
+			//////////////////////////////////
+			_successfulDeleteOrgKeyClient(self);
+			/////////////////////////////////////
+		}
+	})
+}
+var _successfulDeleteOrgKeyClient=function(self){
+	logger.emit("log","_successfulDeleteOrgKeyClient");
+	self.emit("successfulDeleteOrgKeyClient",{"success":{"message":"Delete Organizations Key Clients  Successfully"}});
+}

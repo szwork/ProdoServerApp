@@ -412,7 +412,7 @@ exports.resetPassword=function(req,res){
 }
 exports.signOutSessions=function(req,res){
     req.logout();
-    //req.session.destroy();
+    req.session.destroy();
     res.send({"success":{"message":"You have successfully signed out"}});
 }
 //old data
