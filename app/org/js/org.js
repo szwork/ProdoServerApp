@@ -1720,7 +1720,7 @@ var _deleteOrgKeyClient=function(self,orgkeyclientids,orgid){
    }else{
    		org_key_clients_array.push(orgkeyclientids.s);
    }
-	orgModel.findAndModify({orgid:orgid,"keyclients.imageid":{$in:org_key_clients_array}},[],{$pull:{keyclients:{imageid:{$in:org_key_clients_array}}}},{new:false},function(err,deletekeyclientstatus){
+	orgModel.findAndModify({orgid:orgid,"keyclients.clientid":{$in:org_key_clients_array}},[],{$pull:{keyclients:{clientid:{$in:org_key_clients_array}}}},{new:false},function(err,deletekeyclientstatus){
 		if(err){
 			self.emit("failedDeleteOrgKeyClient",{"error":{"code":"ED001","message":"function:_deleteOrgImage\nError in db to "}});
 		}else if(!deletekeyclientstatus){

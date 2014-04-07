@@ -80,7 +80,7 @@ var OrganizationSchema = mongoose.Schema({
     terms:{type:Boolean},
     org_delreqsend:{type:Boolean,default:false},
     broadcast:[{message:{type:String},expirydate:{type:Date},datecreated:{type:Date}}],
-    keyclients:[{imageid:{type:String},clientname:{type:String},image:{type:String},bucket:{type:String},key:{type:String}}]
+    keyclients:[{clientid:{type:String},clientname:{type:String},image:{type:String},bucket:{type:String},key:{type:String}}]
 
 });
 

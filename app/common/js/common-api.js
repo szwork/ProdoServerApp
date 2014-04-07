@@ -1155,7 +1155,7 @@ var orgKeyClientFileUpload =function(orgid,awsparams,filename,orgclientname,call
         if(err){
           callback({"error":{"message":"orgLogoUpload:Error in getting getSignedUrl"+err}});
         }else{
-          var org_key_client_object={clientname:orgclientname,bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId()};
+          var org_key_client_object={clientname:orgclientname,bucket:params1.Bucket,key:params1.Key,image:url,clientid:generateId()};
            OrgModel.update({orgid:orgid},{$push:{keyclients:org_key_client_object}},function(err,orgkeyclientsuploadstatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"orgFileUpload:Dberror"+err}});
