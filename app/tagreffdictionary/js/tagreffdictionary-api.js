@@ -8,13 +8,14 @@ exports.addTag = function(req, res) {
 	var tagreffdictionary = new TagReffDictionary();
 
 	tagreffdictionary.removeAllListeners("failedAddTagReffDictionary");
-  		tagreffdictionary.on("failedAddTagReffDictionary",function(err){
+  	tagreffdictionary.on("failedAddTagReffDictionary",function(err){
     	logger.emit("error", err.error.message,req.user.userid);
     	res.send(err);
   	});
 
+  	tagreffdictionary.removeAllListeners("successfulAddTagReffDictionary");
 	tagreffdictionary.on("successfulAddTagReffDictionary",function(result){
-    	logger.emit("info", result.success.message);      
+    	logger.emit("info", result.success.message);
 		res.send(result);
 	});
 	if(req.user.isAdmin==true){
@@ -41,4 +42,22 @@ exports.getAllTag = function(req, res) {
 		res.send(result);
 	});
     tagreffdictionary.getAllTag();
+}
+
+exports.getAllDomainTags = function(req, res) {
+	var sessionuserid = req.user.userid;	
+	var tagreffdictionary = new TagReffDictionary();
+
+	tagreffdictionary.removeAllListeners("failedGetAllDomainTag");
+  	tagreffdictionary.on("failedGetAllDomainTag",function(err){
+    	logger.emit("error", err.error.message,req.user.userid);
+    	res.send(err);
+  	});
+
+  	tagreffdictionary.removeAllListeners("successfulGetAllDomainTag");
+	tagreffdictionary.on("successfulGetAllDomainTag",function(result){
+    	logger.emit("info", result.success.message);      
+		res.send(result);
+	});
+    tagreffdictionary.getAllDomainTags();
 }

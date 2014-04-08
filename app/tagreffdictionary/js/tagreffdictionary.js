@@ -94,3 +94,28 @@ var _successfulGetAllTag = function(self,tags){
 	logger.emit("log","_successfulGetAllTagReffDictionary");
 	self.emit("successfulGetAllTagReffDictionary", {"success":{"message":"Getting All tag details Successfully","tags":tags}});
 }
+
+TagReffDictionary.prototype.getAllDomainTags = function() {
+	var self = this;
+	//////////////////
+	_getAllDomainTags(self);
+	///////////////////
+};
+var _getAllDomainTags = function(self){
+	TagReffDicModel.aggregate([{"$unwind":"$domain_tag"},{$group:{_id:null,tags:{"$addToSet":"$domain_tag"}}}]).exec(function(err,tags){
+		if(err){
+			self.emit("failedGetAllDomainTag",{"error":{"code":"ED001","message":"Error in db to find all users"}});
+		}else if(tags.length == 0){
+			self.emit("failedGetAllDomainTag",{"error":{"code":"AU003","message":"No Domain tag exist"}});
+		}else{
+			////////////////////////////////
+			_successfulGetAllDomainTags(self,tags[0]);
+			////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetAllDomainTags = function(self,tags){
+	logger.emit("log","_successfulGetAllDomainTags");
+	self.emit("successfulGetAllDomainTag", {"success":{"message":"Getting All Domain Tag Details Successfully","domain_tags":tags}});
+}

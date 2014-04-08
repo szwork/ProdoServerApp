@@ -727,22 +727,22 @@ Organization.prototype.getAllOrganizationName = function() {
 
 var _getAllOrganizationName=function(self){
 	
-	userModel.find({},{name:1}).lean().exec(function(err,organization){
+	orgModel.find({},{name:1,_id:0}).lean().exec(function(err,organization){
 		if(err){
-			self.emit("failedUserGetAll",{"error":{"code":"ED001","message":"Error in db to find all organizations"}});
+			self.emit("failedGetAllOrgName",{"error":{"code":"ED001","message":"Error in db to find all organizations"}});
 		}else if(organization.length==0){
-			self.emit("failedUserGetAll",{"error":{"code":"AO003","message":"No organization exists"}});
+			self.emit("failedGetAllOrgName",{"error":{"code":"AO003","message":"No organization exists"}});
 		}else{
 			////////////////////////////////////////////////
-			_successfulOrganizationGetAll(self,organization);
+			_successfulOrgNames(self,organization);
 			///////////////////////////////////////////////
 		}
 	})
 };
 
-var _successfulOrganizationGetAll=function(self,organization){
-	logger.emit("log","_successfulOrganizationGetAll");
-	self.emit("successfulOrganizationGetAll", {"success":{"message":"Getting Organization details Successfully","organization":organization}});
+var _successfulOrgNames=function(self,organization){
+	logger.emit("log","_successfulOrgNames");
+	self.emit("successfulGetAllOrgName", {"success":{"message":"Getting Organization Names Successfully","OrgNames":organization}});
 }
 
 Organization.prototype.getOrgAddressByCriteria = function(OrgCriteriaData,orgid) {

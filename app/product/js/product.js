@@ -285,6 +285,32 @@ var _successfulGetAllProduct=function(self,product){
 	self.emit("successfulGetAllProduct", {"success":{"message":"Getting All Product details Successfully","product":product}});
 }
 
+Product.prototype.getAllProductNames = function(orgid) {
+	var self=this;
+	//////////////////
+	_getAllProductNames(self,orgid);
+	///////////////////
+};
+
+var _getAllProductNames = function(self,orgid){
+	productModel.find({orgid:orgid,status:{$ne:"deactive"}},{name:1,_id:0}).lean().exec(function(err,product){
+		if(err){
+			self.emit("failedGetAllProductNames",{"error":{"code":"ED001","message":"Error in db to find all product"}});
+		}else if(product.length==0){
+			self.emit("failedGetAllProductNames",{"error":{"code":"AP002","message":"No product exists"}});
+		}else{
+			////////////////////////////////
+			_successfulGetAllProductNames(self,product);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetAllProductNames = function(self,product){
+	logger.emit("log","successfulGetAllProductNames");
+	self.emit("successfulGetAllProductNames", {"success":{"message":"Getting All Product Names Successfully","product":product}});
+}
+
 Product.prototype.deleteProduct = function(orgid,prodle) {
 	var self=this;
 	//////////////////

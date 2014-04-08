@@ -165,6 +165,35 @@ exports.getAllProduct=function(req,res){
     product.getAllProduct(orgid);
     
 }
+
+exports.getAllProductNames=function(req,res){
+   var sessionuserid=req.user.userid;
+   var orgid=req.params.orgid;
+   logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
+  
+   var product = new Product();
+   // product.setMaxListeners(0);
+   product.removeAllListeners("failedGetAllProductNames"); 
+   product.on("failedGetAllProductNames",function(err){
+      logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+
+    });
+   product.removeAllListeners("successfulGetAllProductNames");
+    product.on("successfulGetAllProductNames",function(result){
+      // logger.emit("info", result.success.message,sessionuserid);
+      // product.removeAllListeners();
+     // res.header('Cache-Control', 'no-cache');
+      res.send(result);
+       // product.removeListener(this,function(stream){
+       //  logger.log("listner "+this+"removed");
+       // });
+    });
+    product.getAllProductNames(orgid);    
+}
+
 exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){ 
    // var userdata=commentdata.user;
   logger.emit("log","req boyd comment"+JSON.stringify(req.body));
