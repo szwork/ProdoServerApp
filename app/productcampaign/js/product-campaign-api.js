@@ -5,7 +5,7 @@ var mongodb = require("mongodb");
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
 var logger=require("../../common/js/logger");
-var ProductCampain = require("./product-campain");
+var ProductCampain = require("./product-campaign");
 
 
 exports.addProductCampain=function(req,res){

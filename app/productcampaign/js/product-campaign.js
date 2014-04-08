@@ -13,7 +13,7 @@
 var events = require("events");
 var logger = require("../../common/js/logger");
 // var productCampainModel = require("./product-campain-model");
-var ProductCampainModel = require("./product-campain-model");
+var ProductCampainModel = require("./product-campaign-model");
 var ProductCampain = function(campaindata) {
 	this.productcampain = campaindata;
 };

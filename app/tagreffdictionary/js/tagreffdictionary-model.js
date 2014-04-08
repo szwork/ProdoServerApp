@@ -18,7 +18,8 @@ var logger = require("../../common/js/logger");
 
 var TagReffDictionary = mongoose.Schema({
   tagid:{type:String}, 
-  tagname:{type:String},  
+  tagname:{type:String},
+  domain_tag:[{type:String}],
   emotions:{category:{type:String},emotion:{type:String},level:{type:String},result:{type:String},emotion_url:{type:String}}  
 });
 

@@ -60,9 +60,11 @@ Organization.prototype.addOrganization=function(sessionuserid,subscriptiondata,s
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
 		  }else if(organizationdata.orgtype=="manufacturer" && organizationdata.terms==false ){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please agree the terms and condition"}});
+		  }else if(organizationdata.industry_category==undefined){
+		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"please pass industry category"}});
 		  }else if(["manufacturer","company"].indexOf(organizationdata.orgtype.toLowerCase())<0){
 		  	self.emit("failedOrgAdd",{"error":{"code":"AV001","message":"Organization type must be Manufcaturer or Company"}});
-			}else{
+		  }else{
 
 					logger.emit("log","_validated");
 					//this.emit("validated", organizationdata);
@@ -715,6 +717,34 @@ var _successfulOrganizationGetAll=function(self,organization){
 	logger.emit("log","_successfulOrganizationGetAll");
 	self.emit("successfulOrganizationGetAll", {"success":{"message":"Getting Organization details Successfully","organization":organization}});
 }
+
+Organization.prototype.getAllOrganizationName = function() {
+	var self=this;
+	//////////////////
+	_getAllOrganizationName(self);
+	///////////////////
+};
+
+var _getAllOrganizationName=function(self){
+	
+	orgModel.find({status:{$ne:"deactive"}},{name:1,_id:0}).lean().exec(function(err,organization){
+		if(err){
+			self.emit("failedGetAllOrgName",{"error":{"code":"ED001","message":"Error in db to find all organizations"}});
+		}else if(organization.length==0){
+			self.emit("failedGetAllOrgName",{"error":{"code":"AO003","message":"No organization exists"}});
+		}else{
+			////////////////////////////////////////////////
+			_successfulOrgNames(self,organization);
+			///////////////////////////////////////////////
+		}
+	})
+};
+
+var _successfulOrgNames=function(self,organization){
+	logger.emit("log","_successfulOrgNames");
+	self.emit("successfulGetAllOrgName", {"success":{"message":"Getting Organization Names Successfully","OrgNames":organization}});
+}
+
 Organization.prototype.getOrgAddressByCriteria = function(OrgCriteriaData,orgid) {
 	var self=this;
 	//////////////////

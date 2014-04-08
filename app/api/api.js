@@ -24,7 +24,7 @@ var discountapi=require("../discount/js/discount-api");
 var tagreffdictionary = require("../tagreffdictionary/js/tagreffdictionary-api");
 var featureanalytics = require("../featureanalytics/js/feature-analytics-api");
 var featuretrending = require("../featuretrending/js/feature-trending-api");
-var productcampainapi = require("../productcampain/js/product-campain-api");
+var productcampaignapi = require("../productcampaign/js/product-campaign-api");
 
 var warrantyapi = require("../warranty/js/warranty-api");
 
@@ -41,6 +41,6 @@ exports.discountapi=discountapi;
 exports.tagreffdictionary=tagreffdictionary;
 exports.featureanalytics = featureanalytics;
 exports.featuretrending = featuretrending;
-exports.productcampainapi = productcampainapi;
+exports.productcampaignapi = productcampaignapi;
 
 exports.warrantyapi = warrantyapi;

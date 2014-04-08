@@ -21,7 +21,8 @@ exports.init = function (app) {
 
   app.post('/api/organization', auth,api.orgapi.addOrganization);//create
   app.put('/api/organization/:orgid',auth, api.orgapi.updateOrganization);//update
-   app.get('/api/organization',auth,api.orgapi.getAllOrganization); //read
+  app.get('/api/organization',auth,api.orgapi.getAllOrganization); //read
+  app.get('/api/orgnames',auth,api.orgapi.getAllOrganizationName); //read all org name
   app.get('/api/organization/:orgid',auth, api.orgapi.getOrganization);//read
   app.post('/api/orgdelreq/:orgid',auth,api.orgapi.requestToDeleteOrganization);
  

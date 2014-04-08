@@ -29,8 +29,8 @@ var _validateTagReffDicData = function(self,sessionuserid,tagReffDicData) {
 		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide level to tagreffdicdata"}});			
 	}else if(tagReffDicData.emotions.result==undefined){
 		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide result to tagreffdicdata"}});			
-	// }else if(tagReffDicData.emotions.emotion_url==undefined){
-	// 	self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide emotion_url to tagreffdicdata"}});			
+	}else if(tagReffDicData.domain_tag==undefined){
+		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide domain tag to tagreffdicdata"}});			
 	}else{
 		///////////////////////////////////////////////////////
 		_checkTagnameIsExist(self,sessionuserid,tagReffDicData);
@@ -59,15 +59,15 @@ var _addTag = function(self,tagReffDicData){
 			self.emit("failedAddTagReffDictionary",{"error":{"code":"ED001","message":"Error in db to save new tag"}});
 		}else{
   			/////////////////////////////////
-			_successfulAddTagReffDictionary(self,tag_data);
+			_successfulAddTagReffDictionary(self);
 			/////////////////////////////////
 		}
 	})
 }
 
-var _successfulAddTagReffDictionary = function(self,newtag_data){
+var _successfulAddTagReffDictionary = function(self){
 	logger.emit("log","successfulAddTagReffDictionary");
-	self.emit("successfulAddTagReffDictionary",{"success":{"message":"Tag added sucessfully in refference dictionary","tag_data":newtag_data}})
+	self.emit("successfulAddTagReffDictionary",{"success":{"message":"Tag added sucessfully in refference dictionary"}})
 }
 
 TagReffDictionary.prototype.getAllTag = function() {
@@ -93,4 +93,29 @@ var _getAllTag = function(self){
 var _successfulGetAllTag = function(self,tags){
 	logger.emit("log","_successfulGetAllTagReffDictionary");
 	self.emit("successfulGetAllTagReffDictionary", {"success":{"message":"Getting All tag details Successfully","tags":tags}});
+}
+
+TagReffDictionary.prototype.getAllDomainTags = function() {
+	var self = this;
+	//////////////////
+	_getAllDomainTags(self);
+	///////////////////
+};
+var _getAllDomainTags = function(self){
+	TagReffDicModel.aggregate([{"$unwind":"$domain_tag"},{$group:{_id:null,tags:{"$addToSet":"$domain_tag"}}}]).exec(function(err,tags){
+		if(err){
+			self.emit("failedGetAllDomainTag",{"error":{"code":"ED001","message":"Error in db to find all users"}});
+		}else if(tags.length == 0){
+			self.emit("failedGetAllDomainTag",{"error":{"code":"AU003","message":"No Domain tag exist"}});
+		}else{
+			////////////////////////////////
+			_successfulGetAllDomainTags(self,tags[0]);
+			////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetAllDomainTags = function(self,tags){
+	logger.emit("log","_successfulGetAllDomainTags");
+	self.emit("successfulGetAllDomainTag", {"success":{"message":"Getting All Domain Tag Details Successfully","domain_tags":tags}});
 }

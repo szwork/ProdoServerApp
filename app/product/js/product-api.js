@@ -110,6 +110,31 @@ exports.getProduct=function(req,res){
  
   product.getProduct(orgid,prodle);
 }
+
+exports.getLatestFiveProducts=function(req,res){
+  logger.emit("log","///////Calling to Get Products///////");
+  var sessionuserid ;//= req.user.userid;
+  var product= new Product();
+  // product.setMaxListeners(0); 
+  product.removeAllListeners("failedGetLatestFiveProducts");
+  product.on("failedGetLatestFiveProducts",function(err){
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  product.removeAllListeners("successfulGetLatestFiveProducts");
+  product.on("successfulGetLatestFiveProducts",function(result){
+    logger.emit("log","Getting Latest Five Products details successfully");
+    // logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  }); 
+  product.getLatestFiveProducts();
+}
+
 exports.getAllProduct=function(req,res){
     // req.setMaxListeners(0); 
    
@@ -140,6 +165,35 @@ exports.getAllProduct=function(req,res){
     product.getAllProduct(orgid);
     
 }
+
+exports.getAllProductNames=function(req,res){
+   var sessionuserid=req.user.userid;
+   // var orgid=req.params.orgid;
+   // logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
+  
+   var product = new Product();
+   // product.setMaxListeners(0);
+   product.removeAllListeners("failedGetAllProductNames"); 
+   product.on("failedGetAllProductNames",function(err){
+      logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+
+    });
+   product.removeAllListeners("successfulGetAllProductNames");
+    product.on("successfulGetAllProductNames",function(result){
+      // logger.emit("info", result.success.message,sessionuserid);
+      // product.removeAllListeners();
+     // res.header('Cache-Control', 'no-cache');
+      res.send(result);
+       // product.removeListener(this,function(stream){
+       //  logger.log("listner "+this+"removed");
+       // });
+    });
+    product.getAllProductNames();    
+}
+
 exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){ 
    // var userdata=commentdata.user;
   logger.emit("log","req boyd comment"+JSON.stringify(req.body));
