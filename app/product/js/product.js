@@ -285,15 +285,15 @@ var _successfulGetAllProduct=function(self,product){
 	self.emit("successfulGetAllProduct", {"success":{"message":"Getting All Product details Successfully","product":product}});
 }
 
-Product.prototype.getAllProductNames = function(orgid) {
+Product.prototype.getAllProductNames = function() {
 	var self=this;
 	//////////////////
-	_getAllProductNames(self,orgid);
+	_getAllProductNames(self);
 	///////////////////
 };
 
-var _getAllProductNames = function(self,orgid){
-	productModel.find({orgid:orgid,status:{$ne:"deactive"}},{name:1,_id:0}).lean().exec(function(err,product){
+var _getAllProductNames = function(self){
+	productModel.find({status:{$ne:"deactive"}},{name:1,_id:0,prodle:1}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProductNames",{"error":{"code":"ED001","message":"Error in db to find all product"}});
 		}else if(product.length==0){

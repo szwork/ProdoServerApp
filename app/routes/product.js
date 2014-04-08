@@ -7,7 +7,7 @@ exports.init = function (app) {
   app.post("/api/product/:orgid",auth,api.productapi.addProduct);//add new product
  
   app.get("/api/product/:orgid",auth,api.productapi.getAllProduct);//get all product data
-  app.get("/api/productname/:orgid",auth,api.productapi.getAllProductNames);//get all product names
+  app.get("/api/productname",auth,api.productapi.getAllProductNames);//get all product names
   app.get("/api/product/:orgid/:prodle",auth,api.productapi.getProduct);//get single product data
   app.put("/api/product/:orgid/:prodle",auth,api.productapi.updateProduct);//update the product data
   app.get("/api/product",api.productapi.getLatestFiveProducts);//get latest added five products data

@@ -47,6 +47,10 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass date of purchase"}});
 	}else if(warrantydata.purchase_location==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass purchase location"}});
+	}else if(warrantydata.purchase_location.city==undefined){
+	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass city in purchase location"}});
+	}else if(warrantydata.purchase_location.country==undefined){
+	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass country in purchase location"}});
 	}else if(warrantydata.expirydate==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass expiry date"}});
 	}else if(warrantydata.description==undefined){

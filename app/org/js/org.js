@@ -727,7 +727,7 @@ Organization.prototype.getAllOrganizationName = function() {
 
 var _getAllOrganizationName=function(self){
 	
-	orgModel.find({},{name:1,_id:0}).lean().exec(function(err,organization){
+	orgModel.find({status:{$ne:"deactive"}},{name:1,_id:0}).lean().exec(function(err,organization){
 		if(err){
 			self.emit("failedGetAllOrgName",{"error":{"code":"ED001","message":"Error in db to find all organizations"}});
 		}else if(organization.length==0){

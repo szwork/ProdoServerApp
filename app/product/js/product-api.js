@@ -168,8 +168,8 @@ exports.getAllProduct=function(req,res){
 
 exports.getAllProductNames=function(req,res){
    var sessionuserid=req.user.userid;
-   var orgid=req.params.orgid;
-   logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
+   // var orgid=req.params.orgid;
+   // logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
   
    var product = new Product();
    // product.setMaxListeners(0);
@@ -191,7 +191,7 @@ exports.getAllProductNames=function(req,res){
        //  logger.log("listner "+this+"removed");
        // });
     });
-    product.getAllProductNames(orgid);    
+    product.getAllProductNames();    
 }
 
 exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){ 
