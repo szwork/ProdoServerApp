@@ -318,8 +318,24 @@ exports.getAllOrganization = function(req, res) {
     organization.getAllOrganization();
 }
 
-///
-//
+exports.getAllOrganizationName = function(req, res) {  
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedGetAllOrgName");
+  organization.on("failedGetAllOrgName",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+      // organization.removeAllListeners();
+      res.send(err);
+    });
+ organization.removeAllListeners("successfulGetAllOrgName");
+    organization.on("successfulGetAllOrgName",function(result){
+      // logger.emit("info", result.success.message);
+      // organization.removeAllListeners();
+      res.send(result);
+    });
+    organization.getAllOrganizationName();
+}
+
 exports.getOrgAddressByCriteria=function(req,res){
   var OrgCriteriaData=req.query;
   logger.emit("log","req query getOrgAddressByCriteria"+JSON.stringify(OrgCriteriaData));

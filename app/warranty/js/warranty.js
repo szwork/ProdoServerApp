@@ -35,10 +35,6 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 	//validate warranty data
 	if(warrantydata==undefined){
 		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please provide data to add warranty"}});
-	// }else if(warrantydata.prodle==undefined){
-	// 	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please pass prdouct id"}});
-	// }else if(warrantydata.userid==undefined){
-		// self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please provide userid"}});		
 	}else if(warrantydata.name==undefined){
 		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
 	}else if(warrantydata.model_no==undefined){
@@ -56,8 +52,11 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 	}else if(warrantydata.description==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass description "}});
 	}else{
-	  	// _checkProdleIsValid(self,warrantydata,sessionuserid);
-	  	_addUserWarranty(self,warrantydata,sessionuserid);
+		if(warrantydata.prodle==""){
+			_addUserWarranty(self,warrantydata,sessionuserid);
+		}else{
+			_checkProdleIsValid(self,warrantydata,sessionuserid);
+		}	
 	}
 };
 
@@ -65,9 +64,9 @@ var _checkProdleIsValid = function(self,warrantydata,sessionuserid){
 
 	ProductModel.findOne({prodle:warrantydata.prodle},function(err,productdata){
 		if(err){
-			self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":" function:_checkProdleIsValid \nError in db to find product err message: "+err}})
+			self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":" function:_checkProdleIsValid \nError in db to find product err message: "+err}});
 		}else if(!productdata){
-			self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Wrong prodle"}})
+			self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Wrong prodle"}});
 		}else{
 			///////////////////////////////////
 			_checkWarrantyAlreadyExist(self,warrantydata,sessionuserid);
@@ -80,7 +79,7 @@ var _checkWarrantyAlreadyExist = function(self,warrantydata,sessionuserid){
 	warrantydata.userid = sessionuserid;
 	WarrantyModel.findOne({prodle:warrantydata.prodle,userid:warrantydata.userid},function(err,warranty){
 		if(err){
-			self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":"Error in db to find warranty err message: "+err}})
+			self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":"Error in db to find warranty err message: "+err}});
 		}else if(!warranty){
 			///////////////////////////////////
 			_addUserWarranty(self,warrantydata,sessionuserid);

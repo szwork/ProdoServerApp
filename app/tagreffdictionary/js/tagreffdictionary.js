@@ -29,8 +29,8 @@ var _validateTagReffDicData = function(self,sessionuserid,tagReffDicData) {
 		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide level to tagreffdicdata"}});			
 	}else if(tagReffDicData.emotions.result==undefined){
 		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide result to tagreffdicdata"}});			
-	// }else if(tagReffDicData.emotions.emotion_url==undefined){
-	// 	self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide emotion_url to tagreffdicdata"}});			
+	}else if(tagReffDicData.domain_tag==undefined){
+		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide domain tag to tagreffdicdata"}});			
 	}else{
 		///////////////////////////////////////////////////////
 		_checkTagnameIsExist(self,sessionuserid,tagReffDicData);
@@ -59,15 +59,15 @@ var _addTag = function(self,tagReffDicData){
 			self.emit("failedAddTagReffDictionary",{"error":{"code":"ED001","message":"Error in db to save new tag"}});
 		}else{
   			/////////////////////////////////
-			_successfulAddTagReffDictionary(self,tag_data);
+			_successfulAddTagReffDictionary(self);
 			/////////////////////////////////
 		}
 	})
 }
 
-var _successfulAddTagReffDictionary = function(self,newtag_data){
+var _successfulAddTagReffDictionary = function(self){
 	logger.emit("log","successfulAddTagReffDictionary");
-	self.emit("successfulAddTagReffDictionary",{"success":{"message":"Tag added sucessfully in refference dictionary","tag_data":newtag_data}})
+	self.emit("successfulAddTagReffDictionary",{"success":{"message":"Tag added sucessfully in refference dictionary"}})
 }
 
 TagReffDictionary.prototype.getAllTag = function() {

@@ -1,5 +1,5 @@
 /*
-* Overview: Product Campain Model
+* Overview: Product Campaign Model
 * Dated:
 * Author: Dinesh Sawant
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
@@ -17,7 +17,6 @@ var logger = require("../../common/js/logger")
 var commentSchema = mongoose.Schema({
   commentid:{type:String},
   user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
-  //orgname and grpname set when user is organization  user
   status:{type:String},
   datecreated:{type:Date}, 
   dateremoved:{type:Date},   
@@ -26,32 +25,32 @@ var commentSchema = mongoose.Schema({
   comment_image:[{imageid:{type:String},image:{type:String}}]
 });
 
-//Product Campain Model
-var productCampainSchema = mongoose.Schema({
+//Product Campaign Model
+var productCampaignSchema = mongoose.Schema({
   orgid:{type:String,ref:"Organisation"},
-  campain_id:{type:String},
-  campain_lead:{type:String},
+  campaign_id:{type:String},
+  campaign_lead:{type:String},
   title:{type:String},
   description:{type:String},
   startdate:{type:Date},//,default:Date.now
   enddate:{type:Date},
   status:{type:String,default:"init"},//init,active,deactive
-  campain_logo:{type:String},
+  campaign_logo:{type:String},
   artwork:{logo:{type:String},banner:{type:String},photose:[{type:String}]},
-  campain_comments: [commentSchema],
+  campaign_comments: [commentSchema],
 });
 
-productCampainSchema.pre('save', function(next) {
-  var productscampain = this;
-  productscampain.campain_id = shortId.generate();  
-  // console.log("ProductsCampain pre "+ productscampain);
+productCampaignSchema.pre('save', function(next) {
+  var productscampaign = this;
+  productscampaign.campain_id = shortId.generate();  
+  // console.log("ProductsCampaign pre "+ productscampaign);
   next();
 })
 
 //Seed a Product Campain
-productCampainSchema.set('redisCache', true);
-productCampainSchema.set('expires', 90);
+productCampaignSchema.set('redisCache', true);
+productCampaignSchema.set('expires', 90);
  
-var ProductCampain = mongoose.model('productcampain', productCampainSchema);
+var ProductCampaign = mongoose.model('productcampaign', productCampaignSchema);
 
-module.exports = ProductCampain;
+module.exports = ProductCampaign;
