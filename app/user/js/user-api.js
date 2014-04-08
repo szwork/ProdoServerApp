@@ -166,7 +166,7 @@ exports.signin = function(req, res) {
     passport.authenticate('local', function(err, user_data, info) {
       if (err) { 
 
-        user.emit("failedUserSignin",{"error":{"code":"AP002","message":"Error in passport to authenticate"}});
+        user.emit("failedUserSignin",{"error":{"code":"AP002","message":"Error in passport to authenticate"+err}});
       } else if (info) {
         user.emit("failedUserSignin",{"error":{"code":info.code,"message":info.message}});
        }else {//valid user

@@ -99,7 +99,7 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 		productdata.orgid=orgid;
 		productdata.status="active";
 		productdata.prodle=shortId.generate();  
-		productdata.features=[{featurename:productdata.name.toLowerCase(),featuredescription:"product features"}];
+		productdata.features=[{featurename:productdata.name.toLowerCase(),featuredescription:" default product features"}];
     var product=new productModel(productdata);
     productModel.update({orgid:orgid,model_no:productdata.model_no},{$set:productdata},{upsert:true},function(err,addstatus){
     	if(err){
