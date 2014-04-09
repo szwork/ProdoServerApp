@@ -1693,6 +1693,8 @@ var _validateBroadcastMessage=function(self,user,orgid,broadcastmessagedata){
 		self.emit("failedBroadcastMessage",{"error":{"code":"AV001","message":"Please pass broadcast data"}}); 
 	}else if(broadcastmessagedata.message==undefined){
 		self.emit("failedBroadcastMessage",{"error":{"code":"AV001","message":"Please pass message"}}); 
+	}else if(broadcastmessagedata.broadcasttype==undefined || broadcastmessagedata.broadcasttype==""){
+		self.emit("failedBroadcastMessage",{"error":{"code":"AV001","message":"Please pass broadcasttype"}}); 
 	}else if(broadcastmessagedata.expireindays==undefined){
 		self.emit("failedBroadcastMessage",{"error":{"code":"AV001","message":"Please pass expireindays"}}); 
 	}else if(!S(broadcastmessagedata.expireindays).isNumeric()){
@@ -1753,6 +1755,9 @@ var _getBroadcastMessage=function(self,orgid){
 		}else{
 			var broadcast=[];
 			for(var i=0;i<broadcastmessage.length;i++){
+				broadcastmessage[i].broadcast.broadcastid=broadcastmessage[i].broadcast._id;
+				broadcastmessage[i].broadcast._id=undefined;
+
 				broadcast.push(broadcastmessage[i].broadcast);
 			}
 			/////////////////////////////////////
@@ -1826,3 +1831,27 @@ var _successfulDeleteOrgKeyClient=function(self){
 	logger.emit("log","_successfulDeleteOrgKeyClient");
 	self.emit("successfulDeleteOrgKeyClient",{"success":{"message":"Delete Organizations Key Clients  Successfully"}});
 }
+Organization.prototype.deleteBroadcastMessage = function(orgid,broadcastid) {
+	var self=this;
+	///////////////////////////
+	_deleteBroadcastMessage(self,orgid,broadcastid);
+	////////////////////////
+	
+};
+var _deleteBroadcastMessage=function(self,orgid,broadcastid){
+	orgModel.update({orgid:orgid,"broadcast._id":broadcastid},{$pull:{broadcast:{_id:broadcastid}}},function(err,deletebraodcaststatus){
+		if(err){
+			self.emit("failedDeleteBroadcastMessage",{"error":{"code":"ED001","message":"Database Issue"}});
+		}else if(deletebraodcaststatus==0){
+			self.emit("failedDeleteBroadcastMessage",{"error":{"message":"broadcastid or orgid is wrong"}});
+		}else{
+			//////////////////////////////////
+			_successfullBroadcastMessage(self)
+			////////////////////////////////
+		}
+	})
+}
+var _successfullBroadcastMessage=function(self){
+   logger.emit("log","_successfullBroadcastMessage");
+	self.emit("successfulDeleteBroadastMessage",{"success":{"message":"Organization broadcast message successfully"}});
+}	
