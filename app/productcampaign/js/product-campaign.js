@@ -21,21 +21,21 @@ var ProductCampaign = function(campaigndata) {
 ProductCampaign.prototype = new events.EventEmitter;
 module.exports = ProductCampaign;
 
-ProductCampaign.prototype.addProductCampaign=function(orgid,sessionuserid){
+ProductCampaign.prototype.addProductCampaign=function(orgid,prodle,sessionuserid){
 	var self=this;
 	var campaigndata = this.productcampaign;
 	/////////////////////////////////////////////////////
-	_isValidOrgID(self,campaigndata,orgid,sessionuserid);
+	_isValidOrgID(self,campaigndata,orgid,prodle,sessionuserid);
 	/////////////////////////////////////////////////////
 }
 
-var _isValidOrgID = function(self,campaigndata,orgid,sessionuserid){
+var _isValidOrgID = function(self,campaigndata,orgid,prodle,sessionuserid){
 	OrgModel.findOne({orgid:orgid,status:{$ne:"deactive"}}).lean().exec(function(err,org){
 		if(err){
 			self.emit("failedAddProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campain : " +err}});
 		}else if(org){
 			//////////////////////////////////////////////////
-			_validateProductCampaignData(self,campaigndata,orgid,sessionuserid);
+			_validateProductCampaignData(self,campaigndata,orgid,prodle,sessionuserid);
 			//////////////////////////////////////////////////
 		}else{			
 			self.emit("failedAddProductCampaign",{"error":{"code":"AP001","message":"Provided orgid is wrong"}});
@@ -43,12 +43,16 @@ var _isValidOrgID = function(self,campaigndata,orgid,sessionuserid){
 	})
 }
 
-var _validateProductCampaignData = function(self,campaigndata,orgid,sessionuserid) {
+var _validateProductCampaignData = function(self,campaigndata,orgid,prodle,sessionuserid) {
 	//validate the product campain data
 	if(campaigndata==undefined){
 	 	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Please provide data to add product campain"}});
 	}else if(campaigndata.name==undefined){
 		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Please pass name"}});
+	}else if(campaigndata.productname==undefined){
+		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Please pass productname"}});
+	}else if(campaigndata.category==undefined){
+		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Please pass category"}});
 	}else if(campaigndata.description==undefined){
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass product description "}});
 	}else if(campaigndata.startdate==undefined){
@@ -56,11 +60,11 @@ var _validateProductCampaignData = function(self,campaigndata,orgid,sessionuseri
 	}else if(campaigndata.enddate==undefined){
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass end date"}});
 	}else{
-	  	_addProductCampaign(self,campaigndata,orgid);	   	
+	  	_addProductCampaign(self,campaigndata,orgid,prodle);	   	
 	}
 };
 
-var _addProductCampaign=function(self,campaigndata,orgid){
+var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 
 	var startDate = new Date(campaigndata.startdate);
 	var endDate = new Date(campaigndata.enddate);
@@ -74,6 +78,7 @@ var _addProductCampaign=function(self,campaigndata,orgid){
 	}else if(endDate == "Invalid Date"){
 		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Invalid end date"}});
 	}else{
+		campaigndata.prodle=prodle;
 		campaigndata.orgid=orgid;
 		campaigndata.startdate = startDate;
 		campaigndata.enddate = endDate;

@@ -17,6 +17,9 @@ var logger = require("../../common/js/logger");
 //Product Campaign Model
 var productCampaignSchema = mongoose.Schema({
   orgid:{type:String,ref:"Organisation"},
+  prodle:{type:String,ref:"Products"},
+  productname:{type:String,ref:"Products"},
+  category:[{type:String}],
   campaign_id:{type:String},  
   name:{type:String},
   description:{type:String},
