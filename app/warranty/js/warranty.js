@@ -65,6 +65,7 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid,warrantyinv
 	}else if(warrantydata.description==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass description "}});
 
+
 	}else if(warrantydata.warranty_type==undefined || warrantydata.warranty_type==""){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass warranty type "}});
 	}else if(["extended","standard"].indexOf(warrantydata.warranty_type.toLowerCase())<0){
@@ -75,6 +76,7 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid,warrantyinv
 		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please upload  ddwarrantyinvoice"}});
 	}else if(!S(warrantyinvoice.type).contains("image") && !S(warrantyinvoice.type).contains("pdf")){
 		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please upload only image or pdf"}});
+
 
 	}else{
 

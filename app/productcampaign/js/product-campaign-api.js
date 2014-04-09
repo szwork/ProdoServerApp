@@ -11,6 +11,7 @@ var ProductCampaign = require("./product-campaign");
 exports.addProductCampaign=function(req,res){
     console.log("addProductCampain");
 	var orgid = req.params.orgid;
+    var prodle = req.params.prodle;
   	var campaigndata=req.body.campaigndata;
   	var productcampaign = new ProductCampaign(campaigndata);
   
@@ -28,7 +29,7 @@ exports.addProductCampaign=function(req,res){
       // productcampaign.removeAllListeners();
       res.send(result);
     });
-    productcampaign.addProductCampaign(orgid,sessionuserid);   
+    productcampaign.addProductCampaign(orgid,prodle,sessionuserid);   
 }
 
 exports.updateProductCampaign=function(req,res){
