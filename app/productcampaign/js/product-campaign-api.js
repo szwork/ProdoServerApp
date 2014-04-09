@@ -5,81 +5,105 @@ var mongodb = require("mongodb");
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
 var logger=require("../../common/js/logger");
-var ProductCampain = require("./product-campaign");
+var ProductCampaign = require("./product-campaign");
 
 
-exports.addProductCampain=function(req,res){
+exports.addProductCampaign=function(req,res){
     console.log("addProductCampain");
 	var orgid = req.params.orgid;
-  	var campaindata=req.body.campaindata;
-  	var productcampain = new ProductCampain(campaindata);
+  	var campaigndata=req.body.campaigndata;
+  	var productcampaign = new ProductCampaign(campaigndata);
   
   	var sessionuserid=req.user.userid;
     logger.emit("log","\norgid: "+orgid+"\nsessionid: "+sessionuserid);
-    productcampain.removeAllListeners("failedAddProductCampain");
-    productcampain.on("failedAddProductCampain",function(err){
+    productcampaign.removeAllListeners("failedAddProductCampaign");
+    productcampaign.on("failedAddProductCampaign",function(err){
       logger.emit("error", err.error.message,sessionuserid);
-      // productcampain.removeAllListeners();
+      // productcampaign.removeAllListeners();
       res.send(err);
     });
-    productcampain.removeAllListeners("successfulAddProductCampain");
-    productcampain.on("successfulAddProductCampain",function(result){
+    productcampaign.removeAllListeners("successfulAddProductCampaign");
+    productcampaign.on("successfulAddProductCampaign",function(result){
       logger.emit("info", result.success.message,sessionuserid);
-      // productcampain.removeAllListeners();
+      // productcampaign.removeAllListeners();
       res.send(result);
     });
-    productcampain.addProductCampain(orgid,sessionuserid);   
+    productcampaign.addProductCampaign(orgid,sessionuserid);   
 }
 
-exports.getProductCampain=function(req,res){
+exports.updateProductCampaign=function(req,res){
+    console.log("updateProductCampain");
+    var orgid = req.params.orgid;
+    var campaign_id=req.params.campaign_id;
+    var campaigndata=req.body.campaigndata;
+    var productcampaign = new ProductCampaign(campaigndata);
+  
+    var sessionuserid=req.user.userid;
+    logger.emit("log","\norgid: "+orgid+"\nsessionid: "+sessionuserid);
+    productcampaign.removeAllListeners("failedUpdateProductCampaign");
+    productcampaign.on("failedUpdateProductCampaign",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // productcampaign.removeAllListeners();
+      res.send(err);
+    });
+    productcampaign.removeAllListeners("successfulUpdateProductCampaign");
+    productcampaign.on("successfulUpdateProductCampaign",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // productcampaign.removeAllListeners();
+      res.send(result);
+    });
+    productcampaign.updateProductCampaign(orgid,campaign_id,sessionuserid);   
+}
+
+exports.getProductCampaign=function(req,res){
     logger.emit("log","///////Calling to Get Products Campain///////");
     var sessionuserid=req.user.userid;
     var orgid=req.params.orgid;
-    var campain_id=req.params.campain_id;
-    logger.emit("log","orgid:"+orgid+"\ncampain_id:"+campain_id+"\nsessionid:"+sessionuserid);
-    var productcampain = new ProductCampain();
+    var campaign_id=req.params.campaign_id;
+    logger.emit("log","orgid:"+orgid+"\ncampain_id:"+campaign_id+"\nsessionid:"+sessionuserid);
+    var productcampaign = new ProductCampaign();
     
-    productcampain.removeAllListeners("failedGetProductCampain");
-    productcampain.on("failedGetProductCampain",function(err){
+    productcampaign.removeAllListeners("failedGetProductCampaign");
+    productcampaign.on("failedGetProductCampaign",function(err){
         logger.emit("log","error:"+err.error.message+":"+sessionuserid);
         logger.emit("error", err.error.message,sessionuserid);
-        // productcampain.removeAllListeners();
+        // productcampaign.removeAllListeners();
         res.send(err);
         // eventEmitter.removeListener(this);
     });
-    productcampain.removeAllListeners("successfulGetProductCampain");
-    productcampain.on("successfulGetProductCampain",function(result){
-        logger.emit("log","Getting Product Campain details successfully");
+    productcampaign.removeAllListeners("successfulGetProductCampaign");
+    productcampaign.on("successfulGetProductCampaign",function(result){
+        logger.emit("log","Getting Product Campaign details successfully");
         logger.emit("info", result.success.message,sessionuserid);
-        // productcampain.removeAllListeners();
+        // productcampaign.removeAllListeners();
         res.send(result);
         // eventEmitter.removeListener(this);
     }); 
-    productcampain.getProductCampain(orgid,campain_id);
+    productcampaign.getProductCampaign(orgid,campaign_id);
 }
 
-exports.getAllProductCampain=function(req,res){
+exports.getAllProductCampaign=function(req,res){
     logger.emit("log","///////Calling to Get All Products Campain///////");
     var sessionuserid=req.user.userid;
     var orgid=req.params.orgid;
     logger.emit("log","orgid:"+orgid+"\nsessionid:"+sessionuserid);
-    var productcampain = new ProductCampain();
+    var productcampaign = new ProductCampaign();
     
-    productcampain.removeAllListeners("failedGetAllProductCampain");
-    productcampain.on("failedGetAllProductCampain",function(err){
+    productcampaign.removeAllListeners("failedGetAllProductCampaign");
+    productcampaign.on("failedGetAllProductCampaign",function(err){
         logger.emit("log","error:"+err.error.message+":"+sessionuserid);
         logger.emit("error", err.error.message,sessionuserid);
-        // productcampain.removeAllListeners();
+        // productcampaign.removeAllListeners();
         res.send(err);
         // eventEmitter.removeListener(this);
     });
-    productcampain.removeAllListeners("successfulGetAllProductCampain");
-    productcampain.on("successfulGetAllProductCampain",function(result){
+    productcampaign.removeAllListeners("successfulGetAllProductCampaign");
+    productcampaign.on("successfulGetAllProductCampaign",function(result){
         logger.emit("log","Getting All Product Campain details successfully");
         logger.emit("info", result.success.message,sessionuserid);
-        // productcampain.removeAllListeners();
+        // productcampaign.removeAllListeners();
         res.send(result);
         // eventEmitter.removeListener(this);
     }); 
-    productcampain.getAllProductCampain(orgid);
+    productcampaign.getAllProductCampaign(orgid);
 }

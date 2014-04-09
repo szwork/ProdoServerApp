@@ -20,7 +20,8 @@ var logger = require("../../common/js/logger");
 var warrantySchema = mongoose.Schema({
   warranty_id:{type:String},
   prodle:{type:String},
-  orgname:{type:String},  
+  orgid:{type:String},
+  orgname:{type:String},
   name:{type:String},
   model_name:{type:String},
   model_no:{type:String},
