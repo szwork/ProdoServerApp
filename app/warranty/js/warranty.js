@@ -55,6 +55,8 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass expiry date"}});
 	}else if(warrantydata.description==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass description "}});
+	}else if(warrantydata.warranty_type==undefined){
+	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass warranty_type"}});
 	}else{
 		if(warrantydata.prodle==""){
 			_addUserWarranty(self,warrantydata,sessionuserid);
