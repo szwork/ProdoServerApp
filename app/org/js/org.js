@@ -919,10 +919,46 @@ var _successfulOrgUpdateressAdd=function(self){
 Organization.prototype.deleteOrgAddress = function(orgid,orgaddressid) {
 	var self=this;
 	// var orgaddress=self.orgaddress;
+	//////////////////////////////////////////////////////////
+	_isContainCompanyOneCompanyAddress(self,orgid,orgaddressid)
+	//////////////////////////////////////////////////////////
+
 	//////////////////////////////////////////////
-	_deleteOrgAddress(self,orgid,orgaddressid);
+	// _deleteOrgAddress(self,orgid,orgaddressid);
 	//////////////////////////////////////////////
 };
+var _isContainCompanyOneCompanyAddress=function(self,orgid,orgaddressid){
+	orgModel.aggregate({$match:{orgid:orgid}},{"$unwind":"$location"},{$match:{"location.locationtype":"Company Address"}},{$project:{location:1}},function(err,orglocations){
+		if(err){
+			self.emit("failedDeleteOrgAddress",{"error":{"code":"ED001","message":"Error in db to delete organization address"}});
+		}else{
+			console.log("orglocations"+JSON.stringify(orglocations))
+			if(orglocations.length==0){
+				_deleteOrgAddress(self,orgid,orgaddressid)
+			}else{
+				var locationids=[];
+				for(var i=0;i<orglocations.length;i++){
+					locationids.push(orglocations[i].location._id+"");
+				}
+				console.log("locationids length"+orgaddressid)
+				console.log(locationids)
+				console.log(locationids.indexOf(orgaddressid))
+				if(orglocations.length==1){
+					if(locationids.indexOf(orgaddressid)<0){
+						_deleteOrgAddress(self,orgid,orgaddressid)
+					
+					}else{
+						self.emit("failedDeleteOrgAddress",{"error":{"code":"EAO01","message":"It should have atleast one company address"}});			
+					}
+				}else{
+					_deleteOrgAddress(self,orgid,orgaddressid)
+				}
+			}
+		} 
+
+		
+	})
+}
 var _deleteOrgAddress=function(self,orgid,orgaddressid){
 	orgModel.update({orgid:orgid,"location._id":orgaddressid},{$pull:{location:{_id:orgaddressid}}},function(err,orgaddrespullstatus){
 		if(err){
