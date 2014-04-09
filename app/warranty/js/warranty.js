@@ -14,7 +14,16 @@ var events = require("events");
 var logger = require("../../common/js/logger");
 var ProductModel = require("../../product/js/product-model");
 var WarrantyModel = require("./warranty-model");
-
+var AWS = require('aws-sdk');
+var CONFIG=require("config").Prodonus;
+var amazonbucket=CONFIG.amazonbucket;
+var S=require("string");
+var exec = require('child_process').exec;
+AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
+AWS.config.update({region:'ap-southeast-1'});
+var s3bucket = new AWS.S3();
+var fs=require("fs");
+var path=require("path");
 var Warranty = function(warrantydata) {
 	this.warranty = warrantydata;
 };
@@ -22,16 +31,16 @@ var Warranty = function(warrantydata) {
 Warranty.prototype = new events.EventEmitter;
 module.exports = Warranty;
 
-Warranty.prototype.addUserWarranty = function(sessionuserid){
+Warranty.prototype.addUserWarranty = function(sessionuserid,warrantyinvoice){
 	var self = this;
 	var warrantydata = this.warranty;
 	// console.log("WarrantyData : " + JSON.stringify(warrantydata));
 	////////////////////////////////////////////////////////////
-	_validateWarrantyData(self,warrantydata,sessionuserid);
+	_validateWarrantyData(self,warrantydata,sessionuserid,warrantyinvoice);
 	//////////////////////////////////////////////////////////
 }
 
-var _validateWarrantyData = function(self,warrantydata,sessionuserid){
+var _validateWarrantyData = function(self,warrantydata,sessionuserid,warrantyinvoice){
 	//validate warranty data
 	if(warrantydata==undefined){
 		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please provide data to add warranty"}});
@@ -47,24 +56,38 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass date of purchase"}});
 	}else if(warrantydata.purchase_location==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass purchase location"}});
-	}else if(warrantydata.purchase_location.city==undefined){
+	}else if(warrantydata.purchase_location_city==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass city in purchase location"}});
-	}else if(warrantydata.purchase_location.country==undefined){
+	}else if(warrantydata.purchase_location_country==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass country in purchase location"}});
 	}else if(warrantydata.expirydate==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass expiry date"}});
 	}else if(warrantydata.description==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass description "}});
+	}else if(warrantydata.warranty_type==undefined || warrantydata.warranty_type==""){
+	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass warranty type "}});
+	}else if(["extended","standard"].indexOf(warrantydata.warranty_type.toLowerCase())<0){
+	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Warranty type should be extended or standard"}});
+	}else if(warrantyinvoice==undefined){
+		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please upload warrantyinvoice "}});
+	}else if(warrantyinvoice.originalFilename==""){
+		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please upload  ddwarrantyinvoice"}});
+	}else if(!S(warrantyinvoice.type).contains("image") && !S(warrantyinvoice.type).contains("pdf")){
+		self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Please upload only image or pdf"}});
 	}else{
+
 		if(warrantydata.prodle==""){
-			_addUserWarranty(self,warrantydata,sessionuserid);
+			///////////////////////////////////////
+			_validateWarrantyInvoice(self,warrantydata,sessionuserid,warrantyinvoice)
+			//////////////////////////////////////
+			
 		}else{
-			_checkProdleIsValid(self,warrantydata,sessionuserid);
+			_checkProdleIsValid(self,warrantydata,sessionuserid,warrantyinvoice);
 		}	
 	}
 };
 
-var _checkProdleIsValid = function(self,warrantydata,sessionuserid){
+var _checkProdleIsValid = function(self,warrantydata,sessionuserid,warrantyinvoice){
 
 	ProductModel.findOne({prodle:warrantydata.prodle},function(err,productdata){
 		if(err){
@@ -73,28 +96,33 @@ var _checkProdleIsValid = function(self,warrantydata,sessionuserid){
 			self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Wrong prodle"}});
 		}else{
 			///////////////////////////////////
-			_checkWarrantyAlreadyExist(self,warrantydata,sessionuserid);
+			_checkWarrantyAlreadyExist(self,warrantydata,sessionuserid,warrantyinvoice);
 			///////////////////////////////////
 		}
 	})
 }
 
-var _checkWarrantyAlreadyExist = function(self,warrantydata,sessionuserid){
+var _checkWarrantyAlreadyExist = function(self,warrantydata,sessionuserid,warrantyinvoice){
 	warrantydata.userid = sessionuserid;
 	WarrantyModel.findOne({prodle:warrantydata.prodle,userid:warrantydata.userid},function(err,warranty){
 		if(err){
 			self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":"Error in db to find warranty err message: "+err}});
 		}else if(!warranty){
-			///////////////////////////////////
-			_addUserWarranty(self,warrantydata,sessionuserid);
-			///////////////////////////////////			
+			///////////////////////////////////////
+			_validateWarrantyInvoice(self,warrantydata,sessionuserid,warrantyinvoice)
+			//////////////////////////////////////
+			
 		}else{
 			self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"Warranty Already Exist"}});
 		}
 	})	
 }
-
-var _addUserWarranty = function(self,warrantydata,sessionuserid){
+var _validateWarrantyInvoice=function(self,warrantydata,sessionuserid,warrantyinvoice){
+	///////////////////////////////////
+			_addUserWarranty(self,warrantydata,sessionuserid,warrantyinvoice);
+			///////////////////////////////////			
+}
+var _addUserWarranty = function(self,warrantydata,sessionuserid,warrantyinvoice){
 
 	var purchaseDate = new Date(warrantydata.purchase_date);
 	var expiryDate = new Date(warrantydata.expirydate);
@@ -117,18 +145,76 @@ var _addUserWarranty = function(self,warrantydata,sessionuserid){
 		 	if(err){
 		  		self.emit("failedAddUserWarranty",{"error":{"code":"ED001","message":"Error in db to add new warranty "+ err}});	
 		  	}else{
-		  		////////////////////////////
-		  		_successfulWarrantyAdd(self);
-		  		////////////////////////////
+
+		  		//////////////////////////////////////////////////////////////
+		  		_associateInvocieImageToWarranty(self,warranty,warrantyinvoice,sessionuserid)
+		  		/////////////////////////////////////////////////////////////
+		  		
 		  	}
 		})	
 	}
 	
 }
-
-var _successfulWarrantyAdd = function(self){
+var _associateInvocieImageToWarranty=function(self,warranty,warrantyinvoice,sessionuserid){
+	fs.readFile(warrantyinvoice.path,function (err, data) {
+  		if(err){
+  			logger.emit("error","File Read Issue:_associateInvocieImageToWarranty,err:"+err,sessionuserid);
+  			self.emit("failedAddUserWarranty",{"error":{"message":"Warranty Invoice Read Issue"}});		
+  		}else{
+  			var ext = path.extname(warrantyinvoice.originalFilename||'').split('.');
+  			ext=ext[ext.length - 1];
+  			 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+		    var bucketFolder;
+		    var params;
+		    bucketFolder=amazonbucket+"/user/"+sessionuserid+"/warranty"+warranty.warranty_id;
+      	    params = {
+	             Bucket: bucketFolder,
+	             Key:warranty.warranty_id+s3filekey,
+	             Body: data,
+	             //ACL: 'public-read-write',
+	             ContentType: warrantyinvoice.type
+            };
+            ////////////////////////////////////////////////////////////
+            _addWarrantyInvoiceFileToAmazonServer(self,params,warranty.warranty_id,sessionuserid,warrantyinvoice);
+            ////////////////////////////////////////////////////////////////////////////
+  			
+  		}
+  	});
+}
+var _addWarrantyInvoiceFileToAmazonServer=function(self,awsparams,warranty_id,userid,warrantyinvoice){
+	s3bucket.putObject(awsparams, function(err, data) {
+    if (err) {
+      self.emit("failedAddUserWarranty",{"error":{"message":"s3bucket.putObject:-_addProviderLogoToAmazonServer"+err}})
+    } else {
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject',params1, function (err, url) {
+        if(err){
+          self.emit("failedAddUserWarranty",{"error":{"message":"userFileUpload:Error in getting getSignedUrl"+err}});
+        }else{
+          var newprofileurl={bucket:params1.Bucket,key:params1.Key,image:url};
+          // console.log("providerid"+providerid);
+          WarrantyModel.update({warranty_id:warranty_id},{$set:{invoice_image:newprofileurl}},function(err,warrantyinvoiceimage){
+            if(err){
+              self.emit("failedAddUserWarranty",{"error":{"code":"EDOO1","message":"userFileUpload:Dberror"+err}});
+            }else if(warrantyinvoiceimage==0){
+            	self.emit("failedAddUserWarranty",{"error":{"message":"warranty id wrong"}});
+            }else{
+              
+			 exec("rm -rf "+"../../../"+warrantyinvoice.path);
+              console.log("rm -rf "+"../../../"+warrantyinvoice.path);               
+               //////////////////////////////           
+              _successfulWarrantyAdd(self,url)
+              ///////////////////////////////////
+            }
+          })
+        }
+      });
+    }
+  }) 
+}
+var _successfulWarrantyAdd = function(self,url){
 	logger.log("log","successfulAddUserWarranty");
-	self.emit("successfulAddUserWarranty",{"success":{"message":"Warranty added sucessfully"}})
+	self.emit("successfulAddUserWarranty",{"success":{"message":"Warranty added sucessfully","image":url}})
 }
 
 Warranty.prototype.updateUserWarranty = function(userid,warranty_id){
