@@ -19,6 +19,7 @@ var logger = require("../../common/js/logger");
 //Product Warranty Data Model
 var warrantySchema = mongoose.Schema({
   warranty_id:{type:String},
+  warranty_type:{type:String},//extended or standard
   prodle:{type:String},
   orgid:{type:String},
   orgname:{type:String},
@@ -28,7 +29,7 @@ var warrantySchema = mongoose.Schema({
   serial_no:{type:String},  
   purchase_date:{type:Date},
   expirydate:{type:Date},
-  warranty_type:{type:String},//extended or standard
+  
   purchase_location:{city:{type:String},country:{type:String}},
   invoice_image:{bucket:{type:String},key:String,image:{type:String}},
   status:{type:String,default:"active"},
