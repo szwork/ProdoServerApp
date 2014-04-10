@@ -307,6 +307,10 @@ exports.uploadFiles=function(io,__dirname){
                    ACL: 'public-read',
                    ContentType: file_type
                };
+               fs.close(fd, function() {
+                  exec("rm -rf '"+fileName+"'");
+                             
+                });
                //////////////////////////////////////////////////
                _addWarrantyWithInvoice(userid,warrantydata,params)
                //////////////////////////////////////////////////
