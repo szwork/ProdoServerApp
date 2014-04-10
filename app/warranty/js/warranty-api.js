@@ -11,6 +11,7 @@ exports.addUserWarranty=function(req,res){
 	console.log("Call addUserWarranty");
     var sessionuserid=req.user.userid;
   	var warrantydata=req.body;
+    console.log("req form"+JSON.stringify(req.form));
     var warrantyinvoice=req.files.warrantyinvoice;
     console.log("warrantyinvoice"+JSON.stringify(req.files))
     // logger.emit("log","req warranty body "+JSON.stringify(req.body));

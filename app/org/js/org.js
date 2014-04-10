@@ -1831,17 +1831,30 @@ var _successfulDeleteOrgKeyClient=function(self){
 	logger.emit("log","_successfulDeleteOrgKeyClient");
 	self.emit("successfulDeleteOrgKeyClient",{"success":{"message":"Delete Organizations Key Clients  Successfully"}});
 }
-Organization.prototype.deleteBroadcastMessage = function(orgid,broadcastid) {
+Organization.prototype.deleteBroadCastMessage = function(orgid,broadcastid) {
 	var self=this;
+
 	///////////////////////////
-	_deleteBroadcastMessage(self,orgid,broadcastid);
-	////////////////////////
-	
+	           _deleteBroadcastMessage(self,orgid,broadcastid);
+	           ////////////////////////
 };
+// var _checkBroadCastIdIsCorrect=function(self,orgid,broadcastid){
+// 	orgModel.findOne({orgid:orgid,"broadcast._id":broadcastid},{broadcast:1},function(err,orgbroadcast){
+// 		if(err){
+// 			self.emit("failedDeleteBroadcastMessage",{"error":{"code":"ED001","message":"Database Issue"}});
+// 		}else if(!orgbroadcast){
+// 			self.emit("failedDeleteBroadcastMessage",{"error":{"message":"broadcastid or orgid is wrong"}});
+// 		}else{
+// 				///////////////////////////
+// 	           _deleteBroadcastMessage(self,orgid,broadcastid);
+// 	           ////////////////////////
+// 		}
+// 	})
+// }
 var _deleteBroadcastMessage=function(self,orgid,broadcastid){
 	orgModel.update({orgid:orgid,"broadcast._id":broadcastid},{$pull:{broadcast:{_id:broadcastid}}},function(err,deletebraodcaststatus){
 		if(err){
-			self.emit("failedDeleteBroadcastMessage",{"error":{"code":"ED001","message":"Database Issue"}});
+			self.emit("failedDeleteBroadcastMessage",{"error":{"code":"ED001","message":"Database Issue"+err}});
 		}else if(deletebraodcaststatus==0){
 			self.emit("failedDeleteBroadcastMessage",{"error":{"message":"broadcastid or orgid is wrong"}});
 		}else{
@@ -1853,5 +1866,5 @@ var _deleteBroadcastMessage=function(self,orgid,broadcastid){
 }
 var _successfullBroadcastMessage=function(self){
    logger.emit("log","_successfullBroadcastMessage");
-	self.emit("successfulDeleteBroadastMessage",{"success":{"message":"Organization broadcast message successfully"}});
+	self.emit("successfulDeleteBroadastMessage",{"success":{"message":"Organization broadcast message Deleted Successfully"}});
 }	
