@@ -219,6 +219,132 @@ exports.uploadFiles=function(io,__dirname){
      //action for product images upload
      //action:{product:{userid:,orgid:,prodle:}}
     // console.log("sessionid"+JSON.stringify(socket.handshake));
+    socket.on('addWarranty',function(userid,warrantydata,file){
+       redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+        if(err){
+           socket.emit("addWarrantyResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(reply==null){
+        socket.emit("addWarrantyResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(JSON.parse(reply).passport.user==undefined){
+          socket.emit("addWarrantyResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(userid!=socket.handshake.user.userid){
+          socket.emit("addWarrantyResponse",{"error":{"code":"","message":"You have not authorized to add Warranty"}});
+        }else{
+          ///////////////////////////////////////////////////
+          _validateAddWarrantyData(userid,warrantydata,file,userid)
+          ////////////////////////////////////////////////
+        }          
+        })
+      })
+    
+    var _validateAddWarrantyData=function(userid,warrantydata,file,userid){
+      if(warrantydata==undefined){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"Please provide data to add warranty"}});
+      }else if(warrantydata.name==undefined){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
+      }else if(warrantydata.model_no==undefined){
+       socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"Please pass model number"}});
+      }else if(warrantydata.model_name==undefined){
+          socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass model name"}});
+      }else if(warrantydata.serial_no==undefined){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass serial number"}});
+      }else if(warrantydata.purchase_date==undefined){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass date of purchase"}});
+      }else if(warrantydata.purchase_location==undefined){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass purchase location"}});
+      }else if(warrantydata.purchase_location.city==undefined || warrantydata.purchase_location.city==""){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass city in purchase location"}});
+      }else if(warrantydata.purchase_location.country==undefined || warrantydata.purchase_location_country==""){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass country in purchase location"}});
+      }else if(warrantydata.expirydate==undefined){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass expiry date"}});
+      }else if(warrantydata.description==undefined){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass description "}});
+      }else if(warrantydata.warranty_type==undefined || warrantydata.warranty_type==""){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass warranty type "}});
+      }else if(["extended","standard"].indexOf(warrantydata.warranty_type.toLowerCase())<0){
+        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"Warranty type should be extended or standard"}});
+      }else{
+        ///////////////////////////////////////////////////////
+        _validateWarrantyInvoiceFile(userid,warrantydata,file,userid);
+        ///////////////////////////////////////////////////////
+      }
+    }
+    var _validateWarrantyInvoiceFile=function(userid,warrantydata,file,userid){
+      var file_name=file.filename;
+      var file_buffer=file.filebuffer;
+      var file_length=file.filelength;  
+      var file_type=file.filetype;
+      // logger.emit("log","file details"+JSON.stringify(file));
+      var ext = path.extname(file_name||'').split('.');
+      ext=ext[ext.length - 1];
+      var fileName = __dirname + '/tmp/uploads/' + file_name;
+      
+      if(!S(file_type).contains("image") && !S(file_type).contains("pdf") ){
+        callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
+      }else if(file_length>1000000){
+        socket.emit("addWarrantyResponse",{"error":{"message":"You can upload  image of size less than 1mb"}});
+      }else{
+        fs.open(fileName, 'a', 0755, function(err, fd) {
+          if (err) {
+           socket.emit("addWarrantyResponse",{"error":{"message":"_validateWarrantyInvoiceFile fs.open:"+err}})
+          }else{
+            fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+              if(err){
+                socket.emit("addWarrantyResponse",{"error":{"message":"_validateWarrantyInvoiceFile fs.write:"+err}})
+              }else{
+                var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                var bucketFolder;
+                var params;
+                var currentdate=new Date();
+                var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
+                bucketFolder=amazonbucket+"/user/"+userid+"/warranty";
+                params = {
+                   Bucket: bucketFolder,
+                   Key: userid+s3filekey,
+                   Body: writebuffer,
+                   Expires:expirydate,
+                   ACL: 'public-read',
+                   ContentType: file_type
+               };
+               //////////////////////////////////////////////////
+               _addWarrantyWithInvoice(userid,warrantydata,params)
+               //////////////////////////////////////////////////
+              }
+            })
+          }
+        })
+      }
+    }
+    var _addWarrantyWithInvoice=function(userid,warrantydata,awsparams){
+      s3bucket.putObject(awsparams, function(err, data) {
+        if (err) {
+          socket.emit("addWarrantyResponse",{"error":{"message":"s3bucket.putObject:-_addWarrantyWithInvoice"+err}})
+        } else {
+          var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+          s3bucket.getSignedUrl('getObject', params1, function (err, url) {
+            if(err){
+              socket.emit("addWarrantyResponse",{"error":{"message":"_addWarrantyWithInvoice:Error in getting getSignedUrl"+err}});
+            }else{
+             var invoice_image={bucket:params1.Bucket,key:params1.Key,image:url}
+             warrantydata.invoice_image=invoice_image;
+             var warranty_object=new WarrantyModel(warrantydata);
+             warranty_object.save(function(err,warranty){
+              if(err){
+                socket.emit("addWarrantyResponse",{"error":{"message":"Database Isssue"}})
+              }else{
+                socket.emit("addWarrantyResponse",{"success":{"message":"Warranty Added successfully","invoiceimage":url}});
+              }
+             })
+            }
+          });
+        }
+      })  
+    }
+
+
+
+
     socket.on('uploadFiles', function(file,action) {
       
       redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
@@ -292,8 +418,7 @@ exports.uploadFiles=function(io,__dirname){
         }
       })
     })
-  })
-}
+  
 
 uploadFile=function(file,dirname,action,sessionuser,callback){
   var file_name=file.filename;
@@ -1170,3 +1295,6 @@ var orgKeyClientFileUpload =function(orgid,awsparams,filename,orgclientname,call
     }
   })  
 }
+})
+}
+

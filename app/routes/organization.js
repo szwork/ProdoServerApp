@@ -43,6 +43,7 @@ exports.init = function (app) {
  app.post("/api/organization/broadcast/:orgid",auth,api.orgapi.broadcastMessage);
  app.get("/api/organization/broadcast/:orgid",auth,api.orgapi.getBroadcastMessage);
  app.delete("/api/keyclient/org/:orgid",auth,api.orgapi.deleteOrgKeyClient);
+ app.delete("/api/organization/broadcast/:orgid/:broadcastid",auth,api.orgapi.deleteBroadcastMessage)
  
 
 }

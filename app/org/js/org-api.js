@@ -878,7 +878,7 @@ exports.deleteOrgKeyClient=function(req,res){
 }
 exports.deleteBroadcastMessage=function(req,res){
   var orgid=req.params.orgid;
-  var broadcastids=req.params.broadcastid;
+  var broadcastid=req.params.broadcastid;
   var sessionuserid=req.user.userid;
   // var broadcastmessagedata=req.body.broadcast;
   var organization=new Organization();
@@ -896,7 +896,7 @@ exports.deleteBroadcastMessage=function(req,res){
   });
     if(req.user.org.orgid!=orgid){
       organization.emit("failedDeleteBroadcastMessage",{"error":{"code":"EA001","message":"Your are organization member"}});
-    }else if(req.user.org.isAdmin==true){
+    }else if(req.user.org.isAdmin==false){
       organization.emit("failedDeleteBroadcastMessage",{"error":{"code":"EA001","message":"Your are not  an admin"}});
     }else{
       /////////////////////////////////
