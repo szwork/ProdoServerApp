@@ -201,6 +201,6 @@ var _getAllProductCampaign = function(self,orgid){
 
 var _successfulGetAllProductCampaign = function(self,productcampain){
 	logger.emit("log","_successfulGetAllProductCampain");
-	self.emit("successfulGetAllProductCampaign",{"success":{"message":"Getting All Product Campaign Details Successfully","Product_Campains":productcampain}});
+	self.emit("successfulGetAllProductCampaign",{"success":{"message":"Getting All Product Campaign Details Successfully","Product_Campaigns":productcampain}});
 }
 
