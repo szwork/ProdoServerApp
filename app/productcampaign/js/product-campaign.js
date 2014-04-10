@@ -13,6 +13,7 @@
 var events = require("events");
 var logger = require("../../common/js/logger");
 var OrgModel = require("../../org/js/org-model");
+var ProductModel = require("../../product/js/product-model");
 var ProductCampaignModel = require("./product-campaign-model");
 var ProductCampaign = function(campaigndata) {
 	this.productcampaign = campaigndata;
@@ -44,7 +45,7 @@ var _isValidOrgID = function(self,campaigndata,orgid,prodle,sessionuserid){
 }
 
 var _isValidProdle = function(self,campaigndata,orgid,prodle,sessionuserid){
-	OrgModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,org){
+	ProductModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,org){
 		if(err){
 			self.emit("failedAddProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campain : " +err}});
 		}else if(org){
