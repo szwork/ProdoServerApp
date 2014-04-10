@@ -41,6 +41,7 @@ var redisstore =new RedisStore({ host: 'localhost', port: 5000, client: redis,tt
 //   next();
 // });
 app.use(express.favicon());
+app.use(express.multipart({ uploadDir: './tmp/uploads' }));
 app.use(express.logger());
 app.use(express.cookieParser());
 // app.use(express.bodyParser());

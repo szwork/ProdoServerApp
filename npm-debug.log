@@ -1,0 +1,145 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install', 'tesseract' ]
+2 info using npm@1.4.3
+3 info using node@v0.10.26
+4 verbose node symlink /usr/bin/node
+5 warn package.json querystring@0.2.0 querystring is also the name of a node core module.
+6 verbose readDependencies using package.json deps
+7 verbose cache add [ 'tesseract', null ]
+8 verbose cache add name=undefined spec="tesseract" args=["tesseract",null]
+9 verbose parsed url { protocol: null,
+9 verbose parsed url   slashes: null,
+9 verbose parsed url   auth: null,
+9 verbose parsed url   host: null,
+9 verbose parsed url   port: null,
+9 verbose parsed url   hostname: null,
+9 verbose parsed url   hash: null,
+9 verbose parsed url   search: null,
+9 verbose parsed url   query: null,
+9 verbose parsed url   pathname: 'tesseract',
+9 verbose parsed url   path: 'tesseract',
+9 verbose parsed url   href: 'tesseract' }
+10 silly lockFile 5d5959f8-tesseract tesseract
+11 verbose lock tesseract /home/giantleap/.npm/5d5959f8-tesseract.lock
+12 silly lockFile 5d5959f8-tesseract tesseract
+13 silly lockFile 5d5959f8-tesseract tesseract
+14 verbose addNamed [ 'tesseract', '' ]
+15 verbose addNamed [ null, '*' ]
+16 silly lockFile 490299bc-tesseract tesseract@
+17 verbose lock tesseract@ /home/giantleap/.npm/490299bc-tesseract.lock
+18 silly addNameRange { name: 'tesseract', range: '*', hasData: false }
+19 verbose url raw tesseract
+20 verbose url resolving [ 'https://registry.npmjs.org/', './tesseract' ]
+21 verbose url resolved https://registry.npmjs.org/tesseract
+22 info trying registry request attempt 1 at 11:53:55
+23 verbose etag "378K1DI5JDHEQRSS4MVVAQCBW"
+24 http GET https://registry.npmjs.org/tesseract
+25 http 304 https://registry.npmjs.org/tesseract
+26 silly registry.get cb [ 304,
+26 silly registry.get   { date: 'Wed, 09 Apr 2014 06:24:02 GMT',
+26 silly registry.get     server: 'Apache',
+26 silly registry.get     via: '1.1 varnish',
+26 silly registry.get     'last-modified': 'Wed, 09 Apr 2014 06:24:02 GMT',
+26 silly registry.get     'cache-control': 'max-age=1',
+26 silly registry.get     etag: '"378K1DI5JDHEQRSS4MVVAQCBW"',
+26 silly registry.get     'x-served-by': 'cache-sv94-SJC3',
+26 silly registry.get     'x-cache': 'MISS',
+26 silly registry.get     'x-cache-hits': '0',
+26 silly registry.get     'x-timer': 'S1397024642.122565269,VS0,VE84',
+26 silly registry.get     vary: 'Accept',
+26 silly registry.get     'content-length': '0',
+26 silly registry.get     'keep-alive': 'timeout=10, max=50',
+26 silly registry.get     connection: 'Keep-Alive' } ]
+27 verbose etag tesseract from cache
+28 silly addNameRange number 2 { name: 'tesseract', range: '*', hasData: true }
+29 silly addNameRange versions [ 'tesseract', [ '0.0.1' ] ]
+30 verbose addNamed [ 'tesseract', '0.0.1' ]
+31 verbose addNamed [ '0.0.1', '0.0.1' ]
+32 silly lockFile 8196aa71-tesseract-0-0-1 tesseract@0.0.1
+33 verbose lock tesseract@0.0.1 /home/giantleap/.npm/8196aa71-tesseract-0-0-1.lock
+34 silly lockFile 8196aa71-tesseract-0-0-1 tesseract@0.0.1
+35 silly lockFile 8196aa71-tesseract-0-0-1 tesseract@0.0.1
+36 silly lockFile 490299bc-tesseract tesseract@
+37 silly lockFile 490299bc-tesseract tesseract@
+38 silly resolved [ { name: 'tesseract',
+38 silly resolved     author: { name: 'Alexander Makarenko', email: 'estliberitas@gmail.com' },
+38 silly resolved     version: '0.0.1',
+38 silly resolved     description: 'Tesseract OCR bindings for Node.js',
+38 silly resolved     tags: [ 'tesseract', 'ocr', 'image processing' ],
+38 silly resolved     homepage: 'https://github.com/estliberitas/node-tesseract',
+38 silly resolved     bugs: { url: 'https://github.com/estliberitas/node-tesseract/issues' },
+38 silly resolved     repository:
+38 silly resolved      { type: 'git',
+38 silly resolved        url: 'git://github.com/estliberitas/node-tesseract.git' },
+38 silly resolved     engines: [ 'node >= 0.8' ],
+38 silly resolved     main: './lib/tesseract.js',
+38 silly resolved     scripts: { install: 'node-gyp rebuild' },
+38 silly resolved     gypfile: true,
+38 silly resolved     readme: 'node-tesseract\n==============\n\n**Tesseract OCR bindings for Node.js.**\n\nI started developing of this module when had a need to have Tesseract working with Node.js. But found that\nexisting modules do call `tesseract` command-line tool. And I have a need in fully customizable API. I started \nfrom [this article](simple-example-how-to-call-use-tesseract-library) and now working with Tesseract 3.02 API \ndocumentation. So soon will have much more things implemented! :wink:\n\nExample\n===============\n```javascript\nvar tesseract = require("tesseract")\n  , tess = new tesseract.BaseApi()\n  , pix;\n\n// set language\ntess.init("eng");\n// set image\ntess.setImage("some-image.png");\n// run recognition\ntess.recognize();\n// get recognized text\nconsole.log(tess.getText());\n\n// clear results\ntess.clear();\n\n// create Pix object (wrapper for Leptonica PIX structure)\npix = new tesseract.Pix("other-image.png");\n// Pix can be used in BaseApi::SetImage() too\ntess.setImage(pix);\n// again recognize and get text\ntess.recognize();\nconsole.log(tess.getText());\n\n// finish him! - free memory of underlying TessBaseAPI object\ntess.end();\n```\n\n\nTODO\n===============\n* Make class BaseApi support more of TessBaseAPI\n* Make tests\n* Support of other Tesseract APIs (someday)!',
+38 silly resolved     readmeFilename: 'README.md',
+38 silly resolved     _id: 'tesseract@0.0.1',
+38 silly resolved     _from: 'tesseract@' } ]
+39 info install tesseract@0.0.1 into /home/giantleap/Documents/projects/prodonus-server-app
+40 info installOne tesseract@0.0.1
+41 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/tesseract unbuild
+42 verbose tar unpack /home/giantleap/.npm/tesseract/0.0.1/package.tgz
+43 silly lockFile 8abd904b-erver-app-node-modules-tesseract tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/tesseract
+44 verbose lock tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/tesseract /home/giantleap/.npm/8abd904b-erver-app-node-modules-tesseract.lock
+45 silly lockFile c5e0719e--npm-tesseract-0-0-1-package-tgz tar:///home/giantleap/.npm/tesseract/0.0.1/package.tgz
+46 verbose lock tar:///home/giantleap/.npm/tesseract/0.0.1/package.tgz /home/giantleap/.npm/c5e0719e--npm-tesseract-0-0-1-package-tgz.lock
+47 silly gunzTarPerm modes [ '755', '644' ]
+48 silly gunzTarPerm extractEntry package.json
+49 silly gunzTarPerm extractEntry README.md
+50 silly gunzTarPerm extractEntry LICENSE
+51 silly gunzTarPerm extractEntry binding.gyp
+52 silly gunzTarPerm extractEntry lib/tesseract.js
+53 silly gunzTarPerm extractEntry src/leptonica_pix.cc
+54 silly gunzTarPerm extractEntry src/leptonica_pix.h
+55 silly gunzTarPerm extractEntry src/tesseract_baseapi.cc
+56 silly gunzTarPerm extractEntry src/tesseract_baseapi.h
+57 silly gunzTarPerm extractEntry src/tesseract_bindings.cc
+58 silly gunzTarPerm extractEntry src/tesseract_bindings.h
+59 silly gunzTarPerm extractEntry tesseract-0.0.1.tgz
+60 silly lockFile 8abd904b-erver-app-node-modules-tesseract tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/tesseract
+61 silly lockFile 8abd904b-erver-app-node-modules-tesseract tar:///home/giantleap/Documents/projects/prodonus-server-app/node_modules/tesseract
+62 silly lockFile c5e0719e--npm-tesseract-0-0-1-package-tgz tar:///home/giantleap/.npm/tesseract/0.0.1/package.tgz
+63 silly lockFile c5e0719e--npm-tesseract-0-0-1-package-tgz tar:///home/giantleap/.npm/tesseract/0.0.1/package.tgz
+64 info preinstall tesseract@0.0.1
+65 verbose readDependencies using package.json deps
+66 verbose readDependencies using package.json deps
+67 silly resolved []
+68 verbose about to build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/tesseract
+69 info build /home/giantleap/Documents/projects/prodonus-server-app/node_modules/tesseract
+70 verbose linkStuff [ false,
+70 verbose linkStuff   false,
+70 verbose linkStuff   false,
+70 verbose linkStuff   '/home/giantleap/Documents/projects/prodonus-server-app/node_modules' ]
+71 info linkStuff tesseract@0.0.1
+72 verbose linkBins tesseract@0.0.1
+73 verbose linkMans tesseract@0.0.1
+74 verbose rebuildBundles tesseract@0.0.1
+75 info install tesseract@0.0.1
+76 verbose unsafe-perm in lifecycle false
+77 info tesseract@0.0.1 Failed to exec install script
+78 info /home/giantleap/Documents/projects/prodonus-server-app/node_modules/tesseract unbuild
+79 info preuninstall tesseract@0.0.1
+80 info uninstall tesseract@0.0.1
+81 verbose true,/home/giantleap/Documents/projects/prodonus-server-app/node_modules,/home/giantleap/Documents/projects/prodonus-server-app/node_modules unbuild tesseract@0.0.1
+82 info postuninstall tesseract@0.0.1
+83 error tesseract@0.0.1 install: `node-gyp rebuild`
+83 error Exit status 1
+84 error Failed at the tesseract@0.0.1 install script.
+84 error This is most likely a problem with the tesseract package,
+84 error not with npm itself.
+84 error Tell the author that this fails on your system:
+84 error     node-gyp rebuild
+84 error You can get their info via:
+84 error     npm owner ls tesseract
+84 error There is likely additional logging output above.
+85 error System Linux 3.8.0-33-generic
+86 error command "/usr/bin/node" "/usr/bin/npm" "install" "tesseract"
+87 error cwd /home/giantleap/Documents/projects/prodonus-server-app
+88 error node -v v0.10.26
+89 error npm -v 1.4.3
+90 error code ELIFECYCLE
+91 verbose exit [ 1, true ]

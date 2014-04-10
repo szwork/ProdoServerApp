@@ -10,7 +10,9 @@ exports.addUserWarranty=function(req,res){
   var sessionuserid = req.user.userid;
 	console.log("Call addUserWarranty");
     var sessionuserid=req.user.userid;
-  	var warrantydata=req.body.warrantydata;
+  	var warrantydata=req.body;
+    var warrantyinvoice=req.files.warrantyinvoice;
+    console.log("warrantyinvoice"+JSON.stringify(req.files))
     // logger.emit("log","req warranty body "+JSON.stringify(req.body));
   	var warranty = new Warranty(warrantydata);
   	
@@ -28,7 +30,7 @@ exports.addUserWarranty=function(req,res){
       	res.send(result);
     });
     if(sessionuserid==userid){
-      warranty.addUserWarranty(sessionuserid);
+      warranty.addUserWarranty(sessionuserid,warrantyinvoice);
     }else{   
       warranty.emit("failedAddUserWarranty",{"error":{"code":"EA001","message":"Provided userid is not match with session userid"}})
     }

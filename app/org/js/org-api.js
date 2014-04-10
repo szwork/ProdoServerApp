@@ -876,3 +876,33 @@ exports.deleteOrgKeyClient=function(req,res){
     //////////////////////////////////////////////// ///////////
   }
 }
+exports.deleteBroadcastMessage=function(req,res){
+  var orgid=req.params.orgid;
+  var broadcastids=req.params.broadcastid;
+  var sessionuserid=req.user.userid;
+  // var broadcastmessagedata=req.body.broadcast;
+  var organization=new Organization();
+  
+  // logger.emit("log","orgid:"+orgid+"grpid:"+grpid+"usermemberid:"+usermemberid);
+  organization.removeAllListeners("failedDeleteBroadcastMessage");
+  organization.on("failedDeleteBroadcastMessage",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulDeleteBroadastMessage");
+  organization.on("successfulDeleteBroadastMessage",function(result){
+    // logger.emit("info", result.success.message);
+    res.send(result);
+  });
+    if(req.user.org.orgid!=orgid){
+      organization.emit("failedDeleteBroadcastMessage",{"error":{"code":"EA001","message":"Your are organization member"}});
+    }else if(req.user.org.isAdmin==true){
+      organization.emit("failedDeleteBroadcastMessage",{"error":{"code":"EA001","message":"Your are not  an admin"}});
+    }else{
+      /////////////////////////////////
+    organization.deleteBroadCastMessage(orgid,broadcastid);
+    ////////////////////////////////   
+    }
+    
+  
+}

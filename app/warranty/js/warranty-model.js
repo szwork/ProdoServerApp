@@ -29,8 +29,9 @@ var warrantySchema = mongoose.Schema({
   serial_no:{type:String},  
   purchase_date:{type:Date},
   expirydate:{type:Date},
+  
   purchase_location:{city:{type:String},country:{type:String}},
-  invoice_image:{type:String},//path of invoice image
+  invoice_image:{bucket:{type:String},key:String,image:{type:String}},
   status:{type:String,default:"active"},
   modified_date:{type:Date},
   createddate:{type:Date,default:Date.now},
