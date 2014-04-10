@@ -152,6 +152,33 @@ var _successfulUpdateProductCampaignData=function(self){
 	self.emit("successfulUpdateProductCampaign",{"success":{"message":"Product Campaign Updated Sucessfully"}})
 }
 
+ProductCampaign.prototype.removeProductCampaign=function(campaign_id,sessionuserid){
+	var self=this;
+	// var campaigndata = this.productcampaign;
+	/////////////////////////////////////////////////////
+	_removeProductCampaign(self,campaign_id,sessionuserid);
+	/////////////////////////////////////////////////////
+}
+
+var _removeProductCampaign = function(self,campaign_id,sessionuserid){
+	ProductCampaignModel.update({campaign_id:campaign_id},{$set:{status:"deactive"}}).lean().exec(function(err,productupdatestatus){
+		if(err){
+			self.emit("failedRemoveProductCampaign",{"error":{"code":"ED001","message":"Error in db to delete product campaign"}});
+		}else if(productupdatestatus!=1){
+			self.emit("failedRemoveProductCampaign",{"error":{"code":"AP001","message":"Wrong campaign id"}});
+		}else{
+			////////////////////////////////
+			_successfulRemoveProductCampaign(self);
+			//////////////////////////////////
+		}
+	})
+} 
+
+var _successfulRemoveProductCampaign=function(self){
+	logger.log("log","_successfulRemoveProductCampaign");
+	self.emit("successfulRemoveProductCampaign",{"success":{"message":"Product Campaign Deleted Sucessfully"}})
+}
+
 ProductCampaign.prototype.getProductCampaign = function(orgid,campain_id) {
 	var self=this;
 	//////////////////////////////////////////
@@ -160,7 +187,7 @@ ProductCampaign.prototype.getProductCampaign = function(orgid,campain_id) {
 };
 
 var _getProductCampaign = function(self,orgid,campaign_id){
-	ProductCampaignModel.findOne({orgid:orgid,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.findOne({status:{$ne:"deactive"},orgid:orgid,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
 		}else if(productcampain){

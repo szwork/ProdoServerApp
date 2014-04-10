@@ -29,8 +29,8 @@ exports.addProductCampaign=function(req,res){
       // productcampaign.removeAllListeners();
       res.send(result);
     });
-    if(req.user.usertype!="manufacturer"){
-      product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You are not manufacturer to add campaign"}})
+    if(req.user.usertype.toLowerCase()!="manufacturer"){
+      productcampaign.emit("failedAddProductCampaign",{"error":{"code":"EA001","message":"You are not manufacturer to add campaign"}})
     }else{
       productcampaign.addProductCampaign(orgid,prodle,sessionuserid);
     }
@@ -86,6 +86,30 @@ exports.getProductCampaign=function(req,res){
         // eventEmitter.removeListener(this);
     }); 
     productcampaign.getProductCampaign(orgid,campaign_id);
+}
+
+exports.removeProductCampaign=function(req,res){
+    console.log("removeProductCampain");
+    // var orgid = req.params.orgid;
+    var campaign_id=req.params.campaign_id;
+    // var campaigndata=req.body.campaigndata;
+    var productcampaign = new ProductCampaign();
+  
+    var sessionuserid=req.user.userid;
+    // logger.emit("log","\norgid: "+orgid+"\nsessionid: "+sessionuserid);
+    productcampaign.removeAllListeners("failedRemoveProductCampaign");
+    productcampaign.on("failedRemoveProductCampaign",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // productcampaign.removeAllListeners();
+      res.send(err);
+    });
+    productcampaign.removeAllListeners("successfulRemoveProductCampaign");
+    productcampaign.on("successfulRemoveProductCampaign",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // productcampaign.removeAllListeners();
+      res.send(result);
+    });
+    productcampaign.removeProductCampaign(campaign_id,sessionuserid);   
 }
 
 exports.getAllProductCampaign=function(req,res){
