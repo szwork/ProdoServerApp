@@ -13,6 +13,7 @@
 var events = require("events");
 var logger = require("../../common/js/logger");
 var OrgModel = require("../../org/js/org-model");
+var ProductModel = require("../../product/js/product-model");
 var ProductCampaignModel = require("./product-campaign-model");
 var ProductCampaign = function(campaigndata) {
 	this.productcampaign = campaigndata;
@@ -35,10 +36,24 @@ var _isValidOrgID = function(self,campaigndata,orgid,prodle,sessionuserid){
 			self.emit("failedAddProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campain : " +err}});
 		}else if(org){
 			//////////////////////////////////////////////////
-			_validateProductCampaignData(self,campaigndata,orgid,prodle,sessionuserid);
+			_isValidProdle(self,campaigndata,orgid,prodle,sessionuserid);
 			//////////////////////////////////////////////////
 		}else{			
 			self.emit("failedAddProductCampaign",{"error":{"code":"AP001","message":"Provided orgid is wrong"}});
+		}
+	})
+}
+
+var _isValidProdle = function(self,campaigndata,orgid,prodle,sessionuserid){
+	ProductModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,org){
+		if(err){
+			self.emit("failedAddProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campain : " +err}});
+		}else if(org){
+			//////////////////////////////////////////////////
+			_validateProductCampaignData(self,campaigndata,orgid,prodle,sessionuserid);
+			//////////////////////////////////////////////////
+		}else{			
+			self.emit("failedAddProductCampaign",{"error":{"code":"AP001","message":"You can not add campaign for the product which does not exist in the organization"}});
 		}
 	})
 }
@@ -186,6 +201,6 @@ var _getAllProductCampaign = function(self,orgid){
 
 var _successfulGetAllProductCampaign = function(self,productcampain){
 	logger.emit("log","_successfulGetAllProductCampain");
-	self.emit("successfulGetAllProductCampaign",{"success":{"message":"Getting All Product Campaign Details Successfully","Product_Campains":productcampain}});
+	self.emit("successfulGetAllProductCampaign",{"success":{"message":"Getting All Product Campaign Details Successfully","Product_Campaigns":productcampain}});
 }
 

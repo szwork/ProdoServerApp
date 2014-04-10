@@ -29,7 +29,12 @@ exports.addProductCampaign=function(req,res){
       // productcampaign.removeAllListeners();
       res.send(result);
     });
-    productcampaign.addProductCampaign(orgid,prodle,sessionuserid);   
+    if(req.user.usertype!="manufacturer"){
+      product.emit("failedProductAdd",{"error":{"code":"EA001","message":"You are not manufacturer to add campaign"}})
+    }else{
+      productcampaign.addProductCampaign(orgid,prodle,sessionuserid);
+    }
+    
 }
 
 exports.updateProductCampaign=function(req,res){
