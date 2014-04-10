@@ -35,10 +35,24 @@ var _isValidOrgID = function(self,campaigndata,orgid,prodle,sessionuserid){
 			self.emit("failedAddProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campain : " +err}});
 		}else if(org){
 			//////////////////////////////////////////////////
-			_validateProductCampaignData(self,campaigndata,orgid,prodle,sessionuserid);
+			_isValidProdle(self,campaigndata,orgid,prodle,sessionuserid);
 			//////////////////////////////////////////////////
 		}else{			
 			self.emit("failedAddProductCampaign",{"error":{"code":"AP001","message":"Provided orgid is wrong"}});
+		}
+	})
+}
+
+var _isValidProdle = function(self,campaigndata,orgid,prodle,sessionuserid){
+	OrgModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,org){
+		if(err){
+			self.emit("failedAddProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campain : " +err}});
+		}else if(org){
+			//////////////////////////////////////////////////
+			_validateProductCampaignData(self,campaigndata,orgid,prodle,sessionuserid);
+			//////////////////////////////////////////////////
+		}else{			
+			self.emit("failedAddProductCampaign",{"error":{"code":"AP001","message":"You can not add campaign for the product which does not exist in the organization"}});
 		}
 	})
 }

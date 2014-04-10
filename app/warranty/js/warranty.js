@@ -56,7 +56,7 @@ var _validateWarrantyData = function(self,warrantydata,sessionuserid){
 	}else if(warrantydata.description==undefined){
 	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass description "}});
 	}else if(warrantydata.warranty_type==undefined && warrantydata.warranty_type!="standard" && warrantydata.warranty_type!="extended"){
-	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass warranty_type"}});
+	  	self.emit("failedAddUserWarranty",{"error":{"code":"AV001","message":"please pass warranty_type as standard or extended"}});
 	}else{
 		if(warrantydata.prodle==""){
 			_addUserWarranty(self,warrantydata,sessionuserid);
