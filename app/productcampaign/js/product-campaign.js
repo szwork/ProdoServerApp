@@ -230,7 +230,7 @@ var _getAllProductCampaign = function(self,orgid){
 		if(err){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(productcampain.length==0){
-			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No Product Campain exists"}});
+			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No Product Campaign exists"}});
 		}else{
 			////////////////////////////////////////////////////
 			_successfulGetAllProductCampaign(self,productcampain);

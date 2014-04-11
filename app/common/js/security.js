@@ -13,7 +13,7 @@
 var app=require("../../../prodonus-app");
 auth = function (req, res, next) {
   if (req.isAuthenticated()) { 
-  	console.log("test"+req.user);
+  	// console.log("test"+req.user);
   	return next(); }
   //app.set("userid","");
  // req.session.destroy();

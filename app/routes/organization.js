@@ -18,13 +18,14 @@ var api = require("../api/api.js");
 var auth=require('../common/js/security');
 // Organization - REST api
 exports.init = function (app) {
-
-  app.post('/api/organization', auth,api.orgapi.addOrganization);//create
+console.log("init##");
+  app.post('/api/organization',auth,api.orgapi.addOrganization);//create
   app.put('/api/organization/:orgid',auth, api.orgapi.updateOrganization);//update
   app.get('/api/organization',auth,api.orgapi.getAllOrganization); //read
   app.get('/api/orgnames',auth,api.orgapi.getAllOrganizationName); //read all org name
   app.get('/api/organization/:orgid',auth, api.orgapi.getOrganization);//read
-  app.post('/api/orgdelreq/:orgid',auth,api.orgapi.requestToDeleteOrganization);
+  app.get('/api/orgindustrycategory',auth,api.orgapi.getOrgIndustryCategory);//get all industry category
+  app.post('/api/orgdeleterequest/:orgid',auth,api.orgapi.requestToDeleteOrganization);
  
   app.delete('/api/organization/:orgid',auth, api.orgapi.deleteOrganization);//delete
   ///organization address
