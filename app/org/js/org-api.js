@@ -281,6 +281,7 @@ var changeOrgDeleteRequestStatus = function(orgid){
 }
 //
 exports.getOrganization = function(req, res) {
+  console.log("ddddddddddd00");
   var orgid=req.params.orgid;
   var sessionuserid=req.user.userid;
   var organization=new Organization();
@@ -316,6 +317,25 @@ exports.getAllOrganization = function(req, res) {
       res.send(result);
     });
     organization.getAllOrganization();
+}
+
+exports.getOrgIndustryCategory = function(req, res) {
+  console.log("getOrgIndustryCategory");
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedGetOrgIndustryCategory");
+  organization.on("failedGetOrgIndustryCategory",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+      // organization.removeAllListeners();
+      res.send(err);
+    });
+ organization.removeAllListeners("successfulGetOrgIndustryCategory");
+    organization.on("successfulGetOrgIndustryCategory",function(result){
+      // logger.emit("info", result.success.message);
+      // organization.removeAllListeners();
+      res.send(result);
+    });
+    organization.getOrgIndustryCategory();
 }
 
 exports.getAllOrganizationName = function(req, res) {  

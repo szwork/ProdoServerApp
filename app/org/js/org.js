@@ -718,7 +718,36 @@ var _successfulOrganizationGetAll=function(self,organization){
 	self.emit("successfulOrganizationGetAll", {"success":{"message":"Getting Organization details Successfully","organization":organization}});
 }
 
+Organization.prototype.getOrgIndustryCategory = function() {
+	console.log("getOrgIndustryCategory");
+	var self=this;
+	//////////////////
+	_getOrgIndustryCategory(self);
+	///////////////////
+};
+
+var _getOrgIndustryCategory=function(self){
+	
+	orgModel.aggregate([{"$unwind":"$industry_category"},{$group:{_id:null,industry_category:{"$addToSet":"$industry_category"}}},{$project:{industry_category:1,_id:0}}]).exec(function(err,organization){
+		if(err){
+			self.emit("failedGetOrgIndustryCategory",{"error":{"code":"ED001","message":"Error in db to find all organizations"}});
+		}else if(organization.length==0){
+			self.emit("failedGetOrgIndustryCategory",{"error":{"code":"AO003","message":"No organization exists"}});
+		}else{
+			////////////////////////////////////////////////
+			_successfulGetOrgIndustryCategory(self,organization[0].industry_category);
+			///////////////////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetOrgIndustryCategory=function(self,organization){
+	logger.emit("log","_successfulGetOrgIndustryCategory");
+	self.emit("successfulGetOrgIndustryCategory", {"success":{"message":"Getting Organization Industry Category Successfully","industry_category":organization}});
+}
+
 Organization.prototype.getAllOrganizationName = function() {
+
 	var self=this;
 	//////////////////
 	_getAllOrganizationName(self);

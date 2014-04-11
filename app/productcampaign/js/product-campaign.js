@@ -138,7 +138,7 @@ var _updateProductCampaignData = function(self,campaigndata,orgid,campaign_id){
 		if(err){
 			self.emit("failedUpdateProductCampaign",{"error":{"code":"ED001","message":"Error in db to update product"}});
 		}else if(productupdatestatus!=1){
-			self.emit("failedUpdateProductCampaign",{"error":{"code":"AP001","message":"product id is wrong"}});
+			self.emit("failedUpdateProductCampaign",{"error":{"code":"AP001","message":"orgid or campaign id is wrong"}});
 		}else{
 			////////////////////////////////
 			_successfulUpdateProductCampaignData(self);
@@ -152,6 +152,46 @@ var _successfulUpdateProductCampaignData=function(self){
 	self.emit("successfulUpdateProductCampaign",{"success":{"message":"Product Campaign Updated Sucessfully"}})
 }
 
+ProductCampaign.prototype.removeProductCampaign=function(campaign_id,sessionuserid){
+	var self=this;
+	/////////////////////////////////////////////////////
+	_checkProductCampaignExistOrNot(self,campaign_id,sessionuserid);
+	/////////////////////////////////////////////////////
+}
+
+var _checkProductCampaignExistOrNot = function(self,campaign_id,sessionuserid){
+	ProductCampaignModel.findOne({status:{$ne:"deactive"},campaign_id:campaign_id}).lean().exec(function(err,productcampain){
+		if(err){
+			self.emit("failedRemoveProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
+		}else if(productcampain){
+			//////////////////////////////////////////////////
+			_removeProductCampaign(self,campaign_id,sessionuserid);
+			//////////////////////////////////////////////////
+		}else{			
+			self.emit("failedRemoveProductCampaign",{"error":{"code":"AP001","message":"Provided campaign_id is wrong"}});
+		}
+	})
+}
+
+var _removeProductCampaign = function(self,campaign_id,sessionuserid){
+	ProductCampaignModel.update({campaign_id:campaign_id},{$set:{status:"deactive"}}).lean().exec(function(err,productupdatestatus){
+		if(err){
+			self.emit("failedRemoveProductCampaign",{"error":{"code":"ED001","message":"Error in db to delete product campaign"}});
+		}else if(productupdatestatus!=1){
+			self.emit("failedRemoveProductCampaign",{"error":{"code":"AP001","message":"Wrong campaign id"}});
+		}else{
+			////////////////////////////////
+			_successfulRemoveProductCampaign(self);
+			//////////////////////////////////
+		}
+	})
+} 
+
+var _successfulRemoveProductCampaign=function(self){
+	logger.log("log","_successfulRemoveProductCampaign");
+	self.emit("successfulRemoveProductCampaign",{"success":{"message":"Product Campaign Deleted Sucessfully"}})
+}
+
 ProductCampaign.prototype.getProductCampaign = function(orgid,campain_id) {
 	var self=this;
 	//////////////////////////////////////////
@@ -160,7 +200,7 @@ ProductCampaign.prototype.getProductCampaign = function(orgid,campain_id) {
 };
 
 var _getProductCampaign = function(self,orgid,campaign_id){
-	ProductCampaignModel.findOne({orgid:orgid,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.findOne({status:{$ne:"deactive"},orgid:orgid,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
 		}else if(productcampain){
@@ -190,7 +230,7 @@ var _getAllProductCampaign = function(self,orgid){
 		if(err){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(productcampain.length==0){
-			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No Product Campain exists"}});
+			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No Product Campaign exists"}});
 		}else{
 			////////////////////////////////////////////////////
 			_successfulGetAllProductCampaign(self,productcampain);
