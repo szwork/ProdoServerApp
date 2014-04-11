@@ -65,7 +65,7 @@ user.registerUser(req.get("host"));
 
 
 
-exports.activateAccount = function(req, res) {
+exports.verifyAccount = function(req, res) {
   logger.emit("log","calling to activate Account");
   var user = new User();
   var html=S("<html><body><h1><font color=blue><a href='http://"+req.get("host")+"'>Prodonus</a></font></h1><br><message></body></html>");
@@ -281,7 +281,7 @@ exports.deleteUser = function(req, res) {
   });
 
   if(isAuthorizedUser(userid,sessionuserid)){
-     user.deleteUser(userid);
+     user.deleteUser(req.user);
   }else{
     user.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
   }

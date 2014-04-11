@@ -88,6 +88,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 				self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
 			}else if(user){
 				// console.log("userData777"+userdata);
+				if(user.org.or)
 				self.emit("failedUserRegistration",{"error":{"code":"AU001","message":"Email already exist or Username already exists"}});
 			}else{
 		// validate the new user data
@@ -697,13 +698,39 @@ var _successfulUserUpdation = function(self) {
 		logger.emit("log","successfulUserUpdation");
 		self.emit("successfulUserUpdation", {"success":{"message":"User Updated Successfully"}});
 	}
-User.prototype.deleteUser = function(userid) {
+User.prototype.deleteUser = function(user) {
 	var self=this;
-	////////////////////////
-	_deleteUser(self,userid);
-	///////////////////////
+	//////////////////////////////
+	_isOrganizationAdmin(self,user)
+	//////////////////////////
+	
 	
 };
+var _isOrganizationAdmin=function(self,user){
+	if(user.org.isAdmin==false || user.org.isAdmin==null){
+		////////////////////////
+		_deleteUser(self,userid);
+		///////////////////////
+	}else{
+		userModel.find({"org.orgid":user.org.orgid,"org.isAdmin":true},function(err,orgadmins){
+			if(err){
+				self.emit("failedUserDeletion",{"error":{"code":"ED001","message":"Database Issue"}});
+			}else {
+				if(orgadmins.length==0){
+					////////////////////////
+					_deleteUser(self,userid);
+					///////////////////////
+				}else if(orgadmins.length>1){
+					////////////////////////
+		           _deleteUser(self,userid);
+		            ///////////////////////
+				}else{
+					self.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You are only one admin you can not delete yourself"}})
+				}
+			}
+		})
+	}
+}
 var _deleteUser=function(self,userid)
 {
 	// var userdata={removedate:new Date(),status:"deactive"}

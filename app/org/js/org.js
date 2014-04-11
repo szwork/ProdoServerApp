@@ -948,7 +948,7 @@ var _isContainCompanyOneCompanyAddress=function(self,orgid,orgaddressid){
 						_deleteOrgAddress(self,orgid,orgaddressid)
 					
 					}else{
-						self.emit("failedDeleteOrgAddress",{"error":{"code":"EAO01","message":"It should have atleast one company address"}});			
+						self.emit("failedDeleteOrgAddress",{"error":{"code":"EAO01","message":"Organization should maintain atleast one company address"}});			
 					}
 				}else{
 					_deleteOrgAddress(self,orgid,orgaddressid)
@@ -1127,10 +1127,14 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 						var userdata=[];
 		      			for(var i=0;i<newusers.length;i++)
 		     			{
+		     			  var isAdmin=false;
+		     			  if(usergrp.grpname.toLowerCase()=="admin"){
+		     			  	isAdmin=true;
+		     			  }
 		     			  if(product){
-		     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:true,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+		     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:isAdmin,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
 		     			  }else{
-		    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:true,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+		    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:isAdmin,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
 		     			  }
 					      
 		      	        }
