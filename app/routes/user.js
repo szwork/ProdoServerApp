@@ -28,7 +28,7 @@ exports.init = function (app) {
   app.post('/api/user/forgotpassword',api.userapi.forgotPassword);
   app.get('/api/logout',auth,api.userapi.signOutSessions);
   app.post('/api/recaptcha',api.userapi.recaptcha); 
-  app.get('/api/verify/:token',api.userapi.activateAccount);
+  app.get('/api/verify/:token',api.userapi.verifyAccount);
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
   app.get("/api/isloggedin",api.userapi.isLoggedIn);
