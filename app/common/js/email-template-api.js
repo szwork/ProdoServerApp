@@ -90,6 +90,11 @@ exports.loadEmailTemplate=function(req,res){
 			templatetype: "orgdeletereqnotification",
 			subject: "Organization Delete Request from <orgname>",
 			description: "Dear Prodonus Team,<br><br><orgname> has requested to be deleted from the prodonus platform. Please ensure the organization deactivation process is initiated as per the prodonus company policies. <br><br>From,<br><br><orgname>"
+		},
+		{
+			templatetype: "activateaccount",
+			subject: "Activate Account Request",
+			description: "Dear <email> You are requested to activate your account,So to activate your account please copy and pasteu this address into your web browser's address bar:<br><br><url><br><br>Have fun, and don't hesitate to contact us with your feedback <feedbackurl>.<br><br>- The Prodonus Team <br><br><br>Please do not reply to this e-mail; if you require assistance, please visit our support link <support link url> or write to - support@prodonus.com"
 		}]
 
 

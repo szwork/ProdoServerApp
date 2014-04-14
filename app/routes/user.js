@@ -65,4 +65,6 @@ exports.init = function (app) {
    app.get('/api/myrecommendproducts',auth,api.userapi.getMyRecommendProductsFollowed);//get my recommend products followed
    app.post('/api/changeemail/:userid',auth,api.userapi.changeEmail);
    app.post('/api/changepassword/:userid',auth,api.userapi.changePassword);
+   app.post('/api/activateaccountrequest',api.userapi.activateAccountRequest);
+   app.get('/api/activateaccount/:token',api.userapi.activateAccount);
 }

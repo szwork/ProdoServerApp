@@ -231,7 +231,7 @@ var _validateUpdateWarrantyData = function(self,userid,warranty_id){
 	var warrantydata = self.warranty;
 	if(warrantydata==undefined){
 		self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"Please provide data to add warranty"}});
-	}else{
+	}else {
 	  	_updateUserWarranty(self,userid,warranty_id,warrantydata);
 	}
 };
