@@ -714,7 +714,7 @@ User.prototype.deleteUser = function(user) {
 var _isOrganizationAdmin=function(self,user){
 	if(user.org.isAdmin==false || user.org.isAdmin==null){
 		////////////////////////
-		_deleteUser(self,userid);
+		_deleteUser(self,user.userid);
 		///////////////////////
 	}else{
 		userModel.find({"org.orgid":user.org.orgid,"org.isAdmin":true},function(err,orgadmins){
@@ -723,11 +723,11 @@ var _isOrganizationAdmin=function(self,user){
 			}else {
 				if(orgadmins.length==0){
 					////////////////////////
-					_deleteUser(self,userid);
+					_deleteUser(self,user.userid);
 					///////////////////////
 				}else if(orgadmins.length>1){
 					////////////////////////
-		           _deleteUser(self,userid);
+		           _deleteUser(self,user.userid);
 		            ///////////////////////
 				}else{
 					self.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You are only one admin you can not delete yourself"}})
