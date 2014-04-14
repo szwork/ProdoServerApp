@@ -88,8 +88,13 @@ var _validateRegisterUser = function(self,userdata,host) {
 				self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
 			}else if(user){
 				// console.log("userData777"+userdata);
-				if(user.org.or)
-				self.emit("failedUserRegistration",{"error":{"code":"AU001","message":"Email already exist or Username already exists"}});
+				// if(user.org.or)
+				if(user.status=="deactive"){
+					self.emit("failedUserRegistration",{"error":{"code":"ACT001","message":"Your account is deactived ,Do you want to activate?"}});	
+				}else{
+					self.emit("failedUserRegistration",{"error":{"code":"AU001","message":"Email already exist or Username already exists"}});	
+				}
+				
 			}else{
 		// validate the new user data
 			
