@@ -337,7 +337,7 @@ exports.uploadFiles=function(io,__dirname){
               if(err){
                 socket.emit("addWarrantyResponse",{"error":{"message":"Database Isssue"}})
               }else{
-                socket.emit("addWarrantyResponse",null,{"success":{"message":"Warranty Added successfully","warranty_id":warranty.warranty.warranty_id,"invoiceimage":url}});
+                socket.emit("addWarrantyResponse",null,{"success":{"message":"Warranty Added successfully","warranty_id":warranty.warranty_id,"invoiceimage":url}});
               }
              })
             }

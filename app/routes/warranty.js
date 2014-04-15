@@ -9,4 +9,5 @@ exports.init = function (app) {
   	app.get("/api/warranty/:userid/:warranty_id",auth,api.warrantyapi.getUserWarranty);//get user warranty
   	app.get("/api/warranty/:userid",auth,api.warrantyapi.getAllUserWarranty);//get all user warranty
 	app.delete("/api/warranty/:userid/:warranty_id",auth,api.warrantyapi.deleteUserWarranty);//delete warranty
+	app.get("/api/nextwarranties/:userid/:warranty_id",auth,api.warrantyapi.loadMoreWarranties);
 }

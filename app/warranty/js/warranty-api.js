@@ -141,3 +141,29 @@ exports.getAllUserWarranty = function(req,res){
   });
   warranty.getAllUserWarranty(userid);
 }
+exports.loadMoreWarranties = function(req,res){
+  var userid = req.params.userid;
+  // var warranty_id = req.params.warranty_id;
+  var sessionuserid = req.user.userid;
+  var warranty_id=req.params.warranty_id;
+  var warranty = new Warranty();
+
+  warranty.removeAllListeners("failedLoadMoreWarranties");
+    warranty.on("failedLoadMoreWarranties",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // warranty.removeAllListeners();
+      res.send(err);
+    });
+  warranty.removeAllListeners("successfulLoadMoreWarranties");
+  warranty.on("successfulLoadMoreWarranties",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // warranty.removeAllListeners();
+    res.send(result);
+  });
+  if(sessionuserid!=userid){
+    warranty.emit("failedLoadMoreWarranties",{error:{message:"You have not authorized to see warranties",code:"EA001"}})
+  }else{
+    warranty.loadMoreWarranties(userid,warranty_id);  
+  }
+  
+}
