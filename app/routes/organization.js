@@ -45,6 +45,6 @@ console.log("init##");
  app.get("/api/organization/broadcast/:orgid",auth,api.orgapi.getBroadcastMessage);
  app.delete("/api/keyclient/org/:orgid",auth,api.orgapi.deleteOrgKeyClient);
  app.delete("/api/organization/broadcast/:orgid/:broadcastid",auth,api.orgapi.deleteBroadcastMessage)
- 
+ app.get('/api/latestorganization',api.orgapi.latesAddedOrganization); 
 
 }

@@ -349,14 +349,14 @@ var _loadMoreWarranty=function(self,sessionuserid,warranty_id){
 		}else if(!warranty){
 			self.emit("failedLoadMoreWarranties",{"error":{"code":"AC001","message":"Wrong userid or wrrantyid"}});
 		}else{
-			logger.emit("log",comment);
+			
 			var query=WarrantyModel.find({userid:sessionuserid,status:"active",createddate:{$lt:warranty.createddate}},{_id:0,status:0}).sort({createddate:-1}).limit(5);
 			query.exec(function(err,nextwarranties){
 				if(err){
 
 					self.emit("failedLoadMoreWarranties",{"error":{"code":"ED001","message":"_loadMoreComment: Error in db to delete comment"+err}});
 				}else if(nextwarranties.length==0){
-					self.emit("failedLoadMoreWarranties",{"error":{"code":"AC002","message":"No More Warranty(s)"}});
+					self.emit("failedLoadMoreWarranties",{"error":{"code":"AW002","message":"No More Warranty(s)"}});
 				}else{
 					///////////////////////////////////
 					_successfullLoadMoreWarranties(self,nextwarranties);
@@ -368,5 +368,5 @@ var _loadMoreWarranty=function(self,sessionuserid,warranty_id){
 }
 var _successfullLoadMoreWarranties=function(self,nextwarranties){
 	logger.emit("log","_successfullLoadMoreWarranties");
-	self.emit("successfulLoadMoreComment", {"success":{"message":"Next Warranties","warranty":nextwarranties}});
+	self.emit("successfulLoadMoreWarranties", {"success":{"message":"Next Warranties","warranty":nextwarranties}});
 }

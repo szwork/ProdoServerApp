@@ -20,4 +20,5 @@ exports.init = function (app) {
  app.get("/api/productfeature/:orgid/:prodle",auth,api.productapi.getProductFeature);
  app.get("/api/trendingproducts",auth,api.productapi.getProductTrending);
  app.get("/api/categorytags",auth,api.productapi.getAllCategoryTags);
+ app.get('/api/latestproduct',api.productapi.getLatestAddedProduct);
 }

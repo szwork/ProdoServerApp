@@ -1901,3 +1901,27 @@ var _successfullBroadcastMessage=function(self){
    logger.emit("log","_successfullBroadcastMessage");
 	self.emit("successfulDeleteBroadastMessage",{"success":{"message":"Organization broadcast message Deleted Successfully"}});
 }	
+Organization.prototype.latestAddedOrganization = function() {
+	var self=this;
+
+	///////////////////////////
+	_latestAddedOrganization(self);
+	////////////////////////
+};
+var _latestAddedOrganization=function(self){
+	var query=orgModel.find({},{orgied:1,name:1,orglogo:1,org_images:1}).sort({prodo_setupdate:-1}).limit(5);
+	query.exec(function(err,organizations){
+		if(err){
+			self.emit("failedLatestAddedOrganization",{error:{code:"ED001",message:"Database Issue"+err}})
+		}else if(organizations.length==0){
+         self.emit("failedLatestAddedOrganization",{error:{message:"No Latest Organizations"}})
+		}else{
+			/////////////////////////////////////////////////////
+			_successfullLatestAddedOrganization(self,organizations)
+			///////////////////////////////////////////////////////
+		}
+	})
+}
+var _successfullLatestAddedOrganization=function(self,organizations){
+	self.emit("successfulLatestAddedOrganization",{success:{message:"Latest Organization Getting Successfully",organization:organizations}})
+}

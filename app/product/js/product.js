@@ -728,3 +728,27 @@ var _getAllCategoryTags=function(self){
 var _successfullGetAllCategoryTags=function(self,categorytgsarray){
 	self.emit("successfulGetAllCategoryTags",{"success":{"message":"Getting All Category Tags Successfully","categorytags":categorytgsarray}})
 }
+Product.prototype.latestAddedProduct = function() {
+	var self=this;
+
+	///////////////////////////
+	_latestAddedProduct(self);
+	////////////////////////
+};
+var _latestAddedProduct=function(self){
+	var query=productModel.find({},{orgid:1,prodle:1,product_logo:1,product_images:1}).sort({prodo_setupdate:-1}).limit(5);
+	query.exec(function(err,products){
+		if(err){
+			self.emit("failedLatestAddedProduct",{error:{code:"ED001",message:"Database Issue"+err}})
+		}else if(products.length==0){
+         self.emit("failedLatestAddedProduct",{error:{message:"No Latest Products"}})
+		}else{
+			/////////////////////////////////////////////////////
+			_successfullLatestAddedOrganization(self,products)
+			///////////////////////////////////////////////////////
+		}
+	})
+}
+var _successfullLatestAddedOrganization=function(self,products){
+	self.emit("successfulLatestAddedProduct",{success:{message:"Latest Product Getting Successfully",product:products}})
+}
