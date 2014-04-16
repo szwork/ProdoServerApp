@@ -167,3 +167,23 @@ exports.loadMoreWarranties = function(req,res){
   }
   
 }
+exports.getLatestWarranty = function(req,res){
+  var userid = req.params.userid;
+  // var warranty_id = req.params.warranty_id;
+  var sessionuserid = req.user.userid;
+  var warranty = new Warranty();
+
+  warranty.removeAllListeners("failedGetLatestWarranty");
+    warranty.on("failedGetLatestWarranty",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // warranty.removeAllListeners();
+      res.send(err);
+    });
+  warranty.removeAllListeners("successfulGetLatestWarranty");
+  warranty.on("successfulGetLatestWarranty",function(result){
+    logger.emit("info", result.success.message,sessionuserid);
+    // warranty.removeAllListeners();
+    res.send(result);
+  });
+  warranty.getLatestWarranty(userid);
+}

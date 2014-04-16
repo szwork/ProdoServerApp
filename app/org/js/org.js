@@ -1909,7 +1909,7 @@ Organization.prototype.latestAddedOrganization = function() {
 	////////////////////////
 };
 var _latestAddedOrganization=function(self){
-	var query=orgModel.find({},{orgied:1,name:1,orglogo:1,org_images:1}).sort({prodo_setupdate:-1}).limit(5);
+	var query=orgModelm.find({},{orgid:1,name:1,org_logo:1,org_images:1}).sort({prodo_setupdate:-1}).limit(5);
 	query.exec(function(err,organizations){
 		if(err){
 			self.emit("failedLatestAddedOrganization",{error:{code:"ED001",message:"Database Issue"+err}})

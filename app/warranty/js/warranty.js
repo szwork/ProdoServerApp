@@ -370,3 +370,30 @@ var _successfullLoadMoreWarranties=function(self,nextwarranties){
 	logger.emit("log","_successfullLoadMoreWarranties");
 	self.emit("successfulLoadMoreWarranties", {"success":{"message":"Next Warranties","warranty":nextwarranties}});
 }
+Warranty.prototype.getLatestWarranty = function(userid){
+	var self = this;
+	/////////////////////////////////////////
+	_getLatestWarranty(self,userid);
+	/////////////////////////////////////////
+}
+
+var _getLatestWarranty = function(self,userid){
+	console.log("_getAllUserWarranty " + userid);
+	var query=WarrantyModel.find({status:"active",userid:userid}).sort({createddate:-1}).limit(5);
+	query.exec(function(err,warranty){
+		if(err){
+			self.emit("failedGetLatestWarranty",{"error":{"code":"ED001","message":"Error in db to find warranty err message: "+err}})
+		}else if(!warranty){
+			self.emit("failedGetLatestWarranty",{"error":{"code":"AV001","message":"User warranty does not exist"}})
+		}else{
+			////////////////////////////////////////
+			_successfulLatestWarranty(self,warranty);
+			////////////////////////////////
+		}
+	});
+}
+
+var _successfulLatestWarranty = function(self,doc){
+	logger.emit("log","_successfulGetAllUserWarranty");
+	self.emit("successfulGetLatestWarranty", {"success":{"message":"Getting Latest Warranty details Successfully","Warranty":doc}});
+}

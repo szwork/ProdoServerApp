@@ -83,7 +83,7 @@ var _validateRegisterUser = function(self,userdata,host) {
 	  }else if(["business","individual"].indexOf(userdata.prodousertype.toLowerCase())<0){
 		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Prodousertype must be individual or business"}});
 	   }else{
-	  	userModel.findOne({$or:[{email:userdata.email},{username:userdata.username}]},{email:1}).lean().exec(function(err,user){
+	  	userModel.findOne({$or:[{email:userdata.email},{username:userdata.username}]},{email:1,status:1}).lean().exec(function(err,user){
 			if(err){
 				self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
 			}else if(user){
