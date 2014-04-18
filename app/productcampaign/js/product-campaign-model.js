@@ -28,7 +28,8 @@ var productCampaignSchema = mongoose.Schema({
   status:{type:String,default:"init"},//init,active,deactive
   // campaign_lead:{type:String},
   // campaign_logo:{type:String},
-  artwork:{logo:{type:String},banner:{type:String},photos:[{type:String}]},
+  artwork:[{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}}],
+  // artwork:{logo:{type:String},banner:{type:String},photos:[{type:String}]},
 });
 
 productCampaignSchema.pre('save', function(next) {

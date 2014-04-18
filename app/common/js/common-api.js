@@ -27,6 +27,7 @@ var path=require("path");
 var userModel=require('../../user/js/user-model');
 var OrgModel=require('../../org/js/org-model');
 var ProductModel=require('../../product/js/product-model');
+var CampaignModel = require('../../productcampaign/js/product-campaign-model');
 var WarrantyModel = require('../../warranty/js/warranty-model');
 var exec = require('child_process').exec;
 var CONFIG = require('config').Prodonus;
@@ -192,8 +193,8 @@ var checkSocketSession=function(redisreply,file,action,callback){
     socketreply="orgLogoResponse";    
   }else if(action.productlogo!=undefined){
     socketreply="productLogoResponse";
-  }else if(action.warranty!=undefined){
-    socketreply="warrantyUploadResponse";
+  }else if(action.campaign!=undefined){warranty 
+    socketreply="campaignUploadResponse";
   }else if(action.orgkeyclient!=undefined){
      socketreply="orgKeyClientResponse";
   }else{
@@ -370,8 +371,8 @@ exports.uploadFiles=function(io,__dirname){
                   socket.emit("orgUploadResponse",{"error":{"message":"Please pass file details or action details"}});
                 }else if(action.product!=undefined){
                   socket.emit("productUploadResponse",{"error":{"message":"Please pass file details or action details"}});
-                }else if(action.warranty!=undefined){
-                  socket.emit("warrantyUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+                }else if(action.campaign!=undefined){
+                  socket.emit("campaignUploadResponse",{"error":{"message":"Please pass file details or action details"}});
                 }else if(action.orgkeyclient!=undefined){
                   socket.emit("orgKeyClientResponse",{"error":{"message":"Please pass file details or action details"}});
                 }else{
@@ -389,8 +390,8 @@ exports.uploadFiles=function(io,__dirname){
                       socket.emit("orgUploadResponse",err);
                     }else if(action.product!=undefined){
                       socket.emit("productUploadResponse",err);
-                    }else if(action.warranty!=undefined){
-                      socket.emit("warrantyUploadResponse",err);
+                    }else if(action.campaign!=undefined){
+                      socket.emit("campaignUploadResponse",err);
                     }else if(action.productlogo!=undefined){
                       socket.emit("productUploadLogoResponse",err);
                     }else if(action.orgkeyclient!=undefined){ 
@@ -405,8 +406,8 @@ exports.uploadFiles=function(io,__dirname){
                       socket.emit("orgUploadResponse",null,uploadresult);
                     }else if(action.product!=undefined){
                       socket.emit("productUploadResponse",null,uploadresult);
-                    }else if(action.warranty!=undefined){
-                      socket.emit("warrantyUploadResponse",null,uploadresult);
+                    }else if(action.campaign!=undefined){
+                      socket.emit("campaignUploadResponse",null,uploadresult);
                     }else if(action.productlogo!=undefined){
                       socket.emit("productUploadLogoResponse",null,uploadresult);
                     }else if(action.orglogo!=undefined){
@@ -458,9 +459,9 @@ uploadFile=function(file,dirname,action,sessionuser,callback){
       }
     })
     
-  }else if(action.warranty!=undefined){//warranty uploads
+  }else if(action.campaign!=undefined){//campaign uploads
 
-    __warrantyInvoiceImgBuffer(action,file,dirname,action,sessionuser,function(err,result){
+    __campaignImgBuffer(action,file,dirname,action,sessionuser,function(err,result){
       if(err){
          callback(err)
       }else{
@@ -918,10 +919,10 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
   }
 }
 
-var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,callback){
+var __campaignImgBuffer=function(action,file,dirname,action,sessionuser,callback){
   var file_name=file.filename;
   var file_buffer=file.filebuffer;
-  var file_length=file.filelength;  
+  var file_length=file.filelength;  warranty
   var file_type=file.filetype;
 
   var ext = path.extname(file_name||'').split('.');
@@ -930,7 +931,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
  if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif")  ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
   }else if(file_length>500000){
-    callback({"error":{"message":"You can upload  image of size less than 1mb"}});
+    callback({"error":{"message":"You can upload image of size less than 1mb"}});
   }else{
     easyimg.info(fileName,function(err,info){
       logger.emit("log","error"+err);
@@ -952,21 +953,21 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                      var params;
                      // writebuffer= new Buffer(file_buffer, "base64");
                     
-                      if(action.warranty.userid!=sessionuser.userid){
-                        callback({"error":{"code":"EA001","message":"You are not an authorized to change user warranty invoice image"}});   
+                      if(action.campaign.userid!=sessionuser.userid){
+                        callback({"error":{"code":"EA001","message":"You are not an authorized to change user campaign image"}});   
                       }else{
                         var currentdate=new Date();
                         var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
-                        bucketFolder=amazonbucket+"/user/"+action.warranty.userid+"/warranty";
+                        bucketFolder=amazonbucket+"/user/"+action.campaign.userid+"/campaign";
                         params = {
                              Bucket: bucketFolder,
-                             Key: action.warranty.userid+s3filekey,
+                             Key: action.campaign.userid+s3filekey,
                              Body: writebuffer,
                              ACL: 'public-read',
                              Expires:expirydate,
                              ContentType: file_type
                         };
-                        warrantyInvoiceImgUpload(action.warranty.warranty_id,params,file_name,function(err,result){
+                        campaignImgUpload(action.campaign.campaign_id,params,file_name,function(err,result){
                           if(err){
                             callback(err);
                           }else{
@@ -1247,25 +1248,25 @@ var orgLogoUpload=function(orgid,awsparams,filename,callback){
   })  
 }
 
-var warrantyInvoiceImgUpload=function(warranty_id,awsparams,filename,callback){
+var campaignImgUpload=function(campaign_id,awsparams,filename,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
-      callback({"error":{"message":"s3bucket.putObject:-warrantyInvoiceImgUpload"+err}})
+      callback({"error":{"message":"s3bucket.putObject:-campaignImgUpload"+err}})
     } else {
       logger.emit("log","fileupload saved");
       var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
       s3bucket.getSignedUrl('getObject',params1, function (err, url) {
         if(err){
-          callback({"error":{"message":"warrantyInvoiceImgUpload:Error in getting getSignedUrl "+err}});
+          callback({"error":{"message":"campaignImgUpload:Error in getting getSignedUrl "+err}});
         }else{
-          var warrany_invoice_object={bucket:params1.Bucket,key:params1.Key,image:url}
-          WarrantyModel.update({warranty_id:warranty_id},{$set:{invoice_image:warrany_invoice_object}},function(err,warrantyuploadstatus){
+          var campaignImg_object={bucket:params1.Bucket,key:params1.Key,image:url}
+          CampaignModel.update({campaign_id:campaign_id},{$push:{artwork:campaignImg_object}},function(err,campaignuploadstatus){
             if(err){
-              callback({"error":{"code":"EDOO1","message":"warrantyInvoiceImgUpload:Dberror "+err}});
-            }else if(warrantyuploadstatus==1){
-              callback(null,{"success":{"message":"Warranty invoice image uploaded successfully","image":url,"filename":filename}})
+              callback({"error":{"code":"EDOO1","message":"campaignImgUpload:DBerror "+err}});
+            }else if(campaignuploadstatus==1){
+              callback(null,{"success":{"message":"Campaign image uploaded successfully","image":url,"filename":filename}})
             }else{
-              callback({"error":{"code":"AP001","message":"Wrong warranty_id "+warranty_id}});
+              callback({"error":{"code":"AP001","message":"Wrong campaign_id "+campaign_id}});
             }
           })
         }
