@@ -347,6 +347,26 @@ exports.uploadFiles=function(io,__dirname){
       })  
     }
 
+    socket.on('addMarketingData',function(userid,warrantydata,file){
+      console.log("addMarketingData1");
+      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+        console.log("addMarketingData2");
+        if(err){
+          socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(reply==null){
+          socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(JSON.parse(reply).passport.user==undefined){
+          socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(userid!=socket.handshake.user.userid){
+          socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add Warranty"}});
+        }else{
+          console.log("addMarketingData3");
+          ///////////////////////////////////////////////////
+          // _validateAddWarrantyData(userid,warrantydata,file,userid)
+          ////////////////////////////////////////////////
+        }          
+      })
+    })
 
 
 
