@@ -347,7 +347,7 @@ exports.uploadFiles=function(io,__dirname){
       })  
     }
 
-    socket.on('addMarketingData',function(userid,warrantydata,file){
+    socket.on('addMarketingData',function(userid,marketingdata,file){
       console.log("addMarketingData1");
       redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
         console.log("addMarketingData2");
@@ -362,13 +362,88 @@ exports.uploadFiles=function(io,__dirname){
         }else{
           console.log("addMarketingData3");
           ///////////////////////////////////////////////////
-          // _validateAddWarrantyData(userid,warrantydata,file,userid)
+          _validateAddMarketingData(userid,marketingdata,file,userid);
           ////////////////////////////////////////////////
         }          
       })
     })
+    
+    var _validateAddMarketingData=function(userid,marketingdata,file,userid){
+      var file_name=file.filename;
+      var file_buffer=file.filebuffer;
+      var file_length=file.filelength;  
+      var file_type=file.filetype;
+      // logger.emit("log","file details"+JSON.stringify(file));
+      var ext = path.extname(file_name||'').split('.');
+      ext=ext[ext.length - 1];
+      var fileName = __dirname + '/tmp/uploads/' + file_name;
+      
+      if(!S(file_type).contains("image") && !S(file_type).contains("pdf") ){
+        callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
+      }else if(file_length>1000000){
+        socket.emit("addMarketingDataResponse",{"error":{"message":"You can upload  image of size less than 1mb"}});
+      }else{
+        fs.open(fileName, 'a', 0755, function(err, fd) {
+          if (err) {
+           socket.emit("addMarketingDataResponse",{"error":{"message":"_validateAddMarketingData fs.open:"+err}})
+          }else{
+            fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+              if(err){
+                socket.emit("addMarketingDataResponse",{"error":{"message":"_validateAddMarketingData fs.write:"+err}})
+              }else{
+                var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                var bucketFolder;
+                var params;
+                var currentdate=new Date();
+                var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
+                bucketFolder=amazonbucket+"/user/"+userid+"/marketing";
+                params = {
+                   Bucket: bucketFolder,
+                   Key: userid+s3filekey,
+                   Body: writebuffer,
+                   Expires:expirydate,
+                   ACL: 'public-read',
+                   ContentType: file_type
+               };
+               fs.close(fd, function() {
+                  exec("rm -rf '"+fileName+"'");
+                             
+                });
+               //////////////////////////////////////////////////
+               _addMarketingDataWithImages(userid,marketingdata,params)
+               //////////////////////////////////////////////////
+              }
+            })
+          }
+        })
+      }
+    }
 
-
+    var _addMarketingDataWithImages=function(userid,marketingdata,awsparams){
+      s3bucket.putObject(awsparams, function(err, data) {
+        if (err) {
+          socket.emit("addMarketingDataResponse",{"error":{"message":"s3bucket.putObject:-_addWarrantyWithInvoice"+err}})
+        } else {
+          var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+          s3bucket.getSignedUrl('getObject', params1, function (err, url) {
+            if(err){
+              socket.emit("addMarketingDataResponse",{"error":{"message":"_addWarrantyWithInvoice:Error in getting getSignedUrl"+err}});
+            }else{
+             var marketing_image={bucket:params1.Bucket,key:params1.Key,image:url};
+             marketingdata.marketing_image=marketing_image;
+             var marketing_object=new MarketingModel(marketingdata);
+             marketing_object.save(function(err,marketing){
+              if(err){
+                socket.emit("addMarketingDataResponse",{"error":{"message":"Database Isssue"}})
+              }else{
+                socket.emit("addMarketingDataResponse",null,{"success":{"message":"MarketingData Added successfully","marketing_id":marketing.marketing_id,"invoiceimage":url}});
+              }
+             })
+            }
+          });
+        }
+      })  
+    }
 
     socket.on('uploadFiles', function(file,action) {
       
