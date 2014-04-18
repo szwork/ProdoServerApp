@@ -193,7 +193,7 @@ var checkSocketSession=function(redisreply,file,action,callback){
     socketreply="orgLogoResponse";    
   }else if(action.productlogo!=undefined){
     socketreply="productLogoResponse";
-  }else if(action.campaign!=undefined){warranty 
+  }else if(action.campaign!=undefined){
     socketreply="campaignUploadResponse";
   }else if(action.orgkeyclient!=undefined){
      socketreply="orgKeyClientResponse";
@@ -385,7 +385,7 @@ exports.uploadFiles=function(io,__dirname){
                   if(err){
                     logger.emit("error",err.error.message,sessionuserid)
                     if(action.user!=undefined){
-                       socket.emit("userUploadResponse",err);
+                      socket.emit("userUploadResponse",err);
                     }else if(action.org!=undefined){
                       socket.emit("orgUploadResponse",err);
                     }else if(action.product!=undefined){
@@ -460,7 +460,7 @@ uploadFile=function(file,dirname,action,sessionuser,callback){
     })
     
   }else if(action.campaign!=undefined){//campaign uploads
-
+      console.log("uploadFile action.campaign");
     __campaignImgBuffer(action,file,dirname,action,sessionuser,function(err,result){
       if(err){
          callback(err)
@@ -920,9 +920,10 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
 }
 
 var __campaignImgBuffer=function(action,file,dirname,action,sessionuser,callback){
+  console.log("__campaignImgBuffer");
   var file_name=file.filename;
   var file_buffer=file.filebuffer;
-  var file_length=file.filelength;  warranty
+  var file_length=file.filelength;
   var file_type=file.filetype;
 
   var ext = path.extname(file_name||'').split('.');
