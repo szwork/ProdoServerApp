@@ -19,7 +19,7 @@ TagReffDictionary.prototype.addTag = function(sessionuserid,tagReffDicData){
 var _validateTagReffDicData = function(self,sessionuserid,tagReffDicData) {
 	if(tagReffDicData==undefined){
 	   self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide tagreffdicdata"}});	
-	}else if(tagReffDicData.tagname==undefined){
+	}else if(tagReffDicData.tagname==undefined || tagReffDicData.tagname.trim()==""){
 		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide tagname to tagreffdicdata"}});		
 	}else if(tagReffDicData.emotions.category==undefined){
 		self.emit("failedAddTagReffDictionary",{"error":{"code":"AV001","message":"Please provide category to tagreffdicdata"}});		
@@ -39,7 +39,7 @@ var _validateTagReffDicData = function(self,sessionuserid,tagReffDicData) {
 }
 
 var _checkTagnameIsExist = function(self,sessionuserid,tagReffDicData){
-	TagReffDicModel.findOne({tagname:tagReffDicData.tagname},{tagname:1},function(err,tagname){
+	TagReffDicModel.findOne({tagname:tagReffDicData.tagname.trim().toLowerCase()},{tagname:1},function(err,tagname){
 		if(err){
 			self.emit("failedAddTagReffDictionary",{"error":{"code":"ED001","message":"DB error:_addTag"+err}});	
 		}else if(tagname){
@@ -54,6 +54,7 @@ var _checkTagnameIsExist = function(self,sessionuserid,tagReffDicData){
 
 var _addTag = function(self,tagReffDicData){
 	var tagreffdic_data = new TagReffDicModel(tagReffDicData);
+	tagreffdic_data.tagname = tagReffDicData.tagname.trim().toLowerCase();
 	tagreffdic_data.save(function(err,tag_data){
 		if(err){
 			self.emit("failedAddTagReffDictionary",{"error":{"code":"ED001","message":"Error in db to save new tag"}});
