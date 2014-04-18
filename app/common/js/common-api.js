@@ -1260,7 +1260,7 @@ var campaignImgUpload=function(campaign_id,awsparams,filename,callback){
         if(err){
           callback({"error":{"message":"campaignImgUpload:Error in getting getSignedUrl "+err}});
         }else{
-          var campaignImg_object={bucket:params1.Bucket,key:params1.Key,image:url}
+          var campaignImg_object={bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId()}
           CampaignModel.update({campaign_id:campaign_id},{$push:{artwork:campaignImg_object}},function(err,campaignuploadstatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"campaignImgUpload:DBerror "+err}});

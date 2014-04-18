@@ -42,7 +42,11 @@ productCampaignSchema.pre('save', function(next) {
 //Seed a Product Campain
 productCampaignSchema.set('redisCache', true);
 productCampaignSchema.set('expires', 90);
- 
+
+productCampaignSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+  return this.collection.findAndModify(query, sort, doc, options, callback);
+};
+
 var ProductCampaign = mongoose.model('productcampaign', productCampaignSchema);
 
 module.exports = ProductCampaign;

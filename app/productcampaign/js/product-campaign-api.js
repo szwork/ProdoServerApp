@@ -137,3 +137,44 @@ exports.getAllProductCampaign=function(req,res){
     }); 
     productcampaign.getAllProductCampaign(orgid);
 }
+
+exports.deleteCampaignImage=function(req,res){
+ 
+  var sessionuserid=req.user.userid;
+  
+  var camimageids=req.query.camimageids;
+  var campaign_id = req.params.campaign_id;
+  var orgid=req.params.orgid;
+  logger.emit("log","prodle\nsessionuserid"+sessionuserid+" prodleimageid:"+camimageids+"orgid:"+orgid+"prodleimageids:"+JSON.stringify(camimageids));
+  
+  var productcampaign= new ProductCampaign();
+     // product.setMaxListeners(0); 
+  productcampaign.removeAllListeners("failedDeleteCampaignImage");
+  productcampaign.on("failedDeleteCampaignImage",function(err){
+    // logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  productcampaign.removeAllListeners("successfulDeleteCampaignImage");
+  productcampaign.on("successfulDeleteCampaignImage",function(result){
+    //logger.emit("log","Getting Product details successfully");
+    // logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  });
+   if(req.user.org.orgid!=orgid){
+    logger.emit("error","given orgid does not match with session orgid");
+    productcampaign.emit("failedDeleteCampaignImage",{"error":{"code":"EA001","message":"You have not authorized to delete campaign image"}}); 
+   }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to delete product image");
+    productcampaign.emit("failedDeleteCampaignImage",{"error":{"code":"EA001","message":"You have not authorized to delete campaign image"}}); 
+  }else{
+    ////////////////////////////////////////////////////////////
+    productcampaign.deleteCampaignImage(camimageids,campaign_id);
+    //////////////////////////////////////////////// ///////////
+  }
+}

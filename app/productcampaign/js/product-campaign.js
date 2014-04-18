@@ -15,6 +15,7 @@ var logger = require("../../common/js/logger");
 var OrgModel = require("../../org/js/org-model");
 var ProductModel = require("../../product/js/product-model");
 var ProductCampaignModel = require("./product-campaign-model");
+var S=require("string");
 var ProductCampaign = function(campaigndata) {
 	this.productcampaign = campaigndata;
 };
@@ -242,5 +243,68 @@ var _getAllProductCampaign = function(self,orgid){
 var _successfulGetAllProductCampaign = function(self,productcampain){
 	logger.emit("log","_successfulGetAllProductCampain");
 	self.emit("successfulGetAllProductCampaign",{"success":{"message":"Getting All Product Campaign Details Successfully","Product_Campaigns":productcampain}});
+}
+
+ProductCampaign.prototype.deleteCampaignImage = function(camimageids,campaign_id) {
+	var self=this;
+	if(camimageids==undefined){
+		self.emit("failedDeleteCampaignImage",{"error":{"code":"AV001","message":"Please provide campaign image ids"}});
+	}else if(camimageids.length==0){
+		self.emit("failedDeleteCampaignImage",{"error":{"message":"Given camimageids is empty "}});
+	}else{
+		///////////////////////////////////////////////////////////////////
+	_deleteCampaignImage(self,camimageids,campaign_id);
+	/////////////////////////////////////////////////////////////////	
+	}
+	
+};
+var _deleteCampaignImage=function(self,camimageids,campaign_id){
+	 var camp_imagearray=[];
+	camimageids=S(camimageids);
+	// db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
+   if(camimageids.contains(",")){
+   		camp_imagearray=camimageids.split(",");
+   }else{
+   		camp_imagearray.push(camimageids.s);
+   }
+	ProductCampaignModel.findAndModify({campaign_id:campaign_id,"artwork.imageid":{$in:camp_imagearray}},[],{$pull:{artwork:{imageid:{$in:camp_imagearray}}}},{new:false},function(err,deleteimagestatus){
+		if(err){
+			self.emit("failedDeleteCampaignImage",{"error":{"code":"ED001","message":"function:_deleteCampaignImage\nError in db to "}});
+		}else if(!deleteimagestatus){
+			self.emit("failedDeleteCampaignImage",{"error":{"message":"campaign_id or given camimageids is wrong "}});
+		}else{
+			var artwork=deleteimagestatus.artwork;
+			// artwork=JSON.parse(artwork);
+			logger.emit("log","dd"+JSON.stringify(artwork));
+			var object_array=[];
+			for(var i=0;i<artwork.length;i++){
+				object_array.push({Key:artwork[i].key});
+				console.log("test"+artwork[i]);
+			}
+			logger.emit("log","object_array:"+JSON.stringify(object_array));
+			var delete_aws_params={
+				Bucket: artwork[0].bucket, // required
+  			Delete: { // required
+    				Objects: object_array,
+      			Quiet: true || false
+      		}
+      	}
+      	logger.emit('log',"delete_aws_params:"+JSON.stringify(delete_aws_params));
+      s3bucket.deleteObjects(delete_aws_params, function(err, data) {
+			  if (err){
+			  	logger.emit("error","Campaign images not deleted from amazon s3 campaign_id:"+campaign_id)
+			  } else{
+			  	logger.emit("log","Campaign images deleted from amazon s3 campaign_id:"+campaign_id);
+			  } 
+			})
+			//////////////////////////////////
+			_successfulDeleteCampaignImage(self);
+			/////////////////////////////////////
+		}
+	})
+}
+var _successfulDeleteCampaignImage=function(self){
+	logger.emit("log","_successfulDeleteCampaignImage");
+	self.emit("successfulDeleteCampaignImage",{"success":{"message":"Delete Campaign Images Successfully"}});
 }
 
