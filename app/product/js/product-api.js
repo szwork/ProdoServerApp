@@ -488,3 +488,23 @@ exports.getAllCategoryTags=function(req,res){
     product.getAllCategoryTags();
     ////////////////////////////////  
 }
+exports.getLatestAddedProduct=function(req,res){
+  
+  // var broadcastmessagedata=req.body.broadcast;
+  var product=new Product();
+  
+  // logger.emit("log","orgid:"+orgid+"grpid:"+grpid+"usermemberid:"+usermemberid);
+  product.removeAllListeners("failedLatestAddedProduct");
+  product.on("failedLatestAddedProduct",function(err){
+    logger.emit("error", err.error.message);
+    res.send(err);
+  });
+  product.removeAllListeners("successfulLatestAddedProduct");
+  product.on("successfulLatestAddedProduct",function(result){
+    res.send(result);
+  });
+  
+    /////////////////////////////////
+    product.latestAddedProduct();
+    ////////////////////////////////   
+}

@@ -977,7 +977,7 @@ var _isContainCompanyOneCompanyAddress=function(self,orgid,orgaddressid){
 						_deleteOrgAddress(self,orgid,orgaddressid)
 					
 					}else{
-						self.emit("failedDeleteOrgAddress",{"error":{"code":"EAO01","message":"It should have atleast one company address"}});			
+						self.emit("failedDeleteOrgAddress",{"error":{"code":"EAO01","message":"Organization should maintain atleast one company address"}});			
 					}
 				}else{
 					_deleteOrgAddress(self,orgid,orgaddressid)
@@ -1156,10 +1156,14 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 						var userdata=[];
 		      			for(var i=0;i<newusers.length;i++)
 		     			{
+		     			  var isAdmin=false;
+		     			  if(usergrp.grpname.toLowerCase()=="admin"){
+		     			  	isAdmin=true;
+		     			  }
 		     			  if(product){
-		     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:true,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+		     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:isAdmin,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
 		     			  }else{
-		    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:true,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+		    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:isAdmin,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
 		     			  }
 					      
 		      	        }
@@ -1897,3 +1901,27 @@ var _successfullBroadcastMessage=function(self){
    logger.emit("log","_successfullBroadcastMessage");
 	self.emit("successfulDeleteBroadastMessage",{"success":{"message":"Organization broadcast message Deleted Successfully"}});
 }	
+Organization.prototype.latestAddedOrganization = function() {
+	var self=this;
+
+	///////////////////////////
+	_latestAddedOrganization(self);
+	////////////////////////
+};
+var _latestAddedOrganization=function(self){
+	var query=orgModelm.find({},{orgid:1,name:1,org_logo:1,org_images:1}).sort({prodo_setupdate:-1}).limit(5);
+	query.exec(function(err,organizations){
+		if(err){
+			self.emit("failedLatestAddedOrganization",{error:{code:"ED001",message:"Database Issue"+err}})
+		}else if(organizations.length==0){
+         self.emit("failedLatestAddedOrganization",{error:{message:"No Latest Organizations"}})
+		}else{
+			/////////////////////////////////////////////////////
+			_successfullLatestAddedOrganization(self,organizations)
+			///////////////////////////////////////////////////////
+		}
+	})
+}
+var _successfullLatestAddedOrganization=function(self,organizations){
+	self.emit("successfulLatestAddedOrganization",{success:{message:"Latest Organization Getting Successfully",organization:organizations}})
+}

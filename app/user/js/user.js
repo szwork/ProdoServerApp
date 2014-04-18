@@ -83,12 +83,18 @@ var _validateRegisterUser = function(self,userdata,host) {
 	  }else if(["business","individual"].indexOf(userdata.prodousertype.toLowerCase())<0){
 		self.emit("failedUserRegistration",{"error":{"code":"AV001","message":"Prodousertype must be individual or business"}});
 	   }else{
-	  	userModel.findOne({$or:[{email:userdata.email},{username:userdata.username}]},{email:1}).lean().exec(function(err,user){
+	  	userModel.findOne({$or:[{email:userdata.email},{username:userdata.username}]},{email:1,status:1}).lean().exec(function(err,user){
 			if(err){
 				self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find user"}});
 			}else if(user){
 				// console.log("userData777"+userdata);
-				self.emit("failedUserRegistration",{"error":{"code":"AU001","message":"Email already exist or Username already exists"}});
+				// if(user.org.or)
+				if(user.status=="deactive"){
+					self.emit("failedUserRegistration",{"error":{"code":"ACT001","message":"Your account is deactived ,Do you want to activate?"}});	
+				}else{
+					self.emit("failedUserRegistration",{"error":{"code":"AU001","message":"Email already exist or Username already exists"}});	
+				}
+				
 			}else{
 		// validate the new user data
 			
@@ -243,7 +249,7 @@ var _applyDefaultIndividualTrialPlan=function(user){
 	})
 }
 //verify user
-User.prototype.activateAccount = function(token) {
+User.prototype.verifyAccount = function(token) {
 	var self=this;
 	////////////////////////
 	_verifyToken(self,token);
@@ -697,13 +703,39 @@ var _successfulUserUpdation = function(self) {
 		logger.emit("log","successfulUserUpdation");
 		self.emit("successfulUserUpdation", {"success":{"message":"User Updated Successfully"}});
 	}
-User.prototype.deleteUser = function(userid) {
+User.prototype.deleteUser = function(user) {
 	var self=this;
-	////////////////////////
-	_deleteUser(self,userid);
-	///////////////////////
+	//////////////////////////////
+	_isOrganizationAdmin(self,user)
+	//////////////////////////
+	
 	
 };
+var _isOrganizationAdmin=function(self,user){
+	if(user.org.isAdmin==false || user.org.isAdmin==null){
+		////////////////////////
+		_deleteUser(self,user.userid);
+		///////////////////////
+	}else{
+		userModel.find({"org.orgid":user.org.orgid,"org.isAdmin":true},function(err,orgadmins){
+			if(err){
+				self.emit("failedUserDeletion",{"error":{"code":"ED001","message":"Database Issue"}});
+			}else {
+				if(orgadmins.length==0){
+					////////////////////////
+					_deleteUser(self,user.userid);
+					///////////////////////
+				}else if(orgadmins.length>1){
+					////////////////////////
+		           _deleteUser(self,user.userid);
+		            ///////////////////////
+				}else{
+					self.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You are only one admin you can not delete yourself"}})
+				}
+			}
+		})
+	}
+}
 var _deleteUser=function(self,userid)
 {
 	// var userdata={removedate:new Date(),status:"deactive"}
@@ -2047,3 +2079,118 @@ var _successfullPasswordChange=function(self){
 	logger.emit("log","_successfullPasswordChange");
 	self.emit("successfulChangePassword",{"success":{"message":"Password Changed Successfully"}});
 }
+User.prototype.activateAccountRequest = function(email,host) {
+	var self=this;
+	/////////////////////////////////////
+    _isAccountIsDeactivated(self,email,host)
+	/////////////////////////////////////
+};
+var _isAccountIsDeactivated=function(self,email,host){
+	userModel.findOne({email:email},function(err,user){
+		if(err){
+			logger.emit("error","Database Issue:_isAccountIsDeactivated"+err);
+			self.emit("failedactivateAccountRequest",{"error":{"message":"Database Issue"}});	
+		}else if(!user){
+			self.emit("failedactivateAccountRequest",{"error":{"message":"Provided emailid is not regsitered with prodonus"}});	
+		}else{
+			if(user.status!="deactive"){
+				self.emit("failedactivateAccountRequest",{"error":{"message":"Provided emailid account is already activate"}})
+			}else{
+				if(user.org.orgid!=null){//to check wheather user organization suer
+        	self.emit("failedactivateAccountRequest",{"error":{"message":"Organization user can not be activate through this request"}})
+				}else{
+					///////////////////////////////////////////
+					_createActivateAccountToken(self,user,host)
+					///////////////////////////////////////
+				}
+			}
+		}
+	})
+}
+
+var _createActivateAccountToken = function(self,user,host){
+		var verificationToken = new VerificationTokenModel({_userId: user.userid,tokentype:"activateaccount"});
+    verificationToken.createVerificationToken(function (err, token) {
+    	if (err){  
+    		logger.emit("error","_createActivateAccountToken"+err)
+        self.emit("failedactivateAccountRequest",{"error":{"code":"AT001","message":"Token create Issue"}});
+      }else{
+      	//////////////////////////////////////
+      	_sendActivateAccountRequestEmail(self,token,user,host);
+       	//////////////////////////////////////
+      }
+		})
+};
+	//find verify template and send verification token
+	var _sendActivateAccountRequestEmail = function(self,token, user,host) {
+
+	
+		EmailTemplateModel.findOne({"templatetype":"activateaccount"}).lean().exec(function(err,emailtemplate){
+			if(err){
+				logger.emit("error","Database Issue _sendActivateAccountRequestEmail"+err)
+				self.emit("failedactivateAccountRequest",{"error":{"code":"ED001","message":"Database Issue"}});
+			}else if(emailtemplate){
+				var url = "http://"+host+"/api/activateaccount/"+token;
+				var html=emailtemplate.description;
+        html=S(html);
+
+        html=html.replaceAll("<name>",user.fullname);
+        html=html.replaceAll("<url>",url);
+        html=html.replaceAll("<email>",user.email);
+      	var message = {
+            from: "Prodonus <noreply@prodonus.com>", // sender address
+            to: user.email, // list of receivers
+            subject:emailtemplate.subject, // Subject line
+            html: html.s // html body
+        }
+		 // calling to sendmail method
+        commonapi.sendMail(message,CONFIG.smtp_general,function (result){
+        	if(result=="failure"){
+        		self.emit("failedactivateAccountRequest",{"error":{"code":"AT001","message":"Error to send activateaccount email"}});
+        	}else{
+        		/////////////////////////////////
+        		_successfullActivateAccountRequest(self)
+        		////////////////////////////////
+        	}
+      	});
+	    }else{
+	      self.emit("failedactivateAccountRequest",{"error":{"code":"ED002","message":"Server setup template issue"}});
+			}
+	  })
+	}
+var _successfullActivateAccountRequest=function(self,email){
+	self.emit("successfulactivateAccountRequest",{"success":{"message":"Activate Accoount request send to your emailid"}})
+}
+User.prototype.activateAccount = function(token) {
+	var self=this;
+	console.log("token"+token)
+	//////////////////////////
+	_activateAccount(self,token)
+	/////////////////////////////
+};
+var _activateAccount = function(self,token) {
+	console.log("token"+token);
+	// console.log("calling to verify token");
+	// self.emit("failedUserActivation",{"error":{"code":"ED001","message":"Error in Db to find verification token"}});
+  VerificationTokenModel.findAndModify({token: token,tokentype:"activateaccount",status:"active"},[],
+                {$set: {status:"deactive"}},{new:false} ,function (err, userVerificationToken){
+    if (err){
+
+			self.emit("failedactivateAccount",{"error":{"code":"ED001","message":"Database Issue"}});
+    } else if (userVerificationToken){
+      userModel.findAndModify({ userid: userVerificationToken._userId},[],
+          {$set: {status:"active",verified:true}},{new:false}, function(err,user){
+        if(err){
+        	logger.emit("error","Database Issue"+err)
+    			self.emit("failedactivateAccount",{"error":{"code":"ED001","message":"Database Issue"}});
+        }else if(!user){
+          self.emit("failedactivateAccount",{"error":{"code":"AV001","message":"wrong userid"}});
+        }else{
+        		self.emit("tokenredirect","#/user/activateaccount")
+        }
+      })
+    }else{
+    	self.emit("tokenredirect","#/user/regenerateactivatetoken");
+    }
+  })
+};

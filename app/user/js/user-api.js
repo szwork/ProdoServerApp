@@ -65,7 +65,7 @@ user.registerUser(req.get("host"));
 
 
 
-exports.activateAccount = function(req, res) {
+exports.verifyAccount = function(req, res) {
   logger.emit("log","calling to activate Account");
   var user = new User();
   var html=S("<html><body><h1><font color=blue><a href='http://"+req.get("host")+"'>Prodonus</a></font></h1><br><message></body></html>");
@@ -74,10 +74,6 @@ exports.activateAccount = function(req, res) {
     console.log("failedUserActivation" + err)
     logger.emit("error", err.error.message);
     html=html.replaceAll("<message>",err.error.message).s;
-   // user.removeListener('failedUserActivation', function (stream) {
-   //   logger.emit("log","failedUserActivation event removed");
-   // });
-   // //user.removeAllListeners();
     res.send(html);
   });
  user.removeAllListeners("successfullUserActivation");
@@ -113,7 +109,7 @@ exports.activateAccount = function(req, res) {
   });
 
   var token = req.params.token;
-   user.activateAccount(token);
+   user.verifyAccount(token);
 };
 exports.signin = function(req, res) {
    if (req.isAuthenticated()){
@@ -281,7 +277,7 @@ exports.deleteUser = function(req, res) {
   });
 
   if(isAuthorizedUser(userid,sessionuserid)){
-     user.deleteUser(userid);
+     user.deleteUser(req.user);
   }else{
     user.emit("failedUserDeletion",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
   }
@@ -738,4 +734,47 @@ exports.changePassword = function(req, res) {
      user.emit("failedChangePassword",{"error":{"code":"EA001","message":"You have not authorize to change password"}})
     }
     
+}
+exports.activateAccountRequest=function(req,res){
+  var email=req.body.email;
+  var user = new User();
+  // var sessionuserid=req.user.userid;
+  user.removeAllListeners("failedactivateAccountRequest");
+  user.on("failedactivateAccountRequest",function(err){
+    logger.emit("error", err.error.message);
+      // //user.removeAllListeners();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulactivateAccountRequest");
+  user.on("successfulactivateAccountRequest",function(result){
+    logger.emit("info", result.success.message);
+    // user.removeAllListeners();
+    res.send(result);
+  });
+  user.activateAccountRequest(email,req.get('host'));
+}
+exports.activateAccount=function(req,res){
+  var user = new User();
+  var token=req.params.token;
+  // var sessionuserid=req.user.userid;
+  user.removeAllListeners("failedactivateAccount");
+  user.on("failedactivateAccount",function(err){
+    logger.emit("error", err.error.message);
+      // //user.removeAllListeners();
+    res.send(err);
+  });
+  user.removeAllListeners("successfulactivateAccount");
+  user.on("successfulactivateAccount",function(result){
+    logger.emit("info", result.success.message);
+    // user.removeAllListeners();
+    res.send(result);
+  });
+  user.removeAllListeners("tokenredirect");
+  user.on("tokenredirect",function(redirecturl){
+    var redirect_data="<html><body><script>";
+    redirect_data+="setTimeout(function(){ window.location.assign('http://"+req.get("host")+"/"+redirecturl+"')},3000);";
+    redirect_data+="</script>Activating Your Account &nbsp; <img width=400 height=100 src='http://www.advait.in/images/loading_slide.gif'></img></body></html>"
+    res.send(redirect_data);
+  });
+  user.activateAccount(token);
 }

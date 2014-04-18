@@ -231,7 +231,7 @@ var _validateUpdateWarrantyData = function(self,userid,warranty_id){
 	var warrantydata = self.warranty;
 	if(warrantydata==undefined){
 		self.emit("failedUpdateWarranty",{"error":{"code":"AV001","message":"Please provide data to add warranty"}});
-	}else{
+	}else {
 	  	_updateUserWarranty(self,userid,warranty_id,warrantydata);
 	}
 };
@@ -319,7 +319,8 @@ Warranty.prototype.getAllUserWarranty = function(userid){
 
 var _getAllUserWarranty = function(self,userid){
 	console.log("_getAllUserWarranty " + userid);
-	WarrantyModel.find({status:"active",userid:userid},function(err,warranty){
+	var query=WarrantyModel.find({status:"active",userid:userid}).sort({createddate:-1});
+	query.exec(function(err,warranty){
 		if(err){
 			self.emit("failedGetAllUserWarranty",{"error":{"code":"ED001","message":"Error in db to find warranty err message: "+err}})
 		}else if(!warranty){
@@ -333,4 +334,66 @@ var _getAllUserWarranty = function(self,userid){
 var _successfulGetAllUserWarranty = function(self,doc){
 	logger.emit("log","_successfulGetAllUserWarranty");
 	self.emit("successfulGetAllUserWarranty", {"success":{"message":"Getting Warranty details Successfully","Warranty":doc}});
+}
+
+Warranty.prototype.loadMoreWarranties = function(sessionuserid,warranty_id) {
+	var self=this;
+
+    //////////////////////////////////////
+    _loadMoreWarranty(self,sessionuserid,warranty_id);
+};
+var _loadMoreWarranty=function(self,sessionuserid,warranty_id){
+	WarrantyModel.findOne({userid:sessionuserid,warranty_id:warranty_id,status:"active"},{userid:1,warranty_id:1,createddate:1},function(err,warranty){
+		if(err){
+			self.emit("failedLoadMoreWarranties",{"error":{"code":"ED001","message":"_loadMoreComment:Error in db to get comment"+err}});
+		}else if(!warranty){
+			self.emit("failedLoadMoreWarranties",{"error":{"code":"AC001","message":"Wrong userid or wrrantyid"}});
+		}else{
+			
+			var query=WarrantyModel.find({userid:sessionuserid,status:"active",createddate:{$lt:warranty.createddate}},{_id:0,status:0}).sort({createddate:-1}).limit(5);
+			query.exec(function(err,nextwarranties){
+				if(err){
+
+					self.emit("failedLoadMoreWarranties",{"error":{"code":"ED001","message":"_loadMoreComment: Error in db to delete comment"+err}});
+				}else if(nextwarranties.length==0){
+					self.emit("failedLoadMoreWarranties",{"error":{"code":"AW002","message":"No More Warranty(s)"}});
+				}else{
+					///////////////////////////////////
+					_successfullLoadMoreWarranties(self,nextwarranties);
+					//////////////////////////////////
+				}
+			})
+		}
+	})
+}
+var _successfullLoadMoreWarranties=function(self,nextwarranties){
+	logger.emit("log","_successfullLoadMoreWarranties");
+	self.emit("successfulLoadMoreWarranties", {"success":{"message":"Next Warranties","warranty":nextwarranties}});
+}
+Warranty.prototype.getLatestWarranty = function(userid){
+	var self = this;
+	/////////////////////////////////////////
+	_getLatestWarranty(self,userid);
+	/////////////////////////////////////////
+}
+
+var _getLatestWarranty = function(self,userid){
+	console.log("_getAllUserWarranty " + userid);
+	var query=WarrantyModel.find({status:"active",userid:userid}).sort({createddate:-1}).limit(5);
+	query.exec(function(err,warranty){
+		if(err){
+			self.emit("failedGetLatestWarranty",{"error":{"code":"ED001","message":"Error in db to find warranty err message: "+err}})
+		}else if(!warranty){
+			self.emit("failedGetLatestWarranty",{"error":{"code":"AV001","message":"User warranty does not exist"}})
+		}else{
+			////////////////////////////////////////
+			_successfulLatestWarranty(self,warranty);
+			////////////////////////////////
+		}
+	});
+}
+
+var _successfulLatestWarranty = function(self,doc){
+	logger.emit("log","_successfulGetAllUserWarranty");
+	self.emit("successfulGetLatestWarranty", {"success":{"message":"Getting Latest Warranty details Successfully","Warranty":doc}});
 }

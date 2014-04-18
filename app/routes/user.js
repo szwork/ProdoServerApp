@@ -28,7 +28,7 @@ exports.init = function (app) {
   app.post('/api/user/forgotpassword',api.userapi.forgotPassword);
   app.get('/api/logout',auth,api.userapi.signOutSessions);
   app.post('/api/recaptcha',api.userapi.recaptcha); 
-  app.get('/api/verify/:token',api.userapi.activateAccount);
+  app.get('/api/verify/:token',api.userapi.verifyAccount);
   app.post('/api/regenerateverificationtoken',api.userapi.regenerateVerificationUrl);
   app.put("/api/user/resetpassword/:userid",auth,api.userapi.resetPassword);
   app.get("/api/isloggedin",api.userapi.isLoggedIn);
@@ -65,4 +65,6 @@ exports.init = function (app) {
    app.get('/api/myrecommendproducts',auth,api.userapi.getMyRecommendProductsFollowed);//get my recommend products followed
    app.post('/api/changeemail/:userid',auth,api.userapi.changeEmail);
    app.post('/api/changepassword/:userid',auth,api.userapi.changePassword);
+   app.post('/api/activateaccountrequest',api.userapi.activateAccountRequest);
+   app.get('/api/activateaccount/:token',api.userapi.activateAccount);
 }

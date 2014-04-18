@@ -258,8 +258,8 @@ exports.uploadFiles=function(io,__dirname){
         socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass country in purchase location"}});
       }else if(warrantydata.expirydate==undefined){
         socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass expiry date"}});
-      }else if(warrantydata.description==undefined){
-        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass description "}});
+      // }else if(warrantydata.description==undefined){
+        // socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass description "}});
       }else if(warrantydata.warranty_type==undefined || warrantydata.warranty_type==""){
         socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass warranty type "}});
       }else if(["extended","standard"].indexOf(warrantydata.warranty_type.toLowerCase())<0){
@@ -337,7 +337,7 @@ exports.uploadFiles=function(io,__dirname){
               if(err){
                 socket.emit("addWarrantyResponse",{"error":{"message":"Database Isssue"}})
               }else{
-                socket.emit("addWarrantyResponse",{"success":{"message":"Warranty Added successfully","invoiceimage":url}});
+                socket.emit("addWarrantyResponse",null,{"success":{"message":"Warranty Added successfully","warranty_id":warranty.warranty_id,"invoiceimage":url}});
               }
              })
             }
@@ -957,7 +957,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                       }else{
                         var currentdate=new Date();
                         var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
-                        bucketFolder=amazonbucket+"/user/"+action.warranty.userid;
+                        bucketFolder=amazonbucket+"/user/"+action.warranty.userid+"/warranty";
                         params = {
                              Bucket: bucketFolder,
                              Key: action.warranty.userid+s3filekey,
@@ -966,7 +966,7 @@ var __warrantyInvoiceImgBuffer=function(action,file,dirname,action,sessionuser,c
                              Expires:expirydate,
                              ContentType: file_type
                         };
-                        warrantyInvoiceImgUpload(action.warranty.warranty_id,params,function(err,result){
+                        warrantyInvoiceImgUpload(action.warranty.warranty_id,params,file_name,function(err,result){
                           if(err){
                             callback(err);
                           }else{
@@ -1247,7 +1247,7 @@ var orgLogoUpload=function(orgid,awsparams,filename,callback){
   })  
 }
 
-var warrantyInvoiceImgUpload=function(warranty_id,awsparams,callback){
+var warrantyInvoiceImgUpload=function(warranty_id,awsparams,filename,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
       callback({"error":{"message":"s3bucket.putObject:-warrantyInvoiceImgUpload"+err}})
@@ -1263,7 +1263,7 @@ var warrantyInvoiceImgUpload=function(warranty_id,awsparams,callback){
             if(err){
               callback({"error":{"code":"EDOO1","message":"warrantyInvoiceImgUpload:Dberror "+err}});
             }else if(warrantyuploadstatus==1){
-              callback(null,{"success":{"message":"Warranty invoice image uploaded successfully","image":url}})
+              callback(null,{"success":{"message":"Warranty invoice image uploaded successfully","image":url,"filename":filename}})
             }else{
               callback({"error":{"code":"AP001","message":"Wrong warranty_id "+warranty_id}});
             }
