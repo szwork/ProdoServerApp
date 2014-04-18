@@ -189,7 +189,7 @@ var _removeProductCampaign = function(self,campaign_id,sessionuserid){
 
 var _successfulRemoveProductCampaign=function(self){
 	logger.log("log","_successfulRemoveProductCampaign");
-	self.emit("successfulRemoveProductCampaign",{"success":{"message":"Product Campaign Deleted Sucessfully"}})
+	self.emit("successfulRemoveProductCampaign",{"success":{"message":"Product Campaign Stopped Sucessfully"}})
 }
 
 ProductCampaign.prototype.getProductCampaign = function(orgid,campain_id) {

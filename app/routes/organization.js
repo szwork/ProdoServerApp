@@ -18,7 +18,6 @@ var api = require("../api/api.js");
 var auth=require('../common/js/security');
 // Organization - REST api
 exports.init = function (app) {
-console.log("init##");
   app.post('/api/organization',auth,api.orgapi.addOrganization);//create
   app.put('/api/organization/:orgid',auth, api.orgapi.updateOrganization);//update
   app.get('/api/organization',auth,api.orgapi.getAllOrganization); //read
