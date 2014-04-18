@@ -433,8 +433,8 @@ exports.uploadFiles=function(io,__dirname){
               socket.emit("addMarketingDataResponse",{"error":{"message":"_addMarketingDataWithImages:Error in getting getSignedUrl"+err}});
             }else{
              var marketing_image={bucket:params1.Bucket,key:params1.Key,image:url};
-             marketingdata.marketing_image=marketing_image;
-             var marketing_object=new MarketingModel(marketingdata);
+             marketingdata.artwork=marketing_image;
+             var marketing_object = new MarketingModel(marketingdata);
              marketing_object.save(function(err,marketing){
               if(err){
                 socket.emit("addMarketingDataResponse",{"error":{"message":"Database Isssue"}})
