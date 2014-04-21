@@ -15,6 +15,11 @@ var logger = require("../../common/js/logger");
 var OrgModel = require("../../org/js/org-model");
 var ProductModel = require("../../product/js/product-model");
 var ProductCampaignModel = require("./product-campaign-model");
+var CONFIG = require('config').Prodonus;
+var AWS = require('aws-sdk');
+AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
+AWS.config.update({region:'ap-southeast-1'});
+var s3bucket = new AWS.S3();
 var S=require("string");
 var ProductCampaign = function(campaigndata) {
 	this.productcampaign = campaigndata;
