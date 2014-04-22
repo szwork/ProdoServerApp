@@ -1940,13 +1940,20 @@ var _getProductCount=function(self,organizations,orgids){
 			for(var i=0;i<products.length;i++){
 				productorgids.push(products[i]._id);
 			}
+			console.log("productscounts"+JSON.stringify(products))
 			for(var i=0;i<organizations.length;i++){
+				console.log("tesing"+productorgids.indexOf(organizations[i].orgid))
 				if(productorgids.indexOf(organizations[i].orgid)>=0){
-					var organalytic=organizations[i];
+					var organalytic=JSON.stringify(organizations[i])
+					organalytic=JSON.parse(organalytic);
+					console.log("ddd"+organizations[i].orgid+""+products[productorgids.indexOf(organizations[i].orgid)].productcount);
 					organalytic.productcount=products[productorgids.indexOf(organizations[i].orgid)].productcount;
-					organalytics.push(organalytic)
+					console.log(organizations[i]);
+					// organizations[i].productcount=products[productorgids.indexOf(organizations[i].orgid)].productcount;
+					 organalytics.push(organalytic)
 				}else{
-					var organalytic=organizations[i];
+					var organalytic=JSON.stringify(organizations[i])
+					organalytic=JSON.parse(organalytic);
 					organalytic.productcount=0;
 					organalytics.push(organalytic)
 				}
@@ -1974,14 +1981,16 @@ var _orgdatawithProductCommentCountAndFollowedCount=function(self,organalytics){
 				for(var i=0;i<trendingbyorg.length;i++){
 					trendingbyorgids.push(trendingbyorg[i]._id);
 				}
-				for(var i=o;i<organalytics.length;i++){
+				for(var i=0;i<organalytics.length;i++){
 					if(trendingbyorgids.indexOf(organalytics[i].orgid)>=0){
-						var organalytic=organalytics[i];
-						organalytic.followedcount=products[trendingbyorgids.indexOf(organalytics[i].orgid)].followedcount;
-						organalytic.commentcount=products[trendingbyorgids.indexOf(organalytics[i].orgid)].commentcount;
+						var organalytic=JSON.stringify(organalytics[i]);
+						organalytic=JSON.parse(organalytic);
+						organalytic.followedcount=trendingbyorg[trendingbyorgids.indexOf(organalytics[i].orgid)].followedcount;
+						organalytic.commentcount=trendingbyorg[trendingbyorgids.indexOf(organalytics[i].orgid)].commentcount;
 						organalyticsarray.push(organalytic)
 					}else{
-						var organalytic=organalytics[i];
+						var organalytic=JSON.stringify(organalytics[i]);
+						organalytic=JSON.parse(organalytic);
 						organalytic.followedcount=0;
 						organalytic.commentcount=0;
 						organalyticsarray.push(organalytic)
@@ -2009,12 +2018,14 @@ var _orgdataWithProductCampaign=function(self,organalyticsarray){
 				for(var i=0;i<trendingbyorg.length;i++){
 					trendingbyorgids.push(trendingbyorg[i]._id);
 				}
-				for(var i=o;i<organalyticsarray.length;i++){
+				for(var i=0;i<organalyticsarray.length;i++){
 					if(trendingbyorgids.indexOf(organalyticsarray[i].orgid)>=0){
-						var organalytic=organalyticsarray[i];
+						var organalytic=JSON.stringify(organalyticsarray[i]);
+						organalytic=JSON.parse(organalytic);
 						organalytic.campaign=trendingbyorg[trendingbyorgids.indexOf(organalyticsarray[i].orgid)].campaign;
 					}else{
-						var organalytic=organalyticsarray[i];
+						var organalytic=JSON.stringify(organalyticsarray[i]);
+						organalytic=JSON.parse(organalytic);
 						organalytic.campaign=[];
 					}
 			    }
