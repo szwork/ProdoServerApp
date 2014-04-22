@@ -22,6 +22,7 @@ exports.init = function (app) {
   app.put('/api/organization/:orgid',auth, api.orgapi.updateOrganization);//update
   app.get('/api/organization',auth,api.orgapi.getAllOrganization); //read
   app.get('/api/orgnames',auth,api.orgapi.getAllOrganizationName); //read all org name
+  app.get('/api/organization/latestsignups',auth,api.orgapi.getLatestSignUpOrgs); //get latest signup orgs
   app.get('/api/organization/:orgid',auth, api.orgapi.getOrganization);//read
   app.get('/api/orgindustrycategory',auth,api.orgapi.getOrgIndustryCategory);//get all industry category
   app.post('/api/orgdeleterequest/:orgid',auth,api.orgapi.requestToDeleteOrganization);

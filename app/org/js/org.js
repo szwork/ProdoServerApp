@@ -774,6 +774,40 @@ var _successfulOrgNames=function(self,organization){
 	self.emit("successfulGetAllOrgName", {"success":{"message":"Getting Organization Names Successfully","OrgNames":organization}});
 }
 
+Organization.prototype.getLatestSignUpOrgs = function() {
+
+	var self=this;
+	//////////////////
+	_getLatestSignUpOrgs(self);
+	///////////////////
+};
+
+var _getLatestSignUpOrgs=function(self){
+	var startDate = new Date();
+	var endDate = new Date();
+	console.log("startDate  : " + startDate);
+	startDate.setDate(startDate.getDate()-14);
+	console.log("startDate 1 : " + startDate);
+	console.log("endDate  : " + endDate);
+
+	orgModel.find({status:{$ne:"deactive"},prodo_setupdate: {$gte: startDate, $lt: endDate}}/*,{name:1,_id:0,orgid:1}*/).limit(5).lean().exec(function(err,organization){
+		if(err){
+			self.emit("failedGetLatestSignUpOrgs",{"error":{"code":"ED001","message":"Error in db to find latest signup organizations"}});
+		}else if(organization.length==0){
+			self.emit("failedGetLatestSignUpOrgs",{"error":{"code":"AO003","message":"No signups has been done in last two weeks"}});
+		}else{
+			////////////////////////////////////////////////
+			_successfulGetLatestSignUpOrgs(self,organization);
+			///////////////////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetLatestSignUpOrgs=function(self,organization){
+	logger.emit("log","_successfulGetLatestSignUpOrgs");
+	self.emit("successfulGetLatestSignUpOrgs", {"success":{"message":"Getting Organization Details Successfully","OrgNames":organization}});
+}
+
 Organization.prototype.getOrgAddressByCriteria = function(OrgCriteriaData,orgid) {
 	var self=this;
 	//////////////////

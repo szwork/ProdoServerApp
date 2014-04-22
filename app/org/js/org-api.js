@@ -356,6 +356,24 @@ exports.getAllOrganizationName = function(req, res) {
     organization.getAllOrganizationName();
 }
 
+exports.getLatestSignUpOrgs = function(req, res) {  
+  var sessionuserid=req.user.userid;
+  var organization=new Organization();
+  organization.removeAllListeners("failedGetLatestSignUpOrgs");
+  organization.on("failedGetLatestSignUpOrgs",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+      // organization.removeAllListeners();
+      res.send(err);
+    });
+ organization.removeAllListeners("successfulGetLatestSignUpOrgs");
+    organization.on("successfulGetLatestSignUpOrgs",function(result){
+      // logger.emit("info", result.success.message);
+      // organization.removeAllListeners();
+      res.send(result);
+    });
+    organization.getLatestSignUpOrgs();
+}
+
 exports.getOrgAddressByCriteria=function(req,res){
   var OrgCriteriaData=req.query;
   logger.emit("log","req query getOrgAddressByCriteria"+JSON.stringify(OrgCriteriaData));
