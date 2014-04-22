@@ -16,6 +16,7 @@ var commonapi=require("../../common/js/common-api");
 var CONFIG = require('config').Prodonus;
 var PaymentModel=require("../../subscription/js/payment-model");
 var AWS = require('aws-sdk');
+var ProductCampaignModel=require("../../productcampaign/js/product-campaign-model");
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
@@ -1909,19 +1910,121 @@ Organization.prototype.getAllOrgnizationAnalytics = function() {
 	////////////////////////
 };
 var _getAllOrgnizationAnalytics=function(self){
-	var query=orgModel.find({},{orgid:1,name:1,org_logo:1,org_images:1}).sort({prodo_setupdate:-1}).limit(5);
+	var query=orgModel.find({orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
 	query.exec(function(err,organizations){
 		if(err){
-			self.emit("failedLatestAddedOrganization",{error:{code:"ED001",message:"Database Issue"+err}})
+			self.emit("failedgetAllOrgnizationAnalytics",{error:{code:"ED001",message:"Database Issue"+err}})
 		}else if(organizations.length==0){
-         self.emit("failedLatestAddedOrganization",{error:{message:"No Latest Organizations"}})
+          self.emit("failedgetAllOrgnizationAnalytics",{error:{message:"No Organizations"}})
 		}else{
-			/////////////////////////////////////////////////////
-			_successfullLatestAddedOrganization(self,organizations)
-			///////////////////////////////////////////////////////
+			var orgids=[];
+			for(var i=0;i<organizations.length;i++){
+				orgids.push(organizations[i].orgid);
+			}
+			/////////////////////////
+			_getProductCount(self,organizations,orgids);
+			////////////////////////////////
 		}
 	})
 }
-var _successfullLatestAddedOrganization=function(self,organizations){
-	self.emit("successfulLatestAddedOrganization",{success:{message:"Latest Organization Getting Successfully",organization:organizations}})
+var _getProductCount=function(self,organizations,orgids){
+
+	productModel.aggregate({$match:{orgid:{$in:orgids}}},{$group:{_id:"$orgid",productcount:{$sum:1}}},function(err,products){
+		if(err){
+		 self.emit("failedgetAllOrgnizationAnalytics",{error:{code:"ED001",message:"Database Issue"+err}})
+		}else if(products.length==0){
+			self.emit("failedgetAllOrgnizationAnalytics",{error:{message:"No Product exists"}})
+		}else{
+			var organalytics=[];
+			var productorgids=[];
+			for(var i=0;i<products.length;i++){
+				productorgids.push(products[i]._id);
+			}
+			for(var i=0;i<organizations.length;i++){
+				if(productorgids.indexOf(organizations[i].orgid)>=0){
+					var organalytic=organizations[i];
+					organalytic.productcount=products[productorgids.indexOf(organizations[i].orgid)].productcount;
+					organalytics.push(organalytic)
+				}else{
+					var organalytic=organizations[i];
+					organalytic.productcount=0;
+					organalytics.push(organalytic)
+				}
+			}
+			logger.emit("log","org data with product count"+JSON.stringify(organalytics));
+			////////////////////////////////
+			_orgdatawithProductCommentCountAndFollowedCount(self,organalytics)
+			////////////////////////
+
+		}
+	})
+}
+var _orgdatawithProductCommentCountAndFollowedCount=function(self,organalytics){
+	TrendModel.aggregate({$group:{_id:"$orgid",followedcount:{$sum:"$followedcount"},commentcount:{$sum:"$commentcount"}}},function(err,trendingbyorg){
+		if(err){
+			self.emit("failedgetAllOrgnizationAnalytics",{error:{code:"ED001",message:"Database Issue"+err}})
+		}else{
+			if(trendingbyorg.length==0){
+				//////////////////////////////////
+				_orgdataWithProductCampaign(self,organalytics);
+				////////////////////////////////
+			}else{
+				var organalyticsarray=[];
+				var trendingbyorgids=[];
+				for(var i=0;i<trendingbyorg.length;i++){
+					trendingbyorgids.push(trendingbyorg[i]._id);
+				}
+				for(var i=o;i<organalytics.length;i++){
+					if(trendingbyorgids.indexOf(organalytics[i].orgid)>=0){
+						var organalytic=organalytics[i];
+						organalytic.followedcount=products[trendingbyorgids.indexOf(organalytics[i].orgid)].followedcount;
+						organalytic.commentcount=products[trendingbyorgids.indexOf(organalytics[i].orgid)].commentcount;
+						organalyticsarray.push(organalytic)
+					}else{
+						var organalytic=organalytics[i];
+						organalytic.followedcount=0;
+						organalytic.commentcount=0;
+						organalyticsarray.push(organalytic)
+					}
+			    }
+			    ///////////////////////////////////
+                _orgdataWithProductCampaign(self,organalyticsarray);
+			    //////////////////////////////////
+			}
+		}
+	})
+}
+var _orgdataWithProductCampaign=function(self,organalyticsarray){
+	ProductCampaignModel.aggregate({$match:{status:"active"}},{$group:{_id:"$orgid",campaign:{$addToSet:{campaign_id:"$campaign_id",name:"$name",banner_image:"$banner_image",description:"$description"}}}},function(err,campaignbyorg){
+		if(err){
+			self.emit("failedgetAllOrgnizationAnalytics",{error:{code:"ED001",message:"Database Issue"+err}})
+		}else{
+			if(campaignbyorg.length==0){
+				//////////////////////////////////
+				_successfullOrgAnalytics(self,organalyticsarray);
+				////////////////////////////////
+			}else{
+				var organalyticsarrayproductcampaign=[];
+				var trendingbyorgids=[];
+				for(var i=0;i<trendingbyorg.length;i++){
+					trendingbyorgids.push(trendingbyorg[i]._id);
+				}
+				for(var i=o;i<organalyticsarray.length;i++){
+					if(trendingbyorgids.indexOf(organalyticsarray[i].orgid)>=0){
+						var organalytic=organalyticsarray[i];
+						organalytic.campaign=trendingbyorg[trendingbyorgids.indexOf(organalyticsarray[i].orgid)].campaign;
+					}else{
+						var organalytic=organalyticsarray[i];
+						organalytic.campaign=[];
+					}
+			    }
+			   //////////////////////////////////
+				_successfullOrgAnalytics(self,organalyticsarrayproductcampaign);
+				////////////////////////////////
+			}
+		}
+	})
+}
+var _successfullOrgAnalytics=function(self,organalytics){
+	self.emit("successfulgetAllOrgnizationAnalytics",{success:{message:"Organalytics data getting successfully",organalytics:organalytics}})
 }

@@ -943,7 +943,7 @@ exports.getAllOrgnizationAnalytics=function(req,res){
     res.send(result);
   });
   
-      /////////////////////////////////
+    //////////////////////////////////
     organization.getAllOrgnizationAnalytics();
     ////////////////////////////////   
 }
