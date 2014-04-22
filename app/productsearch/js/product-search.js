@@ -55,8 +55,8 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		 		// searchCriteria.push({name: new RegExp('^'+productsearchdata.Product_Name, "i")});
                 var product_or_name_array=[];
 		 		for(var i=0;i<prod_name_arr.length;i++){
-		 			product_or_name_array.push(new RegExp('^'+prod_name_arr[i].substr(0,1), "i"));
-		 			product_or_name_array.push(new RegExp(prod_name_arr[i].substr(0,prod_name_arr[i].length), "i"));
+		 			product_or_name_array.push(new RegExp('^'+prod_name_arr[i].substr(0,prod_name_arr[i].length), "i"));
+		 			// product_or_name_array.push(new RegExp(prod_name_arr[i].substr(0,prod_name_arr[i].length), "i"));
 		 			searchCriteria.push({name: new RegExp(prod_name_arr[i], "i")});
 		 		}
 		 		query.name={$in:product_or_name_array};
@@ -147,7 +147,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 				var org_or_array=[];
 				for(var i=0;i<org_array.length;i++){
 					org_or_array.push(new RegExp('^'+org_array[i], "i"));
-					org_or_array.push(new RegExp('^'+org_array[i].substr(0,1), "i"));
+					org_or_array.push(new RegExp('^'+org_array[i].substr(0,org_array[i].length), "i"));
 				}
 				var Q = {status:{$in:["active","init"]},name:{$in:org_or_array}};
 				// console.log("QQQQQ " + JSON.stringify(Q));
