@@ -2049,18 +2049,20 @@ var _orgdataWithProductCampaign=function(self,organalyticsarray){
 			}else{
 				var organalyticsarrayproductcampaign=[];
 				var trendingbyorgids=[];
-				for(var i=0;i<trendingbyorg.length;i++){
-					trendingbyorgids.push(trendingbyorg[i]._id);
+				for(var i=0;i<campaignbyorg.length;i++){
+					trendingbyorgids.push(campaignbyorg[i]._id);
 				}
 				for(var i=0;i<organalyticsarray.length;i++){
 					if(trendingbyorgids.indexOf(organalyticsarray[i].orgid)>=0){
 						var organalytic=JSON.stringify(organalyticsarray[i]);
 						organalytic=JSON.parse(organalytic);
-						organalytic.campaign=trendingbyorg[trendingbyorgids.indexOf(organalyticsarray[i].orgid)].campaign;
+						organalytic.campaign=campaignbyorg[trendingbyorgids.indexOf(organalyticsarray[i].orgid)].campaign;
+						organalyticsarrayproductcampaign.push(organalytic)
 					}else{
 						var organalytic=JSON.stringify(organalyticsarray[i]);
 						organalytic=JSON.parse(organalytic);
 						organalytic.campaign=[];
+					    organalyticsarrayproductcampaign.push(organalytic)
 					}
 			    }
 			   //////////////////////////////////
