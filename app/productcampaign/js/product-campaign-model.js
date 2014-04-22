@@ -21,6 +21,7 @@ var productCampaignSchema = mongoose.Schema({
   productname:{type:String,ref:"Products"},
   category:[{type:String}],
   campaign_id:{type:String},  
+  banner_image:{bucket:String,key:String,image:{type:String}},
   name:{type:String},
   description:{type:String},
   startdate:{type:Date},//,default:Date.now

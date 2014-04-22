@@ -926,24 +926,24 @@ exports.deleteBroadcastMessage=function(req,res){
     
   
 }
-exports.latesAddedOrganization=function(req,res){
+exports.getAllOrgnizationAnalytics=function(req,res){
   
   // var broadcastmessagedata=req.body.broadcast;
   var organization=new Organization();
   
   // logger.emit("log","orgid:"+orgid+"grpid:"+grpid+"usermemberid:"+usermemberid);
-  organization.removeAllListeners("failedLatestAddedOrganization");
-  organization.on("failedLatestAddedOrganization",function(err){
+  organization.removeAllListeners("failedgetAllOrgnizationAnalytics");
+  organization.on("failedgetAllOrgnizationAnalytics",function(err){
     logger.emit("error", err.error.message);
     res.send(err);
   });
-  organization.removeAllListeners("successfulLatestAddedOrganization");
-  organization.on("successfulLatestAddedOrganization",function(result){
+  organization.removeAllListeners("successfulgetAllOrgnizationAnalytics");
+  organization.on("successfulgetAllOrgnizationAnalytics",function(result){
     
     res.send(result);
   });
   
       /////////////////////////////////
-    organization.latestAddedOrganization();
+    organization.getAllOrgnizationAnalytics();
     ////////////////////////////////   
 }
