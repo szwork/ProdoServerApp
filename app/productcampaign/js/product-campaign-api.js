@@ -113,7 +113,7 @@ exports.removeProductCampaign=function(req,res){
 }
 
 exports.getAllOrgCampaign=function(req,res){
-    logger.emit("log","///////Calling to Get All Products Campain///////");
+    logger.emit("log","///////Calling to Get All Organization Campaign///////");
     var sessionuserid=req.user.userid;
     var orgid=req.params.orgid;
     logger.emit("log","orgid:"+orgid+"\nsessionid:"+sessionuserid);
@@ -139,7 +139,7 @@ exports.getAllOrgCampaign=function(req,res){
 }
 
 exports.getAllProductCampaign=function(req,res){
-    logger.emit("log","///////Calling to Get All Products Campain///////");
+    logger.emit("log","///////Calling to Get All Products Campaign///////");
     var sessionuserid=req.user.userid;
     var prodle=req.params.prodle;
     logger.emit("log","prodle:"+prodle+"\nsessionid:"+sessionuserid);
