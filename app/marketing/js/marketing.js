@@ -16,7 +16,7 @@ Marketing.prototype.getAllMarketingData=function(){
 }
 
 var _getAllMarketingData = function(self){
-    MarketingModel.find({status:"active"},{name:1,description:1,artwork:1,status:0,marketing_id:0,_id:0}).lean().exec(function(err,doc){
+    MarketingModel.find({status:{$ne:"deactive"}},{name:1,description:1,artwork:1,_id:0}).lean().exec(function(err,doc){
         if(err){
             self.emit("failedGetMarketingData",{"error":{"code":"ED001","message":"Error in db to find all marketing data"}});
         }else if(doc.length==0){

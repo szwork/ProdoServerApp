@@ -84,7 +84,7 @@ exports.getProductCampaign=function(req,res){
         // productcampaign.removeAllListeners();
         res.send(result);
         // eventEmitter.removeListener(this);
-    }); 
+    });
     productcampaign.getProductCampaign(orgid,campaign_id);
 }
 

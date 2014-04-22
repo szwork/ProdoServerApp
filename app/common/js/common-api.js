@@ -248,8 +248,8 @@ exports.uploadFiles=function(io,__dirname){
         socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"Please pass prdouct name"}});
       }else if(warrantydata.model_no==undefined){
        socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"Please pass model number"}});
-      }else if(warrantydata.model_name==undefined){
-          socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass model name"}});
+      // }else if(warrantydata.model_name==undefined){
+      //     socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass model name"}});
       }else if(warrantydata.serial_no==undefined){
         socket.emit("addWarrantyResponse",{"error":{"code":"AV001","message":"please pass serial number"}});
       }else if(warrantydata.purchase_date==undefined){
