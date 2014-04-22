@@ -112,11 +112,37 @@ exports.removeProductCampaign=function(req,res){
     productcampaign.removeProductCampaign(campaign_id,sessionuserid);   
 }
 
-exports.getAllProductCampaign=function(req,res){
+exports.getAllOrgCampaign=function(req,res){
     logger.emit("log","///////Calling to Get All Products Campain///////");
     var sessionuserid=req.user.userid;
     var orgid=req.params.orgid;
     logger.emit("log","orgid:"+orgid+"\nsessionid:"+sessionuserid);
+    var productcampaign = new ProductCampaign();
+    
+    productcampaign.removeAllListeners("failedGetAllOrgCampaign");
+    productcampaign.on("failedGetAllOrgCampaign",function(err){
+        logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+        logger.emit("error", err.error.message,sessionuserid);
+        // productcampaign.removeAllListeners();
+        res.send(err);
+        // eventEmitter.removeListener(this);
+    });
+    productcampaign.removeAllListeners("successfulGetAllOrgCampaign");
+    productcampaign.on("successfulGetAllOrgCampaign",function(result){
+        logger.emit("log","Getting All Organization Campaign Details successfully");
+        logger.emit("info", result.success.message,sessionuserid);
+        // productcampaign.removeAllListeners();
+        res.send(result);
+        // eventEmitter.removeListener(this);
+    }); 
+    productcampaign.getAllOrgCampaign(orgid);
+}
+
+exports.getAllProductCampaign=function(req,res){
+    logger.emit("log","///////Calling to Get All Products Campain///////");
+    var sessionuserid=req.user.userid;
+    var prodle=req.params.prodle;
+    logger.emit("log","prodle:"+prodle+"\nsessionid:"+sessionuserid);
     var productcampaign = new ProductCampaign();
     
     productcampaign.removeAllListeners("failedGetAllProductCampaign");
@@ -129,13 +155,13 @@ exports.getAllProductCampaign=function(req,res){
     });
     productcampaign.removeAllListeners("successfulGetAllProductCampaign");
     productcampaign.on("successfulGetAllProductCampaign",function(result){
-        logger.emit("log","Getting All Product Campain details successfully");
+        logger.emit("log","Getting All Product Campaign Details Successfully");
         logger.emit("info", result.success.message,sessionuserid);
         // productcampaign.removeAllListeners();
         res.send(result);
         // eventEmitter.removeListener(this);
     }); 
-    productcampaign.getAllProductCampaign(orgid);
+    productcampaign.getAllProductCampaign(prodle);
 }
 
 exports.deleteCampaignImage=function(req,res){

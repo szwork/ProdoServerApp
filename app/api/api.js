@@ -25,7 +25,7 @@ var tagreffdictionary = require("../tagreffdictionary/js/tagreffdictionary-api")
 var featureanalytics = require("../featureanalytics/js/feature-analytics-api");
 var featuretrending = require("../featuretrending/js/feature-trending-api");
 var productcampaignapi = require("../productcampaign/js/product-campaign-api");
-
+var marketingapi = require("../marketing/js/marketing-api");
 var warrantyapi = require("../warranty/js/warranty-api");
 
 exports.orgapi = orgapi;
@@ -42,5 +42,5 @@ exports.tagreffdictionary=tagreffdictionary;
 exports.featureanalytics = featureanalytics;
 exports.featuretrending = featuretrending;
 exports.productcampaignapi = productcampaignapi;
-
+exports.marketingapi = marketingapi;
 exports.warrantyapi = warrantyapi;

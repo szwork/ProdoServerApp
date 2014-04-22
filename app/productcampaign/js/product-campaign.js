@@ -15,6 +15,11 @@ var logger = require("../../common/js/logger");
 var OrgModel = require("../../org/js/org-model");
 var ProductModel = require("../../product/js/product-model");
 var ProductCampaignModel = require("./product-campaign-model");
+var CONFIG = require('config').Prodonus;
+var AWS = require('aws-sdk');
+AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
+AWS.config.update({region:'ap-southeast-1'});
+var s3bucket = new AWS.S3();
 var S=require("string");
 var ProductCampaign = function(campaigndata) {
 	this.productcampaign = campaigndata;
@@ -219,19 +224,45 @@ var _successfulGetProductCampaign = function(self,productcampain){
 	self.emit("successfulGetProductCampaign", {"success":{"message":"Getting Product Campaign Details Successfully","Product_Campaign":productcampain}});
 }
 
-ProductCampaign.prototype.getAllProductCampaign = function(orgid) {
+ProductCampaign.prototype.getAllOrgCampaign = function(orgid) {
 	var self=this;
 	//////////////////////////////////
-	_getAllProductCampaign(self,orgid);
+	_getAllOrgCampaign(self,orgid);
 	/////////////////////////////////
 };
 
-var _getAllProductCampaign = function(self,orgid){
+var _getAllOrgCampaign = function(self,orgid){
 	ProductCampaignModel.find({orgid:orgid,status:{$ne:"deactive"}}).lean().exec(function(err,productcampain){
+		if(err){
+			self.emit("failedGetAllOrgCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
+		}else if(productcampain.length==0){
+			self.emit("failedGetAllOrgCampaign",{"error":{"code":"AP002","message":"No Organization Campaign Exists"}});
+		}else{
+			////////////////////////////////////////////////////
+			_successfulGetAllOrgCampaign(self,productcampain);
+			////////////////////////////////////////////////////
+		}
+	})
+}
+
+var _successfulGetAllOrgCampaign = function(self,productcampain){
+	logger.emit("log","_successfulGetAllOrgCampaign");
+	self.emit("successfulGetAllOrgCampaign",{"success":{"message":"Getting All Organization Campaign Details Successfully","Product_Campaigns":productcampain}});
+}
+
+ProductCampaign.prototype.getAllProductCampaign = function(prodle) {
+	var self=this;
+	//////////////////////////////////
+	_getAllProductCampaign(self,prodle);
+	/////////////////////////////////
+};
+
+var _getAllProductCampaign = function(self,prodle){
+	ProductCampaignModel.find({prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(productcampain.length==0){
-			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No Product Campaign exists"}});
+			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No Product Campaign Exists"}});
 		}else{
 			////////////////////////////////////////////////////
 			_successfulGetAllProductCampaign(self,productcampain);
@@ -241,7 +272,7 @@ var _getAllProductCampaign = function(self,orgid){
 }
 
 var _successfulGetAllProductCampaign = function(self,productcampain){
-	logger.emit("log","_successfulGetAllProductCampain");
+	logger.emit("log","_successfulGetAllProductCampaign");
 	self.emit("successfulGetAllProductCampaign",{"success":{"message":"Getting All Product Campaign Details Successfully","Product_Campaigns":productcampain}});
 }
 

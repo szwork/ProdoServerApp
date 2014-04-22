@@ -21,6 +21,7 @@ var MarketingSchema = mongoose.Schema({
   name:{type:String},
   description:{type:String},
   artwork:{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}},
+  status:{type:String,default:"active"}
 });
 
 //generate the marketing_id when you save.

@@ -381,7 +381,7 @@ exports.uploadFiles=function(io,__dirname){
       ext=ext[ext.length - 1];
       var fileName = __dirname + '/tmp/uploads/' + file_name;
       
-      if(!S(file_type).contains("image") && !S(file_type).contains("pdf") ){
+      if(!S(file_type).contains("image") && !S(file_type).contains("pdf")){
         callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
       }else if(file_length>1000000){
         socket.emit("addMarketingDataResponse",{"error":{"message":"You can upload  image of size less than 1mb"}});
