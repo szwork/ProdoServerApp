@@ -2,6 +2,7 @@
 
 var CommentModel=require("./comment-model");
 var ProductModel=require("../../product/js/product-model");
+var ProductCampaignModel=require("../../productcampaign/js/product-campaign-model");
 var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
 var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 var events = require("events");
@@ -458,34 +459,90 @@ var _successfullLoadMoreComments=function(self,nextcomments){
 	self.emit("successfulLoadMoreComment", {"success":{"message":"Next comments","comment":nextcomments}});
 }
 
-Comment.prototype.addCampaignComment=function(sessionuserid,prodle,__dirname){
+Comment.prototype.addCampaignComment=function(sessionuserid,prodle,campaign_id,__dirname){
 	var self=this;
-      ////////////////////////////////////
-	_validateCampaignCommentData(self,sessionuserid,campaign_id,__dirname);
-	//////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+	_validateCampaignCommentData(self,sessionuserid,prodle,campaign_id,__dirname);
+	//////////////////////////////////////////////////////////////////////////////
 }
 
-// var _validateCampaignCommentData=function(self,sessionuserid,prodle,__dirname) {
-// 	var commentdata=self.comment;
-// 	if(commentdata==undefined){
-// 	   self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please provide commentdata"}});	
-// 	}else if(commentdata.user==undefined){
-// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please provide user to commentdata"}});		
-// 	}else if(commentdata.user.userid==undefined){
-// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please provide userid with user object"}});		
-// 	} else if(commentdata.commenttext==undefined){
-// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass commenttext"}});			
-// 	}else if(commentdata.commenttext.trim().length==0){
-// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
-// 	}else if(commentdata.type==undefined){
-// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
-// 	}else if(commentdata.analytics==undefined){
-// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass analytics"}});			
-// 	// }else if(commentdata.analytics.featureid==undefined){
-// 	// 	self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass featureid in analytics"}});			
-// 	}else{
-// 		///////////////////////////////////////////////////////
-// 		_isSessionUserToComment(self,sessionuserid,prodle,commentdata,__dirname);
-// 		///////////////////////////////////////////////////////
-// 	}
-// }
+var _validateCampaignCommentData=function(self,sessionuserid,prodle,campaign_id,__dirname) {
+	var commentdata=self.comment;
+	if(commentdata==undefined){
+	   self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please provide commentdata"}});	
+	}else if(commentdata.user==undefined){
+		self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please provide user to commentdata"}});		
+	}else if(commentdata.user.userid==undefined){
+		self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please provide userid with user object"}});		
+	} else if(commentdata.commenttext==undefined){
+		self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please pass commenttext"}});			
+	}else if(commentdata.commenttext.trim().length==0){
+		self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
+	}else if(commentdata.type==undefined){
+		self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
+	}else if(commentdata.analytics==undefined){
+		self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please pass analytics"}});			
+	// }else if(commentdata.analytics.featureid==undefined){
+	// 	self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please pass featureid in analytics"}});			
+	}else{
+		////////////////////////////////////////////////////////////////////////////////////////////////
+		_isSessionUserToAddCampaignComment(self,sessionuserid,prodle,campaign_id,commentdata,__dirname);
+		////////////////////////////////////////////////////////////////////////////////////////////////
+	}
+}
+
+var _isSessionUserToAddCampaignComment=function(self,sessionuserid,prodle,campaign_id,commentdata,__dirname){
+	if(sessionuserid!=commentdata.user.userid){
+		self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"Provided userid is not match with sessionuserid"}})
+	}else{
+		//////////////////////////////////////////////
+		_isValidProdle(self,sessionuserid,prodle,campaign_id,commentdata,__dirname);
+		/////////////////////////////////////////////		
+	}
+}
+
+var _isValidProdle=function(self,sessionuserid,prodle,campaign_id,commentdata,__dirname){
+	ProductModel.findOne({prodle:prodle},function(err,productdata){
+		if(err){
+			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidProdle \nError ind db to find product err message: "+err}})
+		}else if(!productdata){
+			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":" Wrong prodle"}})
+		}else{
+			//////////////////////////////////////////////////////////////////////////////
+			_isValidCampaignId(self,prodle,campaign_id,commentdata,productdata,__dirname);
+			//////////////////////////////////////////////////////////////////////////////
+		}
+	})
+}
+
+var _isValidCampaignId=function(self,sessionuserid,prodle,campaign_id,commentdata,__dirname){
+	ProductCampaignModel.findOne({campaign_id:campaign_id},function(err,campaigndata){
+		if(err){
+			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidProdle \nError ind db to find product err message: "+err}})
+		}else if(!campaigndata){
+			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":"Campaign id is wrong"}})
+		}else{
+			/////////////////////////////////////////////////////////////////////////////////////////////
+			__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
+			/////////////////////////////////////////////////////////////////////////////////////////////
+		}
+	})
+}
+
+var __checkCampaignCommentImageExists=function(self,prodle,campaign_id,commentdata,product,__dirname){
+	// commentdata.commentid=generateId();
+	commentdata.status="active";
+	commentdata.datecreated=new Date();
+	commentdata.prodle=prodle;
+	commentdata.campaign_id=campaign_id;
+	if(commentdata.comment_image==undefined || commentdata.comment_image==""){
+		/////////////////////////////////////////////////////////////////
+        _addCampaignComment(self,prodle,campaign_id,commentdata,product);
+		/////////////////////////////////////////////////////////////////
+	}else{
+		/////////////////////////////////////////////////////////////////////////////////
+        _readCampaignCommentImage(self,prodle,campaign_id,commentdata,product,__dirname);
+		/////////////////////////////////////////////////////////////////////////////////
+	}
+
+}

@@ -101,7 +101,7 @@ exports.comment=function(io,__dirname){
       });
     })
 
-    socket.on('addCampaignComment', function(campaign_id,commentdata) {
+    socket.on('addCampaignComment', function(prodle,campaign_id,commentdata) {
       var comment = new Comment(commentdata);      
       logger.emit("log",campaign_id+""+JSON.stringify(commentdata));
       comment.removeAllListeners("failedAddCampaignComment");
@@ -114,9 +114,9 @@ exports.comment=function(io,__dirname){
         logger.emit("info", result.success.message,sessionuserid);
         socket.emit("addCampaignCommentResponse",null,result);
         if(result.success.product_comment.type=="campaign"){
-          socket.broadcast.emit("campaigncommentResponse"+campaign_id,null,result);
+          socket.broadcast.emit("campaigncommentResponse"+prodle+" "+campaign_id,null,result);
         }else{
-          socket.broadcast.emit("warrantycommentResponse"+campaign_id,null,result);
+          socket.broadcast.emit("warrantycommentResponse"+prodle+" "+campaign_id,null,result);
         }
       });
       redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
@@ -127,7 +127,7 @@ exports.comment=function(io,__dirname){
         }else if(JSON.parse(reply).passport.user==undefined){
           socket.emit("addCampaignCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
         }else{
-          comment.addCampaignComment(sessionuserid,campaign_id,__dirname);   
+          comment.addCampaignComment(sessionuserid,prodle,campaign_id,__dirname);   
         }      
       });
     })
