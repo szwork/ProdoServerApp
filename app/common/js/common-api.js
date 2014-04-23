@@ -592,6 +592,8 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
             }else{
              var campaign_banner_image={bucket:params1.Bucket,key:params1.Key,image:url}
              campaigndata.banner_image=campaign_banner_image;
+             campaigndata.orgid=orgid;
+             campaigndata.prodle=prodle;
              var product_campaign_object=new CampaignModel(campaigndata);
              product_campaign_object.save(function(err,product_campaign){
               if(err){
