@@ -85,6 +85,7 @@ var Comment = function(commentdata) {
 
 Comment.prototype = new events.EventEmitter;
 module.exports = Comment;
+
 Comment.prototype.addComment=function(sessionuserid,prodle,__dirname){
 	var self=this;
       ////////////////////////////////////
@@ -456,3 +457,35 @@ var _successfullLoadMoreComments=function(self,nextcomments){
 	logger.emit("log","_successfullLoadMoreComments");
 	self.emit("successfulLoadMoreComment", {"success":{"message":"Next comments","comment":nextcomments}});
 }
+
+Comment.prototype.addCampaignComment=function(sessionuserid,prodle,__dirname){
+	var self=this;
+      ////////////////////////////////////
+	_validateCampaignCommentData(self,sessionuserid,campaign_id,__dirname);
+	//////////////////////////////////////
+}
+
+// var _validateCampaignCommentData=function(self,sessionuserid,prodle,__dirname) {
+// 	var commentdata=self.comment;
+// 	if(commentdata==undefined){
+// 	   self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please provide commentdata"}});	
+// 	}else if(commentdata.user==undefined){
+// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please provide user to commentdata"}});		
+// 	}else if(commentdata.user.userid==undefined){
+// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please provide userid with user object"}});		
+// 	} else if(commentdata.commenttext==undefined){
+// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass commenttext"}});			
+// 	}else if(commentdata.commenttext.trim().length==0){
+// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
+// 	}else if(commentdata.type==undefined){
+// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
+// 	}else if(commentdata.analytics==undefined){
+// 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass analytics"}});			
+// 	// }else if(commentdata.analytics.featureid==undefined){
+// 	// 	self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass featureid in analytics"}});			
+// 	}else{
+// 		///////////////////////////////////////////////////////
+// 		_isSessionUserToComment(self,sessionuserid,prodle,commentdata,__dirname);
+// 		///////////////////////////////////////////////////////
+// 	}
+// }
