@@ -664,7 +664,7 @@ Comment.prototype.getLatestCampaignComments=function(){
 }
 
 var _getLatestCampaignComments = function(self){
-	ProductCampaignModel.find({status:{$ne:"deactive"}}).sort({datecreated:-1}).limit(5).lean().exec(function(err,campaign_comment){
+	CommentModel.find({type:"campaign",status:{$ne:"deactive"}}).sort({datecreated:-1}).limit(5).lean().exec(function(err,campaign_comment){
 		if(err){
 			self.emit("failedGetCampaignComments",{"error":{"code":"ED001","message":" function:_getLatestCampaignComments \nError in db to find campaign comments err message: "+err}});
 		}else if(!campaign_comment){
