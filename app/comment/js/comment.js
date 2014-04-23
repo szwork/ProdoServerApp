@@ -496,12 +496,12 @@ var _isSessionUserToAddCampaignComment=function(self,sessionuserid,prodle,campai
 		self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"Provided userid is not match with sessionuserid"}})
 	}else{
 		//////////////////////////////////////////////
-		_isValidProdle(self,sessionuserid,prodle,campaign_id,commentdata,__dirname);
+		_isValidProdle(self,prodle,campaign_id,commentdata,__dirname);
 		/////////////////////////////////////////////		
 	}
 }
 
-var _isValidProdle=function(self,sessionuserid,prodle,campaign_id,commentdata,__dirname){
+var _isValidProdle=function(self,prodle,campaign_id,commentdata,__dirname){
 	ProductModel.findOne({prodle:prodle},function(err,productdata){
 		if(err){
 			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidProdle \nError ind db to find product err message: "+err}})
@@ -515,10 +515,10 @@ var _isValidProdle=function(self,sessionuserid,prodle,campaign_id,commentdata,__
 	})
 }
 
-var _isValidCampaignId=function(self,sessionuserid,prodle,campaign_id,commentdata,__dirname){
+var _isValidCampaignId=function(self,prodle,campaign_id,commentdata,__dirname){
 	ProductCampaignModel.findOne({campaign_id:campaign_id},function(err,campaigndata){
 		if(err){
-			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidProdle \nError ind db to find product err message: "+err}})
+			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidCampaignId \nError ind db to find product err message: "+err}})
 		}else if(!campaigndata){
 			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":"Campaign id is wrong"}})
 		}else{
