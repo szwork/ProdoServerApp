@@ -515,7 +515,7 @@ var _isValidProdle=function(self,prodle,campaign_id,commentdata,__dirname){
 	})
 }
 
-var _isValidCampaignId=function(self,prodle,campaign_id,commentdata,__dirname){
+var _isValidCampaignId=function(self,prodle,campaign_id,commentdata,productdata,__dirname){
 	ProductCampaignModel.findOne({campaign_id:campaign_id},function(err,campaigndata){
 		if(err){
 			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidCampaignId \nError ind db to find product err message: "+err}})
@@ -589,7 +589,7 @@ var commentdata={type:"product",comment_image:{filetype:filedata.type,filename:f
 		            ContentType: file_type
 		        };
 		        ////////////////////////////////////////
-		        _campaignCommentImageUpload(self,commentdata,product,params);
+		        _campaignCommentImageUpload(self,prodle,campaign_id,commentdata,product,params);
 		        //////////////////////////////////////
 	     	}
 	     })
@@ -598,20 +598,20 @@ var commentdata={type:"product",comment_image:{filetype:filedata.type,filename:f
 	}
 }
 
-var _campaignCommentImageUpload=function(self,commentdata,product,awsparams){
+var _campaignCommentImageUpload=function(self,prodle,campaign_id,commentdata,product,awsparams){
 	s3bucket.putObject(awsparams, function(err, data) {
 	    if (err) {
-	    	self.emit("failedAddCampaignComment",{"error":{"message":" function:_campaignCommentImageUpload \nError in s3buctke put object "+err}})     
+	    	self.emit("failedAddCampaignComment",{"error":{"message":" function:_campaignCommentImageUpload \nError in s3buctke put object "+err}});
 	    } else {
 	    	logger.emit("log","filecomment  saved");
 	      	var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
 	      	s3bucket.getSignedUrl('getObject',params1, function (err, url) {
 	        	if(err){
-	         	self.emit("failedAddCampaignComment",{"error":{"message":" function:_campaignCommentImageUpload \nError in s3aws getSignedUrl "+err}})     
+	         	self.emit("failedAddCampaignComment",{"error":{"message":" function:_campaignCommentImageUpload \nError in s3aws getSignedUrl "+err}});
 	        	}else{
 	        		commentdata.comment_image=[{imageid:generateId(),image:url}];
 	          		/////////////////////////////////////////////////////////////
-	          		_addCampaignComment(self,product.prodle,commentdata,product);
+	          		_addCampaignComment(self,prodle,campaign_id,commentdata,product);
 	          		/////////////////////////////////////////////////////////////
 		        }
 	    	});
