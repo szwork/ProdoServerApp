@@ -67,6 +67,23 @@ exports.loadMoreComment=function(req,res){
   comment.loadMoreComment(sessionuserid,commentid);
 }
 
+exports.getLatestCampaignComments = function(req, res) {
+  // var commentid=req.params.commentid;
+  // var sessionuserid=req.user.userid;
+  var comment=new Comment();
+  comment.removeAllListeners("failedGetCampaignComments");
+  comment.on("failedGetCampaignComments",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  comment.removeAllListeners("successfulGetCampaignComments");
+  comment.on("successfulGetCampaignComments",function(result){
+    logger.emit("info", result.success.message);
+      res.send(result);
+    });
+  comment.getLatestCampaignComments();    
+}
+
 exports.comment=function(io,__dirname){
   io.of('/api/prodoapp').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
@@ -113,7 +130,7 @@ exports.comment=function(io,__dirname){
       comment.on("successfulAddCampaignComment",function(result){
         logger.emit("info", result.success.message,sessionuserid);
         socket.emit("addCampaignCommentResponse",null,result);
-        if(result.success.product_comment.type=="campaign"){
+        if(result.success.camapign_comment.type=="campaign"){
           socket.broadcast.emit("campaigncommentResponse"+prodle+" "+campaign_id,null,result);
         }else{
           socket.broadcast.emit("warrantycommentResponse"+prodle+" "+campaign_id,null,result);

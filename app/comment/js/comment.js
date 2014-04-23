@@ -655,3 +655,29 @@ var _successfulAddCampaignComment=function(self,newcomment){
 	logger.emit("log","successfulAddCampaignComment");
 	self.emit("successfulAddCampaignComment",{"success":{"message":"Gave comment to campaign sucessfully","campaign_comment":newcomment}});
 }
+
+Comment.prototype.getLatestCampaignComments=function(){
+	var self=this;
+    //////////////////////////////////////////////////////////////////////////////
+	_getLatestCampaignComments(self);
+	//////////////////////////////////////////////////////////////////////////////
+}
+
+var _getLatestCampaignComments = function(self){
+	ProductCampaignModel.find({status:{$ne:"deactive"}}).sort({datecreated:-1}).limit(5).lean().exec(function(err,campaign_comment){
+		if(err){
+			self.emit("failedGetCampaignComments",{"error":{"code":"ED001","message":" function:_getLatestCampaignComments \nError in db to find campaign comments err message: "+err}});
+		}else if(!campaign_comment){
+			self.emit("failedGetCampaignComments",{"error":{"code":"AP001","message":"Campaign id is wrong"}});
+		}else{
+			//////////////////////////////////////////////////////
+			_successfulGetCampaignComments(self,campaign_comment);
+			//////////////////////////////////////////////////////
+		}
+	})
+}
+
+var _successfulGetCampaignComments=function(self,campaign_comment){
+	logger.emit("log","_successfulGetCampaignComments");
+	self.emit("successfulGetCampaignComments",{"success":{"message":"Getting campaign comments sucessfully","campaign_comment":campaign_comment}});
+}
