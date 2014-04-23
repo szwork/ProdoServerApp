@@ -66,8 +66,9 @@ exports.loadMoreComment=function(req,res){
     });
   comment.loadMoreComment(sessionuserid,commentid);
 }
+
 exports.comment=function(io,__dirname){
-io.of('/api/prodoapp').on('connection', function(socket) {
+  io.of('/api/prodoapp').on('connection', function(socket) {
     var sessionuserid=socket.handshake.user.userid;
     socket.on('addComment', function(prodle,commentdata) {
       var comment = new Comment(commentdata);
@@ -96,29 +97,39 @@ io.of('/api/prodoapp').on('connection', function(socket) {
           socket.emit("addcommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
         }else{
           comment.addComment(sessionuserid,prodle,__dirname);   
+        }      
+      });
+    })
+
+    socket.on('addCampaignComment', function(campaign_id,commentdata) {
+      var comment = new Comment(commentdata);      
+      logger.emit("log",campaign_id+""+JSON.stringify(commentdata));
+      comment.removeAllListeners("failedAddCampaignComment");
+      comment.on("failedAddCampaignComment",function(err){
+        logger.emit("error", err.error.message,sessionuserid);
+        socket.emit("addCampaignCommentResponse",err);
+      });
+      comment.removeAllListeners("successfulAddCampaignComment");
+      comment.on("successfulAddCampaignComment",function(result){
+        logger.emit("info", result.success.message,sessionuserid);
+        socket.emit("addCampaignCommentResponse",null,result);
+        if(result.success.product_comment.type=="campaign"){
+          socket.broadcast.emit("campaigncommentResponse"+campaign_id,null,result);
+        }else{
+          socket.broadcast.emit("warrantycommentResponse"+campaign_id,null,result);
         }
-      
-    });
-  // socket.on('uploadFiles', function(file,action) {
-  //   ///action for user profile update
-  //    //action:{user:{userid:}}
-  //    //action for org images upload
-  //    //action:{org:{userid:,orgid:}}
-  //    //action for product images upload
-  //    //action:{product:{userid:,orgid:,prodle:}}
-      
-  //   console.log("calling to Upload files");
-  //   ///////////////
-  //   api.commonapi.uploadFiles(file,__dirname,action,function(err,url){
-  //     if(err){
-  //       console.log("error in uploadFiles"+err);
-  //     }else{
-  //       socket.emit("uploadFileResponse",url);
-  //     }
-  //   })
-  // })
-})
-})
-
-
+      });
+      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+        if(err){
+          logger.emit("log","Errrr in get sessionid client");
+        }else if(reply==null){
+          socket.emit("addCampaignCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+        }else if(JSON.parse(reply).passport.user==undefined){
+          socket.emit("addCampaignCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+        }else{
+          comment.addCampaignComment(sessionuserid,campaign_id,__dirname);   
+        }      
+      });
+    })
+  })
 }
