@@ -546,3 +546,112 @@ var __checkCampaignCommentImageExists=function(self,prodle,campaign_id,commentda
 	}
 
 }
+
+var _readCampaignCommentImage=function(self,prodle,campaign_id,commentdata,product,dirname){
+	var file_name=commentdata.comment_image.filename;
+  	var file_buffer=commentdata.comment_image.filebuffer;
+   	// var file_length=commentdata.comment_image.filelength;  
+  	var file_type=commentdata.comment_image.filetype;
+/*
+var commentdata={type:"product",comment_image:{filetype:filedata.type,filename:filedata.name,filebuffer:buffer},user:{userid:"ulksGOKEoS",fullname:"Sunil More",orgname:"Giant Leap Systems",grpname:"admin"},commenttext:"sssssssssssssssssssssssss"};
+*/
+	var ext = path.extname(fileName||'').split('.');
+	ext=ext[ext.length - 1];
+	if(file_name==undefined){
+		self.emit("failedAddCampaignComment",{"error":{"message":"Please provide comment image file_name"}});
+	}else if(file_buffer==undefined){
+  		self.emit("failedAddCampaignComment",{"error":{"message":"Please provide comment image file_buffer"}});
+	}else if(file_type==undefined){
+		self.emit("failedAddCampaignComment",{"error":{"message":"Please provide comment image file_type"}});
+	}else if(ext=="jpeg" || ext=="jpg" || ext=="png" || ext=="gif"){
+		self.emit("failedAddCampaignComment",{"error":{"message":"You can add only image of type jpeg,jpg,gif,png"}});
+	}else{
+		var fileName = dirname + '/tmp/uploads/' + file_name;
+		fs.open(fileName, 'a', 0755, function(err, fd) {
+	    if (err) {
+	      self.emit("failedAddCampaignComment",{"error":{"message":" function:_readCampaignCommentImage \nError in open image "+err}})
+	    }else{	      
+	      console.log("buffer size"+file_buffer.size);
+	      console.log("file extension"+ext);
+	      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+	        if(err){
+	       		self.emit("failedAddCampaignComment",{"error":{"message":" function:_readCampaignCommentImage \nError in write image "+err}})   
+	        }else{
+				var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+				var bucketFolder;
+				var params;
+				bucketFolder=amazonbucket+"/org/"+product.orgid+"/product/"+product.prodle+"/campaign/"+campaign_id+"/comment";
+		      	params = {
+		            Bucket: bucketFolder,
+		            Key: product.orgid+product.prodle+s3filekey,
+		            Body: writebuffer,
+		            //ACL: 'public-read-write',
+		            ContentType: file_type
+		        };
+		        ////////////////////////////////////////
+		        _campaignCommentImageUpload(self,commentdata,product,params);
+		        //////////////////////////////////////
+	     	}
+	     })
+	    }
+	  })
+	}
+}
+
+var _campaignCommentImageUpload=function(self,commentdata,product,awsparams){
+	s3bucket.putObject(awsparams, function(err, data) {
+	    if (err) {
+	    	self.emit("failedAddCampaignComment",{"error":{"message":" function:_campaignCommentImageUpload \nError in s3buctke put object "+err}})     
+	    } else {
+	    	logger.emit("log","filecomment  saved");
+	      	var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+	      	s3bucket.getSignedUrl('getObject',params1, function (err, url) {
+	        	if(err){
+	         	self.emit("failedAddCampaignComment",{"error":{"message":" function:_campaignCommentImageUpload \nError in s3aws getSignedUrl "+err}})     
+	        	}else{
+	        		commentdata.comment_image=[{imageid:generateId(),image:url}];
+	          		/////////////////////////////////////////////////////////////
+	          		_addCampaignComment(self,product.prodle,commentdata,product);
+	          		/////////////////////////////////////////////////////////////
+		        }
+	    	});
+	    }
+  	}) 
+}
+
+var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
+	var tags_array=[];
+	if(commentdata.analytics.length>0){
+		for(var i=0;i<commentdata.analytics.length;i++){
+			if(commentdata.analytics[i].tag!=undefined){
+				tags_array.push(commentdata.analytics[i].tag);
+			}
+		}
+	}
+	commentdata.tags=tags_array;
+	var comment_data=new CommentModel(commentdata);
+
+	comment_data.save(function(err,campaign_commentdata){
+		if(err){
+			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":"Error in db to save new campaign comment"}});
+		}else{      
+	      	// if(campaign_commentdata.type=="campaign"){
+	      	// 	updateLatestProductComment(campaign_commentdata.prodle);
+	      	// }else{
+	      	// 	//updateLatestWarrantyComment(campaign_commentdata.prodle);
+	      	// }
+	  		// campaign_commentdata.status=undefined;
+	    	// 	campaign_commentdata.prodle=undefined;
+			// ///////////////////////////////////		
+			_successfulAddCampaignComment(self,campaign_commentdata);
+			// _validateFeatureAnalytics(prodle,commentdata,product);		
+			/////////////////////////////////
+		}
+	})
+}
+
+var _successfulAddCampaignComment=function(self,newcomment){
+	// updateLatestProductCommentCount(newcomment.prodle);
+	logger.emit("log","successfulAddCampaignComment");
+	self.emit("successfulAddCampaignComment",{"success":{"message":"Gave comment to campaign sucessfully","campaign_comment":newcomment}});
+}
