@@ -233,7 +233,7 @@ ProductCampaign.prototype.getAllOrgCampaign = function(orgid) {
 };
 
 var _getAllOrgCampaign = function(self,orgid){
-	ProductCampaignModel.find({orgid:orgid,status:{$ne:"deactive"}}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.find({orgid:orgid,status:{$ne:"deactive"}}).sort({createdate:-1}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetAllOrgCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(productcampain.length==0){
