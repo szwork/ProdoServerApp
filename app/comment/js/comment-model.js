@@ -22,7 +22,9 @@ var CommentSchema = mongoose.Schema({
   prodle:{type:String, ref:"Product"},
   campaign_id:{type:String},
   status:{type:String,default:"active"}, 
-  type:{type:String},//product,campaign
+
+  type:{type:String},//proudct,campain
+
   datecreated:{type:Date,default:Date.now}, 
   dateremoved:{type:Date},   
   commenttext:{type:String},   
