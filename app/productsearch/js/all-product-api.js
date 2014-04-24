@@ -6,6 +6,7 @@ var reds = require('../lib/reds'),
 var ProductModel = require("../../product/js/product-model");
 var OrganizationModel = require("../../org/js/org-model");
 var logger=require("../../common/js/logger");
+var commonapi = require('../../common/js/common-api');
 // var S=require("string");
 exports.allProduct = function(req,res){
 	var self=this;

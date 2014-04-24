@@ -4,7 +4,7 @@ var ProductSearch = require("./product-search");
 var logger=require("../../common/js/logger");
 var reds = require('../lib/reds');
 var search = reds.createSearch('products');
-
+var commonapi = require('../../common/js/common-api');
 
 exports.searchProduct = function(req,res){
 	
@@ -25,6 +25,19 @@ exports.searchProduct = function(req,res){
       logger.emit("info", doc.success.message,sessionuserid);
       // console.log("L " + doc.success.doc.length);
       res.send(doc);
+    });
+    productsearch.removeAllListeners("getAdvanacSearchData");
+    productsearch.on("getAdvanacSearchData",function(doc){
+      console.log("getAdvanacSearchData"+doc);
+      commonapi.getOrganizationAnalyticsData(doc,function(err,result){
+        if(err){
+           console.log("tes111t"+err)
+          productsearch.emit("failedToSearchProduct",err);
+        }else{
+          productsearch.emit("successfulProductSearch", result);
+          console.log("test"+result)
+        }
+      })
     });
 
 	productsearch.searchProduct(productsearchdata);	

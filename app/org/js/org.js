@@ -39,133 +39,6 @@ function removeDuplicates(arrayIn) {
     }
     return arrayOut;
 }
-var getOrganizationAnalyticsData=function(organizations,callback){
-  var orgids=[];
-	for(var i=0;i<organizations.length;i++){
-			orgids.push(organizations[i].orgid);
-	}
-	productModel.aggregate({$match:{orgid:{$in:orgids},status:"active"}},{$group:{_id:"$orgid",productcount:{$sum:1}}},function(err,products){
-		if(err){
-		 callback({error:{code:"ED001",message:"Database Issue"+err}})
-		}else if(products.length==0){
-			callback({error:{message:"No Product exists"}})
-		}else{
-			var organalytics=[];
-			var productorgids=[];
-			for(var i=0;i<products.length;i++){
-				productorgids.push(products[i]._id);
-			}
-			console.log("productscounts"+JSON.stringify(products))
-			for(var i=0;i<organizations.length;i++){
-				console.log("tesing"+productorgids.indexOf(organizations[i].orgid))
-				if(productorgids.indexOf(organizations[i].orgid)>=0){
-					var organalytic=JSON.stringify(organizations[i])
-					organalytic=JSON.parse(organalytic);
-					console.log("ddd"+organizations[i].orgid+""+products[productorgids.indexOf(organizations[i].orgid)].productcount);
-					organalytic.productcount=products[productorgids.indexOf(organizations[i].orgid)].productcount;
-					console.log(organizations[i]);
-					// organizations[i].productcount=products[productorgids.indexOf(organizations[i].orgid)].productcount;
-					 organalytics.push(organalytic)
-				}else{
-					var organalytic=JSON.stringify(organizations[i])
-					organalytic=JSON.parse(organalytic);
-					organalytic.productcount=0;
-					organalytics.push(organalytic)
-				}
-			}
-			logger.emit("log","org data with product count"+JSON.stringify(organalytics));
-		
-			_orgdatawithProductCommentCountAndFollowedCount(organalytics,function(err,result){
-          if(err){
-          	 callback(err)
-          }else{
-          	callback(null,result);
-          }
-			})
-		}
-	})
-
-}
-var _orgdatawithProductCommentCountAndFollowedCount=function(organalytics,callback){
-	TrendModel.aggregate({$group:{_id:"$orgid",followedcount:{$sum:"$followedcount"},commentcount:{$sum:"$commentcount"}}},function(err,trendingbyorg){
-		if(err){
-			callback({error:{code:"ED001",message:"Database Issue"+err}})
-		}else{
-			if(trendingbyorg.length==0){
-				_orgdataWithProductCampaign(organalytics,function(err,result){
-			    	if(err){
-          	 callback(err)
-	          }else{
-	          	callback(null,result);
-	          }
-			    });
-			}else{
-				var organalyticsarray=[];
-				var trendingbyorgids=[];
-				for(var i=0;i<trendingbyorg.length;i++){
-					trendingbyorgids.push(trendingbyorg[i]._id);
-				}
-				for(var i=0;i<organalytics.length;i++){
-					if(trendingbyorgids.indexOf(organalytics[i].orgid)>=0){
-						var organalytic=JSON.stringify(organalytics[i]);
-						organalytic=JSON.parse(organalytic);
-						organalytic.followedcount=trendingbyorg[trendingbyorgids.indexOf(organalytics[i].orgid)].followedcount;
-						organalytic.commentcount=trendingbyorg[trendingbyorgids.indexOf(organalytics[i].orgid)].commentcount;
-						organalyticsarray.push(organalytic)
-					}else{
-						var organalytic=JSON.stringify(organalytics[i]);
-						organalytic=JSON.parse(organalytic);
-						organalytic.followedcount=0;
-						organalytic.commentcount=0;
-						organalyticsarray.push(organalytic)
-					}
-			    }
-			    _orgdataWithProductCampaign(organalyticsarray,function(err,result){
-			    	if(err){
-          	 callback(err)
-	          }else{
-	          	callback(null,result);
-	          }
-			    });
-		
-			}
-		}
-	})
-}
-var _orgdataWithProductCampaign=function(organalyticsarray,callback){
-	ProductCampaignModel.aggregate({$match:{status:"active"}},{$group:{_id:"$orgid",campaign:{$addToSet:{campaign_id:"$campaign_id",name:"$name",banner_image:"$banner_image",description:"$description"}}}},function(err,campaignbyorg){
-		if(err){
-			callback({error:{code:"ED001",message:"Database Issue"+err}})
-		}else{
-			if(campaignbyorg.length==0){
-				callback(null,{success:{message:"Organization analytics getting successfully",organalytics:organalyticsarray}});
-			}else{
-				var organalyticsarrayproductcampaign=[];
-				var trendingbyorgids=[];
-				for(var i=0;i<campaignbyorg.length;i++){
-					trendingbyorgids.push(campaignbyorg[i]._id);
-				}
-				for(var i=0;i<organalyticsarray.length;i++){
-					if(trendingbyorgids.indexOf(organalyticsarray[i].orgid)>=0){
-						var organalytic=JSON.stringify(organalyticsarray[i]);
-						organalytic=JSON.parse(organalytic);
-						organalytic.campaign=campaignbyorg[trendingbyorgids.indexOf(organalyticsarray[i].orgid)].campaign;
-						organalyticsarrayproductcampaign.push(organalytic)
-					}else{
-						var organalytic=JSON.stringify(organalyticsarray[i]);
-						organalytic=JSON.parse(organalytic);
-						organalytic.campaign=[];
-					    organalyticsarrayproductcampaign.push(organalytic)
-					}
-			  }
-			  callback(null,{success:{message:"Organization analytics getting successfully",organalytics:organalyticsarrayproductcampaign}});
-
-			}
-
-			
-		}
-	})
-}
 
 
 Organization.prototype = new events.EventEmitter;
@@ -2080,15 +1953,10 @@ var _getAllOrgnizationAnalytics=function(self){
 		}else if(organizations.length==0){
       self.emit("failedgetAllOrgnizationAnalytics",{error:{message:"No Organizations"}})
 		}else{
-			getOrganizationAnalyticsData(organizations,function(err,result){
-				if(err){
-					self.emit("failedgetAllOrgnizationAnalytics",err)
-				}else{
-          //////////////////////////////////
-			  	_successfullOrgAnalytics(self,result);
-				  ////////////////////////////////
-				}
-			})
+			///////////////////////////////////////////
+			self.emit("getOrgAnalyticsData",organizations)
+			////////////////////////////////////
+			
 		}
 	})
 }

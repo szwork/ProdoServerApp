@@ -17,9 +17,9 @@ var events = require("events");
 var util = require("util");
 var events = require("events");
 var logger = require("../../common/js/logger");
-var commonapi = require('../../common/js/common-api');
-var S = require("string");
 
+var S = require("string");
+var organalytics = require("../../org/js/org");
 
 var ProductSearch = function(productsearchdata) {
 	this.product = productsearchdata;
@@ -271,8 +271,10 @@ var _getOrgSingleProdle = function(self,doc,i,doc1){
 		  	}
 		})
 	}else{
-		// _successfulOrgSearch(self,doc1);
-		_getOrganizationAnalyticsData(doc1);
+		
+				self.emit("getAdvanacSearchData",doc1)
+		
+		
 	}
 }
 

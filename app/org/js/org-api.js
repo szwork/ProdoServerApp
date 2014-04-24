@@ -960,6 +960,16 @@ exports.getAllOrgnizationAnalytics=function(req,res){
     
     res.send(result);
   });
+  organization.removeAllListeners("getOrgAnalyticsData");
+  organization.on("getOrgAnalyticsData",function(doc){
+    commonapi.getOrganizationAnalyticsData(doc,function(err,result){
+        if(err){
+          organization.emit("failedgetAllOrgnizationAnalytics",err)
+        }else{
+          organization.emit("successfulgetAllOrgnizationAnalytics",result);
+        }
+      }) 
+  });
   
     //////////////////////////////////
     organization.getAllOrgnizationAnalytics();
