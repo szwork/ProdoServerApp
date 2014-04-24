@@ -113,14 +113,51 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
 		}else if(product){
 			userdata.products_followed =[{prodle:product.prodle,orgid:product.orgid}];
-			 _addUser(self,userdata,host);
-	    }else{
-	    	
+			_updateTrendingForProdonusFollowedCount(self,product);
+			_addUser(self,userdata,host);
+	    }else{	    	
 	    	 _addUser(self,userdata,host);
-
 		}
 	});
 }
+
+var _updateTrendingForProdonusFollowedCount = function(self,product){
+	console.log("_updateTrendingForProdonusFollowedCount : "+product.prodle);
+	TrendingModel.findOne({prodle:product.prodle},function(err,trenddata){
+		if(err){
+			logger.emit("log","Error in updation latest product followed count");
+		}else if(!trenddata){
+			productModel.findOne({prodle:product.prodle},{prodle:1,orgid:1,name:1,_id:0}).exec(function(err,productdata){
+				if(err){
+					logger.emit({"error":{"code":"ED001","message":"Error in db to get product"}});
+				}else if(!productdata){
+					logger.emit({"error":{"message":"prodle is wrong"}});
+				}else{
+					var trend={prodle:productdata.prodle,commentcount:0,followedcount:1,name:productdata.name,orgid:productdata.orgid};
+					var trend_data = new TrendingModel(trend);
+					trend_data.save(function(err,analyticsdata){
+		            	if(err){
+		               	 	console.log("Error in db to save trending data" + err);
+		            	}else{
+		                	console.log("Trending for Latest product followed added sucessfully" + analyticsdata);
+		            	}
+		        	})
+				}
+			});			
+		}else{
+			TrendingModel.update({prodle:product.prodle},{$inc:{followedcount:1}},function(err,latestupatestatus){
+				if(err){
+					logger.emit("error","Error in updation latest product followed count");
+				}else if(latestupatestatus==1){
+					logger.emit("log","Latest product followed count updated");
+				}else{
+					logger.emit("error","Given product id is wrong to update latest product followed count");
+				}
+			})			
+		}
+	})
+}
+
    var _addUser = function(self,userdata,host) {
 		//adding user
 		if(userdata.prodousertype=="individual"){

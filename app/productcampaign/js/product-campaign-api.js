@@ -64,9 +64,9 @@ exports.updateProductCampaign=function(req,res){
 exports.getProductCampaign=function(req,res){
     logger.emit("log","///////Calling to Get Products Campain///////");
     var sessionuserid=req.user.userid;
-    var orgid=req.params.orgid;
+    var prodle=req.params.prodle;
     var campaign_id=req.params.campaign_id;
-    logger.emit("log","orgid:"+orgid+"\ncampain_id:"+campaign_id+"\nsessionid:"+sessionuserid);
+    logger.emit("log","prodle:"+prodle+"\ncampain_id:"+campaign_id+"\nsessionid:"+sessionuserid);
     var productcampaign = new ProductCampaign();
     
     productcampaign.removeAllListeners("failedGetProductCampaign");
@@ -85,7 +85,7 @@ exports.getProductCampaign=function(req,res){
         res.send(result);
         // eventEmitter.removeListener(this);
     });
-    productcampaign.getProductCampaign(orgid,campaign_id);
+    productcampaign.getProductCampaign(prodle,campaign_id);
 }
 
 exports.removeProductCampaign=function(req,res){

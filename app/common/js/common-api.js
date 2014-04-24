@@ -365,14 +365,28 @@ exports.uploadFiles=function(io,__dirname){
           socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add Warranty"}});
         }else{
           console.log("addMarketingData3");
-          ///////////////////////////////////////////////////
+          ///////////////////////////////////////////////////          
           _validateAddMarketingData(userid,marketingdata,file,userid);
           ////////////////////////////////////////////////
         }          
       })
     })
-    
+
     var _validateAddMarketingData=function(userid,marketingdata,file,userid){
+      if(marketingdata==undefined){
+        socket.emit("addMarketingDataResponse",{"error":{"code":"AV001","message":"Please provide marketing data"}});
+      }else if(marketingdata.name==undefined){
+        socket.emit("addMarketingDataResponse",{"error":{"code":"AV001","message":"Please pass name"}});
+      }else if(marketingdata.description==undefined){
+        socket.emit("addMarketingDataResponse",{"error":{"code":"AV001","message":"Please pass description"}});
+      }else{
+        ///////////////////////////////////////////////////////
+        _validateAddMarketingDataFile(userid,marketingdata,file,userid);
+        ///////////////////////////////////////////////////////
+      }
+    }
+
+    var _validateAddMarketingDataFile=function(userid,marketingdata,file,userid){
       var file_name=file.filename;
       var file_buffer=file.filebuffer;
       var file_length=file.filelength;  

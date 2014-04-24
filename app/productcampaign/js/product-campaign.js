@@ -1,3 +1,4 @@
+
 /*
 * Overview: Product Campain
 * Dated:
@@ -198,15 +199,15 @@ var _successfulRemoveProductCampaign=function(self){
 	self.emit("successfulRemoveProductCampaign",{"success":{"message":"Product Campaign Stopped Sucessfully"}})
 }
 
-ProductCampaign.prototype.getProductCampaign = function(orgid,campain_id) {
+ProductCampaign.prototype.getProductCampaign = function(prodle,campain_id) {
 	var self=this;
 	//////////////////////////////////////////
-	_getProductCampaign(self,orgid,campain_id);
+	_getProductCampaign(self,prodle,campain_id);
 	/////////////////////////////////////////
 };
 
-var _getProductCampaign = function(self,orgid,campaign_id){
-	ProductCampaignModel.findOne({status:{$ne:"deactive"},orgid:orgid,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
+var _getProductCampaign = function(self,prodle,campaign_id){
+	ProductCampaignModel.findOne({status:{$ne:"deactive"},prodle:prodle,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
 		}else if(productcampain){
@@ -214,7 +215,7 @@ var _getProductCampaign = function(self,orgid,campaign_id){
 			_successfulGetProductCampaign(self,productcampain);
 			//////////////////////////////////////////////////
 		}else{			
-			self.emit("failedGetProductCampaign",{"error":{"code":"AP001","message":"Provided orgid or campaign_id is wrong"}});
+			self.emit("failedGetProductCampaign",{"error":{"code":"AP001","message":"Provided prodle or campaign_id is wrong"}});
 		}
 	})
 }
@@ -232,7 +233,7 @@ ProductCampaign.prototype.getAllOrgCampaign = function(orgid) {
 };
 
 var _getAllOrgCampaign = function(self,orgid){
-	ProductCampaignModel.find({orgid:orgid,status:{$ne:"deactive"}}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.find({orgid:orgid,status:{$ne:"deactive"}}).sort({createdate:-1}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetAllOrgCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(productcampain.length==0){
