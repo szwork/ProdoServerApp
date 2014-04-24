@@ -131,9 +131,9 @@ exports.comment=function(io,__dirname){
         logger.emit("info", result.success.message,sessionuserid);
         socket.emit("addCampaignCommentResponse",null,result);
         if(result.success.camapign_comment.type=="campaign"){
-          socket.broadcast.emit("campaigncommentResponse"+prodle+" "+campaign_id,null,result);
+          socket.broadcast.emit("campaigncommentResponse"+campaign_id,null,result);
         }else{
-          socket.broadcast.emit("warrantycommentResponse"+prodle+" "+campaign_id,null,result);
+          socket.broadcast.emit("warrantycommentResponse"+campaign_id,null,result);
         }
       });
       redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {

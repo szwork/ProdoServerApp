@@ -36,6 +36,16 @@ ProductSearch.prototype.searchProduct = function(productsearchdata){
 }
 
 var _validateProductSearchData = function(self,productsearchdata) {
+	if(productsearchdata.searchtype == undefined || productsearchdata.searchtype == ""){
+		self.emit("failedToSearchProduct",{"error":{"message":"Please pass search type"}});
+	}else if(["home","wall"].indexOf(productsearchdata.searchtype.toLowerCase())<0){
+		self.emit("failedToSearchProduct",{"error":{"message":"Please pass search type as home or wall"}});
+	}else{
+		_productSearchFiltering(self,productsearchdata);
+	}
+}
+
+var _productSearchFiltering = function(self,productsearchdata) {
 	console.log("_validateProductSearchData");
 	var searchCriteria = [];
 	var query={status:{$in:["active","init"]}};
@@ -151,7 +161,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 				}
 				var Q = {status:{$in:["active","init"]},name:{$in:org_or_array}};
 				// console.log("QQQQQ " + JSON.stringify(Q));
-				OrganizationModel.find(Q,{name:1,orgid:1,_id:0}).limit(5).exec(function(err,doc){
+				OrganizationModel.find(Q,{name:1,orgid:1,org_logo:1,_id:0}).limit(5).exec(function(err,doc){
 					if(err){
 						self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get orgid by orgname"}});
 					}else if(doc.length==0){
@@ -162,7 +172,11 @@ var _validateProductSearchData = function(self,productsearchdata) {
 						}
 						if(productsearchdata.Product_Name=="" && productsearchdata.Model_Number=="" && productsearchdata.Feature=="" && productsearchdata.Category==""){
 							// _successfulOrgSearch(self,doc);
-							_getProdleOfOrganisation(self,doc);
+							if(productsearchdata.searchtype == "home"){
+								_getProdleOfOrganisation(self,doc);
+							}else{
+								_getProdleWithProductOfOrganisation(self,doc);
+							}							
 						}else{
 							query.orgid={$in:orgid_arr};
 							_searchProduct(self,productsearchdata,searchCriteria,query);
@@ -197,7 +211,7 @@ var _successfulProductSearch = function(self,doc){
 	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Products Found","doc":doc}});
 }
 
-var _getProdleOfOrganisation = function(self,doc){
+var _getProdleWithProductOfOrganisation = function(self,doc){
 	var initialvalue=0;
 	var doc1=[];
 	_getOrgProdle(self,doc,initialvalue,doc1);
@@ -230,6 +244,35 @@ var _getOrgProdle = function(self,doc,i,doc1){
 		})
 	}else{
 		_successfulOrgSearch(self,doc1);
+	}
+}
+
+var _getProdleOfOrganisation = function(self,doc){
+	var initialvalue=0;
+	var doc1=[];
+	_getOrgSingleProdle(self,doc,initialvalue,doc1);
+}
+
+var _getOrgSingleProdle = function(self,doc,i,doc1){
+	if(doc.length>i){
+		ProductModel.findOne({status:{$ne:"deactive"},orgid:doc[i].orgid},{prodle:1,name:1,description:1,_id:0}).exec(function(err,productdata){
+			if(err){
+				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
+			}else if(productdata){
+				if(productdata.length==0){
+					doc1.push({name:doc[i].name,orgid:doc[i].orgid,org_logo:doc[i].org_logo,prodle:productdata.prodle});	
+				}else{
+					doc1.push({name:doc[i].name,orgid:doc[i].orgid,org_logo:doc[i].org_logo,prodle:productdata.prodle});
+				}
+				// console.log("test "+JSON.stringify(doc1));
+				_getOrgSingleProdle(self,doc,++i,doc1);
+			}else{
+		  		_getOrgSingleProdle(self,doc,++i,doc1);
+		  	}
+		})
+	}else{
+		// _successfulOrgSearch(self,doc1);
+		_getOrganizationAnalyticsData(doc1);
 	}
 }
 
