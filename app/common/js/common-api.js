@@ -184,6 +184,7 @@ exports.sendMail = function(message,smtpconfig,callback){
 // // }
 var checkSocketSession=function(redisreply,file,action,callback){
   var socketreply;
+
   if(action.user!=undefined){ 
     socketreply="userUploadResponse";
   }else if(action.org!=undefined){
@@ -381,7 +382,7 @@ exports.uploadFiles=function(io,__dirname){
       ext=ext[ext.length - 1];
       var fileName = __dirname + '/tmp/uploads/' + file_name;
       
-      if(!S(file_type).contains("image") && !S(file_type).contains("pdf")){
+      if(!S(file_type).contains("image") ){
         callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
       }else if(file_length>1000000){
         socket.emit("addMarketingDataResponse",{"error":{"message":"You can upload  image of size less than 1mb"}});
@@ -459,6 +460,7 @@ exports.uploadFiles=function(io,__dirname){
         }else if(userid!=socket.handshake.user.userid){
           socket.emit("addProductCampaignResponse",{"error":{"code":"","message":"You have not authorized to add Warranty"}});
         }else{
+          logger.emit("log","CAMPAING DATA"+JSON.stringify(campaigndata))
           ///////////////////////////////////////////////////
           _isValidOrgIDForProductCampaign(campaigndata,orgid,prodle,userid,file)
           ////////////////////////////////////////////////
@@ -499,7 +501,7 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
   if(campaigndata==undefined){
     socket.emit("addProductCampaignResponse",{"error":{"code":"AV001","message":"Please provide data to add product campain"}});
   }else if(campaigndata.name==undefined){
-    self.emit("addProductCampaignResponse",{"error":{"code":"AV001","message":"Please pass name"}});
+    socket.emit("addProductCampaignResponse",{"error":{"code":"AV001","message":"Please pass name"}});
   }else if(campaigndata.productname==undefined){
     socket.emit("addProductCampaignResponse",{"error":{"code":"AV001","message":"Please pass productname"}});
   }else if(campaigndata.category==undefined){
@@ -578,6 +580,8 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
             }else{
              var campaign_banner_image={bucket:params1.Bucket,key:params1.Key,image:url}
              campaigndata.banner_image=campaign_banner_image;
+             campaigndata.orgid=orgid;
+             campaigndata.prodle=prodle;
              var product_campaign_object=new CampaignModel(campaigndata);
              product_campaign_object.save(function(err,product_campaign){
               if(err){
@@ -596,7 +600,12 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
       redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
         if(err){
           logger.emit("log","Errrr in get sessionid client");
-        }else{
+        }else{ 
+          if(action==undefined){
+            logger.emit("error","uploadFiles doesn't know action");
+          }else{
+
+          
           checkSocketSession(reply,file,action,function(err,result){
             if(err){
               socket.emit(err,{"error":{"code":"AL001","message":"User Session Expired"}});
@@ -667,6 +676,7 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
               }
             }   
           });
+        }
         }
       })
     })
