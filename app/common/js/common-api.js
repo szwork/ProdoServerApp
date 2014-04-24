@@ -142,7 +142,7 @@ exports.getOrganizationAnalyticsData=function(organizations,callback){
           organalyticsdata.productcount=0;
           organalyticsdata.followedcount=0;
           organalyticsdata.commentcount=0;
-          organalyticsdata.campaigns=[];
+          organalyticsdata.campaign=[];
           organalyticsarray.push(organalyticsdata);      
       }
       callback(null,{success:{message:"Get Organization analytics successfully",organalytics:organalyticsarray}})
