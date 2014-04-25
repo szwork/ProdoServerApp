@@ -659,20 +659,15 @@ exports.otherOrgInvites=function(req,res){
     res.send(result);
   });
   organization.removeAllListeners("sendotherorginvite");
-  organization.on("sendotherorginvite",function(otherorginvite_template,inivtedata,user,organization_data){
-    var subject=S(otherorginvite_template.subject);
-    subject=subject.replaceAll("<fromusername>",user.username);
-    subject=subject.replaceAll("<orgname>",organization_data.name);
-    var template=S(otherorginvite_template.description);
-    template=template.replaceAll("<email>",user.email);
-    template=template.replaceAll("<fromusername>",user.username);
-    template=template.replaceAll("<orgname>",organization_data.name);
-    template=template.replaceAll("<name>",inivtedata.name);
+  organization.on("sendotherorginvite",function(subject,body,toemailids,user,org){
+    body+="<br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
+    body+="<br>Disclaimer: The content of this email was Provided by "+user.email+".We are not responsible for content of email";
+    
     var message = {
         from: "Prodonus  <business@prodonus.com>", // sender address
-        to: inivtedata.email, // list of receivers
-        subject:subject.s, // Subject line
-        html: template.s // html body
+        to: toemailids+"", // list of receivers
+        subject:subject, // Subject line
+        html: body // html body
       };
     commonapi.sendMail(message,CONFIG.smtp_business, function (result){
       if(result=="failure"){
@@ -712,25 +707,21 @@ exports.OrgCustomerInvites=function(req,res){
     res.send(result);
   });
   organization.removeAllListeners("sendinviteorgcustomer");
-  organization.on("sendinviteorgcustomer",function(orgcustomerinvite_template,orgcustomer,user,organization){
-    var subject=S(orgcustomerinvite_template.subject);
-    var template=S(orgcustomerinvite_template.description);
-    template=template.replaceAll("<email>",user.email);
-    template=template.replaceAll("<fromusername>",user.username);
-    template=template.replaceAll("<orgname>",organization.name);
-    template=template.replaceAll("<customername>",orgcustomer.name);
+  organization.on("sendinviteorgcustomer",function(subject,body,toemailids,user,org){
+    body+="<br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
+    body+="<br>Disclaimer: The content of this email was Provided by "+user.email+".We are not responsible for content of email";
     
     var message = {
-        from: "Prodonus  <noreply@prodonus.com>", // sender address
-        to: orgcustomer.email, // list of receivers
-        subject:subject.s, // Subject line
-        html: template.s // html body
+        from: "Prodonus  <business@prodonus.com>", // sender address
+        to: toemailids+"", // list of receivers
+        subject:subject, // Subject line
+        html: body // html body
       };
-    commonapi.sendMail(message,CONFIG.smtp_general, function (result){
+    commonapi.sendMail(message,CONFIG.smtp_business, function (result){
       if(result=="failure"){
-        logger.emit("error","Organization Customer invite not sent to "+message.to+" by"+user.email);
+        logger.emit("error","customer inivte not sent to "+message.to+" by"+user.email);
       }else{
-        logger.emit("log","Organization Customer invite Sent Successfully to"+message.to+" by"+user.email);
+        logger.emit("log","customer Invite Sent Successfully to"+message.to+" by"+user.email);
       }
     });
   });

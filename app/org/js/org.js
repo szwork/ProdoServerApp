@@ -20,6 +20,7 @@ var ProductCampaignModel=require("../../productcampaign/js/product-campaign-mode
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
+var regxemail = /\S+@\S+\.\S+/; 
 function isArray(what) {
     return Object.prototype.toString.call(what) === '[object Array]';
 }
@@ -1363,71 +1364,81 @@ Organization.prototype.sendOrgCustomerInvites=function(orgid,orgcustomerinvites,
 }
 var _validateOrgCustomerInvites=function(self,orgid,orgcustomerinvites,sessionuserid){
 	if(orgcustomerinvites==undefined){
-		self.emit("failedOrgCustomerInvites",{"error":{"code":"AV001","message":"Please pass other orgcustomerinvites  data"}});
-	}else if(orgcustomerinvites.length==0){
-		self.emit("failedOrgCustomerInvites",{"error":{"code":"AV001","message":"Please pass atleast one organization details to send invites"}});
+		self.emit("failedOrgCustomerInvites",{"error":{"code":"AV001","message":"Please pass other org invites data"}});
+	}else if(orgcustomerinvites.to==undefined || orgcustomerinvites.to.trim()==""){
+		self.emit("failedOrgCustomerInvites",{"error":{"code":"AV001","message":"Please enter to data"}});
+	}else if(orgcustomerinvites.subject==undefined || orgcustomerinvites.subject.trim()==""){
+		self.emit("failedOrgCustomerInvites",{"error":{"code":"AV001","message":"Please enter subject"}});
+	}else if(orgcustomerinvites.body==undefined || orgcustomerinvites.body.trim()==""){
+		self.emit("failedOrgCustomerInvites",{"error":{"code":"AV001","message":"Please enter body details"}});
 	}else{
-		///////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
     _sendOrgCustomerInvitation(self,orgid,orgcustomerinvites,sessionuserid);
-		///////////////////////////////
+		////////////////////////////////////////////////////////////////////////
 	}
 }
 var _sendOrgCustomerInvitation=function(self,orgid,orgcustomerinvites,sessionuserid){
-	orgModel.findOne({orgid:orgid},function(err,organization){
-				if(err){
-					self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
-				}else if(!organization){
-					self.emit("failedOrgCustomerInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
-				}else{
-					userModel.findOne({userid:sessionuserid},function(err,user){
-						if(err){
-							self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"_sendOtherOrgInvitation DbError"+err}});
-						}else if(!user){
-							self.emit("failedOrgCustomerInvites",{"error":{"code":"AU003","message":"Userid is Wrong"}});	
-						}else{
-							EmailTemplateModel.findOne({templatetype:"orgcustomerinvite"},function(err,orgcustomerginvite_emailtemplate){
-								if(err){
-									self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"Email template"+err}});	
-								}else if(!orgcustomerginvite_emailtemplate){
-									self.emit("failedOrgCustomerInvites",{"error":{"message":"Email template"+err}});	
-								}else{
-									for(var i=0;i<orgcustomerinvites.length;i++)
-									{
-										if(orgcustomerinvites[i].email!=undefined){
-							  			self.emit("sendinviteorgcustomer",orgcustomerginvite_emailtemplate,orgcustomerinvites[i],user,organization);
-							  		}
-									}
-									///////////////////////////////////////////////////////////////
-									_addOrganizationCustomerInviteIntoBusinessOpportunity(self,orgcustomerinvites,user);
-									////////////////////////////////////////////////////////////
-
-								}
-							})//end of email template
-						}
-					})//end of user find
-				}
-			})
+	var emailids=S(orgcustomerinvites.to);
+  var toemailids=[];
+	if(emailids.contains(",")){
+		toemailids=emailids.split(",");
+	}else{
+		toemailids.push(invites.s);
 	}
-var _addOrganizationCustomerInviteIntoBusinessOpportunity=function(self,orgcustomerinvites,user){
-
+	orgModel.findOne({orgid:orgid},function(err,organization){
+		if(err){
+			self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
+		}else if(!organization){
+			self.emit("failedOrgCustomerInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
+		}else{
+			userModel.findOne({userid:sessionuserid},function(err,user){
+				if(err){
+					self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"_sendOtherOrgInvitation DbError"+err}});
+				}else if(!user){
+					self.emit("failedOrgCustomerInvites",{"error":{"code":"AU003","message":"Userid is Wrong"}});	
+				}else{
+			 	  //////////////////////////////////////////////////////////////////////////////////////
+					_addOrganizationCustomerInviteIntoBusinessOpportunity(self,orgcustomerinvites.subject,orgcustomerinvites.body,toemailids,user,organization);
+					/////////////////////////////////////////////////////////////////////////////////////
+				}
+			})//end of email template
+		}
+	})//end of user find
+		}
+	
+var _addOrganizationCustomerInviteIntoBusinessOpportunity=function(self,subject,body,toemailids,user,organization){
+  
+ var otherorginvites=[];
+  for(var i=0;i<toemailids.length;i++){
+  	otherorginvites.push({email:toemailids[i]});
+  }
  var business_opportunity=[];
-	for(var i=0;i<orgcustomerinvites.length;i++)
+    var notvalidemailids=[];
+	for(var i=0;i<otherorginvites.length;i++)
 	{
-		if(orgcustomerinvites[i].email!=undefined){
-			business_opportunity.push({invitetype:"orgcustomer",from:user.email,to:orgcustomerinvites[i].email,fromusertype:user.usertype});
+		var host=S(otherorginvites[i].email).substring(otherorginvites[i].email.indexOf("@")+1,otherorginvites[i].email.indexOf(".",otherorginvites[i].email.indexOf("@")))
+		if(regxemail.test(otherorginvites[i].email)){
+			business_opportunity.push({invitetype:"orgcustomer",from:user.email,to:otherorginvites[i].email,fromusertype:user.usertype});
+		}else{
+			notvalidemailids.push(otherorginvites[i].email)
 		}
 	}
- 	BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){
-	 	if(err){
-	 		self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"Business Opportunity"+err}});	
-	 	}else{
-	 		/////////////////////////////////////////////////
-	 		_successfullOrgCustomerInvites(self);
-	 		///////////////////////////////////////////////
-	 	}
- 	})
+	if(business_opportunity.length==0){
+		self.emit("failedOrgCustomerInvites",{"error":{"message":"Pleae provider company emailids"}});	
+	}else{
+		self.emit("sendinviteorgcustomer",subject,body,toemailids,user,organization);
+		BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){
+		 	if(err){
+		 		self.emit("failedOrgCustomerInvites",{"error":{"code":"ED001","message":"Business Opportunity"+err}});	
+		 	}else{
+		 		/////////////////////////////////////////////////
+		 		_successfullOrgCustomerInvites(self,notvalidemailids);
+		 		///////////////////////////////////////////////
+		 	}
+ 		})	
+	}
 }
-var _successfullOrgCustomerInvites=function (self) {
+var _successfullOrgCustomerInvites=function (self,notvalidemailids) {
 	logger.emit("log","_successfullOrgCustomerInvites");
 	self.emit("successfulOrgCustomerInvites",{"success":{"message":"Organization customer invitation sent Successfully"}});
 }
@@ -1439,60 +1450,58 @@ Organization.prototype.sendOtherOrgInvites=function(orgid,otherorginvites,sessio
 var _validateOtherOrgInvites=function(self,orgid,otherorginvites,sessionuserid){
 	if(otherorginvites==undefined){
 		self.emit("failedOtherOrgInvites",{"error":{"code":"AV001","message":"Please pass other org invites data"}});
-	}else if(otherorginvites.length==0){
-		self.emit("failedOtherOrgInvites",{"error":{"code":"AV001","message":"Please pass atleast one organization details to send invites"}});
+	}else if(otherorginvites.to==undefined || otherorginvites.to.trim()==""){
+		self.emit("failedOtherOrgInvites",{"error":{"code":"AV001","message":"Please enter to data"}});
+	}else if(otherorginvites.subject==undefined || otherorginvites.subject.trim()==""){
+		self.emit("failedOtherOrgInvites",{"error":{"code":"AV001","message":"Please enter subject"}});
+	}else if(otherorginvites.body==undefined || otherorginvites.body.trim()==""){
+		self.emit("failedOtherOrgInvites",{"error":{"code":"AV001","message":"Please enter body details"}});
 	}else{
-		///////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
     _sendOtherOrganizationInvitation(self,orgid,otherorginvites,sessionuserid);
-		///////////////////////////////
+		////////////////////////////////////////////////////////////////////////
 	}
 }
 var _sendOtherOrganizationInvitation=function(self,orgid,otherorginvites,sessionuserid){
-	orgModel.findOne({orgid:orgid},function(err,organization){
-				if(err){
-					self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
-				}else if(!organization){
-					self.emit("failedOtherOrgInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
-				}else{
-					userModel.findOne({userid:sessionuserid},function(err,user){
-						if(err){
-							self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"_sendOtherOrgInvitation DbError"+err}});
-						}else if(!user){
-							self.emit("failedOtherOrgInvites",{"error":{"code":"AU003","message":"Userid is Wrong"}});	
-						}else{
-							EmailTemplateModel.findOne({templatetype:"otherorginvite"},function(err,otherorginvite_emailtemplate){
-								if(err){
-									self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Email template"+err}});	
-								}else if(!otherorginvite_emailtemplate){
-									self.emit("failedOtherOrgInvites",{"error":{"message":"Email template"+err}});	
-								}else{
-									for(var i=0;i<otherorginvites.length;i++)
-									{
-										var host=S(otherorginvites[i].email).substring(otherorginvites[i].email.indexOf("@")+1,otherorginvites[i].email.indexOf(".",otherorginvites[i].email.indexOf("@")))
-										logger.emit("log",email_providerlist.indexOf(host.s));
-										if(otherorginvites[i].email!=undefined ){
-							  			  self.emit("sendotherorginvite",otherorginvite_emailtemplate,otherorginvites[i],user,organization);
-							  			}
-									}
-									///////////////////////////////////////////////////////////////
-									_addOtherOrganizationInviteIntoBusinessOpportunity(self,otherorginvites,user);
-									////////////////////////////////////////////////////////////
-
-								}
-							})//end of email template
-						}
-					})//end of user find
-				}
-			})
+	var emailids=S(otherorginvites.to);
+  var toemailids=[];
+	if(emailids.contains(",")){
+		toemailids=emailids.split(",");
+	}else{
+		toemailids.push(invites.s);
 	}
-var _addOtherOrganizationInviteIntoBusinessOpportunity=function(self,otherorginvites,user){
-
+	orgModel.findOne({orgid:orgid},function(err,organization){
+		if(err){
+			self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Error in db to find org"+err}});
+		}else if(!organization){
+			self.emit("failedOtherOrgInvites",{"error":{"code":"AO001","message":"provided orgid is wrong"}});
+		}else{
+			userModel.findOne({userid:sessionuserid},function(err,user){
+				if(err){
+					self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"_sendOtherOrgInvitation DbError"+err}});
+				}else if(!user){
+					self.emit("failedOtherOrgInvites",{"error":{"code":"AU003","message":"Userid is Wrong"}});	
+				}else{
+					 
+					 ///////////////////////////////////////////////////////////////
+						_addOtherOrganizationInviteIntoBusinessOpportunity(self,otherorginvites.subject,otherorginvites.body,toemailids,user,organization);
+					 ////////////////////////////////////////////////////////////
+        }
+		  })
+		}//end of email template
+	})
+}
+var _addOtherOrganizationInviteIntoBusinessOpportunity=function(self,subject,body,toemailids,user,organization){
+  var otherorginvites=[];
+  for(var i=0;i<toemailids.length;i++){
+  	otherorginvites.push({email:toemailids[i]});
+  }
  var business_opportunity=[];
     var notvalidemailids=[];
 	for(var i=0;i<otherorginvites.length;i++)
 	{
 		var host=S(otherorginvites[i].email).substring(otherorginvites[i].email.indexOf("@")+1,otherorginvites[i].email.indexOf(".",otherorginvites[i].email.indexOf("@")))
-		if(otherorginvites[i].email!=undefined){
+		if(regxemail.test(otherorginvites[i].email)){
 			business_opportunity.push({invitetype:"business",from:user.email,to:otherorginvites[i].email,fromusertype:user.usertype,orgname:otherorginvites[i].orgname});
 		}else{
 			notvalidemailids.push(otherorginvites[i].email)
@@ -1501,17 +1510,17 @@ var _addOtherOrganizationInviteIntoBusinessOpportunity=function(self,otherorginv
 	if(business_opportunity.length==0){
 		self.emit("failedOtherOrgInvites",{"error":{"message":"Pleae provider company emailids"}});	
 	}else{
+		self.emit("sendotherorginvite",subject,body,toemailids,user,organization);
 		BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){
-	 	if(err){
-	 		self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Business Opportunity"+err}});	
-	 	}else{
-	 		/////////////////////////////////////////////////
-	 		_successfullOtherOrgInvites(self,notvalidemailids);
-	 		///////////////////////////////////////////////
-	 	}
- 	})	
+		 	if(err){
+		 		self.emit("failedOtherOrgInvites",{"error":{"code":"ED001","message":"Business Opportunity"+err}});	
+		 	}else{
+		 		/////////////////////////////////////////////////
+		 		_successfullOtherOrgInvites(self,notvalidemailids);
+		 		///////////////////////////////////////////////
+		 	}
+ 		})	
 	}
- 	
 }
 var _successfullOtherOrgInvites=function (self,notvalidemailids) {
 	logger.emit("log","_successfullOtherOrgInvites");

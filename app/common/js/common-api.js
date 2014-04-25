@@ -230,7 +230,8 @@ var _orgdatawithProductCommentCountAndFollowedCount=function(organalytics,callba
   })
 }
 var _orgdataWithProductCampaign=function(organalyticsarray,callback){
-  CampaignModel.aggregate({$match:{status:"active"}},{$group:{_id:"$orgid",campaign:{$addToSet:{campaign_id:"$campaign_id",name:"$name",banner_image:"$banner_image",description:"$description"}}}},function(err,campaignbyorg){
+  var today=new Date();
+  CampaignModel.aggregate({$match:{status:"active",startdate:{$gte:today},lastdate:{$lte:today}}},{$group:{_id:"$orgid",campaign:{$addToSet:{campaign_id:"$campaign_id",name:"$name",banner_image:"$banner_image",description:"$description",orgid:"$orgid",prodle:"$prodle"}}}},function(err,campaignbyorg){
     if(err){
       callback({error:{code:"ED001",message:"Database Issue"+err}})
     }else{
