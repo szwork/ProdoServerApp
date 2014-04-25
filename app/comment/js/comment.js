@@ -383,6 +383,7 @@ var _successfulAddComment=function(self,newcomment){
 	logger.emit("log","successfulAddComment");
 	self.emit("successfulAddComment",{"success":{"message":"Gave comment to product sucessfully","product_comment":newcomment}})
 }
+
 Comment.prototype.deleteComment = function(sessionuserid,commentid) {
 	var self=this;
 
@@ -452,6 +453,60 @@ var updateLatestProductCommentDecCount=function(prodle){
 	})	
 }
 
+Comment.prototype.deleteCampaignComment = function(sessionuserid,commentid) {
+	var self=this;
+    /////////////////////////////////////////////////////////////
+	_isAuhorizedUserToDeleteCampaignComment(self,sessionuserid,commentid);
+	/////////////////////////////////////////////////////////////	
+};
+
+var _isAuhorizedUserToDeleteCampaignComment=function(self,sessionuserid,commentid){
+  CommentModel.findOne({commentid:commentid},{user:1},function(err,comment){
+  	if(err){
+  		self.emit("failedCampaignCommentDeletion",{"error":{"code":"ED001","message":"Error in db to find Comment"}});
+  	}else if(comment){
+  		 if(comment.user.userid!=sessionuserid){
+  		 	self.emit("failedCampaignCommentDeletion",{"error":{"code":"EA001","message":"You are not authorize to delete this comment"}});	
+  		 }else{
+  		 	//////////////////////////////
+        	_deleteCampaignComment(self,commentid);
+		    /////////////////////////////
+		}
+	}else{
+  		self.emit("failedCampaignCommentDeletion",{"error":{"code":"AC001","message":"comment id is wrong"}});
+  	}
+  })
+
+}
+var _deleteCampaignComment=function(self,commentid){
+	var commentdata={status:"deactive",dateremoved:new Date()};
+	
+  	CommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
+		if(err){
+			self.emit("failedCampaignCommentDeletion",{"error":{"code":"ED001","message":"Error in db to delete comment"}});
+		}else if(!comment){
+			self.emit("failedCampaignCommentDeletion",{"error":{"code":"AC001","message":"Provided commentid is wrong"}});
+		}else{  
+			if(comment.type="campaign"){
+				updateLatestCampaignComment(comment.campaign_id);
+       			// updateLatestProductComment(comment.prodle);
+			}else{
+       			//updateLatestWarrantyComment
+			}
+			/////////////////////////////
+			_successfulCampaignCommentDeletion(self,comment.prodle);
+			////////////////////////////
+		}
+	})
+}
+
+var _successfulCampaignCommentDeletion = function(self,prodle) {
+		//validate the user data
+	// updateLatestProductCommentDecCount(prodle);
+	logger.emit("log","_successfulCampaignCommentDeletion");
+  	self.emit("successfulCampaignCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
+}
+
 Comment.prototype.loadMoreComment = function(sessionuserid,commentid) {
 	var self=this;
 
@@ -484,6 +539,42 @@ var _loadMoreComment=function(self,sessionuserid,commentid){
 var _successfullLoadMoreComments=function(self,nextcomments){
 	logger.emit("log","_successfullLoadMoreComments");
 	self.emit("successfulLoadMoreComment", {"success":{"message":"Next comments","comment":nextcomments}});
+}
+
+Comment.prototype.loadMoreCampaignComment = function(sessionuserid,commentid) {
+	var self=this;
+    ///////////////////////////////////////////////////////
+    _loadMoreCampaignComment(self,sessionuserid,commentid);
+    ///////////////////////////////////////////////////////
+};
+
+var _loadMoreCampaignComment=function(self,sessionuserid,commentid){
+	CommentModel.findOne({commentid:commentid,status:"active"},{campaign_id:1,commentid:1,datecreated:1},function(err,comment){
+		if(err){
+			self.emit("failedLoadMoreCampaignComment",{"error":{"code":"ED001","message":"_loadMoreCampaignComment:Error in db to get comment"+err}});
+		}else if(!comment){
+			self.emit("failedLoadMoreCampaignComment",{"error":{"code":"AC001","message":"Wrong commentid"}});
+		}else{
+			logger.emit("log",comment);
+			var query=CommentModel.find({campaign_id:comment.campaign_id,status:"active",datecreated:{$lt:comment.datecreated}},{_id:0,status:0}).sort({datecreated:-1}).limit(10);
+			query.exec(function(err,nextcomments){
+				if(err){
+					self.emit("failedLoadMoreCampaignComment",{"error":{"code":"ED001","message":"_loadMoreCampaignComment: Error in db to get comment "+err}});
+				}else if(nextcomments.length==0){
+					self.emit("failedLoadMoreCampaignComment",{"error":{"code":"AC002","message":"No More Comment(s)"}});
+				}else{
+					///////////////////////////////////
+					_successfulLoadMoreCampaignComment(self,nextcomments);
+					//////////////////////////////////
+				}
+			})
+		}
+	})
+}
+
+var _successfulLoadMoreCampaignComment=function(self,nextcomments){
+	logger.emit("log","_successfulLoadMoreCampaignComment");
+	self.emit("successfulLoadMoreCampaignComment", {"success":{"message":"Next comments","comment":nextcomments}});
 }
 
 Comment.prototype.addCampaignComment=function(sessionuserid,prodle,campaign_id,__dirname){
@@ -681,30 +772,4 @@ var _successfulAddCampaignComment=function(self,newcomment){
 	// updateLatestProductCommentCount(newcomment.prodle);
 	logger.emit("log","successfulAddCampaignComment");
 	self.emit("successfulAddCampaignComment",{"success":{"message":"Gave comment to campaign sucessfully","campaign_comment":newcomment}});
-}
-
-Comment.prototype.getLatestCampaignComments=function(){
-	var self=this;
-    /////////////////////////////////
-	_getLatestCampaignComments(self);
-	/////////////////////////////////
-}
-
-var _getLatestCampaignComments = function(self){
-	CommentModel.find({type:"campaign",status:{$ne:"deactive"}}).sort({datecreated:-1}).limit(5).lean().exec(function(err,campaign_comment){
-		if(err){
-			self.emit("failedGetCampaignComments",{"error":{"code":"ED001","message":" function:_getLatestCampaignComments \nError in db to find campaign comments err message: "+err}});
-		}else if(!campaign_comment){
-			self.emit("failedGetCampaignComments",{"error":{"code":"AP001","message":"Campaign id is wrong"}});
-		}else{
-			//////////////////////////////////////////////////////
-			_successfulGetCampaignComments(self,campaign_comment);
-			//////////////////////////////////////////////////////
-		}
-	})
-}
-
-var _successfulGetCampaignComments=function(self,campaign_comment){
-	logger.emit("log","_successfulGetCampaignComments");
-	self.emit("successfulGetCampaignComments",{"success":{"message":"Getting campaign comments sucessfully","campaign_comment":campaign_comment}});
 }

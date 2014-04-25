@@ -49,6 +49,26 @@ exports.deleteComment = function(req, res) {
   comment.deleteComment(sessionuserid,commentid);
     
 }
+
+exports.deleteCampaignComment = function(req, res) {
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var comment=new Comment();
+  comment.removeAllListeners("failedCampaignCommentDeletion");
+  comment.on("failedCampaignCommentDeletion",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+     comment.removeAllListeners("successfulCampaignCommentDeletion");
+    comment.on("successfulCampaignCommentDeletion",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+    });
+  comment.deleteCampaignComment(sessionuserid,commentid);
+    
+}
+
 exports.loadMoreComment=function(req,res){
   var commentid=req.params.commentid;
   var sessionuserid=req.user.userid;
@@ -67,21 +87,22 @@ exports.loadMoreComment=function(req,res){
   comment.loadMoreComment(sessionuserid,commentid);
 }
 
-exports.getLatestCampaignComments = function(req, res) {
-  // var commentid=req.params.commentid;
-  // var sessionuserid=req.user.userid;
+exports.loadMoreCampaignComment=function(req,res){
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
   var comment=new Comment();
-  comment.removeAllListeners("failedGetCampaignComments");
-  comment.on("failedGetCampaignComments",function(err){
+  comment.removeAllListeners("failedLoadMoreCampaignComment");
+  comment.on("failedLoadMoreCampaignComment",function(err){
     logger.emit("error", err.error.message,req.user.userid);
     res.send(err);
   });
-  comment.removeAllListeners("successfulGetCampaignComments");
-  comment.on("successfulGetCampaignComments",function(result){
-    logger.emit("info", result.success.message);
+    comment.removeAllListeners("successfulLoadMoreCampaignComment");
+    comment.on("successfulLoadMoreCampaignComment",function(result){
+      logger.emit("info", result.success.message);
+      
       res.send(result);
     });
-  comment.getLatestCampaignComments();    
+  comment.loadMoreCampaignComment(sessionuserid,commentid);
 }
 
 exports.comment=function(io,__dirname){

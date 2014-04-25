@@ -5,6 +5,6 @@ exports.init = function (app) {
   app.delete("/api/comment/:commentid",auth,api.commentapi.deleteComment);//delete product
   app.get("/api/nextcomments/:commentid",auth,api.commentapi.loadMoreComment);
 
-  //Rest Api for Campaign Comments
-  app.get("/api/campaigncomments",auth,api.commentapi.getLatestCampaignComments);
+  app.delete("/api/campaigncomment/:commentid",auth,api.commentapi.deleteCampaignComment);//delete product
+  app.get("/api/campaign/nextcomments/:commentid",auth,api.commentapi.loadMoreCampaignComment);
 }
