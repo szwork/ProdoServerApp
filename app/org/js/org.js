@@ -1938,7 +1938,7 @@ var _successfullBroadcastMessage=function(self){
    logger.emit("log","_successfullBroadcastMessage");
 	self.emit("successfulDeleteBroadastMessage",{"success":{"message":"Organization broadcast message Deleted Successfully"}});
 }	
-Organization.prototype.getAllOrgnizationAnalytics = function(criteria) {
+Organization.prototype.getAllOrgnizationAnalytics = function() {
 	var self=this;
   
   	///////////////////////////
@@ -1946,31 +1946,31 @@ Organization.prototype.getAllOrgnizationAnalytics = function(criteria) {
 	////////////////////////	
   
 	
-};
-var _getAllOrgnizationAnalytics=function(self,criteria){
-	var query=[];
-	if(criteria=="" || criteria=="all" ||criteria==undefined){
-		query=orgModel.find({orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
-	}else if(criteria=="latest"){
-		var today = new Date();
-    var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 14);
-		query=orgModel.find({prodo_setupdate:{$lte:today},prodo_setupdate:{$gte:lastWeek}, orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
-	}else{
-		query=orgModel.find({orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});	
-	}
+}
+var _getAllOrgnizationAnalytics=function(self){
 
-	query.exec(function(err,organizations){
-		if(err){
-			self.emit("failedgetAllOrgnizationAnalytics",{error:{code:"ED001",message:"Database Issue"+err}})
-		}else if(organizations.length==0){
-      self.emit("failedgetAllOrgnizationAnalytics",{error:{message:"No Organizations"}})
-		}else{
-			///////////////////////////////////////////
-			self.emit("getOrgAnalyticsData",organizations)
-			////////////////////////////////////
-			
-		}
-	})
+	 	var today = new Date();
+
+    var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 14);
+	
+    var queryall=orgModel.find({orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
+    var querylatest=orgModel.find({prodo_setupdate:{$lte:today},prodo_setupdate:{$gte:lastWeek}, orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
+ 	  queryall.exec(function(err,organalyticsall){
+			if(err){
+				self.emit("failedgetAllOrgnizationAnalytics",{error:{code:"ED001",message:"Database Issue"+err}})
+			}else if(organalyticsall.length==0){
+	      self.emit("failedgetAllOrgnizationAnalytics",{error:{message:"No Organizations"}})
+			}else{
+				querylatest.exec(function(err,organalyticslatest){
+					if(err){
+						self.emit("failedgetAllOrgnizationAnalytics",{error:{code:"ED001",message:"Database Issue"+err}})
+					}else {
+						var organalyticssponser=[];
+			      self.emit("getOrgAnalyticsData",organalyticsall,organalyticslatest,organalyticssponser)
+					}
+				})
+			}
+	 })
 }
 var _successfullOrgAnalytics=function(self,result){
 	self.emit("successfulgetAllOrgnizationAnalytics",result)
