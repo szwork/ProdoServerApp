@@ -238,13 +238,13 @@ var _orgdataWithProductCampaign=function(organalyticsarray,callback){
       if(campaignbyorg.length==0){
 
         var organalyticsarraydata=[]
-        for(var i=0;i<organalyticsarraydata.length;i++){
+        for(var i=0;i<organalyticsarray.length;i++){
           var organalyticsdata=JSON.stringify(organalyticsarray[i]);
           organalyticsdata=JSON.parse(organalyticsdata)
           organalyticsdata.campaign=[];
           organalyticsarraydata.push(organalyticsdata);      
         }
-        callback(null,{success:{message:"Organization analytics getting successfully",organalytics:organalyticsdata}});
+        callback(null,{success:{message:"Organization analytics getting successfully",organalytics:organalyticsarraydata}});
       }else{
         var organalyticsarrayproductcampaign=[];
         var trendingbyorgids=[];
