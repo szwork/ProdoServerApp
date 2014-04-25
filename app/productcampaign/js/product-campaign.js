@@ -259,22 +259,33 @@ ProductCampaign.prototype.getAllProductCampaign = function(prodle) {
 };
 
 var _getAllProductCampaign = function(self,prodle){
-	ProductCampaignModel.find({prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,productcampain){
+
+	ProductModel.findOne({prodle:prodle,status:{$ne:"deactive"}},{name:1,_id:0}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
-		}else if(productcampain.length==0){
-			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No Product Campaign Exists"}});
+		}else if(product){
+			console.log("Product : "+JSON.stringify(product.name));
+			ProductCampaignModel.find({prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,productcampain){
+				if(err){
+					self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
+				}else if(productcampain.length==0){
+					self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No campaign exists for "+product.name}});
+				}else{
+					////////////////////////////////////////////////////
+					_successfulGetAllProductCampaign(self,productcampain,product.name);
+					////////////////////////////////////////////////////
+				}
+			})			
 		}else{
-			////////////////////////////////////////////////////
-			_successfulGetAllProductCampaign(self,productcampain);
-			////////////////////////////////////////////////////
+			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"prodle is wrong"}});
 		}
 	})
+	
 }
 
-var _successfulGetAllProductCampaign = function(self,productcampain){
+var _successfulGetAllProductCampaign = function(self,productcampain,productname){
 	logger.emit("log","_successfulGetAllProductCampaign");
-	self.emit("successfulGetAllProductCampaign",{"success":{"message":"Getting All Product Campaign Details Successfully","Product_Campaigns":productcampain}});
+	self.emit("successfulGetAllProductCampaign",{"success":{"message":"Getting All Product Campaign Details For "+productname+" Successfully","Product_Campaigns":productcampain}});
 }
 
 ProductCampaign.prototype.deleteCampaignImage = function(camimageids,campaign_id) {

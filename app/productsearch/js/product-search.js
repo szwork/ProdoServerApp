@@ -195,14 +195,13 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
     }    
 	// console.log("QQ : "+JSON.stringify(query));
 	if(productsearchdata.searchtype == "home"){
-		// self.emit("failedToSearchProduct",{"error":{"message":"Home Search in progress"}});
 		ProductModel.aggregate([{$match:query},{$group:{_id:"$orgid",prodle:{$addToSet:"$prodle"}}},{$project:{orgid:1,prodle:1,_id:1}}]).limit(50).exec(function(err,doc){
 			if(err){
 				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"+err}});
 			}else if(doc.length==0){
 				self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
 			}else{
-				_getOrgData(self,doc);				
+				_getOrgData(self,doc);
 		  		// _successfulProductSearch(self,doc);
 		  	}
 		});
