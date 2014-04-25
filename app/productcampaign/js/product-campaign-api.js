@@ -239,7 +239,7 @@ exports.publishCampaign=function(req,res){
     productcampaign.emit("failedPublishCampaign",{"error":{"code":"EA001","message":"You are not authorized to publish campaign"}}); 
   }else{
     ////////////////////////////////////////////////////////////
-    productcampaign.publishCampaign(orgid,campaign_id);
+    productcampaign.publishCampaign(orgid,orgid);
     //////////////////////////////////////////////// ///////////
   }
 }

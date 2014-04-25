@@ -236,6 +236,14 @@ var _orgdataWithProductCampaign=function(organalyticsarray,callback){
       callback({error:{code:"ED001",message:"Database Issue"+err}})
     }else{
       if(campaignbyorg.length==0){
+        var organalyticsarraydata=organalyticsarray
+        var organalyticsarray=[]
+        for(var i=0;i<organalyticsarraydata.length;i++){
+          var organalyticsdata=JSON.stringify(organalyticsarraydata[i]);
+          organalyticsdata=JSON.parse(organalyticsdata)
+          organalyticsdata.campaign=[];
+          organalyticsarray.push(organalyticsdata);      
+        }
         callback(null,{success:{message:"Organization analytics getting successfully",organalytics:organalyticsarray}});
       }else{
         var organalyticsarrayproductcampaign=[];
