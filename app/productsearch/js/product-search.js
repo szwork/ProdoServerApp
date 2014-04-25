@@ -193,9 +193,19 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
     if(searchCriteria.length!=0){
     	query.$or=searchCriteria;
     }    
-	// console.log(query);
+	// console.log("QQ : "+JSON.stringify(query));
 	if(productsearchdata.searchtype == "home"){
-		self.emit("failedToSearchProduct",{"error":{"message":"Home Search in progress"}});
+		// self.emit("failedToSearchProduct",{"error":{"message":"Home Search in progress"}});
+		ProductModel.aggregate([{$match:query},{$group:{_id:"$orgid",prodle:{$addToSet:"$prodle"}}},{$project:{orgid:1,prodle:1,_id:1}}]).limit(50).exec(function(err,doc){
+			if(err){
+				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"+err}});
+			}else if(doc.length==0){
+				self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
+			}else{
+				_getOrgData(self,doc);				
+		  		// _successfulProductSearch(self,doc);
+		  	}
+		});
 	}else{
 		ProductModel.find(query,{name:1,prodle:1,orgid:1,description:1,_id:0}).limit(50).exec(function(err,doc){
 			if(err){
@@ -208,6 +218,35 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 		});
 	}
 	
+}
+
+var _getOrgData = function(self,doc){
+	var orgid_prodle_arr = [];
+	var orgidarr = [];
+	var org_data = [];
+	for(var i=0;i<doc.length;i++){
+		orgid_prodle_arr.push({orgid:doc[i]._id,prodle:doc[i].prodle[0]});
+		orgidarr.push(doc[i]._id);
+	}
+	console.log(orgidarr);
+	console.log("orgid_prodle_arr "+ orgid_prodle_arr.length);
+		OrganizationModel.find({orgid:{$in:orgidarr}},{name:1,orgid:1,org_logo:1,description:1,_id:0}).exec(function(err,orgdata){
+			if(err){
+				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get orgid by orgname"}});
+			}else if(orgdata.length>0){
+				var organalyticsdata=JSON.stringify(orgdata);
+				organalyticsdata=JSON.parse(organalyticsdata);
+				for(var i=0;i<organalyticsdata.length;i++){
+					if(orgidarr.indexOf(organalyticsdata[i].orgid)>=0){
+						organalyticsdata[i].prodle=orgid_prodle_arr[orgidarr.indexOf(organalyticsdata[i].orgid)].prodle;
+					}
+				}
+				self.emit("getAdvanacSearchData",organalyticsdata);
+				console.log("dddd"+JSON.stringify(organalyticsdata));				
+			}else{
+				console.log("Wrong orgid");
+			}
+		});
 }
 
 var _successfulProductSearch = function(self,doc){
