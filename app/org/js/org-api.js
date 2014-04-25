@@ -974,7 +974,7 @@ exports.getAllOrgnizationAnalytics=function(req,res){
               if(err){
                 organization.emit("failedgetAllOrgnizationAnalytics",err)
               }else{
-                var result={success:{message:"Org Analytics Data Getting successfully",organalyticsall:organalyticsallresult,organalyticslatest:organalyticslatestresult,organalyticssponser:organalyticssponserresult}}
+                var result={success:{message:"Org Analytics Data Getting successfully",organalyticsall:organalyticsallresult.success.organalytics,organalyticslatest:organalyticslatestresult.success.organalytics,organalyticssponser:organalyticssponserresult.success.organalytics}}
                 organization.emit("successfulgetAllOrgnizationAnalytics",result) 
               }
             })
