@@ -192,19 +192,22 @@ var _productSearchFiltering = function(self,productsearchdata) {
 var _searchProduct = function(self,productsearchdata,searchCriteria,query){
     if(searchCriteria.length!=0){
     	query.$or=searchCriteria;
-    }
-    
-	console.log(query);
-	ProductModel.find(query,{name:1,prodle:1,orgid:1,description:1,_id:0}).limit(50).exec(function(err,doc){
-		if(err){
-			self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"+err}});
-		}else if(doc.length==0){
-			self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
-		}else{
-			self.emit("getAdvanacSearchData",doc);
-	  		// _successfulProductSearch(self,doc);
-	  	}
-	})
+    }    
+	// console.log(query);
+	if(productsearchdata.searchtype == "home"){
+		self.emit("failedToSearchProduct",{"error":{"message":"Home Search in progress"}});
+	}else{
+		ProductModel.find(query,{name:1,prodle:1,orgid:1,description:1,_id:0}).limit(50).exec(function(err,doc){
+			if(err){
+				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"+err}});
+			}else if(doc.length==0){
+				self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
+			}else{
+		  		_successfulProductSearch(self,doc);
+		  	}
+		});
+	}
+	
 }
 
 var _successfulProductSearch = function(self,doc){
@@ -277,7 +280,7 @@ var _getOrgSingleProdle = function(self,doc,i,doc1){
 }
 
 var _successfulOrgSearch = function(self,doc){
-	logger.emit("log","_successfulProductSearch");
+	logger.emit("log","_successfulOrgSearch");
 	self.emit("successfulProductSearch", {"success":{"message":"Search Result - "+doc.length+" Organisations Found","doc":doc}});
 }
 
