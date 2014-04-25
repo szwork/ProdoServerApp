@@ -948,7 +948,7 @@ exports.getAllOrgnizationAnalytics=function(req,res){
   
   // var broadcastmessagedata=req.body.broadcast;
   var organization=new Organization();
-  var criteria=req.query.criteria;
+  // var criteria=req.query.criteria;
   // logger.emit("log","orgid:"+orgid+"grpid:"+grpid+"usermemberid:"+usermemberid);
   organization.removeAllListeners("failedgetAllOrgnizationAnalytics");
   organization.on("failedgetAllOrgnizationAnalytics",function(err){
@@ -961,17 +961,30 @@ exports.getAllOrgnizationAnalytics=function(req,res){
     res.send(result);
   });
   organization.removeAllListeners("getOrgAnalyticsData");
-  organization.on("getOrgAnalyticsData",function(doc){
-    commonapi.getOrganizationAnalyticsData(doc,function(err,result){
+  organization.on("getOrgAnalyticsData",function(organalyticsall,organalyticslatest,organalyticssponser){
+    commonapi.getOrganizationAnalyticsData(organalyticsall,function(err,organalyticsallresult){
         if(err){
           organization.emit("failedgetAllOrgnizationAnalytics",err)
         }else{
-          organization.emit("successfulgetAllOrgnizationAnalytics",result);
-        }
-      }) 
+         commonapi.getOrganizationAnalyticsData(organalyticslatest,function(err,organalyticslatestresult){
+          if(err){
+            organization.emit("failedgetAllOrgnizationAnalytics",err)
+          }else{
+            commonapi.getOrganizationAnalyticsData(organalyticslatest,function(err,organalyticssponserresult){
+              if(err){
+                organization.emit("failedgetAllOrgnizationAnalytics",err)
+              }else{
+                var result={success:{message:"Org Analytics Data Getting successfully",organalyticsall:organalyticsallresult,organalyticslatest:organalyticslatestresult,organalyticssponser:organalyticssponserresult}}
+                organization.emit("successfulgetAllOrgnizationAnalytics",result) 
+              }
+            })
+          }
+        })
+      }
+    }) 
   });
   
     ///////////////////////////////////////////
-    organization.getAllOrgnizationAnalytics(criteria);
+    organization.getAllOrgnizationAnalytics();
     ////////////////////////////////   
 }
