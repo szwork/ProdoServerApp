@@ -236,15 +236,15 @@ var _orgdataWithProductCampaign=function(organalyticsarray,callback){
       callback({error:{code:"ED001",message:"Database Issue"+err}})
     }else{
       if(campaignbyorg.length==0){
-        var organalyticsarraydata=organalyticsarray
-        var organalyticsarray=[]
+
+        var organalyticsarraydata=[]
         for(var i=0;i<organalyticsarraydata.length;i++){
-          var organalyticsdata=JSON.stringify(organalyticsarraydata[i]);
+          var organalyticsdata=JSON.stringify(organalyticsarray[i]);
           organalyticsdata=JSON.parse(organalyticsdata)
           organalyticsdata.campaign=[];
-          organalyticsarray.push(organalyticsdata);      
+          organalyticsarraydata.push(organalyticsdata);      
         }
-        callback(null,{success:{message:"Organization analytics getting successfully",organalytics:organalyticsarray}});
+        callback(null,{success:{message:"Organization analytics getting successfully",organalytics:organalyticsdata}});
       }else{
         var organalyticsarrayproductcampaign=[];
         var trendingbyorgids=[];
