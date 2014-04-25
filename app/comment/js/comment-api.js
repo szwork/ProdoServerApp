@@ -130,7 +130,7 @@ exports.comment=function(io,__dirname){
       comment.on("successfulAddCampaignComment",function(result){
         logger.emit("info", result.success.message,sessionuserid);
         socket.emit("addCampaignCommentResponse",null,result);
-        if(result.success.camapign_comment.type=="campaign"){
+        if(result.success.campaign_comment.type=="campaign"){
           socket.broadcast.emit("campaigncommentResponse"+campaign_id,null,result);
         }else{
           socket.broadcast.emit("warrantycommentResponse"+campaign_id,null,result);
