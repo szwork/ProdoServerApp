@@ -201,7 +201,8 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 		}else if(doc.length==0){
 			self.emit("successfulProductSearch",{"success":{"message":"No product found for specified criteria"}});
 		}else{
-	  		_successfulProductSearch(self,doc);
+			self.emit("getAdvanacSearchData",doc);
+	  		// _successfulProductSearch(self,doc);
 	  	}
 	})
 }
@@ -271,10 +272,7 @@ var _getOrgSingleProdle = function(self,doc,i,doc1){
 		  	}
 		})
 	}else{
-		
-				self.emit("getAdvanacSearchData",doc1)
-		
-		
+		self.emit("getAdvanacSearchData",doc1);
 	}
 }
 
