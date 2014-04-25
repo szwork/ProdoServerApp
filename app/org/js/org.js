@@ -1383,7 +1383,7 @@ var _sendOrgCustomerInvitation=function(self,orgid,orgcustomerinvites,sessionuse
 	if(emailids.contains(",")){
 		toemailids=emailids.split(",");
 	}else{
-		toemailids.push(invites.s);
+		toemailids.push(emailids.s);
 	}
 	orgModel.findOne({orgid:orgid},function(err,organization){
 		if(err){
@@ -1468,7 +1468,7 @@ var _sendOtherOrganizationInvitation=function(self,orgid,otherorginvites,session
 	if(emailids.contains(",")){
 		toemailids=emailids.split(",");
 	}else{
-		toemailids.push(invites.s);
+		toemailids.push(emailids.s);
 	}
 	orgModel.findOne({orgid:orgid},function(err,organization){
 		if(err){

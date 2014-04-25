@@ -10,4 +10,5 @@ exports.init = function (app) {
   	app.get("/api/productcampaign/:prodle/:campaign_id",auth,api.productcampaignapi.getProductCampaign);//get single product campain data
   	app.delete("/api/productcampaign/:campaign_id",auth,api.productcampaignapi.removeProductCampaign);//delete product campaign
   	app.delete("/api/productcampaign/image/:orgid/:campaign_id",auth,api.productcampaignapi.deleteCampaignImage);//delet campaign images
+  	app.post('/api/campaignpublish/:orgid/:campaign_id',auth,api.productcampaignapi.publishCampaign)
 }

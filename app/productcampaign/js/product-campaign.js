@@ -350,4 +350,43 @@ var _successfulDeleteCampaignImage=function(self){
 	logger.emit("log","_successfulDeleteCampaignImage");
 	self.emit("successfulDeleteCampaignImage",{"success":{"message":"Delete Campaign Images Successfully"}});
 }
-
+ProductCampaign.prototype.publishCampaign = function(orgid,campaign_id) {
+	var self=this;
+	
+		///////////////////////////////////////////////////////////////////
+	_publishCampaign(self,orgid,campaign_id);
+	/////////////////////////////////////////////////////////////////	
+};
+var _publishCampaign=function(self,orgid,campaign_id){
+	ProductCampaignModel.findOne({orgid:orgid,campaign_id:campaign_id},{orgid:1,campaign_id:1,status:1},function(err,campaign){
+		if(err){
+			self.emit("failedDeleteCampaignImage",{"error":{code:"ED001",message:"Database issue"}});
+		}else if(!campaign){
+			self.emit("failedDeleteCampaignImage",{"error":{message:"campaign not exists"}});			
+		}else{
+				if(campaign.status=="active" || campaign=="deactive"){
+					self.emit("failedDeleteCampaignImage",{"error":{message:"Campaign is already published or expired"}});			
+				}else{
+					/////////////////////////////////
+					_setActiveCampaing(self,campaign)
+					/////////////////////////////
+				}
+		}
+	})
+}
+var _setActiveCampaing=function(self,campaign){
+	ProductCampaignModel.update({campaign_id:campaign.campaign_id},{$set:{status:"active"}},function(err,campaignactivestatus){
+		if(err){
+			self.emit("failedDeleteCampaignImage",{"error":{code:"ED001",message:"Database issue"}});
+		}else if(campaignactivestatus==0){
+			self.emit("failedDeleteCampaignImage",{"error":{code:"ED001",message:"campain_id is wrong"}});
+		}else{
+			/////////////////////////////////
+			_successfullPublishCampaign(self)
+			////////////////////////////////
+		}
+	})
+}
+var _successfullPublishCampaign=function(self){
+	self.emit("successfulpublishCampaign",{"success":{"message":"Campaign Published successfully"}});
+}

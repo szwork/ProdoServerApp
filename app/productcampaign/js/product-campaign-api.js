@@ -215,15 +215,15 @@ exports.publishCampaign=function(req,res){
   var productcampaign= new ProductCampaign();
      // product.setMaxListeners(0); 
   productcampaign.removeAllListeners("failedPublishCampaign");
-  productcampaign.on("failedDeleteCampaignImage",function(err){
+  productcampaign.on("failedPublishCampaign",function(err){
     // logger.emit("log","error:"+err.error.message+":"+sessionuserid);
     logger.emit("error", err.error.message,sessionuserid);
     // product.removeAllListeners();
     res.send(err);
      // eventEmitter.removeListener(this);
   });
-  productcampaign.removeAllListeners("successfulDeleteCampaignImage");
-  productcampaign.on("successfulDeleteCampaignImage",function(result){
+  productcampaign.removeAllListeners("successfulpublishCampaign");
+  productcampaign.on("successfulpublishCampaign",function(result){
     //logger.emit("log","Getting Product details successfully");
     // logger.emit("info", result.success.message,sessionuserid);
     // product.removeAllListeners();
@@ -233,13 +233,13 @@ exports.publishCampaign=function(req,res){
   });
    if(req.user.org.orgid!=orgid){
     logger.emit("error","given orgid does not match with session orgid");
-    productcampaign.emit("failedDeleteCampaignImage",{"error":{"code":"EA001","message":"You are not authorized to delete campaign image"}}); 
+    productcampaign.emit("failedPublishCampaign",{"error":{"code":"EA001","message":"You are not authorized to publish campaign "}}); 
    }else if(req.user.org.isAdmin==false){
-    logger.emit("log","You are not an admin to delete product image");
-    productcampaign.emit("failedDeleteCampaignImage",{"error":{"code":"EA001","message":"You are not authorized to delete campaign image"}}); 
+    logger.emit("log","You are not an admin to publish campaign");
+    productcampaign.emit("failedPublishCampaign",{"error":{"code":"EA001","message":"You are not authorized to publish campaign"}}); 
   }else{
     ////////////////////////////////////////////////////////////
-    productcampaign.deleteCampaignImage(camimageids,campaign_id);
+    productcampaign.publishCampaign(orgid,campaign_id);
     //////////////////////////////////////////////// ///////////
   }
 }
