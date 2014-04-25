@@ -43,6 +43,32 @@ var updateLatestProductComment=function(prodle){
 		}
 	})
 }
+
+var updateLatestCampaignComment=function(campaign_id){
+	console.log("updateLatestCampaignComment");
+	CommentModel.find({type:"campaign",status:"active",campaign_id:campaign_id},{campaign_id:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
+		if(err){
+			logger.emit("log","Error in updation latest 5 campaign comment");
+		}else {
+			var comment_array;
+			if(comment.length==0){
+				comment_array=[];
+			}else{
+				comment_array=comment;
+			}
+			ProductCampaignModel.update({campaign_id:campaign_id},{$set:{campaign_comments:comment_array}},function(err,latestupatestatus){
+				if(err){
+					logger.emit("error","Error in updation latest 5 campaign comment");
+				}else if(latestupatestatus==1){
+					logger.emit("log","Latest 5 campaign comments updated");
+				}else{
+					logger.emit("error","Given campaign id is wrong to update latest 5 comments");
+				}
+			})
+		}
+	})
+}
+
 var updateLatestProductCommentCount=function(prodle){
 	var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 	TrendingModel.findOne({prodle:prodle},function(err,trenddata){
@@ -79,6 +105,7 @@ var updateLatestProductCommentCount=function(prodle){
 		}
 	})	
 }
+
 var Comment = function(commentdata) {
 	this.comment = commentdata;
 };
@@ -635,13 +662,13 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 		if(err){
 			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":"Error in db to save new campaign comment"}});
 		}else{      
-	      	// if(campaign_commentdata.type=="campaign"){
-	      	// 	updateLatestProductComment(campaign_commentdata.prodle);
-	      	// }else{
-	      	// 	//updateLatestWarrantyComment(campaign_commentdata.prodle);
-	      	// }
-	  		// campaign_commentdata.status=undefined;
-	    	// 	campaign_commentdata.prodle=undefined;
+	      	if(campaign_commentdata.type=="campaign"){
+	      		updateLatestCampaignComment(campaign_commentdata.campaign_id);
+	      	}else{
+	      		//updateLatestWarrantyComment(campaign_commentdata.prodle);
+	      	}
+	  		//campaign_commentdata.status=undefined;
+	   		//campaign_commentdata.prodle=undefined;
 			// ///////////////////////////////////		
 			_successfulAddCampaignComment(self,campaign_commentdata);
 			// _validateFeatureAnalytics(prodle,commentdata,product);		
@@ -658,9 +685,9 @@ var _successfulAddCampaignComment=function(self,newcomment){
 
 Comment.prototype.getLatestCampaignComments=function(){
 	var self=this;
-    //////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////
 	_getLatestCampaignComments(self);
-	//////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////
 }
 
 var _getLatestCampaignComments = function(self){
