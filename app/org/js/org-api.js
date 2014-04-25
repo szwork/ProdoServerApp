@@ -948,7 +948,7 @@ exports.getAllOrgnizationAnalytics=function(req,res){
   
   // var broadcastmessagedata=req.body.broadcast;
   var organization=new Organization();
-  
+  var criteria=req.query.criteria;
   // logger.emit("log","orgid:"+orgid+"grpid:"+grpid+"usermemberid:"+usermemberid);
   organization.removeAllListeners("failedgetAllOrgnizationAnalytics");
   organization.on("failedgetAllOrgnizationAnalytics",function(err){
@@ -971,7 +971,7 @@ exports.getAllOrgnizationAnalytics=function(req,res){
       }) 
   });
   
-    //////////////////////////////////
-    organization.getAllOrgnizationAnalytics();
+    ///////////////////////////////////////////
+    organization.getAllOrgnizationAnalytics(criteria);
     ////////////////////////////////   
 }
