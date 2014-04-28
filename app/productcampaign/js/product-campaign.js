@@ -360,12 +360,12 @@ ProductCampaign.prototype.publishCampaign = function(orgid,campaign_id) {
 var _publishCampaign=function(self,orgid,campaign_id){
 	ProductCampaignModel.findOne({orgid:orgid,campaign_id:campaign_id},{orgid:1,campaign_id:1,status:1},function(err,campaign){
 		if(err){
-			self.emit("failedDeleteCampaignImage",{"error":{code:"ED001",message:"Database issue"}});
+			self.emit("failedPublishCampaign",{"error":{code:"ED001",message:"Database issue"}});
 		}else if(!campaign){
-			self.emit("failedDeleteCampaignImage",{"error":{message:"campaign not exists"}});			
+			self.emit("failedPublishCampaign",{"error":{message:"campaign not exists"}});			
 		}else{
 				if(campaign.status=="active" || campaign=="deactive"){
-					self.emit("failedDeleteCampaignImage",{"error":{message:"Campaign is already published or expired"}});			
+					self.emit("failedPublishCampaign",{"error":{message:"Campaign is already published or expired"}});			
 				}else{
 					/////////////////////////////////
 					_setActiveCampaing(self,campaign)
@@ -377,9 +377,9 @@ var _publishCampaign=function(self,orgid,campaign_id){
 var _setActiveCampaing=function(self,campaign){
 	ProductCampaignModel.update({campaign_id:campaign.campaign_id},{$set:{status:"active"}},function(err,campaignactivestatus){
 		if(err){
-			self.emit("failedDeleteCampaignImage",{"error":{code:"ED001",message:"Database issue"}});
+			self.emit("failedPublishCampaign",{"error":{code:"ED001",message:"Database issue"}});
 		}else if(campaignactivestatus==0){
-			self.emit("failedDeleteCampaignImage",{"error":{code:"ED001",message:"campain_id is wrong"}});
+			self.emit("failedPublishCampaign",{"error":{code:"ED001",message:"campain_id is wrong"}});
 		}else{
 			/////////////////////////////////
 			_successfullPublishCampaign(self)
