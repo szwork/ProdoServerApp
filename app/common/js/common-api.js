@@ -784,7 +784,12 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
                 }else if(action.product!=undefined){
                   socket.emit("productUploadResponse",{"error":{"message":"Please pass file details or action details"}});
                 }else if(action.campaign!=undefined){
-                  socket.emit("campaignUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+                  if(action.campaign.campaignbanner==undefined){
+                    socket.emit("campaignUploadResponse",{"error":{"message":"Please pass file details or action details"}});
+                  }else{
+                    socket.emit("campaignBannerUploadResponse",{"error":{"message":"Please pass file details or action details"}});;
+                  }
+                  // socket.emit("campaignUploadResponse",{"error":{"message":"Please pass file details or action details"}});
                 }else if(action.warranty!=undefined){
                   socket.emit("warrantyUploadResponse",{"error":{"message":"Please pass file details or action details"}});
                 }else if(action.orgkeyclient!=undefined){
@@ -805,7 +810,12 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
                     }else if(action.product!=undefined){
                       socket.emit("productUploadResponse",err);
                     }else if(action.campaign!=undefined){
-                      socket.emit("campaignUploadResponse",err);
+                      if(action.campaign.campaignbanner==undefined){
+                        socket.emit("campaignUploadResponse",err);
+                      }else{
+                        socket.emit("campaignBannerUploadResponse",err);
+                      }
+                      
                     }else if(action.warranty!=undefined){
                       socket.emit("warrantyUploadResponse",err);
                     }else if(action.productlogo!=undefined){
@@ -823,7 +833,11 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
                     }else if(action.product!=undefined){
                       socket.emit("productUploadResponse",null,uploadresult);
                     }else if(action.campaign!=undefined){
-                      socket.emit("campaignUploadResponse",null,uploadresult);
+                      if(action.campaign.campaignbanner==undefined){
+                        socket.emit("campaignUploadResponse",null,uploadresult);
+                      }else{
+                        socket.emit("campaignBannerUploadResponse",null,uploadresult);
+                      }
                     }else if(action.warranty!=undefined){
                       socket.emit("warrantyUploadResponse",null,uploadresult);
                     }else if(action.productlogo!=undefined){
@@ -1388,7 +1402,7 @@ var __campaignImgBuffer=function(action,file,dirname,action,sessionuser,callback
                       }else{
                         var currentdate=new Date();
                         var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
-                        bucketFolder=amazonbucket+"/user/"+action.campaign.userid+"/campaign";
+                        bucketFolder=amazonbucket+"/org/"+action.campaign.orgid+"/campaign/"+action.campaign.prodle;
                         params = {
                              Bucket: bucketFolder,
                              Key: action.campaign.userid+s3filekey,
@@ -1397,17 +1411,32 @@ var __campaignImgBuffer=function(action,file,dirname,action,sessionuser,callback
                              Expires:expirydate,
                              ContentType: file_type
                         };
-                        campaignImgUpload(action.campaign.campaign_id,params,file_name,function(err,result){
-                          if(err){
-                            callback(err);
-                          }else{
-                            callback(null,result);
-                          }
-                          fs.close(fd, function() {
-                            exec("rm -rf '"+fileName+"'");
-                              console.log('File saved successful!');
-                          });
-                        })
+                        if(action.campaign.campaignbanner!=undefined){
+                           campaignBannerImageChange(action.campaign.campaign_id,params,file_name,function(err,result){
+                            if(err){
+                              callback(err);
+                            }else{
+                              callback(null,result);
+                            }
+                            fs.close(fd, function() {
+                              exec("rm -rf '"+fileName+"'");
+                                console.log('File saved successful!');
+                            });
+                        }) 
+                        }else{
+                           campaignImgUpload(action.campaign.campaign_id,params,file_name,function(err,result){
+                            if(err){
+                              callback(err);
+                            }else{
+                              callback(null,result);
+                            }
+                            fs.close(fd, function() {
+                              exec("rm -rf '"+fileName+"'");
+                                console.log('File saved successful!');
+                            });
+                        }) 
+                      }
+                       
                       }
               }
             })
@@ -1768,6 +1797,46 @@ var campaignImgUpload=function(campaign_id,awsparams,filename,callback){
               callback(null,{"success":{"message":"Campaign image uploaded successfully","image":url,"filename":filename}})
             }else{
               callback({"error":{"code":"AP001","message":"Wrong campaign_id "+campaign_id}});
+            }
+          })
+        }
+      });
+    }
+  })  
+}
+var campaignBannerImageChange=function(campaign_id,awsparams,filename,callback){
+  s3bucket.putObject(awsparams, function(err, data) {
+    if (err) {
+      callback({"error":{"message":"s3bucket.putObject:-campaignBannerImageChange"+err}})
+    } else {
+      logger.emit("log","fileupload saved");
+      var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+      s3bucket.getSignedUrl('getObject',params1, function (err, url) {
+        if(err){
+          callback({"error":{"message":"campaignBannerImageChange:Error in getting getSignedUrl "+err}});
+        }else{
+         var banner_image_object={bucket:params1.Bucket,key:params1.Key,image:url};
+          CampaignModel.findAndModify({campaign_id:campaign_id},[],{$set:{banner_image:banner_image_object}},{new:false},function(err,campaignimagedata){
+            if(err){
+              callback({"error":{"code":"EDOO1","message":"Campaign Image:Dberror"+err}});
+            }else if(campaignimagedata){
+              var banner_image=campaignimagedata.banner_image;
+              if(banner_image==undefined){
+                logger.emit("log","first time banner_image changes");
+              }else{
+                var awsdeleteparams={Bucket:campaignimagedata.bucket,Key:campaignimagedata.key};
+                s3bucket.deleteObject(awsdeleteparams, function(err, deleteorglogostatus) {
+                  if (err) {
+                    logger.emit("error","Campaign Banner Image not  deleted from amzon s3 bucket for campaign_id"+campaignimagedata.campaign_id);
+                  }else if(deleteorglogostatus){
+                    logger.emit("log","Campaign Banner Image deleted from Amazon S3");
+                  }
+                }) 
+              }
+              
+              callback(null,{"success":{"message":"Banner Image Changed  Successfully","image":url,"filename":filename}})
+            }else{
+              callback({"error":{"code":"AO002","message":"Wrong campaign_id"+campaign_id}});
             }
           })
         }
