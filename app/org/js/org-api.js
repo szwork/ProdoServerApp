@@ -660,8 +660,8 @@ exports.otherOrgInvites=function(req,res){
   });
   organization.removeAllListeners("sendotherorginvite");
   organization.on("sendotherorginvite",function(subject,body,toemailids,user,org){
-    body+="<br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
-    body+="<br>Disclaimer: The content of this email was Provided by "+user.email+".We are not responsible for content of email";
+    body+="<br><br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
+    body+="<br>Disclaimer: We are not responsible for the content of this email as it is produced by "+user.email;
     
     var message = {
         from: "Prodonus  <business@prodonus.com>", // sender address
@@ -708,8 +708,8 @@ exports.OrgCustomerInvites=function(req,res){
   });
   organization.removeAllListeners("sendinviteorgcustomer");
   organization.on("sendinviteorgcustomer",function(subject,body,toemailids,user,org){
-    body+="<br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
-    body+="<br>Disclaimer: The content of this email was Provided by "+user.email+".We are not responsible for content of email";
+    body+="<br><br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
+    body+="<br>Disclaimer: We are not responsible for the content of this email as it is produced by "+user.email;
     
     var message = {
         from: "Prodonus  <business@prodonus.com>", // sender address
