@@ -41,10 +41,6 @@ var _validateProductSearchData = function(self,productsearchdata) {
 		self.emit("failedToSearchProduct",{"error":{"message":"Please pass search type"}});
 	}else if(["home","wall"].indexOf(productsearchdata.searchtype.toLowerCase())<0){
 		self.emit("failedToSearchProduct",{"error":{"message":"Please pass search type as home or wall"}});
-	// }else if(!productsearchdata.Product_Name.match(letters)){
-	// 	self.emit("failedToSearchProduct",{"error":{"message":"Please pass product name in alphabet characters only"}});
-	// }else if(!productsearchdata.Model_Number.match(letters)){
-	// 	self.emit("failedToSearchProduct",{"error":{"message":"Please pass model number in alphabet characters only"}});
 	}else{
 		_productSearchFiltering(self,productsearchdata);
 	}
@@ -52,7 +48,7 @@ var _validateProductSearchData = function(self,productsearchdata) {
 
 var _productSearchFiltering = function(self,productsearchdata) {
 	console.log("_validateProductSearchData");
-	var letters = /^[A-Za-z0-9]+$/;
+	var letters = /^[A-Za-z0-9 ]+$/;
 	var searchCriteria = [];
 	var query={status:{$in:["active","init"]}};
 

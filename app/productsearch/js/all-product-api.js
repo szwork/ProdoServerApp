@@ -10,6 +10,7 @@ var commonapi = require('../../common/js/common-api');
 // var S=require("string");
 exports.allProduct = function(req,res){
 	var self=this;
+	var letters = /^[A-Za-z0-9 *]+$/;
 	var product_data = req.body;
 	// console.log("######## product_data " + JSON.stringify(product_data));
 	var product_name=product_data.name;
@@ -19,34 +20,23 @@ exports.allProduct = function(req,res){
 	
 	if(product_name==undefined || product_name==""){
 		res.send({"error":{"code":"AD001","message":"Please pass product name"}});
+	}if(!product_name.match(letters)){
+		res.send({"error":{"code":"AD001","message":"Please pass product name in alphabet or numbers only"}});
 	}else if(orgid==undefined || orgid==""){
 		res.send({"error":{"code":"AD001","message":"Please pass orgid"}});
 	}else{
+		if(product_name == "*"){
+			query.orgid=orgid;
+		}else{			
+			product_name_or_arr.push(new RegExp('^'+product_name.substr(0,product_name.length), "i"));
+			query.name={$in:product_name_or_arr};
+			query.orgid=orgid;
+			console.log("product_name_or_arr "+ product_name_or_arr);
+		}		
+
+		/***********SEARCH FROM PRODUCTS MODEL**********/
 		var prod_name_arr = [];
 		var doc_arr = [];
-		product_name_or_arr.push(new RegExp('^'+product_name.substr(0,product_name.length), "i"));
-		// product_name_or_arr.push(new RegExp('^'+product_name.substr(0,1), "i"));
-		query.name={$in:product_name_or_arr};
-		query.orgid=orgid;
-		console.log("product_name_or_arr "+ product_name_or_arr);
-
-		/**********SEARCH FROM ORGANISATION MODEL********/
-		console.log("Q " + JSON.stringify(query));
-		// OrganizationModel.find(query,{name:1,orgid:1,_id:0}).limit(5).exec(function(err,doc){
-		// 	if(err){
-		// 		// res.send({"error":{"code":"ED001","message":"Error in db to search organisation"}});
-		// 	}else if(doc.length==0){
-		// 		// var s = {"success":{"message":"No organisation exists","doc":doc},"name":{"message":"No product name exist","doc":""}};
-		// 		// res.send(s);
-		// 	}else{
-		// 		for(var i=0;i<doc.length;i++){
-		// 			doc_arr.push(doc[i]);
-		// 			prod_name_arr.push("O-"+doc[i].name);
-		// 			// console.log("doc_arr " +doc_arr);
-		// 		}
-		// 	}
-		// });
-		/***********SEARCH FROM PRODUCTS MODEL**********/
 		ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
 			if(err){
 				res.send({"error":{"code":"ED001","message":"Error in db to search product"}});

@@ -100,10 +100,11 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 	}else if(endDate == "Invalid Date"){
 		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Invalid end date"}});
 	}else{
-		campaigndata.prodle=prodle;
-		campaigndata.orgid=orgid;
+		campaigndata.prodle = prodle;
+		campaigndata.orgid = orgid;
 		campaigndata.startdate = startDate;
 		campaigndata.enddate = endDate;
+		campaigndata.createdate = Date.now();
 		var productcampaign = new ProductCampaignModel(campaigndata);
 		productcampaign.save(function(err,product_campaign_data){
 		 	if(err){
