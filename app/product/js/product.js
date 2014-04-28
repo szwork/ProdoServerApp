@@ -14,6 +14,7 @@
 var util = require("util");
 var events = require("events");
 var logger = require("../../common/js/logger");
+var orgModel=require("../../org/js/org-model");
 var productModel = require("./product-model");
 var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 var commonapi = require('../../common/js/common-api');
@@ -96,7 +97,7 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	var _addProduct=function(self,productdata,orgid){
 		productdata.orgid=orgid;
 		productdata.status="active";
-// <<<<<<< HEAD
+
 // 		productdata.prodle=shortId.generate();  
 // 		productdata.features=[{featurename:productdata.name.toLowerCase(),featuredescription:" default product features"}];
 //     var product=new productModel(productdata);
@@ -118,7 +119,7 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 //     		})
 //     	}
 //     })
-// =======
+
 		// productdata.prodle=shortId.generate();  
 		productdata.features=[{featurename:productdata.name.toLowerCase(),featuredescription:"product features"}];
     	var product=new productModel(productdata);
@@ -135,16 +136,37 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	    		// 	}else{
 			    		///////////////////////
 				  		_successfulProductAdd(self,product);
+				  		_addProductInTrending(self,product);
 				  		//////////////////////////
 	    		// 	}
 	    		// })
 	    	}
 	    })
-// >>>>>>> 8817cd2e942e67ec5f250b55d92e686be37160bb
 	}
+
+	var _addProductInTrending = function(self,product){
+		orgModel.findOne({orgid:product.orgid},function(err,organization){
+			if(err){
+			  	logger.emit("error","Error in db to find user");	
+			}else if(organization){
+				var trend={prodle:product.prodle,commentcount:0,followedcount:0,name:product.name,orgid:product.orgid,org_category:organization.industry_category};
+				var trend_data = new TrendingModel(trend);
+				trend_data.save(function(err,analyticsdata){
+				   	if(err){
+				   	 	logger.emit("error","Error in db to save trending data" + err);
+				   	}else{
+				       	logger.emit("log","Trending for new product added sucessfully" + analyticsdata);
+				  	}
+				})
+			}else{
+				logger.emit("error","Wrong orgid");	
+			}
+		})	
+	}
+
 	var _successfulProductAdd=function(self,product){
 		logger.log("log","_successfulProductAdd");
-		self.emit("successfulProductAdd",{"success":{"message":"Product added sucessfully","prodle":product.prodle}})
+		self.emit("successfulProductAdd",{"success":{"message":"Product added sucessfully","prodle":product.prodle}});
 	}
 // Product.prototype.commentToProduct=function(sessionuserid,prodle,commentdata){
 // 	var self=this;
@@ -464,7 +486,7 @@ var _validateUpdateProductData=function(self,orgid,prodle){
 	}else if(productdata.product_comments!=undefined){
 		self.emit("failedUpdateProduct",{"error":{"code":"EA001","message":"Can't  update product comments"}});
 	}else{
-		_updateProduct(self,orgid,prodle,productdata)
+		_updateProduct(self,orgid,prodle,productdata);
 	}
 
 }
@@ -477,10 +499,29 @@ var _updateProduct=function(self,orgid,prodle,productdata){
 		}else{
 			////////////////////////////////
 			_successfulUpdateProduct(self);
+			_updateTrendingForProduct(self,orgid,prodle,productdata);
 			//////////////////////////////////
 		}
 	})
 };
+
+var _updateTrendingForProduct = function(self,orgid,prodle,productdata){
+	orgModel.findOne({orgid:orgid},function(err,organization){
+		if(err){
+		  	logger.emit("error","Error in db to find user");	
+		}else if(organization){
+			TrendingModel.update({prodle:prodle,orgid:orgid},{$set:{org_category:organization.industry_category}}).lean().exec(function(err,status){
+				if(err){
+					logger.emit("error","Error in db to update trending");
+			  	}else{
+					logger.emit("log","Product trending updated successfully");
+				}
+			})
+		}else{
+			logger.emit("error","Wrong orgid");
+		}
+	})
+}
 
 var _successfulUpdateProduct=function(self){
 	logger.emit("log","_successfulUpdateProduct");
@@ -698,6 +739,44 @@ var _getProductTrending=function(self){
 var _successfulGetProductTrends=function(self,trenddata){
 	logger.emit("log","_successfulGetProductTrends");
 	self.emit("successfulGetProductTrends", {"success":{"message":"Product Trends Getting Suceessfully","ProductTrends":trenddata}});
+}
+
+Product.prototype.getCategorySpecificTrending = function(orgid) {
+	var self=this;
+	_getOrgCategories(self,orgid);
+};
+
+var _getOrgCategories = function(self,orgid){
+	orgModel.findOne({orgid:orgid},function(err,organization){
+		if(err){
+		  	self.emit("failedGetCategorySpecificTrending",{"error":{"code":"ED001","message":"Error in db to get org_category"}});
+		}else if(!organization){
+			self.emit("failedGetCategorySpecificTrending",{"error":{"message":"orgid is wrong"}});
+		}else{
+			console.log("organization : "+organization.industry_category);
+			_getCategorySpecificTrending(self,organization.industry_category)
+		}		
+	})
+}
+
+var _getCategorySpecificTrending=function(self,category){
+	console.log("_getCategorySpecificTrending");
+	TrendingModel.find({status:{$ne:"deactive"},org_category:{$in:category}}).limit(5).exec(function(err,trenddata){
+		if(err){
+			self.emit("failedGetCategorySpecificTrending",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
+		}else if(!trenddata){
+			self.emit("failedGetCategorySpecificTrending",{"error":{"message":"Trend data not exist"}});
+		}else{
+			///////////////////////////////////////////
+			_successfulGetCategorySpecificTrending(self,trenddata);
+			///////////////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetCategorySpecificTrending=function(self,trenddata){
+	logger.emit("log","_successfulGetCategorySpecificTrending");
+	self.emit("successfulGetCategorySpecificTrending", {"success":{"message":"Product Trends Getting Suceessfully","ProductTrends":trenddata}});
 }
 
 Product.prototype.getAllCategoryTags = function() {

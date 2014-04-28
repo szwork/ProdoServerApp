@@ -20,7 +20,8 @@ var featureTrendingSchema = mongoose.Schema({
   	prodle:{type:String},
   	commentcount:{type:Number,default:0},
   	followedcount:{type:Number,default:0},
-  	status:{type:String,default:"active"}//deactive
+  	org_category:[{type:String}],
+  	status:{type:String,default:"active"}//active,deactive
 });
 //Seed a feature trending
  featureTrendingSchema.set('redisCache', true);
