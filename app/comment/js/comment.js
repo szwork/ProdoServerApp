@@ -586,6 +586,7 @@ Comment.prototype.addCampaignComment=function(sessionuserid,prodle,campaign_id,_
 
 var _validateCampaignCommentData=function(self,sessionuserid,prodle,campaign_id,__dirname) {
 	var commentdata=self.comment;
+	console.log("commentdata ########## : "+JSON.stringify(commentdata));
 	if(commentdata==undefined){
 	   self.emit("failedAddCampaignComment",{"error":{"code":"AV001","message":"Please provide commentdata"}});	
 	}else if(commentdata.user==undefined){
