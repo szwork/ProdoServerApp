@@ -136,9 +136,25 @@ var _validateUpdateProductCampaignData = function(self,campaigndata,orgid,campai
 	if(campaigndata==undefined){
 	 	self.emit("failedUpdateProductCampaign",{"error":{"code":"AV001","message":"Please provide data to update product campain"}});
 	}else{
-	  	_updateProductCampaignData(self,campaigndata,orgid,campaign_id);	   	
+		_isValidProdleToUpdateCampaign(self,campaigndata,orgid,campaign_id);
+	  	// _updateProductCampaignData(self,campaigndata,orgid,campaign_id);
 	}
 };
+
+var _isValidProdleToUpdateCampaign = function(self,campaigndata,orgid,campaign_id){
+	console.log("campaigndata.productname : "+campaigndata.productname);
+	ProductModel.findOne({orgid:orgid,name:campaigndata.productname,status:{$ne:"deactive"}}).lean().exec(function(err,product){
+		if(err){
+			self.emit("failedUpdateProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product  _isValidProdleToUpdateCampaign: " +err}});
+		}else if(product){
+			//////////////////////////////////////////////////
+			_updateProductCampaignData(self,campaigndata,orgid,campaign_id);
+			//////////////////////////////////////////////////
+		}else{			
+			self.emit("failedUpdateProductCampaign",{"error":{"code":"AP001","message":"You can not edit campaign for the product which does not exist in the organization"}});
+		}
+	})
+}
 
 var _updateProductCampaignData = function(self,campaigndata,orgid,campaign_id){
 	ProductCampaignModel.update({orgid:orgid,campaign_id:campaign_id},{$set:campaigndata}).lean().exec(function(err,productupdatestatus){
