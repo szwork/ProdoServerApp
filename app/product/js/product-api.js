@@ -318,9 +318,9 @@ exports.updateProduct = function(req, res) {
     ///////////////////////////////////
     product.updateProduct(orgid,prodle);
     ////////////////////////////////// 
-  }
-    
+  }    
 }
+
 exports.addProductFeatures=function(req,res){
   var productfeaturedata=req.body.productfeature;
   var orgid=req.params.orgid;
@@ -353,6 +353,7 @@ exports.addProductFeatures=function(req,res){
     ////////////////////////////////// 
   }
 }
+
 exports.updateProductFeature=function(req,res){
   var productfeaturedata=req.body.productfeature;
   var productfeatureid=req.params.productfeatureid;
@@ -469,6 +470,33 @@ exports.getProductTrending=function(req,res){
     product.getProductTrending();
     //////////////////////////////////  
 }
+
+exports.getCategorySpecificTrending=function(req,res){
+  console.log("=================================");
+  console.log("CategorySpecific ProductTrending");
+  console.log("=================================");
+  var orgid=req.user.org.orgid;
+  console.log("Orgid " + orgid);
+  
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedGetCategorySpecificTrending");
+    product.on("failedGetCategorySpecificTrending",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("successfulGetCategorySpecificTrending");
+  product.on("successfulGetCategorySpecificTrending",function(result){
+    // logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    ///////////////////////////////////
+    product.getCategorySpecificTrending(orgid);
+    //////////////////////////////////  
+}
+
 exports.getAllCategoryTags=function(req,res){
   var product = new Product();
   var sessionuserid=req.user.userid;

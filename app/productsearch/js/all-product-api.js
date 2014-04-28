@@ -12,7 +12,7 @@ exports.allProduct = function(req,res){
 	var self=this;
 	var letters = /^[A-Za-z0-9 *]+$/;
 	var product_data = req.body;
-	// console.log("######## product_data " + JSON.stringify(product_data));
+	console.log("######## product_data " + JSON.stringify(product_data));
 	var product_name=product_data.name;
 	var orgid = product_data.orgid;
 	var product_name_or_arr=[];
@@ -32,7 +32,7 @@ exports.allProduct = function(req,res){
 			query.name={$in:product_name_or_arr};
 			query.orgid=orgid;
 			console.log("product_name_or_arr "+ product_name_or_arr);
-		}		
+		}
 
 		/***********SEARCH FROM PRODUCTS MODEL**********/
 		var prod_name_arr = [];
@@ -59,7 +59,7 @@ exports.allProduct = function(req,res){
 	
 	var _successfulGetAllProduct = function(self,doc,prod_name_arr){
 		logger.emit("log","_successfulGetAllProduct");
-		var s = {"success":{"message":"Getting Product details Successfully","doc":doc},"name":{"message":"Product Name","doc":prod_name_arr}};
+		var s = {"success":{"message":"Getting Product Details Successfully","doc":doc},"name":{"message":"Product Name","doc":prod_name_arr}};
 		res.send(s);
 	}
 	

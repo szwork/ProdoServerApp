@@ -19,6 +19,7 @@ exports.init = function (app) {
  app.delete("/api/productfeature/:orgid/:prodle/:productfeatureid",auth,api.productapi.deleteProductFeature);
  app.get("/api/productfeature/:orgid/:prodle",auth,api.productapi.getProductFeature);
  app.get("/api/trendingproducts",auth,api.productapi.getProductTrending);
+ app.get("/api/domaintrending",auth,api.productapi.getCategorySpecificTrending);//domain specifi trending
  app.get("/api/categorytags",auth,api.productapi.getAllCategoryTags);
  app.get('/api/latestproduct',api.productapi.getLatestAddedProduct);
 }
