@@ -36,10 +36,15 @@ ProductSearch.prototype.searchProduct = function(productsearchdata){
 }
 
 var _validateProductSearchData = function(self,productsearchdata) {
+	
 	if(productsearchdata.searchtype == undefined || productsearchdata.searchtype == ""){
 		self.emit("failedToSearchProduct",{"error":{"message":"Please pass search type"}});
 	}else if(["home","wall"].indexOf(productsearchdata.searchtype.toLowerCase())<0){
 		self.emit("failedToSearchProduct",{"error":{"message":"Please pass search type as home or wall"}});
+	// }else if(!productsearchdata.Product_Name.match(letters)){
+	// 	self.emit("failedToSearchProduct",{"error":{"message":"Please pass product name in alphabet characters only"}});
+	// }else if(!productsearchdata.Model_Number.match(letters)){
+	// 	self.emit("failedToSearchProduct",{"error":{"message":"Please pass model number in alphabet characters only"}});
 	}else{
 		_productSearchFiltering(self,productsearchdata);
 	}
@@ -47,12 +52,13 @@ var _validateProductSearchData = function(self,productsearchdata) {
 
 var _productSearchFiltering = function(self,productsearchdata) {
 	console.log("_validateProductSearchData");
+	var letters = /^[A-Za-z0-9]+$/;
 	var searchCriteria = [];
 	var query={status:{$in:["active","init"]}};
 
 		if(productsearchdata.Product_Name!=undefined){
 			if(productsearchdata.Product_Name==""){
-		 	}else{
+		 	}else if(productsearchdata.Product_Name.match(letters)){
 		 		var prod_name_arr = [];
 		 		if(S(productsearchdata.Product_Name).contains(",")){
 		 			prod_name_arr=productsearchdata.Product_Name.split(",");
@@ -70,12 +76,14 @@ var _productSearchFiltering = function(self,productsearchdata) {
 		 			searchCriteria.push({name: new RegExp(prod_name_arr[i], "i")});
 		 		}
 		 		query.name={$in:product_or_name_array};
+		 	}else{
+		 		self.emit("failedToSearchProduct",{"error":{"message":"Please pass product name in alphabet or numbers only"}});
 		 	}
 		}
 
 		if(productsearchdata.Model_Number!=undefined){
 			if(productsearchdata.Model_Number==""){
-			}else{
+			}else if(productsearchdata.Model_Number.match(letters)){
 				var model_no_array = [];
 		 		if(S(productsearchdata.Model_Number).contains(",")){
 		 			model_no_array=productsearchdata.Model_Number.split(",");
@@ -92,12 +100,14 @@ var _productSearchFiltering = function(self,productsearchdata) {
 		 			searchCriteria.push({model_no: model_no_array[i]});
 		 		}
 		 		query.model_no={$in:model_no_or_array};
+			}else{
+				self.emit("failedToSearchProduct",{"error":{"message":"Please pass model number in alphabet or numbers only"}});
 			}			
 	  	}
 
 	  	if(productsearchdata.Feature!=undefined){
 	  		if(productsearchdata.Feature==""){
-	  		}else{
+	  		}else if(productsearchdata.Feature.match(letters)){
 	  			var feature_array = [];
 		 		if(S(productsearchdata.Feature).contains(",")){
 		 			feature_array=productsearchdata.Feature.split(",");
@@ -114,12 +124,14 @@ var _productSearchFiltering = function(self,productsearchdata) {
 		 			searchCriteria.push({"features.featurename": new RegExp(feature_array[i], "i")});
 		 		}
 		 		query["features.featurename"]={$in:feature_or_array};
+	  		}else{
+	  			self.emit("failedToSearchProduct",{"error":{"message":"Please pass featurs in alphabet or numbers only"}});
 	  		}
 	  	}
 
 	  	if(productsearchdata.Category!=undefined){
 	  		if(productsearchdata.Category==""){
-	  		}else{
+	  		}else if(productsearchdata.Category.match(letters)){
 	  			var category_array = [];
 		 		if(S(productsearchdata.Category).contains(",")){
 		 			category_array=productsearchdata.Category.split(",");
@@ -136,13 +148,15 @@ var _productSearchFiltering = function(self,productsearchdata) {
 		 			searchCriteria.push({"category": new RegExp(category_array[i], "i")});
 		 		}
 		 		query["category"]={$in:category_or_array};
+	  		}else{
+	  			self.emit("failedToSearchProduct",{"error":{"message":"Please pass category in alphabet or numbers only"}});
 	  		}
 	  	}
 
 	  	if(productsearchdata.Organization_Name!=undefined){
 	  		if(productsearchdata.Organization_Name==""){
 	  			_searchProduct(self,productsearchdata,searchCriteria,query);
-	  		}else{
+	  		}else if(productsearchdata.Organization_Name.match(letters)){
 	  			/*********GETTING ORG_ID BY ORG_NAME*********/
 	  			var orgid_arr = [];
 				var org_array = [];
@@ -183,6 +197,8 @@ var _productSearchFiltering = function(self,productsearchdata) {
 						}				 		
 				  	}
 				})
+			}else{
+				self.emit("failedToSearchProduct",{"error":{"message":"Please pass organization name in alphabet or numbers only"}});
 			}
 	  	}
 	  	// _searchProduct(self,productsearchdata,searchCriteria,query);
