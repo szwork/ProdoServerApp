@@ -761,7 +761,7 @@ var _getOrgCategories = function(self,orgid){
 
 var _getCategorySpecificTrending=function(self,category){
 	console.log("_getCategorySpecificTrending");
-	TrendingModel.find({status:{$ne:"deactive"},org_category:{$in:category}}).limit(5).exec(function(err,trenddata){
+	TrendingModel.find({status:{$ne:"deactive"},org_category:{$in:category},followedcount:{$gt:0},commentcount:{$gt:0}},{name:1,orgid:1,prodle:1,commentcount:1,followedcount:1,_id:0}).sort({followedcount:-1,commentcount:-1}).limit(5).exec(function(err,trenddata){
 		if(err){
 			self.emit("failedGetCategorySpecificTrending",{"error":{"code":"ED001","message":"Error in db to get product trending data"}});
 		}else if(!trenddata){
