@@ -873,7 +873,7 @@ var _validateSendPasswordSetting=function(self,host){
 };
 var _isProdonusRegisteredEmailId=function(self,email,host){
 	logger.emit("log","_isProdonusRegisteredEmailId");
-	userModel.findOne({email:email},{userid:1,email:1,firstname:1,lastname:1,fullname:1,verified:1}).lean().exec(function(err,user){
+	userModel.findOne({email:email,status:"deactive"},{userid:1,email:1,firstname:1,lastname:1,fullname:1,verified:1}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedSendPasswordSetting",{"error":{"code":"ED001","message":"Error in db to find users"}});
 		}else if(user){

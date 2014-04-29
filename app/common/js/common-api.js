@@ -184,7 +184,7 @@ exports.getOrganizationAnalyticsData=function(organizations,callback){
 
 }
 var _orgdatawithProductCommentCountAndFollowedCount=function(organalytics,callback){
-  TrendModel.aggregate({$group:{_id:"$orgid",followedcount:{$sum:"$followedcount"},commentcount:{$sum:"$commentcount"}}},function(err,trendingbyorg){
+  TrendModel.aggregate({$match:{status:"active"}},{$group:{_id:"$orgid",followedcount:{$sum:"$followedcount"},commentcount:{$sum:"$commentcount"}}},function(err,trendingbyorg){
     if(err){
       callback({error:{code:"ED001",message:"Database Issue"+err}})
     }else{
