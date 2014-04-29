@@ -58,7 +58,12 @@ exports.updateProductCampaign=function(req,res){
       // productcampaign.removeAllListeners();
       res.send(result);
     });
-    productcampaign.updateProductCampaign(orgid,campaign_id,sessionuserid);   
+    if(req.user.usertype.toLowerCase()!="manufacturer"){
+      productcampaign.emit("failedAddProductCampaign",{"error":{"code":"EA001","message":"You are not manufacturer to add campaign"}})
+    }else{
+      productcampaign.updateProductCampaign(orgid,campaign_id,sessionuserid);
+    }
+    
 }
 
 exports.getProductCampaign=function(req,res){
