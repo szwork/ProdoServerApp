@@ -104,7 +104,7 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 		campaigndata.orgid = orgid;
 		campaigndata.startdate = startDate;
 		campaigndata.enddate = endDate;
-		campaigndata.createdate = new Date();
+		// campaigndata.createdate = new Date();
 		var productcampaign = new ProductCampaignModel(campaigndata);
 		productcampaign.save(function(err,product_campaign_data){
 		 	if(err){
