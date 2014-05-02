@@ -38,7 +38,7 @@ var _getTagAnalyticsFromReffDict = function(self,featureanalytics){
 	for(var i=0;i<featureanalytics.length;i++){
 		tagids.push(featureanalytics[i].tagid);
 	}
-	console.log("tagids : "+tagids);
+
 	TagReffDicModel.aggregate([{$match:{tagid:{$in:tagids}}},{$group:{_id:"$emotions.result",tagid:{"$addToSet":"$tagid"}}}]).exec(function(err,taganalytics){
 		if(err){
 			self.emit("failedGetFeatureAnalytics",{"error":{"code":"ED001","message":"Error in db to find all tag analytics from tagreffdictionary"}});
@@ -46,11 +46,22 @@ var _getTagAnalyticsFromReffDict = function(self,featureanalytics){
 			self.emit("failedGetFeatureAnalytics",{"error":{"code":"AU003","message":"Tag analytics does not exists in refference dictionary"}});
 		}else{
 			////////////////////////////////
-			_successfulGetFeatureAnalytics(self,taganalytics);
+			_getFinalAnalyticsResult(self,featureanalytics,taganalytics);			
 			////////////////////////////////
 		}
 	})
 };
+
+var _getFinalAnalyticsResult = function(self,featureanalytics,taganalytics){
+	console.log("featureanalytics : "+JSON.stringify(featureanalytics));
+	console.log("taganalytics : "+JSON.stringify(taganalytics));
+	var tagids = [];
+	for(var i=0;i<taganalytics.length;i++){
+		tagids.push(taganalytics[i].tagid);
+	}
+	console.log("tagids : "+tagids);
+	_successfulGetFeatureAnalytics(self,taganalytics);
+}
 
 var _successfulGetFeatureAnalytics = function(self,taganalytics){
 	logger.emit("log","_successfulGetFeatureAnalytics");
