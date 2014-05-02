@@ -763,7 +763,7 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 	   		//campaign_commentdata.prodle=undefined;
 			// ///////////////////////////////////		
 			_successfulAddCampaignComment(self,campaign_commentdata);
-			_validateCampaignCommentFeatureAnalytics(prodle,commentdata,product);		
+			// _validateCampaignCommentFeatureAnalytics(prodle,commentdata,product);		
 			/////////////////////////////////
 		}
 	})
@@ -775,8 +775,8 @@ var _successfulAddCampaignComment=function(self,newcomment){
 	self.emit("successfulAddCampaignComment",{"success":{"message":"Gave comment to campaign sucessfully","campaign_comment":newcomment}});
 }
 
-var _validateFeatureAnalytics = function(prodle,commentdata,product){
-        console.log("_validateFeatureAnalytics");
+var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata,product){
+        console.log("_validateCampaignCommentFeatureAnalytics");
         // var analytics = commentdata.analytics;
         if(commentdata.analytics.length>0){
             console.log("analytics array " + commentdata.analytics);
