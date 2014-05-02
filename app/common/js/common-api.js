@@ -510,7 +510,9 @@ exports.uploadFiles=function(io,__dirname){
         }else if(JSON.parse(reply).passport.user==undefined){
           socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"User Session Expired"}});
         }else if(userid!=socket.handshake.user.userid){
-          socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add Warranty"}});
+          socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add marketing data"}});
+        }else if(isAdmin!=socket.handshake.user.isAdmin){
+          socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add marketing data"}});
         }else{
           console.log("addMarketingData3");
           ///////////////////////////////////////////////////          
