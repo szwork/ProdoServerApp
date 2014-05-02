@@ -11,7 +11,7 @@ FeatureAnalytics.prototype = new events.EventEmitter;
 module.exports = FeatureAnalytics;
 
 
-FeatureAnalytics.prototype.getTagAnalytics = function(prodle) {
+FeatureAnalytics.prototype.getTagAnalyticsPieChart = function(prodle) {
 	var self = this;
 	//////////////////
 	_getFeatureAnalytics(self,prodle);
@@ -77,4 +77,30 @@ var _getFinalAnalyticsResult = function(self,featureanalytics,taganalytics){
 var _successfulGetFeatureAnalytics = function(self,taganalytics){
 	logger.emit("log","_successfulGetFeatureAnalytics");
 	self.emit("successfulGetFeatureAnalytics", {"success":{"message":"Getting tag analytics successfully","taganalytics":taganalytics}});
+}
+
+FeatureAnalytics.prototype.getTagAnalyticsForBarChart = function(prodle) {
+	var self = this;
+	//////////////////
+	_getFeatureAnalyticsForBarChart(self,prodle);
+	///////////////////
+};
+
+var _getFeatureAnalyticsForBarChart = function(self,prodle){
+	FeatureAnalyticsModel.aggregate([{$unwind:"$analytics"},{$match:{prodle:prodle}},{$group:{_id:{tagid:"$analytics.tagid",tagname:"$analytics.tagname"},tagcount:{$sum:1}}},{$project:{/*tagid:"$_id.tagid",*/tagname:"$_id.tagname",tagcount:1,_id:0}}]).exec(function(err,featureanalytics){
+		if(err){
+			self.emit("failedGetTagAnalyticsForBarChart",{"error":{"code":"ED001","message":"Error in db to find tag analytics"}});
+		}else if(featureanalytics.length == 0){
+			self.emit("failedGetTagAnalyticsForBarChart",{"error":{"code":"AU003","message":"Feature analytics does not exists"}});
+		}else{
+			////////////////////////////////
+			_successfulGetTagAnalyticsForBarChart(self,featureanalytics);
+			////////////////////////////////
+		}
+	})
+};
+
+var _successfulGetTagAnalyticsForBarChart = function(self,taganalytics){
+	logger.emit("log","_successfulGetTagAnalyticsForBarChart");
+	self.emit("successfulGetTagAnalyticsForBarChart", {"success":{"message":"Getting tag analytics successfully","taganalytics":taganalytics}});
 }

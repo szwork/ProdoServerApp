@@ -785,15 +785,15 @@ var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata,produ
                 console.log("analytics featureid" + commentdata.analytics[i].featureitad);
                 console.log("analytics featurename" + commentdata.analytics[i].featurename);
                 console.log("analytics tag" + commentdata.analytics[i].tag);
-                _addFeatureAnalytics(prodle,commentdata.analytics[i],product);
+                _addCampaignCommentFeatureAnalytics(prodle,commentdata.analytics[i],product);
             }
         }else{
                 console.log("Please pass analytics data");
         }
 }
 
-var _addFeatureAnalytics = function(prodle,analytics,product){
-    console.log("_addFeatureAnalytics");
+var _addCampaignCommentFeatureAnalytics = function(prodle,analytics,product){
+    console.log("_addCampaignCommentFeatureAnalytics");
     console.log("CDA " + analytics);
     console.log("CDAFID " + analytics.featureid);
     FeatureAnalyticsModel.findOne({featureid:analytics.featureid}).lean().exec(function(err,analyticsdata){
@@ -801,16 +801,16 @@ var _addFeatureAnalytics = function(prodle,analytics,product){
             logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
         }else if(!analyticsdata){
             console.log("calling to add new analytics with prodle and featureid");
-            _addNewFeatureAnalytics(prodle,analytics,product);
+            _addNewCampaignCommentFeatureAnalytics(prodle,analytics,product);
         }else{
             console.log("calling to update analytics");
-            _updateFeatureAnalytics(prodle,analytics,product);
+            _updateCamapignCommentFeatureAnalytics(prodle,analytics,product);
         }
     });
 }
 
-var _addNewFeatureAnalytics = function(prodle,analytics,product){
-	console.log("_addNewFeatureAnalytics");
+var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,product){
+	console.log("_addNewCampaignCommentFeatureAnalytics");
 	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
 	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
 		if(err){
@@ -833,8 +833,8 @@ var _addNewFeatureAnalytics = function(prodle,analytics,product){
 }
 
 
-var _updateFeatureAnalytics = function(prodle,analytics,product){
-    console.log("_updateFeatureAnalytics");
+var _updateCamapignCommentFeatureAnalytics = function(prodle,analytics,product){
+    console.log("_updateCamapignCommentFeatureAnalytics");
     //checking tagid and tagname exist
     var query = {prodle:prodle,featureid:analytics.featureid};
     TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1,tagname:1}).lean().exec(function(err,tagdata){

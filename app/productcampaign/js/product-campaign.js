@@ -224,7 +224,7 @@ ProductCampaign.prototype.getProductCampaign = function(prodle,campain_id) {
 };
 
 var _getProductCampaign = function(self,prodle,campaign_id){
-	ProductCampaignModel.findOne({status:{$ne:"deactive"},prodle:prodle,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.findOne({status:"active",prodle:prodle,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
 		}else if(productcampain){
@@ -250,7 +250,7 @@ ProductCampaign.prototype.getAllOrgCampaign = function(orgid) {
 };
 
 var _getAllOrgCampaign = function(self,orgid){
-	ProductCampaignModel.find({orgid:orgid,status:{$ne:"deactive"}}).sort({createdate:-1}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.find({orgid:orgid,status:"active"}).sort({createdate:-1}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetAllOrgCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(productcampain.length==0){
@@ -277,7 +277,7 @@ ProductCampaign.prototype.getAllProductCampaign = function(prodle) {
 
 var _getAllProductCampaign = function(self,prodle){
 
-	ProductModel.findOne({prodle:prodle,status:{$ne:"deactive"}},{name:1,_id:0}).lean().exec(function(err,product){
+	ProductModel.findOne({prodle:prodle,status:"active"},{name:1,_id:0}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(product){
