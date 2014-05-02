@@ -510,7 +510,7 @@ var _updateTrendingForProduct = function(self,orgid,prodle,productdata){
 		if(err){
 		  	logger.emit("error","Error in db to find user");	
 		}else if(organization){
-			TrendingModel.update({prodle:prodle,orgid:orgid},{$set:{org_category:organization.industry_category}}).lean().exec(function(err,status){
+			TrendingModel.update({prodle:prodle,orgid:orgid},{$set:{name:productdata.name,org_category:organization.industry_category}}).lean().exec(function(err,status){
 				if(err){
 					logger.emit("error","Error in db to update trending");
 			  	}else{
