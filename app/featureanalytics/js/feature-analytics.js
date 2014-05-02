@@ -55,12 +55,23 @@ var _getTagAnalyticsFromReffDict = function(self,featureanalytics){
 var _getFinalAnalyticsResult = function(self,featureanalytics,taganalytics){
 	console.log("featureanalytics : "+JSON.stringify(featureanalytics));
 	console.log("taganalytics : "+JSON.stringify(taganalytics));
-	var tagids = [];
-	for(var i=0;i<taganalytics.length;i++){
-		tagids.push(taganalytics[i].tagid);
+	var feature_tagids = [];
+	var productanalytics=[];
+	for(var i=0;i<featureanalytics.length;i++){
+		feature_tagids.push(featureanalytics[i].tagid);
 	}
-	console.log("tagids : "+tagids);
-	_successfulGetFeatureAnalytics(self,taganalytics);
+
+	for(var j=0;j<taganalytics.length;j++){
+		var taganalyticscount=0;
+		for(var k=0;k<taganalytics[j].tagid.length;k++){
+			if(feature_tagids.indexOf(taganalytics[j].tagid[k])>=0){
+				taganalyticscount+=featureanalytics[feature_tagids.indexOf(taganalytics[j].tagid[k])].tagcount;
+			}
+		}
+		productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount})
+	}
+	console.log("productanalytics : "+productanalytics);
+	_successfulGetFeatureAnalytics(self,productanalytics);
 }
 
 var _successfulGetFeatureAnalytics = function(self,taganalytics){
