@@ -393,7 +393,7 @@ Comment.prototype.deleteComment = function(sessionuserid,commentid) {
 	
 };
 var _isAuhorizedUserToDeleteComment=function(self,sessionuserid,commentid){
-  CommentModel.findOne({commentid:commentid},{user:1},function(err,comment){
+  CommentModel.findOne({commentid:commentid,status:"active"},{user:1},function(err,comment){
   	if(err){
   		self.emit("failedCommentDeletion",{"error":{"code":"ED001","message":"Error in db to find Comment"}});
   	}else if(comment){
@@ -406,7 +406,7 @@ var _isAuhorizedUserToDeleteComment=function(self,sessionuserid,commentid){
 		    /////////////////////////////
 			}
 		}else{
-  		self.emit("failedCommentDeletion",{"error":{"code":"AC001","message":"comment id is wrong"}});
+  		self.emit("failedCommentDeletion",{"error":{"code":"AC001","message":"Comment already deleted"}});
   	}
   })
 
@@ -461,7 +461,7 @@ Comment.prototype.deleteCampaignComment = function(sessionuserid,commentid) {
 };
 
 var _isAuhorizedUserToDeleteCampaignComment=function(self,sessionuserid,commentid){
-  CommentModel.findOne({commentid:commentid},{user:1},function(err,comment){
+  CommentModel.findOne({commentid:commentid,status:"active"},{user:1},function(err,comment){
   	if(err){
   		self.emit("failedCampaignCommentDeletion",{"error":{"code":"ED001","message":"Error in db to find Comment"}});
   	}else if(comment){
@@ -473,7 +473,7 @@ var _isAuhorizedUserToDeleteCampaignComment=function(self,sessionuserid,commenti
 		    /////////////////////////////
 		}
 	}else{
-  		self.emit("failedCampaignCommentDeletion",{"error":{"code":"AC001","message":"comment id is wrong"}});
+  		self.emit("failedCampaignCommentDeletion",{"error":{"code":"AC001","message":"Comment already deleted"}});
   	}
   })
 
