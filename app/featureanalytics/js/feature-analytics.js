@@ -71,12 +71,12 @@ var _getFinalAnalyticsResult = function(self,featureanalytics,taganalytics){
 		productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount})
 	}
 	console.log("productanalytics : "+productanalytics);
-	_successfulGetFeatureAnalytics(self,productanalytics);
+	_successfulGetFeatureAnalytics(self,featureanalytics,productanalytics);
 }
 
-var _successfulGetFeatureAnalytics = function(self,taganalytics){
+var _successfulGetFeatureAnalytics = function(self,barchart_analytics,piechart_analytics){
 	logger.emit("log","_successfulGetFeatureAnalytics");
-	self.emit("successfulGetFeatureAnalytics", {"success":{"message":"Getting tag analytics successfully","taganalytics":taganalytics}});
+	self.emit("successfulGetFeatureAnalytics", {"success":{"message":"Getting tag analytics successfully","barchart_analytics":barchart_analytics,"piechart_analytics":piechart_analytics}});
 }
 
 FeatureAnalytics.prototype.getTagAnalyticsForBarChart = function(prodle) {
