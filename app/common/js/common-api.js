@@ -1496,7 +1496,7 @@ var __warrantyImageBuffer=function(action,file,dirname,action,sessionuser,callba
                              Expires:expirydate,
                              ContentType: file_type
                         };
-                        warrantyImageUpload(action.warranty.warranty_id,params,file_name,function(err,result){
+                        warrantyImageUpload(action.warranty.warranty_id,params,file_name,file_type,function(err,result){
                           if(err){
                             callback(err);
                           }else{
@@ -1845,7 +1845,7 @@ var campaignBannerImageChange=function(campaign_id,awsparams,filename,callback){
   })  
 }
 
-var warrantyImageUpload=function(warranty_id,awsparams,filename,callback){
+var warrantyImageUpload=function(warranty_id,awsparams,filename,filetype,callback){
   s3bucket.putObject(awsparams, function(err, data) {
     if (err) {
       callback({"error":{"message":"s3bucket.putObject:-warrantyImageUpload"+err}})
@@ -1856,7 +1856,7 @@ var warrantyImageUpload=function(warranty_id,awsparams,filename,callback){
         if(err){
           callback({"error":{"message":"warrantyImageUpload:Error in getting getSignedUrl "+err}});
         }else{
-          var warranty_img_object={bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId()};
+          var warranty_img_object={bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId(),imagetype:filetype};
 
           WarrantyModel.update({warranty_id:warranty_id},{$set:{invoice_image:warranty_img_object}},function(err,warrantyuploadstatus){
             if(err){
