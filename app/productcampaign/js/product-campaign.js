@@ -29,6 +29,10 @@ var ProductCampaign = function(campaigndata) {
 ProductCampaign.prototype = new events.EventEmitter;
 module.exports = ProductCampaign;
 
+function isArray(what) {
+    return Object.prototype.toString.call(what) === '[object Array]';
+}
+
 ProductCampaign.prototype.addProductCampaign=function(orgid,prodle,sessionuserid){
 	var self=this;
 	var campaigndata = this.productcampaign;
@@ -81,6 +85,12 @@ var _validateProductCampaignData = function(self,campaigndata,orgid,prodle,sessi
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass start date"}});
 	}else if(campaigndata.enddate==undefined){
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass end date"}});
+	// }else if(campaigndata.bannertext==undefined){
+	//   	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass bannertext"}});
+	}else if(campaigndata.campaign_tags==undefined){
+	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass campaign_tags"}});
+	}else if(!isArray(campaigndata.campaign_tags)){
+	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"campaign_tags should be an array"}});
 	}else{
 	  	_addProductCampaign(self,campaigndata,orgid,prodle);	   	
 	}
@@ -104,7 +114,7 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 		campaigndata.orgid = orgid;
 		campaigndata.startdate = startDate;
 		campaigndata.enddate = endDate;
-		// campaigndata.createdate = new Date();
+		console.log("campaigndata : "+JSON.stringify(campaigndata));
 		var productcampaign = new ProductCampaignModel(campaigndata);
 		productcampaign.save(function(err,product_campaign_data){
 		 	if(err){
