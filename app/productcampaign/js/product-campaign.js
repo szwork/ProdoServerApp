@@ -29,6 +29,10 @@ var ProductCampaign = function(campaigndata) {
 ProductCampaign.prototype = new events.EventEmitter;
 module.exports = ProductCampaign;
 
+function isArray(what) {
+    return Object.prototype.toString.call(what) === '[object Array]';
+}
+
 ProductCampaign.prototype.addProductCampaign=function(orgid,prodle,sessionuserid){
 	var self=this;
 	var campaigndata = this.productcampaign;
@@ -81,6 +85,12 @@ var _validateProductCampaignData = function(self,campaigndata,orgid,prodle,sessi
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass start date"}});
 	}else if(campaigndata.enddate==undefined){
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass end date"}});
+	// }else if(campaigndata.bannertext==undefined){
+	//   	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass bannertext"}});
+	}else if(campaigndata.campaign_tags==undefined){
+	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass campaign_tags"}});
+	}else if(!isArray(campaigndata.campaign_tags)){
+	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"campaign_tags should be an array"}});
 	}else{
 	  	_addProductCampaign(self,campaigndata,orgid,prodle);	   	
 	}
@@ -104,7 +114,7 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 		campaigndata.orgid = orgid;
 		campaigndata.startdate = startDate;
 		campaigndata.enddate = endDate;
-		// campaigndata.createdate = new Date();
+		console.log("campaigndata : "+JSON.stringify(campaigndata));
 		var productcampaign = new ProductCampaignModel(campaigndata);
 		productcampaign.save(function(err,product_campaign_data){
 		 	if(err){
@@ -224,7 +234,7 @@ ProductCampaign.prototype.getProductCampaign = function(prodle,campain_id) {
 };
 
 var _getProductCampaign = function(self,prodle,campaign_id){
-	ProductCampaignModel.findOne({status:{$ne:"deactive"},prodle:prodle,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.findOne({status:"active",prodle:prodle,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
 		}else if(productcampain){
@@ -250,7 +260,7 @@ ProductCampaign.prototype.getAllOrgCampaign = function(orgid) {
 };
 
 var _getAllOrgCampaign = function(self,orgid){
-	ProductCampaignModel.find({orgid:orgid,status:{$ne:"deactive"}}).sort({createdate:-1}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.find({orgid:orgid}).sort({createdate:-1}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetAllOrgCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(productcampain.length==0){
@@ -277,7 +287,7 @@ ProductCampaign.prototype.getAllProductCampaign = function(prodle) {
 
 var _getAllProductCampaign = function(self,prodle){
 
-	ProductModel.findOne({prodle:prodle,status:{$ne:"deactive"}},{name:1,_id:0}).lean().exec(function(err,product){
+	ProductModel.findOne({prodle:prodle,status:"active"},{name:1,_id:0}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(product){

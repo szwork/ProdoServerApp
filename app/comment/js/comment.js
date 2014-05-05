@@ -763,7 +763,7 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 	   		//campaign_commentdata.prodle=undefined;
 			// ///////////////////////////////////		
 			_successfulAddCampaignComment(self,campaign_commentdata);
-			// _validateFeatureAnalytics(prodle,commentdata,product);		
+			// _validateCampaignCommentFeatureAnalytics(prodle,commentdata,product);		
 			/////////////////////////////////
 		}
 	})
@@ -773,4 +773,86 @@ var _successfulAddCampaignComment=function(self,newcomment){
 	// updateLatestProductCommentCount(newcomment.prodle);
 	logger.emit("log","successfulAddCampaignComment");
 	self.emit("successfulAddCampaignComment",{"success":{"message":"Gave comment to campaign sucessfully","campaign_comment":newcomment}});
+}
+
+var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata,product){
+        console.log("_validateCampaignCommentFeatureAnalytics");
+        // var analytics = commentdata.analytics;
+        if(commentdata.analytics.length>0){
+            console.log("analytics array " + commentdata.analytics);
+            console.log("analytics array leangth " + commentdata.analytics.length);
+            for(var i=0;i<commentdata.analytics.length;i++){
+                console.log("analytics featureid" + commentdata.analytics[i].featureitad);
+                console.log("analytics featurename" + commentdata.analytics[i].featurename);
+                console.log("analytics tag" + commentdata.analytics[i].tag);
+                _addCampaignCommentFeatureAnalytics(prodle,commentdata.analytics[i],product);
+            }
+        }else{
+                console.log("Please pass analytics data");
+        }
+}
+
+var _addCampaignCommentFeatureAnalytics = function(prodle,analytics,product){
+    console.log("_addCampaignCommentFeatureAnalytics");
+    console.log("CDA " + analytics);
+    console.log("CDAFID " + analytics.featureid);
+    FeatureAnalyticsModel.findOne({featureid:analytics.featureid}).lean().exec(function(err,analyticsdata){
+        if(err){
+            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+        }else if(!analyticsdata){
+            console.log("calling to add new analytics with prodle and featureid");
+            _addNewCampaignCommentFeatureAnalytics(prodle,analytics,product);
+        }else{
+            console.log("calling to update analytics");
+            _updateCamapignCommentFeatureAnalytics(prodle,analytics,product);
+        }
+    });
+}
+
+var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,product){
+	console.log("_addNewCampaignCommentFeatureAnalytics");
+	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
+	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
+		if(err){
+            console.log("Error in db to find feature id err message: " + err);
+        }else if(!tagdata){
+            console.log("Tag name does not exist to get tagid");
+        }else{
+        	analytics.prodle = prodle;
+            analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag}];
+            var analytics_data = new FeatureAnalyticsModel(analytics);
+        	analytics_data.save(function(err,analyticsdata){
+            	if(err){
+               	 	console.log("Error in db to save feature analytics" + err);
+            	}else{
+                	console.log("Feature analytics added sucessfully" + analyticsdata);
+            	}
+        	})
+        }
+	});        
+}
+
+
+var _updateCamapignCommentFeatureAnalytics = function(prodle,analytics,product){
+    console.log("_updateCamapignCommentFeatureAnalytics");
+    //checking tagid and tagname exist
+    var query = {prodle:prodle,featureid:analytics.featureid};
+    TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1,tagname:1}).lean().exec(function(err,tagdata){
+		if(err){
+            console.log("Error in db to find feature id err message: " + err);
+        }else if(!tagdata){
+            console.log("Tag name does not exist to get tagid");
+        }else{		    
+		    FeatureAnalyticsModel.update(query,{$push:{analytics:{tagid:tagdata.tagid,tagname:tagdata.tagname}}},function(err,analyticsupdatedata){
+	            if(err){
+	                console.log("Error in db to update count err message: " + err);
+	            }else if(!analyticsupdatedata){
+	                console.log("Feature analytics not updated");
+	            }else{
+	                console.log("Feature analytics updated sucessfully analytics_data : " + analyticsupdatedata);
+	                // _successfulAddComment(self,analyticsdata);
+	            }
+	        });
+		}
+	})	
 }
