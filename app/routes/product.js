@@ -21,5 +21,6 @@ exports.init = function (app) {
  app.get("/api/trendingproducts",auth,api.productapi.getProductTrending);
  app.get("/api/domaintrending",auth,api.productapi.getCategorySpecificTrending);//domain specific trending
  app.get("/api/categorytags",auth,api.productapi.getAllCategoryTags);
+ app.get("/api/commenttags",auth,api.productapi.getAllCommentTags);
  app.get('/api/latestproduct',api.productapi.getLatestAddedProduct);
 }

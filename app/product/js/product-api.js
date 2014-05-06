@@ -536,3 +536,22 @@ exports.getLatestAddedProduct=function(req,res){
     product.latestAddedProduct();
     ////////////////////////////////   
 }
+exports.getAllCommentTags=function(req,res){
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  product.removeAllListeners("failedGetAllCommentTags");
+    product.on("failedGetAllCommentTags",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // product.removeAllListeners();
+      res.send(err);
+    });
+  product.removeAllListeners("successfulGetAllCommentTags");
+  product.on("successfulGetAllCommentTags",function(result){
+    // logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+    ///////////////////////////////////
+    product.getAllCommentTags();
+    ////////////////////////////////  
+}
