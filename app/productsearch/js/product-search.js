@@ -372,3 +372,71 @@ var _successfulAllOrgProducts = function(self,doc,orgdata){
 	logger.emit("log","_successfulGetOrgProduct");
 	self.emit("successfulGetOrgProduct",{"success":{"message":"Following products found for "+orgdata.orgname,"doc":doc}});
 }
+
+ProductSearch.prototype.allProduct = function(product_data){
+	console.log("product_data" + JSON.stringify(product_data));
+	var self=this;
+	_validateAllProductSearchData(self,product_data);
+}
+
+var _validateAllProductSearchData = function(self,product_data){
+	var product_name_or_arr=[];
+	var query={status:{$in:["active","init"]}};
+	var letters = /^[A-Za-z0-9 *]+$/;
+	var star = /^[*]+$/;
+	var product_name=product_data.name;
+	var orgid = product_data.orgid;
+	if(product_name==undefined || product_name==""){
+		// res.send({"error":{"code":"AD001","message":"Please pass product name"}});
+		self.emit("failedToSearchAllProduct",{"error":{"code":"AV001","message":"Please pass product name"}});
+	}else if(!product_name.match(letters)){
+		// res.send({"error":{"code":"AD001","message":"Please pass product name in alphabet or numbers only"}});
+		self.emit("failedToSearchAllProduct",{"error":{"code":"AV001","message":"Please pass product name in alphabet or numbers only"}});
+	}else if(orgid==undefined || orgid==""){
+		// res.send({"error":{"code":"AD001","message":"Please pass orgid"}});
+		self.emit("failedToSearchAllProduct",{"error":{"code":"AV001","message":"Please pass orgid"}});
+	}else{
+		if(product_name.match(star)){
+			query.orgid=orgid;
+			if(product_name.length>1){
+				self.emit("failedToSearchAllProduct",{"error":{"code":"AV001","message":"Please pass valid data"}});
+			}else{
+				_allProduct(self,query);				
+			}			
+		}else{
+			product_name_or_arr.push(new RegExp('^'+product_name.substr(0,product_name.length), "i"));
+			query.name={$in:product_name_or_arr};
+			query.orgid=orgid;
+			_allProduct(self,query);
+		}		
+	}
+}
+
+var _allProduct = function(self,query){
+	var doc_arr = [];
+	var prod_name_arr = [];
+	ProductModel.find(query,{name:1,prodle:1,orgid:1,_id:0}).exec(function(err,doc){
+		if(err){
+			// res.send({"error":{"code":"ED001","message":"Error in db to search product"}});
+			self.emit("failedToSearchAllProduct",{"error":{"code":"ED001","message":"Error in db to search product "+err}});
+		}else if(doc.length==0){
+			// var s = {"success":{"message":"No product exists","doc":doc},"name":{"message":"No product name exist","doc":""}};
+			// res.send(s);
+			_successfulGetAllProduct(self,doc_arr,prod_name_arr);
+		}else{
+			// var prod_name_arr = [];
+			for(var i=0;i<doc.length;i++){
+				doc_arr.push(doc[i]);
+				prod_name_arr.push(doc[i].name);
+			}
+			//////////////////////////////////
+			_successfulGetAllProduct(self,doc_arr,prod_name_arr);
+			//////////////////////////////////
+		}
+	});	
+}
+
+var _successfulGetAllProduct = function(self,doc,prod_name_arr){
+	logger.emit("log","_successfulGetAllProduct");
+	self.emit("successfulAllProductSearch",{"success":{"message":"Getting Product Details Successfully ","doc":doc,"name":{"message":"Product Name","doc":prod_name_arr}}});
+}
