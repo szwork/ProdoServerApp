@@ -1858,7 +1858,7 @@ var warrantyImageUpload=function(warranty_id,awsparams,filename,filetype,callbac
         if(err){
           callback({"error":{"message":"warrantyImageUpload:Error in getting getSignedUrl "+err}});
         }else{
-          var warranty_img_object={bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId(),filetype:filetype};
+          var warranty_img_object={bucket:params1.Bucket,key:params1.Key,image:url,filetype:filetype};
 
           WarrantyModel.update({warranty_id:warranty_id},{$set:{invoice_image:warranty_img_object}},function(err,warrantyuploadstatus){
             if(err){
