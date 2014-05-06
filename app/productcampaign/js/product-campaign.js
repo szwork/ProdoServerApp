@@ -101,8 +101,8 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 
 	var startDate = new Date(campaigndata.startdate);
 	var endDate = new Date(campaigndata.enddate);
-	startDate.setDate(startDate.getDate()+1);
-	endDate.setDate(endDate.getDate()+1);
+	// startDate.setDate(startDate.getDate()+1);
+	// endDate.setDate(endDate.getDate()+1);
 
 	if(startDate == "Invalid Date"){
 		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Invalid start date"}});
