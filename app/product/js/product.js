@@ -62,7 +62,13 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	  	}else if( !isArray(productdata.category)){
 	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"category should be an array"}});
 	  	}else if(productdata.category.length==0){
-	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one category"}});
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one commenttags"}});
+	  	}else if(productdata.commenttags==undefined || productdata.commenttags==""){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Pleae pass commenttags"}});
+	  	}else if( !isArray(productdata.commenttags)){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"commenttags should be an array"}});
+	  	}else if(productdata.commenttags.length==0){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one commenttags"}});
 	  	}else{
 	  	 	////////////////////////////////////////////////
 			_checkProductNameIsSame(self,productdata,orgid);
@@ -830,4 +836,32 @@ var _latestAddedProduct=function(self){
 }
 var _successfullLatestAddedOrganization=function(self,products){
 	self.emit("successfulLatestAddedProduct",{success:{message:"Latest Product Getting Successfully",product:products}})
+}
+Product.prototype.getAllCommentTags = function() {
+	var self=this;
+	////////////////////////////
+	_getAllCommentTags(self);
+	///////////////////////////
+};
+
+var _getAllCommentTags=function(self){
+	productModel.find({$where:"this.commenttags.length>0"},{commenttags:1,_id:0},function(err,commenttags){
+		if(err){
+			logger.emit("error","Database Issue _getAllCategoryTags "+err)
+			self.emit("failedGetAllCommentTags",{"error":{"message":"Database Issue"}})
+		}else if(commenttags.length==0){
+			self.emit("failedGetAllCommentTags",{"error":{"message":"No Comment Tags Exists"}})
+		}else{
+			var commenttagsarray=[];
+			for(var i=0;i<commenttags.length;i++){
+				commenttagsarray=__.union(commenttags[i].commenttags,commenttagsarray);
+			}
+			///////////////////////////////////
+			_successfullGetAllCommentTags(self,commenttagsarray);
+			///////////////////////////////////
+		}
+	})
+}
+var _successfullGetAllCommentTags=function(self,commenttagsarray){
+	self.emit("successfulGetAllCommentTags",{"success":{"message":"Getting All Comment Tags Successfully","commenttags":commenttagsarray}})
 }
