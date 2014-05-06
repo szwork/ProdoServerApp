@@ -248,3 +248,26 @@ exports.publishCampaign=function(req,res){
     //////////////////////////////////////////////// ///////////
   }
 }
+
+exports.followCampaign=function(req,res){
+  var productcampaign= new ProductCampaign();
+
+  var sessionuserid=req.user.userid;
+  var campaign_id=req.params.campaign_id;
+  // var orgid=req.params.orgid;
+  logger.emit("log","campaign_id"+campaign_id+"\no\nsessionid:"+sessionuserid);
+  
+  productcampaign.removeAllListeners("failedFollowCampaign");
+  productcampaign.on("failedFollowCampaign",function(err){
+    logger.emit("error", err.error.message,req.user.email);
+    res.send(err);
+  });
+  productcampaign.removeAllListeners("successfulFollowCampaign");
+  productcampaign.on("successfulFollowCampaign",function(result){
+    logger.emit("info", result.success.message,req.user.email);
+    // callback(null,result);
+    res.send(result);
+  });
+    
+ productcampaign.followCampaign(campaign_id,sessionuserid);
+}
