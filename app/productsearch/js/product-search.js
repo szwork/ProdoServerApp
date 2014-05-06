@@ -438,5 +438,5 @@ var _allProduct = function(self,query){
 
 var _successfulGetAllProduct = function(self,doc,prod_name_arr){
 	logger.emit("log","_successfulGetAllProduct");
-	self.emit("successfulAllProductSearch",{"success":{"message":"Getting Product Details Successfully ","doc":doc,"name":{"message":"Product Name","doc":prod_name_arr}}});
+	self.emit("successfulAllProductSearch",{"success":{"message":"Getting Product Details Successfully ","doc":doc},"name":{"message":"Product Name","doc":prod_name_arr}});
 }
