@@ -15,6 +15,7 @@ var events = require("events");
 var logger = require("../../common/js/logger");
 var OrgModel = require("../../org/js/org-model");
 var ProductModel = require("../../product/js/product-model");
+var userModel=require("../../user/js/user-model");
 var ProductCampaignModel = require("./product-campaign-model");
 var CONFIG = require('config').Prodonus;
 var AWS = require('aws-sdk');
@@ -416,4 +417,54 @@ var _setActiveCampaing=function(self,campaign){
 }
 var _successfullPublishCampaign=function(self){
 	self.emit("successfulpublishCampaign",{"success":{"message":"Campaign Published successfully"}});
+}
+
+ProductCampaign.prototype.followCampaign=function(campaign_id,sessionuserid){
+	var self=this;
+	_checkCampaignForFollow(self,campaign_id,sessionuserid);
+}
+
+var _checkCampaignForFollow=function(self,campaign_id,sessionuserid){
+	ProductCampaignModel.findOne({campaign_id:campaign_id},function(err,checkcampaignstatus){
+		if(err){
+			logger.emit("log","failed to connect database");
+			self.emit("failedFollowCampaign",{"error":{"code":"ED001","message":"Error in db to follow campaign"}});
+		}else if(checkcampaignstatus){
+			_checkAlreadyFollowCampaignOrNot(self,checkcampaignstatus,sessionuserid);
+		}else{
+			logger.emit("log","Wrong campaign_id");
+			self.emit("failedFollowCampaign",{"error":{"message":"Wrong campaign_id","campaign_id":campaign_id}});
+		}
+	})
+}
+
+var _checkAlreadyFollowCampaignOrNot = function(self,campaign,sessionuserid){
+
+	userModel.findOne({userid:sessionuserid,"campaign_followed.campaign_id":campaign.campaign_id},function(err,userdata){
+		if(err){
+			logger.emit("log","failed to connect to database");
+			self.emit("failedFollowCampaign",{"error":{"code":"ED001","message":"Error in db to follow campaign"}});
+		}else if(!userdata){
+			_followCampaign(self,campaign,sessionuserid);				
+		}else{
+			self.emit("failedFollowCampaign",{"error":{"code":"AD001","message":"You have already following this campaign"}});
+		}
+	})
+}
+
+var _followCampaign = function(self,campaign,sessionuserid){
+	console.log("campaign : "+campaign);
+	userModel.update({userid:sessionuserid},{$push:{campaign_followed:{campaign_id:campaign.campaign_id,prodle:campaign.prodle,orgid:campaign.orgid}}},function(err,followcampaignstatus){
+		if(err){
+			logger.emit("log","failed to connect to database");
+			self.emit("failedFollowCampaign",{"error":{"code":"ED001","message":"Error in db to follow campaign"}});
+		}else if(followcampaignstatus){
+			logger.emit("log","successfulFollowCampaign");
+			// updateLatestProductFollowedCount(campaign);
+			self.emit("successfulFollowCampaign",{"success":{"message":"Following campaign"}});
+		}else{
+			logger.emit("log","Failure in following the campaign");
+			self.emit("failedFollowCampaign",{"error":{"code":"F001","message":"Failed to follow the campaign"}});
+		}
+	});
 }
