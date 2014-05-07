@@ -40,10 +40,10 @@ var subscriptionarray=
 	{
 		
 		plantype:"individual",
-		plandescription:"90 days Free Trial Plan for Individual",
+		plandescription:"30 days Free Trial Plan for Individual",
 		planpaymentcommitment:
 		{
-			commitmenttype:"quarterly",
+			commitmenttype:"monthly",
 			amount:0,
 			currency:"dollar"
 		},

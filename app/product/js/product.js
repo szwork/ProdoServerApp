@@ -103,7 +103,7 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	var _addProduct=function(self,productdata,orgid){
 		productdata.orgid=orgid;
 		productdata.status="active";
-
+         productdata.commenttags.push("general");
 // 		productdata.prodle=shortId.generate();  
 // 		productdata.features=[{featurename:productdata.name.toLowerCase(),featuredescription:" default product features"}];
 //     var product=new productModel(productdata);
