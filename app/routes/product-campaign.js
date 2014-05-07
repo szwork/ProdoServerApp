@@ -12,5 +12,5 @@ exports.init = function (app) {
   	app.delete("/api/productcampaign/image/:orgid/:campaign_id",auth,api.productcampaignapi.deleteCampaignImage);//delet campaign images
   	app.post('/api/campaignpublish/:orgid/:campaign_id',auth,api.productcampaignapi.publishCampaign);
 
-  	app.post("/api/campaign/follow/:campaign_id",auth, api.productcampaignapi.followCampaign);//following campaign
+  	app.get("/api/campaign/follow/:campaign_id",auth, api.productcampaignapi.followCampaign);//following campaign
 }
