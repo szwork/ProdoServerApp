@@ -503,7 +503,7 @@ var _isOrganizationUser=function(user,callback){
 	}
 }
 var getUserRequiredData=function(user,callback){
-   var user_senddata={isOtpPassword:user.isOtpPassword,email:user.email,usertype:user.usertype,userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype,campaign_followed:user.campaign_followed};
+   var user_senddata={isOtpPassword:user.isOtpPassword,email:user.email,usertype:user.usertype,userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype};
 	// user=JSON.stringify(user);
 	// user=JSON.parse(user);
 	// console.log("log","user"+user);
@@ -1456,8 +1456,10 @@ var _checkAlreadyFollowProductOrNot=function(self,product,sessionuserid){
 }
 
 var _followproduct=function(self,product,sessionuserid){
-	userModel.update({userid:sessionuserid},{$push:{products_followed:{prodle:product.prodle,orgid:product.orgid}}},function(err,followprodstatus){
-			// userModel.push({"products_followed":prodle},function(err,followprodstatus){
+	var a = new Date();
+	var date = new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+(a.getDate()+1));
+	
+	userModel.update({userid:sessionuserid},{$push:{products_followed:{prodle:product.prodle,orgid:product.orgid,followdate:date}}},function(err,followprodstatus){
 		if(err){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
