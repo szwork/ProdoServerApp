@@ -32,13 +32,13 @@ var productCampaignSchema = mongoose.Schema({
   prodle:{type:String,ref:"Products"},
   productname:{type:String,ref:"Products"},
   category:[{type:String}],
-  campaign_id:{type:String}, 
+  campaign_id:{type:String},
   banner_image:{bucket:String,key:String,image:{type:String}},
   campaign_tags:[{type:String}],
   bannertext:{type:String},
   name:{type:String},
   description:{type:String},
-  createdate:{type:Date,default:Date.now},//
+  createdate:{type:Date,default:Date.now},
   startdate:{type:Date},//,default:Date.now
   enddate:{type:Date},
   status:{type:String,default:"init"},//init,active,deactive

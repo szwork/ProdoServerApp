@@ -43,6 +43,30 @@ exports.searchProduct = function(req,res){
 	productsearch.searchProduct(productsearchdata);	
 }
 
+exports.allProduct = function(req,res){
+  
+  var product_data = req.body;
+  // console.log(JSON.stringify(product_data));
+  
+  var productsearch = new ProductSearch(product_data);
+  var sessionuserid=req.user.userid;
+
+   // logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
+    productsearch.removeAllListeners("failedToSearchAllProduct");
+    productsearch.on("failedToSearchAllProduct",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      res.send(err);
+    });
+    productsearch.removeAllListeners("successfulAllProductSearch");
+    productsearch.on("successfulAllProductSearch",function(doc){
+      logger.emit("info", doc.success.message,sessionuserid);
+      // console.log("L " + doc.success.doc.length);
+      res.send(doc);
+    });
+
+  productsearch.allProduct(product_data); 
+}
+
 exports.getOrgProducts = function(req,res){
   var sessionuserid = req.user.userid;
   var orgdata = req.body;

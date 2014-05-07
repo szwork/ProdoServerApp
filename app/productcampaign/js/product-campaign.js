@@ -101,11 +101,9 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 
 	var startDate = new Date(campaigndata.startdate);
 	var endDate = new Date(campaigndata.enddate);
-	console.log("startDate 1 : " + startDate);
-	startDate.setDate(startDate.getDate()+1);
-	endDate.setDate(endDate.getDate()+1);
+	// startDate.setDate(startDate.getDate()+1);
+	// endDate.setDate(endDate.getDate()+1);
 
-	console.log("startDate 2 : " + startDate);
 	if(startDate == "Invalid Date"){
 		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Invalid start date"}});
 	}else if(endDate == "Invalid Date"){
@@ -115,7 +113,7 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 		campaigndata.orgid = orgid;
 		campaigndata.startdate = startDate;
 		campaigndata.enddate = endDate;
-		console.log("campaigndata : "+JSON.stringify(campaigndata));
+		// console.log("campaigndata : "+JSON.stringify(campaigndata));
 		var productcampaign = new ProductCampaignModel(campaigndata);
 		productcampaign.save(function(err,product_campaign_data){
 		 	if(err){
@@ -126,11 +124,10 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 		  		/////////////////////////////////	  
 		  	}
 		});
-	}
-	
+	}	
 }
 
-var _successfulProductCampaignAdd=function(self){
+var _successfulProductCampaignAdd = function(self){
 	logger.log("log","_successfulProductCampaignAdd");
 	self.emit("successfulAddProductCampaign",{"success":{"message":"Product Campaign added sucessfully"}});
 }
@@ -184,7 +181,7 @@ var _updateProductCampaignData = function(self,campaigndata,orgid,campaign_id){
 
 var _successfulUpdateProductCampaignData=function(self){
 	logger.log("log","_successfulUpdateProductCampaignData");
-	self.emit("successfulUpdateProductCampaign",{"success":{"message":"Product Campaign Updated Sucessfully"}})
+	self.emit("successfulUpdateProductCampaign",{"success":{"message":"Product Campaign Updated Sucessfully"}});
 }
 
 ProductCampaign.prototype.removeProductCampaign=function(campaign_id,sessionuserid){
@@ -261,7 +258,7 @@ ProductCampaign.prototype.getAllOrgCampaign = function(orgid) {
 };
 
 var _getAllOrgCampaign = function(self,orgid){
-	ProductCampaignModel.find({orgid:orgid}).sort({createdate:-1}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.find({orgid:orgid,status:{$ne:"deactive"}}).sort({createdate:-1}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetAllOrgCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(productcampain.length==0){
