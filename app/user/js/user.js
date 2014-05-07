@@ -1456,8 +1456,12 @@ var _checkAlreadyFollowProductOrNot=function(self,product,sessionuserid){
 }
 
 var _followproduct=function(self,product,sessionuserid){
+	// var a = new Date();
+	// var date = new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
+	// // var date = a.getFullYear()+"-"+(a.getMonth()+1)+"-"+a.getDate()+"T00:00:00.000Z";
+	// console.log("Date : "+date);
+	// console.log("Date1 : "+date.toISOString());
 	userModel.update({userid:sessionuserid},{$push:{products_followed:{prodle:product.prodle,orgid:product.orgid}}},function(err,followprodstatus){
-			// userModel.push({"products_followed":prodle},function(err,followprodstatus){
 		if(err){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});
