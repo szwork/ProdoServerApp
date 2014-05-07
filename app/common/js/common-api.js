@@ -231,6 +231,7 @@ var _orgdatawithProductCommentCountAndFollowedCount=function(organalytics,callba
 }
 var _orgdataWithProductCampaign=function(organalyticsarray,callback){
   var today=new Date();
+  today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
   CampaignModel.aggregate({$match:{status:"active",startdate:{$lte:today},enddate:{$gte:today}}},{$group:{_id:"$orgid",campaign:{$addToSet:{campaign_id:"$campaign_id",name:"$name",bannertext:"$bannertext",banner_image:"$banner_image",description:"$description",orgid:"$orgid",prodle:"$prodle"}}}},function(err,campaignbyorg){
     if(err){
       callback({error:{code:"ED001",message:"Database Issue"+err}})
