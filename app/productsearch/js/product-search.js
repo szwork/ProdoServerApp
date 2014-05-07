@@ -396,7 +396,7 @@ var _validateAllProductSearchData = function(self,product_data){
 		// res.send({"error":{"code":"AD001","message":"Please pass orgid"}});
 		self.emit("failedToSearchAllProduct",{"error":{"code":"AV001","message":"Please pass orgid"}});
 	}else{
-		if(product_name.match(star)){
+		if(S(product_name).contains("*")){
 			query.orgid=orgid;
 			if(product_name.length>1){
 				self.emit("failedToSearchAllProduct",{"error":{"code":"AV001","message":"Please pass valid data"}});

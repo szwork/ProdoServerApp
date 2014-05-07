@@ -181,7 +181,7 @@ var _updateProductCampaignData = function(self,campaigndata,orgid,campaign_id){
 
 var _successfulUpdateProductCampaignData=function(self){
 	logger.log("log","_successfulUpdateProductCampaignData");
-	self.emit("successfulUpdateProductCampaign",{"success":{"message":"Product Campaign Updated Sucessfully"}})
+	self.emit("successfulUpdateProductCampaign",{"success":{"message":"Product Campaign Updated Sucessfully"}});
 }
 
 ProductCampaign.prototype.removeProductCampaign=function(campaign_id,sessionuserid){
