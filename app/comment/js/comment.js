@@ -305,7 +305,7 @@ var _validateFeatureAnalytics = function(prodle,commentdata,product){
             console.log("analytics array " + commentdata.analytics);
             console.log("analytics array leangth " + commentdata.analytics.length);
             for(var i=0;i<commentdata.analytics.length;i++){
-                console.log("analytics featureid" + commentdata.analytics[i].featureitad);
+                console.log("analytics featureid" + commentdata.analytics[i].featureid);
                 console.log("analytics featurename" + commentdata.analytics[i].featurename);
                 console.log("analytics tag" + commentdata.analytics[i].tag);
                 _addFeatureAnalytics(prodle,commentdata.analytics[i],commentdata.user.userid,product);
