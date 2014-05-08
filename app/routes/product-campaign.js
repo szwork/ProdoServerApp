@@ -13,4 +13,5 @@ exports.init = function (app) {
   	app.post('/api/campaignpublish/:orgid/:campaign_id',auth,api.productcampaignapi.publishCampaign);
 
   	app.post("/api/campaign/follow/:campaign_id",auth, api.productcampaignapi.followCampaign);//following campaign
+  	app.get('/api/activecampaign',auth,api.productcampaignapi.getAllActiveCampaign);
 }
