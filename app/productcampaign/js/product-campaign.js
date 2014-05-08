@@ -290,13 +290,20 @@ var _getAllProductCampaign = function(self,prodle){
 		if(err){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(product){
-			console.log("Product : "+JSON.stringify(product.name));
+			// console.log("Product : "+JSON.stringify(product.name));
 			ProductCampaignModel.find({prodle:prodle,status:{$ne:"deactive"}}).lean().exec(function(err,productcampain){
 				if(err){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 				}else if(productcampain.length==0){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No campaign exists for "+product.name}});
 				}else{
+					for(var i=0;i<productcampain.length;i++){
+						var cam_tags = productcampain[i].campaign_tags;
+						productcampain[i].campaign_tags=[];
+						for(var j=0;j<cam_tags.length;j++){
+							productcampain[i].campaign_tags.push({featurename:cam_tags[j]});
+						}						
+					}
 					////////////////////////////////////////////////////
 					_successfulGetAllProductCampaign(self,productcampain,product.name);
 					////////////////////////////////////////////////////

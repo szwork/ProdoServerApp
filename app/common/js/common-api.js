@@ -1819,7 +1819,7 @@ var campaignBannerImageChange=function(campaign_id,awsparams,filename,callback){
           callback({"error":{"message":"campaignBannerImageChange:Error in getting getSignedUrl "+err}});
         }else{
          var banner_image_object={bucket:params1.Bucket,key:params1.Key,image:url};
-          CampaignModel.findAndModify({campaign_id:campaign_id},[],{$set:{banner_image:banner_image_object,bannertext:""}},{new:false},function(err,campaignimagedata){
+          CampaignModel.findAndModify({campaign_id:campaign_id},[],{$set:{banner_image:banner_image_object}},{$unset:{bannertext:1}},{new:false},function(err,campaignimagedata){
             if(err){
               callback({"error":{"code":"EDOO1","message":"Campaign Image:Dberror"+err}});
             }else if(campaignimagedata){
