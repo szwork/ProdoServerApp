@@ -38,3 +38,22 @@ exports.getTagAnalyticsForBarChart = function(req, res) {
 	});
 	featureanalytics.getTagAnalyticsForBarChart(prodle);
 }
+
+exports.getDatewiseTrendingForProduct = function(req, res) {
+	var sessionuserid = req.user.userid;
+	var prodle = req.params.prodle;
+	var featureanalytics = new FeatureAnalytics();
+
+	featureanalytics.removeAllListeners("failedGetDatewiseTrendingForProduct");
+  	featureanalytics.on("failedGetDatewiseTrendingForProduct",function(err){
+    	logger.emit("error", err.error.message,req.user.userid);
+    	res.send(err);
+  	});
+
+  	featureanalytics.removeAllListeners("successfulGetDatewiseTrendingForProduct");
+	featureanalytics.on("successfulGetDatewiseTrendingForProduct",function(result){
+    	logger.emit("info", result.success.message);      
+		res.send(result);
+	});
+	featureanalytics.getDatewiseTrendingForProduct(prodle);
+}

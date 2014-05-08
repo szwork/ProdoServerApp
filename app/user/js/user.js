@@ -1457,7 +1457,7 @@ var _checkAlreadyFollowProductOrNot=function(self,product,sessionuserid){
 
 var _followproduct=function(self,product,sessionuserid){
 	var a = new Date();
-	var date = new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+(a.getDate()+1));
+	var date = new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+(a.getDate()));
 	
 	userModel.update({userid:sessionuserid},{$push:{products_followed:{prodle:product.prodle,orgid:product.orgid,followdate:date}}},function(err,followprodstatus){
 		if(err){
