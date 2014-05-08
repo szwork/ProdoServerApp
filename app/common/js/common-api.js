@@ -1819,10 +1819,19 @@ var campaignBannerImageChange=function(campaign_id,awsparams,filename,callback){
           callback({"error":{"message":"campaignBannerImageChange:Error in getting getSignedUrl "+err}});
         }else{
          var banner_image_object={bucket:params1.Bucket,key:params1.Key,image:url};
-          CampaignModel.findAndModify({campaign_id:campaign_id},[],{$set:{banner_image:banner_image_object}},{$unset:{bannertext:1}},{new:false},function(err,campaignimagedata){
+          CampaignModel.findAndModify({campaign_id:campaign_id},[],{$set:{banner_image:banner_image_object}},{new:false},function(err,campaignimagedata){
             if(err){
               callback({"error":{"code":"EDOO1","message":"Campaign Image:Dberror"+err}});
             }else if(campaignimagedata){
+              CampaignModel.findAndModify({campaign_id:campaign_id},[],{$unset:{bannertext:1}},{new:false},function(err,campaigndata){
+                if(err){
+                  logger.emit("error","Error in db to update campaign");
+                }else if(campaigndata){
+                  logger.emit("log","Banner text remove successfully");
+                }else{
+                  logger.emit("error","Wrong Campaign id to unset bannertext");
+                } 
+              });
               var banner_image=campaignimagedata.banner_image;
               if(banner_image==undefined){
                 logger.emit("log","first time banner_image changes");
