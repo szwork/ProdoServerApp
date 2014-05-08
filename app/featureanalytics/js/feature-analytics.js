@@ -120,26 +120,26 @@ var _getDatewiseTrendingForProduct = function(self,prodle){
 	userModel.aggregate([{$unwind:"$products_followed"},{$match:{"products_followed.prodle":prodle}},{$group:{_id:"$products_followed.followdate",count:{$sum:1}}},{$project:{x:"$_id",y:"$count",_id:0}}]).exec(function(err,producttrend){
 		if(err){
 			self.emit("failedGetDatewiseTrendingForProduct",{"error":{"code":"ED001","message":"Error in db to find product follow trending"}});
-		}else if(producttrend.length>0){
+		}else if(!producttrend){
+			self.emit("failedGetDatewiseTrendingForProduct",{"error":{"code":"AU003","message":"wrong prodle"}});
+		}else{
 			////////////////////////////////
 			_getDatewiseTrendingForProductComment(self,prodle,producttrend);
 			////////////////////////////////
-		}else{
-			self.emit("failedGetDatewiseTrendingForProduct",{"error":{"code":"AU003","message":"wrong prodle"}});
 		}
 	})
 };
 
 var _getDatewiseTrendingForProductComment = function(self,prodle,producttrend){
-	commentModel.aggregate([{$match:{prodle:prodle}},{$project:{day:{$dayOfMonth:'$datecreated'},month:{$month:'$datecreated'},year:{$year:'$datecreated'}}},{$group:{_id:{day:'$day',month:'$month',year:'$year'}, count: {$sum:1}}}]).exec(function(err,commenttrend){
+	commentModel.aggregate([{$match:{prodle:prodle}},{$project:{day:{$dayOfMonth:'$datecreated'},month:{$month:'$datecreated'},year:{$year:'$datecreated'}}},{$group:{_id:{day:'$day',month:'$month',year:'$year'}, count: {$sum:1}}},{$project:{count:"$count",date:"$_id",_id:0}}]).exec(function(err,commenttrend){
 		if(err){
 			self.emit("failedGetDatewiseTrendingForProduct",{"error":{"code":"ED001","message":"Error in db to find comment trending"}});
-		}else if(commenttrend.length>0){
+		}else if(!commenttrend){
+			self.emit("failedGetDatewiseTrendingForProduct",{"error":{"code":"AU003","message":"wrong prodle"}});
+		}else{
 			////////////////////////////////
 			_successfulGetDatewiseTrendingForProduct(self,producttrend,commenttrend);
 			////////////////////////////////
-		}else{
-			self.emit("failedGetDatewiseTrendingForProduct",{"error":{"code":"AU003","message":"wrong prodle"}});
 		}
 	})
 };
