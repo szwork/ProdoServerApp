@@ -252,7 +252,7 @@ var _updateTrendingForProdonusFollowedCount = function(self,product){
 
 
 var _applyDefaultIndividualTrialPlan=function(user){
-	SubscriptionModel.findOne({plantype:"individual","planpaymentcommitment.amount":0},function(err,subscription){
+	SubscriptionModel.findOne({plantype:"individual","planpaymentcommitment.commitmenttype":"monthly"},function(err,subscription){
 		if(err){
 			logger.emit("error","Database Issue"+err)
 		}else if(!subscription){
