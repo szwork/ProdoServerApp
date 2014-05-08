@@ -23,6 +23,7 @@ AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'7jEfBYTb
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
 var S=require("string");
+var __=require("underscore");
 var ProductCampaign = function(campaigndata) {
 	this.productcampaign = campaigndata;
 };
@@ -471,4 +472,57 @@ var _followCampaign = function(self,campaign,sessionuserid){
 			self.emit("failedFollowCampaign",{"error":{"code":"F001","message":"Failed to follow the campaign"}});
 		}
 	});
+}
+ProductCampaign.prototype.getAllActiveCampaign=function(){
+	var self=this;
+	// _checkCampaignForFollow(self,campaign_id,sessionuserid);
+	//////////////////////////////////////
+	_getAllActiveCampaign(self)
+	////////////////////////////////////
+}
+var _getAllActiveCampaign=function(self){
+	var a=new Date();
+    var today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
+    ProductCampaignModel.find({status:"active",startdate:{$lte:today},enddate:{$gte:today}},{orgid:1,prodle:1,campaign_id:1,bannertext:1,banner_image:1,name:1,description:1},function(err,activecampaigns){
+      if(err){
+        logger.emit("log","failed to connect to database"+err);
+			  self.emit("failedGetAllActiveCampaign",{"error":{"code":"ED001","message":"Database Issue"}});
+      }else if(activecampaigns.length==0){
+      	self.emit("failedGetAllActiveCampaign",{"error":{"message":"No Active Campaign Exists"}});
+      }else{
+      	var orgids_array=[];
+      	for(var i=0;i<activecampaigns.length;i++){
+      		orgids_array.push(activecampaigns[i].orgid);
+      	}
+      	orgids_array=__.uniq(orgids_array);
+      	OrgModel.find({orgid:{$in:orgids_array}},{orgid:1,name:1},function(err,organization){
+      		if(err){
+      			logger.emit("log","failed to connect to database"+err);
+			      self.emit("failedGetAllActiveCampaign",{"error":{"code":"ED001","message":"Database Issue"}});
+      		}else if(organization.length==0){
+      			self.emit("failedGetAllActiveCampaign",{"error":{"message":"No Org Campaign Exists"}});
+      		}else{
+      			var orgids=[];
+      			for(var j=0;j<organization.length;j++){
+      				orgids.push(organization[j].orgid);
+      			}
+      			// var org_campaigns=[];
+      			activecampaigns=JSON.stringify(activecampaigns);
+      			activecampaigns=JSON.parse(activecampaigns);
+      			
+      			for(var k=0;k<activecampaigns.length;k++){
+      				if(orgids.indexOf(activecampaigns[k].orgid)>=0){
+      					activecampaigns[k].orgname=organization[orgids.indexOf(activecampaigns[k].orgid)].name;
+      				}
+      			}
+      			//////////////////////////////////////////////
+      			_successfullGetAllActiveCampaign(self,activecampaigns)
+      			/////////////////////////////////////////////
+      		}
+      	})
+      }
+		})
+}
+var _successfullGetAllActiveCampaign=function(self,activecampaigns){
+	self.emit("successfulGetAllActiveCampaign",{success:{message:"Get all active campaign successfully",campaigns:activecampaigns}})
 }

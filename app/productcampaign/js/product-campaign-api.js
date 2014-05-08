@@ -271,3 +271,21 @@ exports.followCampaign=function(req,res){
     
  productcampaign.followCampaign(campaign_id,sessionuserid);
 }
+exports.getAllActiveCampaign=function(req,res){
+  var productcampaign= new ProductCampaign();
+
+  var sessionuserid=req.user.userid;
+ 
+  productcampaign.removeAllListeners("failedGetAllActiveCampaign");
+  productcampaign.on("failedGetAllActiveCampaign",function(err){
+    logger.emit("error", err.error.message,req.user.email);
+    res.send(err);
+  });
+  productcampaign.removeAllListeners("successfulGetAllActiveCampaign");
+  productcampaign.on("successfulGetAllActiveCampaign",function(result){
+    logger.emit("info", result.success.message,req.user.email);
+    // callback(null,result);
+    res.send(result);
+  });
+  productcampaign.getAllActiveCampaign();
+}
