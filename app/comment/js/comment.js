@@ -301,13 +301,13 @@ var _addComment=function(self,prodle,commentdata,product){
 		}
 	})
 }
+
 var _validateFeatureAnalytics = function(prodle,commentdata){
         console.log("_validateFeatureAnalytics");
         // var analytics = commentdata.analytics;
         if(commentdata.analytics.length>0){
              var initialvalue=0;            
-            _addFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);
-            
+            _addFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);            
         }else{
             console.log("Please pass analytics data");
         }
@@ -330,10 +330,6 @@ var _addFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
 	}else{
        console.log("all feature analytics done");
 	}
-    // console.log("_addFeatureAnalytics");
-    // console.log("CDA " + analytics);
-    // console.log("CDAFID " + analytics.featurename);
-    
 }
 
 var _addNewFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
@@ -441,6 +437,7 @@ var _deleteComment=function(self,commentid){
 			}
 			/////////////////////////////
 			_successfulCommentDeletion(self,comment.prodle);
+			_validateDeleteFeatureAnalytics(comment.prodle,comment);
 			////////////////////////////
 		}
 	})
@@ -451,6 +448,35 @@ var _successfulCommentDeletion = function(self,prodle) {
 	updateLatestProductCommentDecCount(prodle);
 	logger.emit("log","_successfulCommentDeletion");
   	self.emit("successfulCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
+}
+
+var _validateDeleteFeatureAnalytics = function(prodle,commentdata){
+        console.log("_validateDeleteFeatureAnalytics");
+        // var analytics = commentdata.analytics;
+        if(commentdata.featureanalytics.length>0){
+            var initialvalue=0;            
+            _deleteFeatureAnalytics(prodle,commentdata.featureanalytics,commentdata.user.userid,initialvalue);
+        }else{
+            console.log("Please pass featureanalytics data");
+        }
+}
+
+var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
+	var analytics=analyticsdata[initialvalue];
+	if(analyticsdata.length>initialvalue){
+		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,"analytics.$.userid":userid,"analytics.$.tagname":analytics.tag},{$set:{commentavailable:false}}).lean().exec(function(err,updatestatus){
+	        if(err){
+	            logger.emit("error","Error in deletion of featureanalytics");
+	        }else if(updatestatus == 1){
+	            logger.emit("log","featureanalytics deleted sucessfully");
+	        }else{
+	        	logger.emit("error","Given commentdata is wrong to delete featureanalytics");
+	        }
+    	});
+    	_deleteFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+	}else{
+       console.log("all featureanalytics deletion is done");
+	}
 }
 
 var updateLatestProductCommentDecCount=function(prodle){
