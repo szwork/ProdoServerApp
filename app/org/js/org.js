@@ -151,13 +151,25 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
 	     	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to find user"}});
 	    }else{  
 	    	logger.emit("log","_addOrganization");
+	    	/////////////////////////////////////////
+            _addIndustryCategory(organization1);
+	    	//////////////////////////////////////
 	    	//////////////////////////////////////////////
 		    _addOrgDetailsToUser(self,organization1,sessionuserid,sessionuser,usergrp);
 		    //////////////////////////////////////1///////      
 	     }
 	  })
-	};
-
+	}; 
+	var _addIndustryCategory=function(organization){
+		var industry_category=organization.industry_category;
+		OrgIndustryCategory.update({},{$addToSet:{tagname:{$each:industry_category}}},function(err,updatelatestcategory){
+			if(err){
+				logger.emit("error","Database Issue _addIndustryCategory"+err)
+      }else{
+      	logger.emit("log","new category tags added");
+			}
+		})
+	}
     
 	var _addOrgDetailsToUser = function(self,organization,sessionuserid,sessionuser,usergrp) {
     var organizationsubscription={planid:organization.subscription.planid,planstartdate:new Date(organization.subscription.planstartdate),planexpirydate:new Date(organization.subscription.planexpirydate)};
