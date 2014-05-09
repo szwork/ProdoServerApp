@@ -268,16 +268,19 @@ var _commentImageUpload=function(self,commentdata,product,awsparams){
 var _addComment=function(self,prodle,commentdata,product){
 
 	var tags_array=[];
+	var analytics_array = [];
 	if(commentdata.analytics.length>0){
 		for(var i=0;i<commentdata.analytics.length;i++){
 			if(commentdata.analytics[i].tag!=undefined){
 				tags_array.push(commentdata.analytics[i].tag);
+				analytics_array.push(commentdata.analytics[i]);
 			}
 		}
 	}
+
 	commentdata.tags=tags_array;
-	var comment_data=new CommentModel(commentdata);
-	
+	commentdata.featureanalytics=analytics_array;
+	var comment_data=new CommentModel(commentdata);	
 
 	comment_data.save(function(err,product_commentdata){
 		if(err){
