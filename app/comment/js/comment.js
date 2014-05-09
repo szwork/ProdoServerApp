@@ -313,10 +313,10 @@ var _validateFeatureAnalytics = function(prodle,commentdata){
 var _addFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
 	var analytics=analyticsdata[initialvalue];
 	if(analyticsdata.length>initialvalue){
-		FeatureAnalyticsModel.findOne({prodle:prodle,featurename:analytics.featurename}).lean().exec(function(err,analyticsdata){
+		FeatureAnalyticsModel.findOne({prodle:prodle,featurename:analytics.featurename}).lean().exec(function(err,analyticsresult){
 	        if(err){
 	            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
-	        }else if(!analyticsdata){
+	        }else if(!analyticsresult){
 	            console.log("calling to add new analytics with prodle and featurename");
 	            _addNewFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
 	        }else{
@@ -345,11 +345,11 @@ var _addNewFeatureAnalytics = function(prodle,analytics,userid,initialvalue,anal
         	analytics.prodle = prodle;
             analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid}];
             var analytics_data = new FeatureAnalyticsModel(analytics);
-        	analytics_data.save(function(err,analyticsdata){
+        	analytics_data.save(function(err,analyticsresult){
             	if(err){
                	 	console.log("Error in db to save feature analytics" + err);
             	}else{
-                	console.log("Feature analytics added sucessfully" + analyticsdata);
+                	console.log("Feature analytics added sucessfully" + analyticsresult);
             	}
             	/////////////////////////////////////////////////////////////////////////////////////////
             	_addFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
