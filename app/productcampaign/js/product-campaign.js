@@ -483,7 +483,7 @@ ProductCampaign.prototype.getAllActiveCampaign=function(){
 var _getAllActiveCampaign=function(self){
 	var a=new Date();
     var today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
-    ProductCampaignModel.find({status:"active",startdate:{$lte:today},enddate:{$gte:today}},{orgid:1,prodle:1,campaign_id:1,bannertext:1,banner_image:1,name:1,description:1},function(err,activecampaigns){
+    ProductCampaignModel.aggregate({$match:{status:"active",startdate:{$lte:today},enddate:{$gte:today}}},{$group:{_id:"$orgid",campaigns:{$addToSet:{campaign_id:"$campaign_id",name:"$name",bannertext:"$bannertext",banner_image:"$banner_image",description:"$description",orgid:"$orgid",prodle:"$prodle"}}}},{$project:{orgid:"$_id",campaigns:1}},function(err,activecampaigns){
       if(err){
         logger.emit("log","failed to connect to database"+err);
 			  self.emit("failedGetAllActiveCampaign",{"error":{"code":"ED001","message":"Database Issue"}});
@@ -494,7 +494,7 @@ var _getAllActiveCampaign=function(self){
       	for(var i=0;i<activecampaigns.length;i++){
       		orgids_array.push(activecampaigns[i].orgid);
       	}
-      	orgids_array=__.uniq(orgids_array);
+      	// orgids_array=__.uniq(orgids_array);
       	OrgModel.find({orgid:{$in:orgids_array}},{orgid:1,name:1},function(err,organization){
       		if(err){
       			logger.emit("log","failed to connect to database"+err);
