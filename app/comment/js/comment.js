@@ -293,46 +293,47 @@ var _addComment=function(self,prodle,commentdata,product){
     	// 	product_commentdata.prodle=undefined;
 		// ///////////////////////////////////		
 		_successfulAddComment(self,product_commentdata);
-		_validateFeatureAnalytics(prodle,commentdata,product);		
+		_validateFeatureAnalytics(prodle,commentdata);		
 		/////////////////////////////////
 		}
 	})
 }
-var _validateFeatureAnalytics = function(prodle,commentdata,product){
+var _validateFeatureAnalytics = function(prodle,commentdata){
         console.log("_validateFeatureAnalytics");
         // var analytics = commentdata.analytics;
         if(commentdata.analytics.length>0){
-            console.log("analytics array " + commentdata.analytics);
-            console.log("analytics array leangth " + commentdata.analytics.length);
-            for(var i=0;i<commentdata.analytics.length;i++){
-                console.log("analytics featureid" + commentdata.analytics[i].featureid);
-                console.log("analytics featurename" + commentdata.analytics[i].featurename);
-                console.log("analytics tag" + commentdata.analytics[i].tag);
-                _addFeatureAnalytics(prodle,commentdata.analytics[i],commentdata.user.userid,product);
-            }
+             var initialvalue=0;            
+            _addFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);
+            
         }else{
             console.log("Please pass analytics data");
         }
 }
 
-var _addFeatureAnalytics = function(prodle,analytics,userid,product){
-    console.log("_addFeatureAnalytics");
-    console.log("CDA " + analytics);
-    console.log("CDAFID " + analytics.featureid);
-    FeatureAnalyticsModel.findOne({featureid:analytics.featureid}).lean().exec(function(err,analyticsdata){
-        if(err){
-            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
-        }else if(!analyticsdata){
-            console.log("calling to add new analytics with prodle and featureid");
-            _addNewFeatureAnalytics(prodle,analytics,userid,product);
-        }else{
-            console.log("calling to update analytics");
-            _updateFeatureAnalytics(prodle,analytics,userid,product);
-        }
-    });
+var _addFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
+	var analytics=analyticsdata[initialvalue];
+	if(analyticsdata.length>initialvalue){
+		FeatureAnalyticsModel.findOne({prodle:prodle,featurename:analytics.featurename}).lean().exec(function(err,analyticsresult){
+	        if(err){
+	            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+	        }else if(!analyticsresult){
+	            console.log("calling to add new analytics with prodle and featurename");
+	            _addNewFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
+	        }else{
+	            console.log("calling to update analytics");
+	            _updateFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
+	        }
+    	});
+	}else{
+       console.log("all feature analytics done");
+	}
+    // console.log("_addFeatureAnalytics");
+    // console.log("CDA " + analytics);
+    // console.log("CDAFID " + analytics.featurename);
+    
 }
 
-var _addNewFeatureAnalytics = function(prodle,analytics,userid,product){
+var _addNewFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
 	console.log("_addNewFeatureAnalytics");
 	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
 	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
@@ -344,22 +345,25 @@ var _addNewFeatureAnalytics = function(prodle,analytics,userid,product){
         	analytics.prodle = prodle;
             analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid,datecreated:new Date()}];
             var analytics_data = new FeatureAnalyticsModel(analytics);
-        	analytics_data.save(function(err,analyticsdata){
+        	analytics_data.save(function(err,analyticsresult){
             	if(err){
                	 	console.log("Error in db to save feature analytics" + err);
             	}else{
-                	console.log("Feature analytics added sucessfully" + analyticsdata);
+                	console.log("Feature analytics added sucessfully" + analyticsresult);
             	}
+            	/////////////////////////////////////////////////////////////////////////////////////////
+            	_addFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+            	/////////////////////////////////////////////////////////////////////////////////
         	})
         }
 	});        
 }
 
 
-var _updateFeatureAnalytics = function(prodle,analytics,userid,product){
+var _updateFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
     console.log("_updateFeatureAnalytics");
     //checking tagid and tagname exist
-    var query = {prodle:prodle,featureid:analytics.featureid};
+    var query = {prodle:prodle,featurename:analytics.featurename};
     TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1,tagname:1}).lean().exec(function(err,tagdata){
 		if(err){
             console.log("Error in db to find feature id err message: " + err);
@@ -375,6 +379,9 @@ var _updateFeatureAnalytics = function(prodle,analytics,userid,product){
 	                console.log("Feature analytics updated sucessfully analytics_data : " + analyticsupdatedata);
 	                // _successfulAddComment(self,analyticsdata);
 	            }
+	            /////////////////////////////////////////////////////////////////////////////////////////
+            	_addFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+            	/////////////////////////////////////////////////////////////////////////////////
 	        });
 		}
 	})	
