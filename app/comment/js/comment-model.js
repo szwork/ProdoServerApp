@@ -21,7 +21,7 @@ var CommentSchema = mongoose.Schema({
   user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
   prodle:{type:String, ref:"Product"},
   campaign_id:{type:String},
-  commenttag:{type:String},//its mandetory
+  commentcategory:{type:String},//its mandetory
   status:{type:String,default:"active"}, 
 
   type:{type:String},//proudct,campain
