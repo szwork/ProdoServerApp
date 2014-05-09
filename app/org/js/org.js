@@ -21,6 +21,7 @@ AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'7jEfBYTb
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
 var regxemail = /\S+@\S+\.\S+/; 
+var OrgIndustryCategory=require("../../common/js/org-industry-category-model");
 function isArray(what) {
     return Object.prototype.toString.call(what) === '[object Array]';
 }
@@ -732,22 +733,22 @@ Organization.prototype.getOrgIndustryCategory = function() {
 
 var _getOrgIndustryCategory=function(self){
 	
-	orgModel.aggregate([{"$unwind":"$industry_category"},{$group:{_id:null,industry_category:{"$addToSet":"$industry_category"}}},{$project:{industry_category:1,_id:0}}]).exec(function(err,organization){
+	OrgIndustryCategory.aggregate([{$group:{_id:null,industry_category:{"$addToSet":"$categoryname"}}},{$project:{industry_category:1,_id:0}}]).exec(function(err,orgindustrycategories){
 		if(err){
 			self.emit("failedGetOrgIndustryCategory",{"error":{"code":"ED001","message":"Error in db to find all organizations"}});
-		}else if(organization.length==0){
+		}else if(orgindustrycategories.length==0){
 			self.emit("failedGetOrgIndustryCategory",{"error":{"code":"AO003","message":"No organization exists"}});
 		}else{
 			////////////////////////////////////////////////
-			_successfulGetOrgIndustryCategory(self,organization[0].industry_category);
+			_successfulGetOrgIndustryCategory(self,orgindustrycategories[0].industry_category);
 			///////////////////////////////////////////////
 		}
 	})
 };
 
-var _successfulGetOrgIndustryCategory=function(self,organization){
+var _successfulGetOrgIndustryCategory=function(self,orgindustrycategories){
 	logger.emit("log","_successfulGetOrgIndustryCategory");
-	self.emit("successfulGetOrgIndustryCategory", {"success":{"message":"Getting Organization Industry Category Successfully","industry_category":organization}});
+	self.emit("successfulGetOrgIndustryCategory", {"success":{"message":"Getting Organization Industry Category Successfully","industry_category":orgindustrycategories}});
 }
 
 Organization.prototype.getAllOrganizationName = function() {

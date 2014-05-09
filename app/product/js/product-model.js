@@ -38,7 +38,8 @@ var commentSchema = mongoose.Schema({
   status:{type:String},
   datecreated:{type:Date}, 
   dateremoved:{type:Date},   
-  commenttext:{type:String},   
+  commenttext:{type:String}, 
+  commentag:{type:String},  
   tags:[{type:String,ref:"Tags"}], 
   comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]
 });
