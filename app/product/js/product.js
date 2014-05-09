@@ -62,13 +62,13 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	  	}else if( !isArray(productdata.category)){
 	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"category should be an array"}});
 	  	}else if(productdata.category.length==0){
-	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one commenttags"}});
-	  	}else if(productdata.commenttags==undefined || productdata.commenttags==""){
-	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Pleae pass commenttags"}});
-	  	}else if( !isArray(productdata.commenttags)){
-	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"commenttags should be an array"}});
-	  	}else if(productdata.commenttags.length==0){
-	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one commenttags"}});
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one commentcategory"}});
+	  	}else if(productdata.commentcategory==undefined || productdata.commentcategory==""){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Pleae pass commentcategory"}});
+	  	}else if( !isArray(productdata.commentcategory)){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"commentcategory should be an array"}});
+	  	}else if(productdata.commentcategory.length==0){
+	  		self.emit("failedProductAdd",{"error":{"code":"AV001","message":"Please pass atleast one commentcategory"}});
 	  	}else{
 	  	 	////////////////////////////////////////////////
 			_checkProductNameIsSame(self,productdata,orgid);
@@ -103,7 +103,9 @@ Product.prototype.addProduct=function(orgid,sessionuserid){
 	var _addProduct=function(self,productdata,orgid){
 		productdata.orgid=orgid;
 		productdata.status="active";
-         productdata.commenttags.push("general");
+		if(productdata.commentcategory.indexOf("general")<0){
+          productdata.commentcategory.push("general");
+		}
 // 		productdata.prodle=shortId.generate();  
 // 		productdata.features=[{featurename:productdata.name.toLowerCase(),featuredescription:" default product features"}];
 //     var product=new productModel(productdata);
@@ -846,7 +848,7 @@ Product.prototype.getAllCommentTags = function() {
 };
 
 var _getAllCommentTags=function(self){
-	productModel.find({$where:"this.commenttags.length>0"},{commenttags:1,_id:0},function(err,commenttags){
+	productModel.find({$where:"this.commentcategory.length>0"},{commentcategory:1,_id:0},function(err,commenttags){
 		if(err){
 			logger.emit("error","Database Issue _getAllCategoryTags "+err)
 			self.emit("failedGetAllCommentTags",{"error":{"message":"Database Issue"}})
@@ -855,7 +857,7 @@ var _getAllCommentTags=function(self){
 		}else{
 			var commenttagsarray=[];
 			for(var i=0;i<commenttags.length;i++){
-				commenttagsarray=__.union(commenttags[i].commenttags,commenttagsarray);
+				commenttagsarray=__.union(commenttags[i].commentcategory,commenttagsarray);
 			}
 			///////////////////////////////////
 			_successfullGetAllCommentTags(self,commenttagsarray);
