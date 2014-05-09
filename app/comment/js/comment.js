@@ -464,7 +464,7 @@ var _validateDeleteFeatureAnalytics = function(prodle,commentdata){
 var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
 	var analytics=analyticsdata[initialvalue];
 	if(analyticsdata.length>initialvalue){
-		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,"analytics.$.userid":userid,"analytics.$.tagname":analytics.tag},{$set:{commentavailable:false}}).lean().exec(function(err,updatestatus){
+		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,"analytics.userid":userid,"analytics.tagname":analytics.tag},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
 	        if(err){
 	            logger.emit("error","Error in deletion of featureanalytics");
 	        }else if(updatestatus == 1){
