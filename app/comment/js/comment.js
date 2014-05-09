@@ -140,8 +140,8 @@ var _validateCommentData=function(self,sessionuserid,prodle,__dirname) {
 		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass analytics"}});			
 	// }else if(commentdata.analytics.featureid==undefined){
 	// 	self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass featureid in analytics"}});			
-	}else  if(commentdata.commenttag==undefined || commentdata.commenttag=="") {
-		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass comment tag"}});			
+	}else  if(commentdata.commentcategory==undefined || commentdata.commentcategory=="") {
+		self.emit("failedAddComment",{"error":{"code":"AV001","message":"Please pass comment category"}});			
 	}else{
 		///////////////////////////////////////////////////////
 		_isSessionUserToComment(self,sessionuserid,prodle,commentdata,__dirname);

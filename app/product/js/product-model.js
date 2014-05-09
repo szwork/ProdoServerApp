@@ -63,7 +63,7 @@ var productSchema = mongoose.Schema({
   banneddate: { type: Date },
   product_images: [{bucket:String,key:String,image:{type:String},imageid:{type:String}}],
   category:[{type:String}],
-  commentcategories:[{type:String}],
+  commentcategory:[{type:String}],
   features: [productFeatureSchema], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 
   incompatability: [{prodle:{type:String,ref:"product"}}], 
