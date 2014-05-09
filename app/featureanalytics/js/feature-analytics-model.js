@@ -19,15 +19,11 @@ var logger = require("../../common/js/logger");
 //Feature Analytics Model
 var featureAnalyticsSchema = mongoose.Schema({
   prodle:{type:String},
-  featureid:{type:String,ref:"productFeatureSchema"},
+  featurename:{type:String,ref:"productFeatureSchema"},
+  // featureid:{type:String,ref:"productFeatureSchema"},
   analytics: [{tagid:{type:String,ref:"TagReffDictionary"},tagname:{type:String,ref:"TagReffDictionary"},userid:{type:String,ref:"User"},datecreated:{type:Date,default:new Date()}}]
 });
-// featureAnalyticsSchema.pre('save', function(next) {
-//   var product = this;
-//   product.prodle=shortId.generate();  
-//    console.log("product pre"+product);
-//   next();
-// })
+
 //Seed a feature analytics
  featureAnalyticsSchema.set('redisCache', true);
  featureAnalyticsSchema.set('expires', 90);
