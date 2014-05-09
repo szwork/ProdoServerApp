@@ -38,7 +38,8 @@ var commentSchema = mongoose.Schema({
   status:{type:String},
   datecreated:{type:Date}, 
   dateremoved:{type:Date},   
-  commenttext:{type:String},   
+  commenttext:{type:String}, 
+  commentcategory:{type:String},  
   tags:[{type:String,ref:"Tags"}], 
   comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]
 });
@@ -62,7 +63,7 @@ var productSchema = mongoose.Schema({
   banneddate: { type: Date },
   product_images: [{bucket:String,key:String,image:{type:String},imageid:{type:String}}],
   category:[{type:String}],
-  commenttags:[{type:String}],
+  commentcategories:[{type:String}],
   features: [productFeatureSchema], 
   substitutes: [{prodle:{type:String,ref:"product"}}], 
   incompatability: [{prodle:{type:String,ref:"product"}}], 

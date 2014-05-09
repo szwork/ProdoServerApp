@@ -22,6 +22,7 @@ var featureAnalyticsSchema = mongoose.Schema({
   featurename:{type:String,ref:"productFeatureSchema"},
   // featureid:{type:String,ref:"productFeatureSchema"},
   analytics: [{tagid:{type:String,ref:"TagReffDictionary"},tagname:{type:String,ref:"TagReffDictionary"},userid:{type:String,ref:"User"},datecreated:{type:Date,default:new Date()}}]
+
 });
 
 //Seed a feature analytics

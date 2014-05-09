@@ -27,7 +27,7 @@ var featuretrending = require("../featuretrending/js/feature-trending-api");
 var productcampaignapi = require("../productcampaign/js/product-campaign-api");
 var marketingapi = require("../marketing/js/marketing-api");
 var warrantyapi = require("../warranty/js/warranty-api");
-
+var orgindustrycategoryapi=require("../common/js/org-industry-category-api");
 exports.orgapi = orgapi;
 exports.userapi = userapi;
 exports.productapi = productapi;
@@ -44,3 +44,4 @@ exports.featuretrending = featuretrending;
 exports.productcampaignapi = productcampaignapi;
 exports.marketingapi = marketingapi;
 exports.warrantyapi = warrantyapi;
+exports.orgindustrycategoryapi=orgindustrycategoryapi;

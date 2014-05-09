@@ -346,7 +346,7 @@ var _addNewFeatureAnalytics = function(prodle,analytics,userid,initialvalue,anal
             console.log("Tag name does not exist to get tagid");
         }else{
         	analytics.prodle = prodle;
-            analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid}];
+            analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid,datecreated:new Date()}];
             var analytics_data = new FeatureAnalyticsModel(analytics);
         	analytics_data.save(function(err,analyticsresult){
             	if(err){
@@ -373,7 +373,7 @@ var _updateFeatureAnalytics = function(prodle,analytics,userid,initialvalue,anal
         }else if(!tagdata){
             console.log("Tag name does not exist to get tagid");
         }else{		    
-		    FeatureAnalyticsModel.update(query,{$push:{analytics:{tagid:tagdata.tagid,tagname:tagdata.tagname,userid:userid}}},function(err,analyticsupdatedata){
+		    FeatureAnalyticsModel.update(query,{$push:{analytics:{tagid:tagdata.tagid,tagname:tagdata.tagname,userid:userid,datecreated:new Date()}}},function(err,analyticsupdatedata){
 	            if(err){
 	                console.log("Error in db to update count err message: " + err);
 	            }else if(!analyticsupdatedata){

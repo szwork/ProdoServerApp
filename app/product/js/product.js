@@ -381,7 +381,8 @@ var _checkProductIsProdonus = function(self,orgid,prodle){
 				_deleteProduct(self,orgid,prodle);
 			}
 	    }else{	    	
-	    	self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Prodonus not found"}});
+	    	_deleteProduct(self,orgid,prodle);
+	    	// self.emit("failedDeleteProduct",{"error":{"code":"AP001","message":"Prodonus not found"}});
 		}
 	});
 }
