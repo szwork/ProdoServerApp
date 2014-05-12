@@ -6,6 +6,7 @@ var ProductCampaignModel=require("../../productcampaign/js/product-campaign-mode
 var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
 var CampaignAnalyticsModel = require("../../featureanalytics/js/campaign-analytics-model");
 var TrendingModel = require("../../featuretrending/js/feature-trending-model");
+var CampaignTrendModel = require("../../featuretrending/js/campaign-trending-model");
 var events = require("events");
 var shortId = require('shortid');
 var logger=require("../../common/js/logger");
@@ -547,7 +548,8 @@ var _successfulCampaignCommentDeletion = function(self,prodle,campaign_id) {
   	self.emit("successfulCampaignCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
 }
 
-var updateLatestCampaignCommentDecCount = function(prodle,campaign_id){	
+var updateLatestCampaignCommentDecCount = function(prodle,campaign_id){
+	console.log("prodle : "+prodle+" campaign_id : "+campaign_id);
     CampaignTrendModel.update({prodle:prodle,campaign_id:campaign_id},{$inc:{commentcount:-1}},function(err,latestupatestatus){
 		if(err){
 			logger.emit("error","Error in updation latest comment count");
