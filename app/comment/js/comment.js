@@ -424,7 +424,7 @@ var _isAuhorizedUserToDeleteComment=function(self,sessionuserid,commentid){
 var _deleteComment=function(self,commentid){
 	var commentdata={status:"deactive",dateremoved:new Date()};
 	
-  CommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
+    CommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
 		if(err){
 			self.emit("failedCommentDeletion",{"error":{"code":"ED001","message":"Error in db to delete comment"}});
 		}else if(!comment){
@@ -501,7 +501,7 @@ Comment.prototype.deleteCampaignComment = function(sessionuserid,commentid) {
 	/////////////////////////////////////////////////////////////	
 };
 
-var _isAuhorizedUserToDeleteCampaignComment=function(self,sessionuserid,commentid){
+var _isAuhorizedUserToDeleteCampaignComment = function(self,sessionuserid,commentid){
   CommentModel.findOne({commentid:commentid,status:"active"},{user:1},function(err,comment){
   	if(err){
   		self.emit("failedCampaignCommentDeletion",{"error":{"code":"ED001","message":"Error in db to find Comment"}});
@@ -566,6 +566,7 @@ Comment.prototype.loadMoreComment = function(sessionuserid,commentid) {
     ///////////////////////////////////////
     _loadMoreComment(self,sessionuserid,commentid);
 };
+
 var _loadMoreComment=function(self,sessionuserid,commentid){
 	CommentModel.findOne({commentid:commentid,status:"active"},{prodle:1,commentid:1,datecreated:1},function(err,comment){
 		if(err){
@@ -589,6 +590,7 @@ var _loadMoreComment=function(self,sessionuserid,commentid){
 		}
 	})
 }
+
 var _successfullLoadMoreComments=function(self,nextcomments){
 	logger.emit("log","_successfullLoadMoreComments");
 	self.emit("successfulLoadMoreComment", {"success":{"message":"Next comments","comment":nextcomments}});
@@ -829,7 +831,7 @@ var _successfulAddCampaignComment=function(self,newcomment){
 }
 
 var updateCampaignTrendingForCommentCount=function(prodle,campaign_id){	
-	CampaignTrendModel.update({prodle:prodle,campaign_id:campaign_id},{$inc:{commentcount:1}}).exec(function(err,latestupatestatus){
+	CampaignTrendModel.update({prodle:prodle,campaign_id:campaign_id},{$inc:{commentcount:1}},{upsert:true}).exec(function(err,latestupatestatus){
 		if(err){
 			logger.emit("error","Error in updation latest campaign comment count");
 		}else if(latestupatestatus==1){
@@ -896,7 +898,6 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,pr
         }
 	});        
 }
-
 
 var _updateCampignCommentFeatureAnalytics = function(prodle,analytics,userid,product){
     console.log("_updateCampignCommentFeatureAnalytics");

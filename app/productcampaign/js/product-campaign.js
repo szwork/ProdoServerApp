@@ -367,11 +367,11 @@ ProductCampaign.prototype.deleteCampaignImage = function(camimageids,campaign_id
 		self.emit("failedDeleteCampaignImage",{"error":{"message":"Given camimageids is empty "}});
 	}else{
 		///////////////////////////////////////////////////////////////////
-	_deleteCampaignImage(self,camimageids,campaign_id);
-	/////////////////////////////////////////////////////////////////	
+		_deleteCampaignImage(self,camimageids,campaign_id);
+		/////////////////////////////////////////////////////////////////	
 	}
-	
 };
+
 var _deleteCampaignImage=function(self,camimageids,campaign_id){
 	 var camp_imagearray=[];
 	camimageids=S(camimageids);
@@ -513,7 +513,7 @@ var _followCampaign = function(self,campaign,sessionuserid){
 }
 
 var updateCampaignTrendingForFollowedCount=function(campaign){
-	CampaignTrendModel.update({prodle:campaign.prodle,campaign_id:campaign.campaign_id},{$inc:{followedcount:1}}).exec(function(err,latestupatestatus){
+	CampaignTrendModel.update({orgid:campaign.orgid,prodle:campaign.prodle,campaign_id:campaign.campaign_id,name:campaign.name},{$inc:{followedcount:1}},{upsert:true}).exec(function(err,latestupatestatus){
 		if(err){
 			logger.emit("error","Error in updation latest campaign followed count");
 		}else if(latestupatestatus==1){
@@ -531,6 +531,7 @@ ProductCampaign.prototype.getAllActiveCampaign=function(){
 	_getAllActiveCampaign(self)
 	////////////////////////////////////
 }
+
 var _getAllActiveCampaign=function(self){
 	var a=new Date();
     var today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
@@ -574,6 +575,7 @@ var _getAllActiveCampaign=function(self){
       }
 		})
 }
+
 var _successfullGetAllActiveCampaign=function(self,activecampaigns){
 	self.emit("successfulGetAllActiveCampaign",{success:{message:"Get all active campaign successfully",campaigns:activecampaigns}})
 }
