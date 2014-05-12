@@ -171,3 +171,21 @@ exports.comment=function(io,__dirname){
     })
   })
 }
+
+exports.getUserInfoCommentedOnProduct = function(req,res){
+  var prodle = req.params.prodle;
+  var sessionuserid=req.user.userid;
+  var comment=new Comment();
+  comment.removeAllListeners("failedGetUserInfoCommentedOnProduct");
+  comment.on("failedGetUserInfoCommentedOnProduct",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+    comment.removeAllListeners("successfulGetUserInfoCommentedOnProduct");
+    comment.on("successfulGetUserInfoCommentedOnProduct",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+    });
+  comment.getUserInfoCommentedOnProduct(sessionuserid,prodle);
+}

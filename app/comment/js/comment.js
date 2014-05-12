@@ -896,3 +896,28 @@ var _updateCampignCommentFeatureAnalytics = function(prodle,analytics,userid,pro
 		}
 	})	
 }
+
+// 
+Comment.prototype.getUserInfoCommentedOnProduct=function(sessionuserid,prodle){
+	var self=this;
+    //////////////////////////////////////////////////////////
+	_getUserInfoCommentedOnProduct(self,sessionuserid,prodle);
+	//////////////////////////////////////////////////////////
+}
+
+var _getUserInfoCommentedOnProduct = function(self,sessionuserid,prodle){
+	CommentModel.aggregate([{$match:{prodle:prodle}},{$group:{_id:{user:"$user"}}},{$project:{username:"$_id.user.username",userid:"$_id.user.userid",_id:0}}]).exec(function(err,userdata){
+	  	if(err){
+	  		self.emit("failedGetUserInfoCommentedOnProduct",{"error":{"code":"ED001","message":"Error in db to find userdata"}});
+	  	}else if(userdata.length==0){
+	  		self.emit("failedGetUserInfoCommentedOnProduct",{"error":{"code":"EA001","message":"prodle is wrong"}});	
+	  	}else{
+	  		_successfulGetUserInfoCommentedOnProduct(self,userdata);
+	  	}
+	});
+}
+
+var _successfulGetUserInfoCommentedOnProduct = function(self,userdata){
+	logger.emit("log","successfulGetUserInfoCommentedOnProduct");
+	self.emit("successfulGetUserInfoCommentedOnProduct",{"success":{"message":"Getting user details sucessfully","userdata":userdata}});
+}
