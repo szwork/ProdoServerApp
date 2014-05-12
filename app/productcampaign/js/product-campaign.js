@@ -230,10 +230,23 @@ var _removeProductCampaign = function(self,campaign_id,sessionuserid){
 		}else{
 			////////////////////////////////
 			_successfulRemoveProductCampaign(self);
+			_changeCampaignStatusInTrending(campaign_id)
 			//////////////////////////////////
 		}
 	})
 } 
+
+var _changeCampaignStatusInTrending = function(campaign_id){
+	console.log("_changeCampaignStatusInTrending");
+	CampaignTrendModel.update({campaign_id:campaign_id},{$set:{status:"deactive"}}).lean().exec(function(err,status){
+		if(err){
+			logger.emit("error","Error in db to update campaign status in trending" + err);
+	  	}else{
+			logger.emit("log","Status updated successfully in trending");
+			// _successfulDeleteProduct(self);
+		}
+	})
+}
 
 var _successfulRemoveProductCampaign=function(self){
 	logger.log("log","_successfulRemoveProductCampaign");
@@ -252,8 +265,18 @@ var _getProductCampaign = function(self,prodle,campaign_id){
 		if(err){
 			self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
 		}else if(productcampain){
+			CampaignTrendModel.findOne({prodle:prodle,campaign_id:campaign_id,status:{$ne:"deactive"}},{commentcount:1,followedcount:1,_id:0}).lean().exec(function(err,campaign_trend){
+				if(err){
+					logger.emit({"message":"Error in db to find ProductTrend"});
+				}else{
+					console.log("Error in Db1");
+					logger.emit({"message":"Provided prodle or campaign_id is wrong"});
+					productcampain.trending = campaign_trend;
+					_successfulGetProductCampaign(self,productcampain);
+				}
+			})
 			//////////////////////////////////////////////////
-			_successfulGetProductCampaign(self,productcampain);
+			// _successfulGetProductCampaign(self,productcampain);
 			//////////////////////////////////////////////////
 		}else{			
 			self.emit("failedGetProductCampaign",{"error":{"code":"AP001","message":"Provided prodle or campaign_id is wrong"}});

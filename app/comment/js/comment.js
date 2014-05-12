@@ -506,9 +506,9 @@ var _isAuhorizedUserToDeleteCampaignComment=function(self,sessionuserid,commenti
   	if(err){
   		self.emit("failedCampaignCommentDeletion",{"error":{"code":"ED001","message":"Error in db to find Comment"}});
   	}else if(comment){
-  		 if(comment.user.userid!=sessionuserid){
+  		if(comment.user.userid!=sessionuserid){
   		 	self.emit("failedCampaignCommentDeletion",{"error":{"code":"EA001","message":"You are not authorize to delete this comment"}});	
-  		 }else{
+  		}else{
   		 	//////////////////////////////
         	_deleteCampaignComment(self,commentid);
 		    /////////////////////////////
@@ -517,11 +517,10 @@ var _isAuhorizedUserToDeleteCampaignComment=function(self,sessionuserid,commenti
   		self.emit("failedCampaignCommentDeletion",{"error":{"code":"AC001","message":"Comment already deleted"}});
   	}
   })
-
 }
+
 var _deleteCampaignComment=function(self,commentid){
-	var commentdata={status:"deactive",dateremoved:new Date()};
-	
+	var commentdata={status:"deactive",dateremoved:new Date()};	
   	CommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
 		if(err){
 			self.emit("failedCampaignCommentDeletion",{"error":{"code":"ED001","message":"Error in db to delete comment"}});
