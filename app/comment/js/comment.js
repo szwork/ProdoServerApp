@@ -463,8 +463,9 @@ var _validateDeleteFeatureAnalytics = function(prodle,commentdata){
 
 var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
 	var analytics=analyticsdata[initialvalue];
-	if(analyticsdata.length>initialvalue){
-		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,"analytics.userid":userid,"analytics.tagname":analytics.tag},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
+	console.log("analytics : "+analytics+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
+	if(analyticsdata.length>initialvalue){//,"analytics.userid":userid,"analytics.tagname":analytics.tag
+		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
 	        if(err){
 	            logger.emit("error","Error in deletion of featureanalytics");
 	        }else if(updatestatus == 1){
@@ -475,11 +476,11 @@ var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue)
     	});
     	_deleteFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
 	}else{
-       console.log("all featureanalytics deletion is done");
+       logger.emit("log","all featureanalytics deletion is done");
 	}
 }
 
-var updateLatestProductCommentDecCount=function(prodle){
+var updateLatestProductCommentDecCount = function(prodle){
 	
     TrendingModel.update({prodle:prodle},{$inc:{commentcount:-1}},function(err,latestupatestatus){
 		if(err){
