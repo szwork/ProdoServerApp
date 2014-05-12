@@ -187,5 +187,10 @@ exports.getUserInfoCommentedOnProduct = function(req,res){
       
       res.send(result);
     });
-  comment.getUserInfoCommentedOnProduct(sessionuserid,prodle);
+  
+  if(req.user.org.isAdmin == true) {
+    comment.getUserInfoCommentedOnProduct(sessionuserid,prodle);
+  }else{
+    comment.emit("failedGetUserInfoCommentedOnProduct",{"error":{"code":"EA001","message":"You have not authorize to done this action"}});
+  }
 }

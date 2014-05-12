@@ -897,7 +897,6 @@ var _updateCampignCommentFeatureAnalytics = function(prodle,analytics,userid,pro
 	})	
 }
 
-// 
 Comment.prototype.getUserInfoCommentedOnProduct=function(sessionuserid,prodle){
 	var self=this;
     //////////////////////////////////////////////////////////
