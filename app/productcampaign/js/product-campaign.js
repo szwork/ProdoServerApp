@@ -16,6 +16,7 @@ var logger = require("../../common/js/logger");
 var OrgModel = require("../../org/js/org-model");
 var ProductModel = require("../../product/js/product-model");
 var userModel=require("../../user/js/user-model");
+var CampaignTrendModel = require("../../featuretrending/js/campaign-trending-model");
 var ProductCampaignModel = require("./product-campaign-model");
 var CONFIG = require('config').Prodonus;
 var AWS = require('aws-sdk');
@@ -122,6 +123,7 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 		  	}else{
 		  		//////////////////////////////////
 		  		_successfulProductCampaignAdd(self);
+		  		_addTrendingForProductCampaign(product_campaign_data);
 		  		/////////////////////////////////	  
 		  	}
 		});
@@ -131,6 +133,19 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 var _successfulProductCampaignAdd = function(self){
 	logger.log("log","_successfulProductCampaignAdd");
 	self.emit("successfulAddProductCampaign",{"success":{"message":"Product Campaign added sucessfully"}});
+}
+
+var _addTrendingForProductCampaign = function(campaigndata){
+	console.log("campaigndata : "+JSON.stringify(campaigndata));
+	var trend={campaign_id:campaigndata.campaign_id,orgid:campaigndata.orgid,prodle:campaigndata.prodle,name:campaigndata.name,commentcount:0,followedcount:0};
+	var trend_data = new CampaignTrendModel(trend);
+	trend_data.save(function(err,trenddata){
+	  	if(err){
+	   	 	logger.emit("error","Error in db to save campaign trending data" + err);
+	   	}else{
+	       	logger.emit("log","Campaign Trending Added Sucessfully" + trenddata);
+	  	}
+	})
 }
 
 ProductCampaign.prototype.updateProductCampaign=function(orgid,campaign_id,sessionuserid){
@@ -465,7 +480,7 @@ var _followCampaign = function(self,campaign,sessionuserid){
 			self.emit("failedFollowCampaign",{"error":{"code":"ED001","message":"Error in db to follow campaign"}});
 		}else if(followcampaignstatus){
 			logger.emit("log","successfulFollowCampaign");
-			// updateLatestProductFollowedCount(campaign);
+			updateCampaignTrendingForFollowedCount(campaign);
 			self.emit("successfulFollowCampaign",{"success":{"message":"Following campaign"}});
 		}else{
 			logger.emit("log","Failure in following the campaign");
@@ -473,6 +488,19 @@ var _followCampaign = function(self,campaign,sessionuserid){
 		}
 	});
 }
+
+var updateCampaignTrendingForFollowedCount=function(campaign){
+	CampaignTrendModel.update({prodle:campaign.prodle,campaign_id:campaign.campaign_id},{$inc:{followedcount:1}}).exec(function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest campaign followed count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest campaign followed count updated");
+		}else{
+			logger.emit("error","Given product id or campaign id is wrong to update latest campaign followed count");
+		}
+	});			
+}
+
 ProductCampaign.prototype.getAllActiveCampaign=function(){
 	var self=this;
 	// _checkCampaignForFollow(self,campaign_id,sessionuserid);

@@ -534,17 +534,29 @@ var _deleteCampaignComment=function(self,commentid){
        			//updateLatestWarrantyComment
 			}
 			/////////////////////////////
-			_successfulCampaignCommentDeletion(self,comment.prodle);
+			_successfulCampaignCommentDeletion(self,comment.prodle,comment.campaign_id);
 			////////////////////////////
 		}
 	})
 }
 
-var _successfulCampaignCommentDeletion = function(self,prodle) {
+var _successfulCampaignCommentDeletion = function(self,prodle,campaign_id) {
 		//validate the user data
-	// updateLatestProductCommentDecCount(prodle);
+	updateLatestCampaignCommentDecCount(prodle,campaign_id);
 	logger.emit("log","_successfulCampaignCommentDeletion");
   	self.emit("successfulCampaignCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
+}
+
+var updateLatestCampaignCommentDecCount = function(prodle,campaign_id){	
+    CampaignTrendModel.update({prodle:prodle,campaign_id:campaign_id},{$inc:{commentcount:-1}},function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest comment count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest comment count(Decrement) for campaign updated");
+		}else{
+			logger.emit("error","Given product id or campaignid is wrong to update latest comment count");
+		}
+	})	
 }
 
 Comment.prototype.loadMoreComment = function(sessionuserid,commentid) {
@@ -810,9 +822,21 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 }
 
 var _successfulAddCampaignComment=function(self,newcomment){
-	// updateLatestProductCommentCount(newcomment.prodle);
+	updateCampaignTrendingForCommentCount(newcomment.prodle,newcomment.campaign_id);
 	logger.emit("log","successfulAddCampaignComment");
 	self.emit("successfulAddCampaignComment",{"success":{"message":"Gave comment to campaign sucessfully","campaign_comment":newcomment}});
+}
+
+var updateCampaignTrendingForCommentCount=function(prodle,campaign_id){	
+	CampaignTrendModel.update({prodle:prodle,campaign_id:campaign_id},{$inc:{commentcount:1}}).exec(function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest campaign comment count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest campaign comment count updated");
+		}else{
+			logger.emit("error","Given product id or campaign id is wrong to update latest campaign comment count");
+		}
+	});
 }
 
 var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata,product){
