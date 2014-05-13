@@ -335,17 +335,55 @@ var _getAllProductCampaign = function(self,prodle){
 				}else if(productcampain.length==0){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No campaign exists for "+product.name}});
 				}else{
+					var productcampainids=[];
+						productcampain=JSON.stringify(productcampain);
+						productcampain=JSON.parse(productcampain);
 					for(var i=0;i<productcampain.length;i++){
 						var cam_tags = productcampain[i].campaign_tags;
 						productcampain[i].campaign_tags=[];
+						// productcampain[i].trending=[];
+						productcampainids.push(productcampain[i].campaign_id)
 						for(var j=0;j<cam_tags.length;j++){
 							productcampain[i].campaign_tags.push({featurename:cam_tags[j]});
-						}						
+						}
 					}
+					var camp_trend;
+					console.log("productcampainids"+productcampainids)
+					CampaignTrendModel.find({prodle:prodle,campaign_id:{$in:productcampainids},status:{$ne:"deactive"}},{campaign_id:1,commentcount:1,followedcount:1,_id:0}).lean().exec(function(err,campaign_trend){
+						if(err){
+							logger.emit({"message":"Error in db to find ProductTrend"});
+						}else{
+							if(campaign_trend.length>0){
+
+								console.log("test"+campaign_trend);
+								for(var j=0;j<campaign_trend.length;j++){
+									if(productcampainids.indexOf(campaign_trend[j].campaign_id)>=0){
+
+										productcampain[productcampainids.indexOf(campaign_trend[j].campaign_id)].trending={commentcount:campaign_trend[j].commentcount,followedcount:campaign_trend[j].followedcount};
+									}
+								}
+								console.log("Error in Db1 : "+JSON.stringify(campaign_trend));
+								// logger.emit({"message":"Provided prodle or campaign_id is wrong : "+campaign_trend});
+								// camp_trend = campaign_trend;
+								console.log("camp_trend 1 : "+camp_trend);
+			             ////////////////////////////////////////////////////
+					      _successfulGetAllProductCampaign(self,productcampain,product.name);
+					     ////////////////////////////////////////////////////
+								// _successfulGetProductCampaign(self,productcampain);
+							}else{
+								_successfulGetAllProductCampaign(self,productcampain,product.name);
+							}
+							
+						}
+					})
+						// console.log("camp_trend : "+camp_trend);
+						////////////////////////////////////////////////////
+					// _successfulGetAllProductCampaign(self,productcampain,product.name);
 					////////////////////////////////////////////////////
-					_successfulGetAllProductCampaign(self,productcampain,product.name);
-					////////////////////////////////////////////////////
-				}
+						// productcampain[i].trending = camp_trend;			
+					}
+					
+				
 			})			
 		}else{
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"prodle is wrong"}});

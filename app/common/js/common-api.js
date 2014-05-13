@@ -642,7 +642,9 @@ exports.uploadFiles=function(io,__dirname){
       if(dashboarddata==undefined){
         socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please provide marketing data"}});
       }else if(dashboarddata.chartname==undefined){
-        socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass name"}});
+        socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass chartname"}});
+      }else if(dashboarddata.description==undefined){
+        socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass description"}});
       }else{
         ///////////////////////////////////////////////////////
         _validateAddDashboardDataFile(userid,dashboarddata,file);

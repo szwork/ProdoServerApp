@@ -2,6 +2,7 @@ var TagReffDicModel = require("../../tagreffdictionary/js/tagreffdictionary-mode
 var FeatureAnalyticsModel = require("./feature-analytics-model");
 var userModel=require("../../user/js/user-model");
 var commentModel = require("../../comment/js/comment-model");
+var DashboardPoolModel = require("../../dashboard/js/dashboard-charts-model");
 var events = require("events");
 var logger=require("../../common/js/logger");
 
@@ -82,7 +83,7 @@ var _getFinalAnalyticsResult = function(self,prodle,featureanalytics,taganalytic
 	}
 	console.log("productanalytics : "+productanalytics);
 	_successfulGetFeatureAnalytics(self,featureanalytics,productanalytics);
-	_addDataInDashboardPool(prodle,featureanalytics,productanalytics);
+	_addDataInProductChartsPool(prodle,featureanalytics,productanalytics);
 }
 
 var _successfulGetFeatureAnalytics = function(self,barchart_analytics,piechart_analytics){
@@ -90,8 +91,41 @@ var _successfulGetFeatureAnalytics = function(self,barchart_analytics,piechart_a
 	self.emit("successfulGetFeatureAnalytics", {"success":{"message":"Getting tag analytics successfully","barchart_analytics":barchart_analytics,"piechart_analytics":piechart_analytics}});
 }
 
-var _addDataInDashboardPool = function(prodle,barchart_analytics,piechart_analytics){
+var _addDataInProductChartsPool = function(prodle,barchart_analytics,piechart_analytics){
+	if(barchart_analytics.length>0){
+		_getChartsFromDashboardPool(prodle,"bar chart",function(err,result){
+			if(err){
+			   logger.emit("error","Error in _getChartsFromDashboardPool "+err.error.message);
+			}else{
+				logger.emit("log","Result 1: "+JSON.stringify(result));
+			}
+		});
+	}
 
+	if(piechart_analytics.length>0){
+		_getChartsFromDashboardPool(prodle,"pie chart",function(err,result){
+			if(err){
+			   	logger.emit("error","Error in _getChartsFromDashboardPool "+err.error.message);
+			}else{
+			    logger.emit("log","Result 2: "+JSON.stringify(result));
+			}
+		});
+	}
+}
+
+var _getChartsFromDashboardPool = function(prodle,chartname,callback){
+	console.log("chartname : "+chartname);
+	DashboardPoolModel.findOne({chartname:chartname},{chartname:1,description:1,charts:1,_id:0}).lean().exec(function(err,doc){
+	    if(err){
+	        callback({error:{message:"Error in db to find dashboard charts"}});
+	    }else if(!doc){
+	        callback({error:{message:"Dashboard Charts Not Available"}});
+	    }else{
+	        ////////////////////////////////////////////////
+	        // callback(null,doc);
+	        ///////////////////////////////////////////////
+	    }
+    })
 }
 
 // FeatureAnalytics.prototype.getTagAnalyticsForBarChart = function(prodle) {
