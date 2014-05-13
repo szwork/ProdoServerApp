@@ -29,6 +29,7 @@ var userModel=require('../../user/js/user-model');
 var OrgModel=require('../../org/js/org-model');
 var MarketingModel = require('../../marketing/js/marketing-model');
 var ProductModel=require('../../product/js/product-model');
+var DashboardPoolModel = require("../../dashboard/js/dasgboard-charts-model");
 var CampaignModel = require('../../productcampaign/js/product-campaign-model');
 var WarrantyModel = require('../../warranty/js/warranty-model');
 var exec = require('child_process').exec;
@@ -512,7 +513,7 @@ exports.uploadFiles=function(io,__dirname){
           socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"User Session Expired"}});
         }else if(userid!=socket.handshake.user.userid){
           socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add marketing data"}});
-        }else if(isAdmin!=socket.handshake.user.isAdmin){
+        }else if(socket.handshake.user.isAdmin==false){
           socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add marketing data"}});
         }else{
           console.log("addMarketingData3");
@@ -613,6 +614,119 @@ exports.uploadFiles=function(io,__dirname){
         }
       })  
     }
+
+    socket.on('addDashboardCharts',function(userid,dashboarddata,file){
+      console.log("addDashboardCharts");
+      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+        console.log("addDashboardCharts");
+        if(err){
+          socket.emit("addDashboardChartResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(reply==null){
+          socket.emit("addDashboardChartResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(JSON.parse(reply).passport.user==undefined){
+          socket.emit("addDashboardChartResponse",{"error":{"code":"","message":"User Session Expired"}});
+        }else if(userid!=socket.handshake.user.userid){
+          socket.emit("addDashboardChartResponse",{"error":{"code":"","message":"You have not authorized to add dsahboard details"}});
+        }else if(socket.handshake.user.isAdmin==false){
+          socket.emit("addDashboardChartResponse",{"error":{"code":"","message":"You have not authorized to add dsahboard details"}});
+        }else{
+          console.log("addDashboardCharts");
+          ///////////////////////////////////////////////////          
+          _validateAddDashboardData(userid,dashboarddata,file);
+          ////////////////////////////////////////////////
+        }          
+      })
+    })
+
+    var _validateAddDashboardData=function(userid,dashboarddata,file){
+      if(dashboarddata==undefined){
+        socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please provide marketing data"}});
+      }else if(dashboarddata.chartname==undefined){
+        socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass name"}});
+      }else{
+        ///////////////////////////////////////////////////////
+        _validateAddDashboardDataFile(userid,dashboarddata,file);
+        ///////////////////////////////////////////////////////
+      }
+    }
+
+    var _validateAddDashboardDataFile=function(userid,dashboarddata,file){
+      var file_name=file.filename;
+      var file_buffer=file.filebuffer;
+      var file_length=file.filelength;  
+      var file_type=file.filetype;
+      // logger.emit("log","file details"+JSON.stringify(file));
+      var ext = path.extname(file_name||'').split('.');
+      ext=ext[ext.length - 1];
+      var fileName = __dirname + '/tmp/uploads/' + file_name;
+      
+      if(!S(file_type).contains("image") ){
+        callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
+      }else if(file_length>1000000){
+        socket.emit("addDashboardChartResponse",{"error":{"message":"You can upload  image of size less than 1mb"}});
+      }else{
+        fs.open(fileName, 'a', 0755, function(err, fd) {
+          if (err) {
+           socket.emit("addDashboardChartResponse",{"error":{"message":"_validateAddDashboardDataFile fs.open:"+err}})
+          }else{
+            fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+              if(err){
+                socket.emit("addDashboardChartResponse",{"error":{"message":"_validateAddDashboardDataFile fs.write:"+err}});
+              }else{
+                var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+                var bucketFolder;
+                var params;
+                var currentdate=new Date();
+                var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
+                bucketFolder=amazonbucket+"/user/"+userid+"/dsahboard";
+                params = {
+                   Bucket: bucketFolder,
+                   Key: userid+s3filekey,
+                   Body: writebuffer,
+                   Expires:expirydate,
+                   ACL: 'public-read',
+                   ContentType: file_type
+               };
+               fs.close(fd, function() {
+                  exec("rm -rf '"+fileName+"'");
+                             
+                });
+               //////////////////////////////////////////////////
+               _addDashboardDataWithImages(userid,dashboarddata,params);
+               //////////////////////////////////////////////////
+              }
+            })
+          }
+        })
+      }
+    }
+
+    var _addDashboardDataWithImages=function(userid,dashboarddata,awsparams){
+      s3bucket.putObject(awsparams, function(err, data) {
+        if (err) {
+          socket.emit("addMarketingDataResponse",{"error":{"message":"s3bucket.putObject:-_addDashboardDataWithImages"+err}});
+        } else {
+          var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+          s3bucket.getSignedUrl('getObject', params1, function (err, url) {
+            if(err){
+              socket.emit("addMarketingDataResponse",{"error":{"message":"_addDashboardDataWithImages:Error in getting getSignedUrl"+err}});
+            }else{
+             var dashboard_chart={bucket:params1.Bucket,key:params1.Key,image:url};
+             dashboarddata.charts=dashboard_chart;
+             var dashboard_obj = new DashboardPoolModel(dashboarddata);
+             dashboard_obj.save(function(err,upload_result){
+              if(err){
+                socket.emit("addMarketingDataResponse",{"error":{"message":"Database Isssue"}})
+              }else{
+                socket.emit("addMarketingDataResponse",null,{"success":{"message":"Dashboard Chart Added successfully","chartname":upload_result.chartname,"chartimage":url}});
+              }
+             })
+            }
+          });
+        }
+      })  
+    }
+
     //add product campaign
      socket.on('addProductCampaign',function(userid,orgid,prodle,campaigndata,file){
        redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {

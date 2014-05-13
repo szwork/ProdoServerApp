@@ -28,13 +28,13 @@ var _getFeatureAnalytics = function(self,prodle){
 			self.emit("failedGetFeatureAnalytics",{"error":{"code":"AU003","message":"Feature analytics does not exists"}});
 		}else{
 			////////////////////////////////
-			_getTagAnalyticsFromReffDict(self,featureanalytics);
+			_getTagAnalyticsFromReffDict(self,prodle,featureanalytics);
 			////////////////////////////////
 		}
 	})
 };
 
-var _getTagAnalyticsFromReffDict = function(self,featureanalytics){
+var _getTagAnalyticsFromReffDict = function(self,prodle,featureanalytics){
 	// console.log("featureanalytics : "+JSON.stringify(featureanalytics));
 	var tagids = [];
 	for(var i=0;i<featureanalytics.length;i++){
@@ -48,13 +48,13 @@ var _getTagAnalyticsFromReffDict = function(self,featureanalytics){
 			self.emit("failedGetFeatureAnalytics",{"error":{"code":"AU003","message":"Tag analytics does not exists in refference dictionary"}});
 		}else{
 			////////////////////////////////
-			_getFinalAnalyticsResult(self,featureanalytics,taganalytics);			
+			_getFinalAnalyticsResult(self,prodle,featureanalytics,taganalytics);			
 			////////////////////////////////
 		}
 	})
 };
 
-var _getFinalAnalyticsResult = function(self,featureanalytics,taganalytics){
+var _getFinalAnalyticsResult = function(self,prodle,featureanalytics,taganalytics){
 	console.log("featureanalytics : "+JSON.stringify(featureanalytics));
 	console.log("taganalytics : "+JSON.stringify(taganalytics));
 	var feature_tagids = [];
@@ -82,6 +82,7 @@ var _getFinalAnalyticsResult = function(self,featureanalytics,taganalytics){
 	}
 	console.log("productanalytics : "+productanalytics);
 	_successfulGetFeatureAnalytics(self,featureanalytics,productanalytics);
+	_addDataInDashboardPool(prodle,featureanalytics,productanalytics);
 }
 
 var _successfulGetFeatureAnalytics = function(self,barchart_analytics,piechart_analytics){
@@ -89,33 +90,35 @@ var _successfulGetFeatureAnalytics = function(self,barchart_analytics,piechart_a
 	self.emit("successfulGetFeatureAnalytics", {"success":{"message":"Getting tag analytics successfully","barchart_analytics":barchart_analytics,"piechart_analytics":piechart_analytics}});
 }
 
-FeatureAnalytics.prototype.getTagAnalyticsForBarChart = function(prodle) {
-	var self = this;
-	//////////////////
-	_getFeatureAnalyticsForBarChart(self,prodle);
-	///////////////////
-};
+var _addDataInDashboardPool = function(prodle,barchart_analytics,piechart_analytics){
 
-var _getFeatureAnalyticsForBarChart = function(self,prodle){
-	FeatureAnalyticsModel.aggregate([{$unwind:"$analytics"},{$match:{prodle:prodle}},{$group:{_id:{tagid:"$analytics.tagid",tagname:"$analytics.tagname"},tagcount:{$sum:1}}},{$project:{/*tagid:"$_id.tagid",*/tagname:"$_id.tagname",tagcount:1,_id:0}}]).exec(function(err,featureanalytics){
-		if(err){
-			self.emit("failedGetTagAnalyticsForBarChart",{"error":{"code":"ED001","message":"Error in db to find tag analytics"}});
-		}else if(featureanalytics.length == 0){
-			self.emit("failedGetTagAnalyticsForBarChart",{"error":{"code":"AU003","message":"Feature analytics does not exists"}});
-		}else{
-			////////////////////////////////
-			_successfulGetTagAnalyticsForBarChart(self,featureanalytics);
-			////////////////////////////////
-		}
-	})
-};
-
-var _successfulGetTagAnalyticsForBarChart = function(self,taganalytics){
-	logger.emit("log","_successfulGetTagAnalyticsForBarChart");
-	self.emit("successfulGetTagAnalyticsForBarChart", {"success":{"message":"Getting tag analytics successfully","taganalytics":taganalytics}});
 }
 
-// 
+// FeatureAnalytics.prototype.getTagAnalyticsForBarChart = function(prodle) {
+// 	var self = this;
+// 	//////////////////
+// 	_getFeatureAnalyticsForBarChart(self,prodle);
+// 	///////////////////
+// };
+
+// var _getFeatureAnalyticsForBarChart = function(self,prodle){
+// 	FeatureAnalyticsModel.aggregate([{$unwind:"$analytics"},{$match:{prodle:prodle}},{$group:{_id:{tagid:"$analytics.tagid",tagname:"$analytics.tagname"},tagcount:{$sum:1}}},{$project:{/*tagid:"$_id.tagid",*/tagname:"$_id.tagname",tagcount:1,_id:0}}]).exec(function(err,featureanalytics){
+// 		if(err){
+// 			self.emit("failedGetTagAnalyticsForBarChart",{"error":{"code":"ED001","message":"Error in db to find tag analytics"}});
+// 		}else if(featureanalytics.length == 0){
+// 			self.emit("failedGetTagAnalyticsForBarChart",{"error":{"code":"AU003","message":"Feature analytics does not exists"}});
+// 		}else{
+// 			////////////////////////////////
+// 			_successfulGetTagAnalyticsForBarChart(self,featureanalytics);
+// 			////////////////////////////////
+// 		}
+// 	})
+// };
+
+// var _successfulGetTagAnalyticsForBarChart = function(self,taganalytics){
+// 	logger.emit("log","_successfulGetTagAnalyticsForBarChart");
+// 	self.emit("successfulGetTagAnalyticsForBarChart", {"success":{"message":"Getting tag analytics successfully","taganalytics":taganalytics}});
+// }
 
 FeatureAnalytics.prototype.getDatewiseTrendingForProduct = function(prodle) {
 	var self = this;
