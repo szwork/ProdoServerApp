@@ -70,7 +70,15 @@ var _getFinalAnalyticsResult = function(self,featureanalytics,taganalytics){
 				taganalyticscount+=featureanalytics[feature_tagids.indexOf(taganalytics[j].tagid[k])].tagcount;
 			}
 		}
-		productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount})
+		if(taganalytics[j]._id=="Positive"){
+			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#00FF00"});
+		}else if(taganalytics[j]._id=="Negative"){
+			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#FF0000"});
+		}else if(taganalytics[j]._id=="Neutral"){
+			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#C0C0C0"});
+		}else{
+			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount});	
+		}		
 	}
 	console.log("productanalytics : "+productanalytics);
 	_successfulGetFeatureAnalytics(self,featureanalytics,productanalytics);
