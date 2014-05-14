@@ -1459,7 +1459,7 @@ var _followproduct=function(self,product,sessionuserid){
 	var a = new Date();
 	var date = new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+(a.getDate()));
 	
-	userModel.update({userid:sessionuserid},{$push:{products_followed:{prodle:product.prodle,orgid:product.orgid,followdate:date}}},function(err,followprodstatus){
+	userModel.update({userid:sessionuserid},{$push:{products_followed:{prodle:product.prodle,orgid:product.orgid,followdate:a}}},function(err,followprodstatus){
 		if(err){
 			logger.emit("log","failed to connect to database");
 			self.emit("failedFollowProduct",{"error":{"code":"ED001","message":"Error in db to update user data"}});

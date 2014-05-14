@@ -6,6 +6,7 @@ var ProductCampaignModel=require("../../productcampaign/js/product-campaign-mode
 var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
 var CampaignAnalyticsModel = require("../../featureanalytics/js/campaign-analytics-model");
 var TrendingModel = require("../../featuretrending/js/feature-trending-model");
+var CampaignTrendModel = require("../../featuretrending/js/campaign-trending-model");
 var events = require("events");
 var shortId = require('shortid');
 var logger=require("../../common/js/logger");
@@ -424,7 +425,7 @@ var _isAuhorizedUserToDeleteComment=function(self,sessionuserid,commentid){
 var _deleteComment=function(self,commentid){
 	var commentdata={status:"deactive",dateremoved:new Date()};
 	
-  CommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
+    CommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
 		if(err){
 			self.emit("failedCommentDeletion",{"error":{"code":"ED001","message":"Error in db to delete comment"}});
 		}else if(!comment){
@@ -464,8 +465,9 @@ var _validateDeleteFeatureAnalytics = function(prodle,commentdata){
 
 var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
 	var analytics=analyticsdata[initialvalue];
-	if(analyticsdata.length>initialvalue){
-		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,"analytics.userid":userid,"analytics.tagname":analytics.tag},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
+	console.log("analytics : "+analytics+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
+	if(analyticsdata.length>initialvalue){//,"analytics.userid":userid,"analytics.tagname":analytics.tag
+		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
 	        if(err){
 	            logger.emit("error","Error in deletion of featureanalytics");
 	        }else if(updatestatus == 1){
@@ -476,11 +478,11 @@ var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue)
     	});
     	_deleteFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
 	}else{
-       console.log("all featureanalytics deletion is done");
+       logger.emit("log","all featureanalytics deletion is done");
 	}
 }
 
-var updateLatestProductCommentDecCount=function(prodle){
+var updateLatestProductCommentDecCount = function(prodle){
 	
     TrendingModel.update({prodle:prodle},{$inc:{commentcount:-1}},function(err,latestupatestatus){
 		if(err){
@@ -500,14 +502,14 @@ Comment.prototype.deleteCampaignComment = function(sessionuserid,commentid) {
 	/////////////////////////////////////////////////////////////	
 };
 
-var _isAuhorizedUserToDeleteCampaignComment=function(self,sessionuserid,commentid){
+var _isAuhorizedUserToDeleteCampaignComment = function(self,sessionuserid,commentid){
   CommentModel.findOne({commentid:commentid,status:"active"},{user:1},function(err,comment){
   	if(err){
   		self.emit("failedCampaignCommentDeletion",{"error":{"code":"ED001","message":"Error in db to find Comment"}});
   	}else if(comment){
-  		 if(comment.user.userid!=sessionuserid){
+  		if(comment.user.userid!=sessionuserid){
   		 	self.emit("failedCampaignCommentDeletion",{"error":{"code":"EA001","message":"You are not authorize to delete this comment"}});	
-  		 }else{
+  		}else{
   		 	//////////////////////////////
         	_deleteCampaignComment(self,commentid);
 		    /////////////////////////////
@@ -516,11 +518,10 @@ var _isAuhorizedUserToDeleteCampaignComment=function(self,sessionuserid,commenti
   		self.emit("failedCampaignCommentDeletion",{"error":{"code":"AC001","message":"Comment already deleted"}});
   	}
   })
-
 }
+
 var _deleteCampaignComment=function(self,commentid){
-	var commentdata={status:"deactive",dateremoved:new Date()};
-	
+	var commentdata={status:"deactive",dateremoved:new Date()};	
   	CommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
 		if(err){
 			self.emit("failedCampaignCommentDeletion",{"error":{"code":"ED001","message":"Error in db to delete comment"}});
@@ -534,17 +535,30 @@ var _deleteCampaignComment=function(self,commentid){
        			//updateLatestWarrantyComment
 			}
 			/////////////////////////////
-			_successfulCampaignCommentDeletion(self,comment.prodle);
+			_successfulCampaignCommentDeletion(self,comment.prodle,comment.campaign_id);
 			////////////////////////////
 		}
 	})
 }
 
-var _successfulCampaignCommentDeletion = function(self,prodle) {
+var _successfulCampaignCommentDeletion = function(self,prodle,campaign_id) {
 		//validate the user data
-	// updateLatestProductCommentDecCount(prodle);
+	updateLatestCampaignCommentDecCount(prodle,campaign_id);
 	logger.emit("log","_successfulCampaignCommentDeletion");
   	self.emit("successfulCampaignCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
+}
+
+var updateLatestCampaignCommentDecCount = function(prodle,campaign_id){
+	console.log("prodle : "+prodle+" campaign_id : "+campaign_id);
+    CampaignTrendModel.update({prodle:prodle,campaign_id:campaign_id},{$inc:{commentcount:-1}},function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest comment count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest comment count(Decrement) for campaign updated");
+		}else{
+			logger.emit("error","Given product id or campaignid is wrong to update latest comment count");
+		}
+	})	
 }
 
 Comment.prototype.loadMoreComment = function(sessionuserid,commentid) {
@@ -553,6 +567,7 @@ Comment.prototype.loadMoreComment = function(sessionuserid,commentid) {
     ///////////////////////////////////////
     _loadMoreComment(self,sessionuserid,commentid);
 };
+
 var _loadMoreComment=function(self,sessionuserid,commentid){
 	CommentModel.findOne({commentid:commentid,status:"active"},{prodle:1,commentid:1,datecreated:1},function(err,comment){
 		if(err){
@@ -576,6 +591,7 @@ var _loadMoreComment=function(self,sessionuserid,commentid){
 		}
 	})
 }
+
 var _successfullLoadMoreComments=function(self,nextcomments){
 	logger.emit("log","_successfullLoadMoreComments");
 	self.emit("successfulLoadMoreComment", {"success":{"message":"Next comments","comment":nextcomments}});
@@ -810,9 +826,21 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 }
 
 var _successfulAddCampaignComment=function(self,newcomment){
-	// updateLatestProductCommentCount(newcomment.prodle);
+	updateCampaignTrendingForCommentCount(newcomment.prodle,newcomment.campaign_id);
 	logger.emit("log","successfulAddCampaignComment");
 	self.emit("successfulAddCampaignComment",{"success":{"message":"Gave comment to campaign sucessfully","campaign_comment":newcomment}});
+}
+
+var updateCampaignTrendingForCommentCount=function(prodle,campaign_id){	
+	CampaignTrendModel.update({prodle:prodle,campaign_id:campaign_id},{$inc:{commentcount:1}},{upsert:true}).exec(function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest campaign comment count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest campaign comment count updated");
+		}else{
+			logger.emit("error","Given product id or campaign id is wrong to update latest campaign comment count");
+		}
+	});
 }
 
 var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata,product){
@@ -872,7 +900,6 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,pr
 	});        
 }
 
-
 var _updateCampignCommentFeatureAnalytics = function(prodle,analytics,userid,product){
     console.log("_updateCampignCommentFeatureAnalytics");
     //checking tagid and tagname exist
@@ -896,6 +923,7 @@ var _updateCampignCommentFeatureAnalytics = function(prodle,analytics,userid,pro
 		}
 	})	
 }
+
 Comment.prototype.agreeDisagreeComment=function(sessionuserid,commentid,action){
 	var self=this;
 	if(["agree","disagree"].indexOf(action)<0){
@@ -1035,4 +1063,29 @@ var _successfullAgreeDisagreeComment=function(self,action){
   	result={success:{message:"Disgree the comment Successfully"}}
   }
   self.emit("successfulAgreeDisagreeComment",result);
+}
+
+Comment.prototype.getUserInfoCommentedOnProduct=function(sessionuserid,prodle){
+	var self=this;
+    //////////////////////////////////////////////////////////
+	_getUserInfoCommentedOnProduct(self,sessionuserid,prodle);
+	//////////////////////////////////////////////////////////
+}
+
+var _getUserInfoCommentedOnProduct = function(self,sessionuserid,prodle){
+	CommentModel.aggregate([{$match:{prodle:prodle}},{$group:{_id:{user:"$user"}}},{$project:{username:"$_id.user.username",userid:"$_id.user.userid",_id:0}}]).exec(function(err,userdata){
+	  	if(err){
+	  		self.emit("failedGetUserInfoCommentedOnProduct",{"error":{"code":"ED001","message":"Error in db to find userdata"}});
+	  	}else if(userdata.length==0){
+	  		self.emit("failedGetUserInfoCommentedOnProduct",{"error":{"code":"EA001","message":"prodle is wrong"}});	
+	  	}else{
+	  		_successfulGetUserInfoCommentedOnProduct(self,userdata);
+	  	}
+	});
+}
+
+var _successfulGetUserInfoCommentedOnProduct = function(self,userdata){
+	logger.emit("log","successfulGetUserInfoCommentedOnProduct");
+	self.emit("successfulGetUserInfoCommentedOnProduct",{"success":{"message":"Getting user details sucessfully","userdata":userdata}});
+
 }
