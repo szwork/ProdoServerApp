@@ -73,18 +73,18 @@ var _getFinalAnalyticsResult = function(self,prodle,featureanalytics,taganalytic
 			}
 		}
 		if(taganalytics[j]._id=="Positive"){
-			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#00FF00"});
+			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#009933"});
 		}else if(taganalytics[j]._id=="Negative"){
-			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#FF0000"});
+			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#CC3300"});
 		}else if(taganalytics[j]._id=="Neutral"){
-			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#C0C0C0"});
+			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount,color:"#3399CC"});
 		}else{
 			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount});	
 		}		
 	}
 	// console.log("productanalytics : "+productanalytics);
 	_successfulGetFeatureAnalytics(self,featureanalytics,productanalytics);
-	_addDataInProductChartsPool(prodle,featureanalytics,productanalytics);
+	// _addDataInProductChartsPool(prodle,featureanalytics,productanalytics);
 }
 
 var _successfulGetFeatureAnalytics = function(self,barchart_analytics,piechart_analytics){

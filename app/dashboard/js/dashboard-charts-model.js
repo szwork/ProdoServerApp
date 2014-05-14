@@ -20,6 +20,8 @@ var DashboardChartsSchema = mongoose.Schema({
   // marketing_id:{type:String},
   chartname:{type:String},
   description:{type:String},
+  category:{type:String},
+  type:{type:String},
   charts:{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}},
   // status:{type:String,default:"active"}
 });
