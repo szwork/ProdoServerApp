@@ -171,3 +171,21 @@ exports.comment=function(io,__dirname){
     })
   })
 }
+exports.agreeDisagreeComment=function(req,res){
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var action=req.query.action;
+  var comment=new Comment();
+  comment.removeAllListeners("failedAgreeDisagreeComment");
+  comment.on("failedAgreeDisagreeComment",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+    comment.removeAllListeners("successfulAgreeDisagreeComment");
+    comment.on("successfulAgreeDisagreeComment",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+    });
+  comment.agreeDisagreeComment(sessionuserid,commentid,action);
+}

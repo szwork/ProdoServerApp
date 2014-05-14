@@ -7,4 +7,5 @@ exports.init = function (app) {
 
   app.delete("/api/campaigncomment/:commentid",auth,api.commentapi.deleteCampaignComment);//delete product
   app.get("/api/campaign/nextcomments/:commentid",auth,api.commentapi.loadMoreCampaignComment);
+  app.post("/api/agreedisagreecomment/:commentid",auth,api.commentapi.agreeDisagreeComment)
 }

@@ -23,7 +23,8 @@ var CommentSchema = mongoose.Schema({
   campaign_id:{type:String},
   commentcategory:{type:String},//its mandetory
   status:{type:String,default:"active"}, 
-
+  agreecount:{type:Number,default:0},
+  disagreecount:{type:Number,default:0},
   type:{type:String},//proudct,campain
 
   datecreated:{type:Date,default:Date.now}, 

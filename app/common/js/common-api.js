@@ -512,7 +512,7 @@ exports.uploadFiles=function(io,__dirname){
           socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"User Session Expired"}});
         }else if(userid!=socket.handshake.user.userid){
           socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add marketing data"}});
-        }else if(isAdmin!=socket.handshake.user.isAdmin){
+        }else if(socket.handshake.user.isAdmin==false){
           socket.emit("addMarketingDataResponse",{"error":{"code":"","message":"You have not authorized to add marketing data"}});
         }else{
           console.log("addMarketingData3");

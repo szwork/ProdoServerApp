@@ -21,6 +21,8 @@ var commentSchema = mongoose.Schema({
   //orgname and grpname set when user is organization  user
   status:{type:String},
   datecreated:{type:Date}, 
+  agreecount:{type:Number},
+  disagreecount:{type:Number},
   dateremoved:{type:Date},   
   commenttext:{type:String},   
   tags:[{type:String,ref:"Tags"}], 
