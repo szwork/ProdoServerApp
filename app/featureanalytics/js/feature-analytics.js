@@ -116,14 +116,12 @@ var _addDataInProductChartsPool = function(prodle,barchart_analytics,piechart_an
 
 var _getChartsFromDashboardPool = function(prodle,chartname,callback){
 	console.log("chartname : "+chartname);
-	DashboardPoolModel.findOne({chartname:chartname},{chartname:1,description:1,charts:1,_id:0}).lean().exec(function(err,doc){
+	DashboardPoolModel.findOne({chartname:chartname}).lean().exec(function(err,doc){
 	    if(err){
+	    	logger.emit("error","Error in db to find dashboard charts");
 	        callback({error:{message:"Error in db to find dashboard charts"}});
-	    }else if(!doc){
-	        callback({error:{message:"Dashboard Charts Not Available"}});
-	    }else{
-	        // callback(null,doc);
-	        doc.charts.chartname = doc.chartname,
+	    }else if(doc){
+	    	doc.charts.chartname = doc.chartname,
 	        doc.charts.description = doc.description;
 	        ProductPoolModel.update({prodle:prodle,$elemMatch:{charts:{chartname:doc.chartname}}},{$push:{charts:doc.charts}},{upsert:true}).exec(function(err,productupdatestatus){
 				if(err){
@@ -136,6 +134,11 @@ var _getChartsFromDashboardPool = function(prodle,chartname,callback){
 					//////////////////////////////////
 				}
 			})
+	    	
+	    }else{
+	        // callback(null,doc);
+	        logger.emit("error","Dashboard Charts Not Available");
+	        callback({error:{message:"Dashboard Charts Not Available"}});
 	    }
     })
 }
