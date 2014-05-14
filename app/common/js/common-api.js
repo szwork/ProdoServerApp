@@ -706,21 +706,21 @@ exports.uploadFiles=function(io,__dirname){
     var _addDashboardDataWithImages=function(userid,dashboarddata,awsparams){
       s3bucket.putObject(awsparams, function(err, data) {
         if (err) {
-          socket.emit("addMarketingDataResponse",{"error":{"message":"s3bucket.putObject:-_addDashboardDataWithImages"+err}});
+          socket.emit("addDashboardChartResponse",{"error":{"message":"s3bucket.putObject:-_addDashboardDataWithImages"+err}});
         } else {
           var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
           s3bucket.getSignedUrl('getObject', params1, function (err, url) {
             if(err){
-              socket.emit("addMarketingDataResponse",{"error":{"message":"_addDashboardDataWithImages:Error in getting getSignedUrl"+err}});
+              socket.emit("addDashboardChartResponse",{"error":{"message":"_addDashboardDataWithImages:Error in getting getSignedUrl"+err}});
             }else{
              var dashboard_chart={bucket:params1.Bucket,key:params1.Key,image:url};
              dashboarddata.charts=dashboard_chart;
              var dashboard_obj = new DashboardPoolModel(dashboarddata);
              dashboard_obj.save(function(err,upload_result){
               if(err){
-                socket.emit("addMarketingDataResponse",{"error":{"message":"Database Isssue"}})
+                socket.emit("addDashboardChartResponse",{"error":{"message":"Database Isssue"}})
               }else{
-                socket.emit("addMarketingDataResponse",null,{"success":{"message":"Dashboard Chart Added successfully","chartname":upload_result.chartname,"chartimage":url}});
+                socket.emit("addDashboardChartResponse",null,{"success":{"message":"Dashboard Chart Added successfully","chartname":upload_result.chartname,"chartimage":url}});
               }
              })
             }
