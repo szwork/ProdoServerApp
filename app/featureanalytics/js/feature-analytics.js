@@ -3,6 +3,7 @@ var FeatureAnalyticsModel = require("./feature-analytics-model");
 var userModel=require("../../user/js/user-model");
 var commentModel = require("../../comment/js/comment-model");
 var DashboardPoolModel = require("../../dashboard/js/dashboard-charts-model");
+var ProductPoolModel = require("../../dashboard/js/product-charts-model");
 var events = require("events");
 var logger=require("../../common/js/logger");
 
@@ -56,8 +57,8 @@ var _getTagAnalyticsFromReffDict = function(self,prodle,featureanalytics){
 };
 
 var _getFinalAnalyticsResult = function(self,prodle,featureanalytics,taganalytics){
-	console.log("featureanalytics : "+JSON.stringify(featureanalytics));
-	console.log("taganalytics : "+JSON.stringify(taganalytics));
+	// console.log("featureanalytics : "+JSON.stringify(featureanalytics));
+	// console.log("taganalytics : "+JSON.stringify(taganalytics));
 	var feature_tagids = [];
 	var productanalytics=[];
 	for(var i=0;i<featureanalytics.length;i++){
@@ -81,7 +82,7 @@ var _getFinalAnalyticsResult = function(self,prodle,featureanalytics,taganalytic
 			productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount});	
 		}		
 	}
-	console.log("productanalytics : "+productanalytics);
+	// console.log("productanalytics : "+productanalytics);
 	_successfulGetFeatureAnalytics(self,featureanalytics,productanalytics);
 	_addDataInProductChartsPool(prodle,featureanalytics,productanalytics);
 }
@@ -121,9 +122,20 @@ var _getChartsFromDashboardPool = function(prodle,chartname,callback){
 	    }else if(!doc){
 	        callback({error:{message:"Dashboard Charts Not Available"}});
 	    }else{
-	        ////////////////////////////////////////////////
 	        // callback(null,doc);
-	        ///////////////////////////////////////////////
+	        doc.charts.chartname = doc.chartname,
+	        doc.charts.description = doc.description;
+	        ProductPoolModel.update({prodle:prodle,$elemMatch:{charts:{chartname:doc.chartname}}},{$push:{charts:doc.charts}}).exec(function(err,productupdatestatus){
+				if(err){
+					callback({error:{message:"Error in db to update product charts"+err}});
+				}else if(productupdatestatus!=1){
+					callback({error:{message:"prodle is wrong"}});
+				}else{
+					////////////////////////////////
+					callback(null,doc);
+					//////////////////////////////////
+				}
+			})
 	    }
     })
 }

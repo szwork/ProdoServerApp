@@ -18,7 +18,7 @@ var logger = require("../../common/js/logger");
 
 var ProductChartsSchema = mongoose.Schema({
   prodle:{type:String,unique:true},
-  charts:[{charname:{type:String},description:{type:String},bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}}]
+  charts:[{chartname:{type:String},description:{type:String},bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}}]
 });
 
 //generate the marketing_id when you save.
