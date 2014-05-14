@@ -10,9 +10,9 @@ var ProductCharts = require("./product-charts");
 exports.getDashboardIcons = function(req,res){
   logger.emit("log","///////Calling to Get Dashboard Icons///////");
   var sessionuserid=req.user.userid;
-  var prodle=req.params.prodle;
+  // var prodle=req.params.prodle;
   // var orgid=req.params.orgid;
-  logger.emit("log","prodle"+prodle+"\nsessionid:"+sessionuserid);
+  // logger.emit("log","prodle"+prodle+"\nsessionid:"+sessionuserid);
    var productcharts= new ProductCharts();
      // product.setMaxListeners(0); 
   productcharts.removeAllListeners("failedGetProductCharts");
@@ -33,5 +33,5 @@ exports.getDashboardIcons = function(req,res){
     // eventEmitter.removeListener(this);
   });
  
-  productcharts.getDashboardIcons(prodle);
+  productcharts.getDashboardIcons();
 }

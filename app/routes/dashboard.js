@@ -6,6 +6,6 @@ var auth=require('../common/js/security');
 exports.init = function (app) {
   //product charts CRUD
  
-  app.get("/api/dashboard/icons/:prodle",auth,api.productchartsapi.getDashboardIcons);//get product charts
+  app.get("/api/dashboard/icons",auth,api.productchartsapi.getDashboardIcons);//get dashboard icons
   
 }

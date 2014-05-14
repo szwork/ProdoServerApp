@@ -16,7 +16,7 @@ var events = require("events");
 var logger = require("../../common/js/logger");
 var S=require('string');
 var shortId = require('shortid');
-var ProductPoolModel = require("../../dashboard/js/product-charts-model");
+var DashboardModel = require("../../dashboard/js/dashboard-charts-model");
 
 var ProductCharts = function(productdata) {
 	this.product = productdata;
@@ -25,27 +25,27 @@ var ProductCharts = function(productdata) {
 ProductCharts.prototype = new events.EventEmitter;
 module.exports = ProductCharts;
 
-ProductCharts.prototype.getDashboardIcons = function(prodle) {
+ProductCharts.prototype.getDashboardIcons = function() {
 	var self=this;
 	/////////////////////////
-	_getDashboardIcons(self,prodle);
+	_getDashboardIcons(self);
 	////////////////////////
 };
-var _getDashboardIcons=function(self,prodle){
-	ProductPoolModel.findOne({prodle:prodle},{_id:0}).lean().exec(function(err,productcharts){
+var _getDashboardIcons=function(self){
+	DashboardModel.aggregate([{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
 		if(err){
 			self.emit("failedGetProductCharts",{"error":{"code":"ED001","message":"Error in db to find dashboard icons"}});
-		}else if(productcharts){
+		}else if(dashboardicons){
 			 ////////////////////////////////
-			_successfulGetProductCharts(self,productcharts);
+			_successfulGetProductCharts(self,dashboardicons);
 			//////////////////////////////////
 		}else{			
-			self.emit("failedGetProductCharts",{"error":{"code":"AP001","message":"Provided prodle is wrong"}});
+			self.emit("failedGetProductCharts",{"error":{"code":"AP001","message":"Dashboard Icons Not Available"}});
 		}
 	})
 }
 
-var _successfulGetProductCharts=function(self,productcharts){
+var _successfulGetProductCharts=function(self,dashboardicons){
 	logger.emit("log","_successfulGetProductCharts");
-	self.emit("successfulGetProductCharts", {"success":{"message":"Getting Dashboard Icons Successfully","dashboardicons":productcharts}});
+	self.emit("successfulGetProductCharts", {"success":{"message":"Getting Dashboard Icons Successfully","doc":dashboardicons}});
 }
