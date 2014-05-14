@@ -125,7 +125,7 @@ var _getChartsFromDashboardPool = function(prodle,chartname,callback){
 	        // callback(null,doc);
 	        doc.charts.chartname = doc.chartname,
 	        doc.charts.description = doc.description;
-	        ProductPoolModel.update({prodle:prodle,$elemMatch:{charts:{chartname:doc.chartname}}},{$push:{charts:doc.charts}}).exec(function(err,productupdatestatus){
+	        ProductPoolModel.update({prodle:prodle,$elemMatch:{charts:{chartname:doc.chartname}}},{$push:{charts:doc.charts}},{upsert:true}).exec(function(err,productupdatestatus){
 				if(err){
 					callback({error:{message:"Error in db to update product charts"+err}});
 				}else if(productupdatestatus!=1){
