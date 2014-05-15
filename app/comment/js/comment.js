@@ -305,14 +305,20 @@ var _addComment=function(self,prodle,commentdata,product){
 }
 
 var _validateFeatureAnalytics = function(prodle,commentdata){
+	    // if()
+	    if(commentdata.analytics==undefined){
+	    	console.log("analytics does not exists");
+	    }else{
+		     if(commentdata.analytics.length>0){
+	             var initialvalue=0;            
+	            _addFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);            
+	        }else{
+	            console.log("Please pass analytics data");
+	        }
+	    }
         console.log("_validateFeatureAnalytics");
         // var analytics = commentdata.analytics;
-        if(commentdata.analytics.length>0){
-             var initialvalue=0;            
-            _addFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);            
-        }else{
-            console.log("Please pass analytics data");
-        }
+       
 }
 
 var _addFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
@@ -455,12 +461,17 @@ var _successfulCommentDeletion = function(self,prodle) {
 var _validateDeleteFeatureAnalytics = function(prodle,commentdata){
         console.log("_validateDeleteFeatureAnalytics");
         // var analytics = commentdata.analytics;
-        if(commentdata.featureanalytics.length>0){
-            var initialvalue=0;            
-            _deleteFeatureAnalytics(prodle,commentdata.featureanalytics,commentdata.user.userid,initialvalue);
+        if(commentdata.featureanalytics==undefined){
+        	console.log("featureanalytics is undefined");
         }else{
-            console.log("Please pass featureanalytics data");
+        	if(commentdata.featureanalytics.length>0){
+            	var initialvalue=0;            
+            	_deleteFeatureAnalytics(prodle,commentdata.featureanalytics,commentdata.user.userid,initialvalue);
+        	}else{
+            	console.log("Please pass featureanalytics data");
+        	}
         }
+       
 }
 
 var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
