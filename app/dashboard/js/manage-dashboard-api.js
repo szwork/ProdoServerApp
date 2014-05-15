@@ -55,8 +55,7 @@ exports.addQuery = function(req,res){
       // managedashboard.removeAllListeners();
       res.send(result);
     });   
-   
-    if(req.user.isAdmin!=true){
+    if(req.user.isAdmin==false){
       logger.emit("error","You are not an admin to manage dashboard query",sessionuserid);
       managedashboard.emit("failedAddDashboardQuery",{"error":{"code":"EA001","message":"You have not authorize to manage dashboard"}});
     }else{
