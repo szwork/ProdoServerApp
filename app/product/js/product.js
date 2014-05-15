@@ -23,8 +23,11 @@ var shortId = require('shortid');
 var S=require('string');
 var shortId = require('shortid');
 var __=require("underscore");
+var UserModel=require("../../user/js/user-model")
+var InboxModel=require("../../inbox/js/inbox-model");
 // var CommentModel=require("./comment-model");
 var AWS = require('aws-sdk');
+var ProductEnquiry=require('./product-enquiry-model');
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
@@ -867,4 +870,154 @@ var _getAllCommentTags=function(self){
 }
 var _successfullGetAllCommentTags=function(self,commenttagsarray){
 	self.emit("successfulGetAllCommentTags",{"success":{"message":"Getting All Comment Tags Successfully","commenttags":commenttagsarray}})
+}
+Product.prototype.productEnquiryRequest = function(productenquierydata,orgid,prodle,user) {
+	var self=this;
+	//////////////////////////////////////////////////////////////
+	_validateProductEnquiryRequest(self,productenquierydata,orgid,prodle,user);
+	//////////////////////////////////////////////////////////////
+};
+var _validateProductEnquiryRequest=function(self,productenquirydata,orgid,prodle,user){
+	if(productenquirydata==undefined){
+		self.emit("failedProductEnquiryRequest",{"error":{"message":"Please pass productenquirydata"}})	
+	}else if(productenquirydata.subject==undefined || productenquirydata.subject==""){
+		self.emit("failedProductEnquiryRequest",{"error":{"message":"Please pass productenquiry subject"}})		
+	}else if(productenquirydata.body==undefined || productenquirydata.body==""){
+		self.emit("failedProductEnquiryRequest",{"error":{"message":"Please pass productenquiry body"}})		
+	}else{
+		////////////////////////////////////////////////////////////////////
+		_isValidOrgForProductEnquiry(self,productenquirydata,orgid,prodle,user)
+		///////////////////////////////////////////////////////////////////
+	}
+}
+var _isValidOrgForProductEnquiry=function(self,productenquirydata,orgid,prodle,user){
+	orgModel.findOne({orgid:orgid},{orgid:1},function(err,organization){
+		if(err){
+			logger.emit("error","Database Issue _isValidOrgForProductEnquiry "+err)
+			self.emit("failedProductEnquiryRequest",{"error":{"message":"Database Issue"}})		
+		}else if(!organization){
+			self.emit("failedProductEnquiryRequest",{"error":{"message":"Organization not exists"}})		
+		}else{
+			productModel.findOne({orgid:orgid,prodle:prodle},function(err,product){
+				if(err){
+					logger.emit("error","Database Issue _isValidOrgForProductEnquiry "+err)
+					self.emit("failedProductEnquiryRequest",{"error":{"message":"Database Issue"}})		
+				}else if(!product){
+					self.emit("failedProductEnquiryRequest",{"error":{"message":"Product not exists"}});		
+				}else{
+					/////////////////////////////////////////////////////////////////
+					_sendProductEnquiryRequest(self,productenquirydata,orgid,product,user)
+					/////////////////////////////////////////////////////////////////
+				}
+			})
+		}
+	})
+}
+var _sendProductEnquiryRequest=function(self,productenquirydata,orgid,product,user){
+	var body=productenquirydata.body;
+	var subject=productenquirydata.subject;
+	body="<br><br>Enquiry about product <b>"+product.name+"</b><br><br>"+productenquirydata.body;
+	body+="<br><br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
+  body+="<br>Disclaimer: We are not responsible for the content of this email as it is produced by "+user.email;
+  UserModel.find({"org.orgid":orgid,status:"active"},{userid:1,email:1},function(err,useremails){
+  	if(err){
+  		logger.emit("error","Database Issue _sendProductEnquiryRequest "+err)
+			self.emit("failedProductEnquiryRequest",{"error":{"message":"Database Issue"}})			
+  	}else if(useremails.length==0){
+  		self.emit("failedProductEnquiryRequest",{"error":{"message":"No Organization member exists"}})			
+  	}else{
+  		orgModel.aggregate({$match:{orgid:orgid}},{$unwind:"$usergrp"},{$match:{"usergrp.grpname":{$in:["sales","marketing","admin"]}}},{$project:{grpname:"$usergrp.grpname",grpmembers:"$usergrp.grpmembers",_id:0}},function(err,usergrps){
+  			if(err){
+  				logger.emit("error","Database Issue _sendProductEnquiryRequest "+err)
+			    self.emit("failedProductEnquiryRequest",{"error":{"code":"ED001","message":"Database Issue"}})			
+  			}else if(usergrps.length==0){
+  				self.emit("failedProductEnquiryRequest",{"error":{"message":"There is no admin,sales,marketing user exists"}})			
+  			}else{
+  				var useremailsarray=[];
+  				for(var i=0;i<useremails.length;i++){
+  					useremailsarray.push(useremails[i].userid)
+  				}
+  				var usergrpemailsarray=[];
+  				for(var j=0;j<usergrps.length;j++){
+  					usergrpemailsarray=__.union(usergrpemailsarray,usergrps[j].grpmembers);
+  				}
+  				var validproductenquiryuserids=__.difference(useremailsarray,usergrpemailsarray);
+  				var validproductenquiryemils=[];
+  				for(var i=0;i<useremails.length;i++){
+  					if(validproductenquiryuserids.indexOf(useremails[i].userid)>=0){
+  						validproductenquiryemils.push(useremails[i].email)
+  					}
+  				}
+  				var message = {
+		        from: "Prodonus  <business@prodonus.com>", // sender address
+		        to: validproductenquiryemils+"", // list of receivers
+		        subject:subject, // Subject line
+		        html: body // html body
+           };
+           ////////////////////////////////////
+			   _addNotificationToGroupMemberInbox(message,validproductenquiryuserids,user)
+			     ///////////////////////////////////
+           /////////////////////////////////////	
+           _addToTheProductEnquiry(self,orgid,product.prodle,message,user.userid)
+           //////////////////////////////////////
+
+			    commonapi.sendMail(message,CONFIG.smtp_business, function (result){
+			      if(result=="failure"){
+			        logger.emit("error","Product enquiry request not sent to "+message.to+" by"+user.email);
+			      }else{
+			        logger.emit("log","Product enquiry request Sent Successfully to"+message.to+" by"+user.email);
+			      }
+			    });
+
+  			}
+  		})
+  	}
+  })
+    
+}
+var _addToTheProductEnquiry=function(self,orgid,prodle,message,userid){
+	var productenquirydata={orgid:orgid,prodle:prodle,subject:message.subject,body:message.body,userid:userid}
+	var productenquiry=new ProductEnquiry(productenquirydata);
+	productenquiry.save(function(err,product_enquiry){
+		if(err){
+			logger.emit("error","Database Issue _sendProductEnquiryRequest "+err)
+			    self.emit("failedProductEnquiryRequest",{"error":{"code":"ED001","message":"Database Issue"}})			
+		}else{
+			
+			///////////////////////////////////////
+			_successfullProductEnquiry(self)
+			////////////////////////////////////	
+		}
+	})
+}
+var _successfullProductEnquiry=function(self){
+	self.emit("successfulProductEnquiryRequest",{success:{message:"Product Enquiry Request Sent successfully to Organization Member"}})
+}
+var _addNotificationToGroupMemberInbox=function(message,userids,user){
+	UserModel.find({userid:{$in:userids}},{userid:1,email:1,firstname:1},function(err,users){
+		if(err){
+			logger.emit("error","Database Issue"+err)
+		}else if(!users){
+			logger.emit("error","No user exists _addNotificationToGroupMemberInbox")
+		}else{
+			var inboxarray=[]
+			for(var i=0;i<users.length;i++){
+				var inbox;
+				if(user.firstname==undefined){
+					inbox={userid:users[i].userid,from:user.email,subject:message.subject,body:message.body}
+				}else{
+					inbox={userid:users[i].userid,from:user.firstname+"<"+user.email+">",subject:message.subject,body:message.body}
+				}
+				inboxarray.push(inbox)
+			}
+			InboxModel.create(inboxarray,function(err,inboxex){
+				if(err){
+					logger.emit("error","Database Issue"+err)
+				}else{
+					logger.emit("log","sent to inbox")
+				}
+			})
+
+		}
+	})
 }

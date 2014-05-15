@@ -576,7 +576,7 @@ var _loadMoreComment=function(self,sessionuserid,commentid){
 			self.emit("failedLoadMoreComment",{"error":{"code":"AC001","message":"Wrong commentid"}});
 		}else{
 			logger.emit("log",comment);
-			var query=CommentModel.find({prodle:comment.prodle,status:"active",datecreated:{$lt:comment.datecreated}},{_id:0,status:0}).sort({datecreated:-1}).limit(10);
+			var query=CommentModel.find({prodle:comment.prodle,status:"active",type:"product",datecreated:{$lt:comment.datecreated}},{_id:0,status:0,type:0}).sort({datecreated:-1}).limit(10);
 			query.exec(function(err,nextcomments){
 				if(err){
 					self.emit("failedLoadMoreComment",{"error":{"code":"ED001","message":"_loadMoreComment: Error in db to delete comment"+err}});
@@ -804,6 +804,7 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 		}
 	}
 	commentdata.tags=tags_array;
+
 	var comment_data=new CommentModel(commentdata);
 
 	comment_data.save(function(err,campaign_commentdata){
