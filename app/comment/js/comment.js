@@ -17,6 +17,7 @@ var path=require("path");
 var exec = require('child_process').exec;
 var CONFIG = require('config').Prodonus;
 var amazonbucket=CONFIG.amazonbucket;
+var AgreeDisagreeComment=require("../../agreedisagreecomment/js/agreedisagree-comment-model")
 var TagReferenceDictionary = require("../../tagreffdictionary/js/tagreffdictionary-model");
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
@@ -865,7 +866,7 @@ var _addCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,produ
     console.log("CDAFID " + analytics.featureid);
     CampaignAnalyticsModel.findOne({featurename:analytics.featurename}).lean().exec(function(err,analyticsdata){
         if(err){
-            logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+          logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
         }else if(!analyticsdata){
             console.log("calling to add new analytics with prodle and featureid");
             _addNewCampaignCommentFeatureAnalytics(prodle,analytics,userid,product);
@@ -923,6 +924,147 @@ var _updateCampignCommentFeatureAnalytics = function(prodle,analytics,userid,pro
 	})	
 }
 
+Comment.prototype.agreeDisagreeComment=function(sessionuserid,commentid,action){
+	var self=this;
+	if(["agree","disagree"].indexOf(action)<0){
+		self.emit("failedAgreeDisagreeComment",{"error":{"message":"Action Should be agree or disagree"}})
+	}else{
+		_isValidCommentId(self,sessionuserid,commentid,action)
+  
+	}
+	console.log("test1");
+	
+	
+}
+var _isValidCommentId=function(self,sessionuserid,commentid,action){
+	CommentModel.findOne({commentid:commentid},{commentid:1},function(err,comment){
+		if(err){
+			self.emit("failedAgreeDisagreeComment",{"error":{"code":"ED001","message":"Database Issue"}})
+		}else if(!comment){
+			self.emit("failedAgreeDisagreeComment",{"error":{"message":"Commentid is wrong or not exists"}})
+		}else{
+  //////////////////////////////////////////////////////////////////////////////
+    _checkItIsAlreadyAgreedOrDisagreed(self,sessionuserid,commentid,action)
+	//////////////////////////////////////////////////////////////////////////////	
+		}
+	})
+}
+var _checkItIsAlreadyAgreedOrDisagreed=function(self,sessionuserid,commentid,action){
+ AgreeDisagreeComment.findOne({commentid:commentid},{commentid:1},function(err,agreedisagreecomment){
+ 	if(err){
+ 		self.emit("failedAgreeDisagreeComment",{"error":{"code":"ED001","message":"Database Issue"}})
+ 	}else if(!agreedisagreecomment){
+ 		console.log("test2");
+ 		//////////////////////////////////////////////////////////////
+ 		_addNewCommentDataToAgreeDisagree(self,sessionuserid,commentid,action)
+ 		//////////////////////////////////////////////////////////////
+ 	}else{
+ 		AgreeDisagreeComment.findOne({commentid:commentid},function(err,agreedisagree){
+ 			if(err){
+ 				self.emit("failedAgreeDisagreeComment",{"error":{"code":"ED001","message":"Database Issue"}})
+ 			}else if(!agreedisagree){
+ 					self.emit("failedAgreeDisagreeComment",{"error":{"message":"commentid is wrong"}});
+ 			}else{
+ 				if(action=="agree"){
+ 					if(agreedisagree.agreeduser.indexOf(sessionuserid)>=0){
+ 					  self.emit("failedAgreeDisagreeComment",{"error":{"message":"You have already agreed this comment"}});
+	 				}else if(agreedisagree.disagreeduser.indexOf(sessionuserid)>=0){
+	 					self.emit("failedAgreeDisagreeComment",{"error":{"message":"You can't Agree and Disagree with the same comment"}});
+	 				}else{
+	 						console.log("test2");
+	 					///////////////////////////////////////////
+	 					_agreeDisagreeComment(self,sessionuserid,commentid,action)
+	 					//////////////////////////////////////////
+	 				}
+ 				}else{
+ 					if(agreedisagree.disagreeduser.indexOf(sessionuserid)>=0){
+ 					  self.emit("failedAgreeDisagreeComment",{"error":{"message":"You have already disagreed this comment"}});
+	 				}else if(agreedisagree.agreeduser.indexOf(sessionuserid)>=0){
+	 					self.emit("failedAgreeDisagreeComment",{"error":{"message":"You can't Agree and Disagree with the same comment"}});
+	 				}else{
+	 						console.log("test3");
+	 					///////////////////////////////////////////
+	 					_agreeDisagreeComment(self,sessionuserid,commentid,action)
+	 					//////////////////////////////////////////
+	 				}
+ 				}
+ 				
+ 			}
+ 		})
+ 	}
+ })
+}
+var _agreeDisagreeComment=function(self,sessionuserid,commentid,action){
+	var condition;
+	if(action=="agree"){
+		condition={$push:{agreeduser:sessionuserid}}
+	}else{
+		condition={$push:{disagreeduser:sessionuserid}}
+	}
+	AgreeDisagreeComment.update({commentid:commentid},condition,function(err,agreedisagreestatus){
+		if(err){
+			self.emit("failedAgreeDisagreeComment",{"error":{"code":"ED001","message":"Database Issue"}})
+		}else if(agreedisagreestatus==0){
+			self.emit("failedAgreeDisagreeComment",{"error":{"message":"Comment id is wrong"}})
+		}else{
+			////////////////////////////////////////////
+			_updateAgreeDisagreeCommentModel(self,commentid,action)
+			////////////////////////////////////////////
+				////////////////////////////////////////////////////////
+			_successfullAgreeDisagreeComment(self,action)
+			//////////////////////////////////////////////////////
+		}
+	})
+}
+var _addNewCommentDataToAgreeDisagree=function(self,sessionuserid,commentid,action){
+	var agreedisagreedata;
+	if(action=="agree"){
+		agreedisagreedata={commentid:commentid,agreeduser:[sessionuserid]}
+	}else{
+		agreedisagreedata={commentid:commentid,disagreeduser:[sessionuserid]}
+	}
+	var agree_disagreecomment=new AgreeDisagreeComment(agreedisagreedata);
+	agree_disagreecomment.save(function(err,agree_disagree_comment){
+		if(err){
+			self.emit("failedAgreeDisagreeComment",{"error":{"code":"ED001","message":"Database Issue"}})
+		}else{
+			////////////////////////////////////////////
+			_updateAgreeDisagreeCommentModel(self,commentid,action)
+			////////////////////////////////////////////
+			////////////////////////////////////////////////////////
+			_successfullAgreeDisagreeComment(self,action)
+			//////////////////////////////////////////////////////
+		}
+	})
+}
+var _updateAgreeDisagreeCommentModel=function(self,commentid,action){
+	var condition;
+	console.log("commentid"+commentid)
+	if(action=="agree"){
+		condition={$inc:{agreecount:1}}
+	}else{
+		condition={$inc:{diagreecount:1}}
+	}
+	CommentModel.update({commentid:commentid},condition,function(err,commentagreedisagreestatus){
+		if(err){
+			logger.emit("error","Database Issue")
+		}else if(commentagreedisagreestatus==0){
+			logger.emit("error","Comment id is worng for _updateAgreeDisagreeCommentModel")
+		}else{
+			logger.emit("log","latest agreedcount and disagreed count updated");
+		}
+	})
+}
+var _successfullAgreeDisagreeComment=function(self,action){
+	var result;
+  if(action=="agree"){
+  	result={success:{message:"Agree the comment Successfully"}}
+  }else{
+  	result={success:{message:"Disgree the comment Successfully"}}
+  }
+  self.emit("successfulAgreeDisagreeComment",result);
+}
+
 Comment.prototype.getUserInfoCommentedOnProduct=function(sessionuserid,prodle){
 	var self=this;
     //////////////////////////////////////////////////////////
@@ -945,4 +1087,5 @@ var _getUserInfoCommentedOnProduct = function(self,sessionuserid,prodle){
 var _successfulGetUserInfoCommentedOnProduct = function(self,userdata){
 	logger.emit("log","successfulGetUserInfoCommentedOnProduct");
 	self.emit("successfulGetUserInfoCommentedOnProduct",{"success":{"message":"Getting user details sucessfully","userdata":userdata}});
+
 }

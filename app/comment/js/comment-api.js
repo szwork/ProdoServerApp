@@ -172,6 +172,25 @@ exports.comment=function(io,__dirname){
   })
 }
 
+exports.agreeDisagreeComment=function(req,res){
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var action=req.query.action;
+  var comment=new Comment();
+  comment.removeAllListeners("failedAgreeDisagreeComment");
+  comment.on("failedAgreeDisagreeComment",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+    comment.removeAllListeners("successfulAgreeDisagreeComment");
+    comment.on("successfulAgreeDisagreeComment",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+    })
+    comment.agreeDisagreeComment(sessionuserid,commentid,action);
+  }
+
 exports.getUserInfoCommentedOnProduct = function(req,res){
   var prodle = req.params.prodle;
   var sessionuserid=req.user.userid;
@@ -186,11 +205,15 @@ exports.getUserInfoCommentedOnProduct = function(req,res){
       logger.emit("info", result.success.message);
       
       res.send(result);
+      
     });
-  
   if(req.user.org.isAdmin == true) {
     comment.getUserInfoCommentedOnProduct(sessionuserid,prodle);
   }else{
     comment.emit("failedGetUserInfoCommentedOnProduct",{"error":{"code":"EA001","message":"You have not authorize to done this action"}});
   }
 }
+  
+  
+
+
