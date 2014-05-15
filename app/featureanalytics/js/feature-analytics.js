@@ -3,7 +3,7 @@ var FeatureAnalyticsModel = require("./feature-analytics-model");
 var userModel=require("../../user/js/user-model");
 var commentModel = require("../../comment/js/comment-model");
 var DashboardPoolModel = require("../../dashboard/js/dashboard-charts-model");
-var ProductPoolModel = require("../../dashboard/js/product-charts-model");
+// var ProductPoolModel = require("../../dashboard/js/product-charts-model");
 var events = require("events");
 var logger=require("../../common/js/logger");
 
@@ -92,56 +92,56 @@ var _successfulGetFeatureAnalytics = function(self,barchart_analytics,piechart_a
 	self.emit("successfulGetFeatureAnalytics", {"success":{"message":"Getting tag analytics successfully","barchart_analytics":barchart_analytics,"piechart_analytics":piechart_analytics}});
 }
 
-var _addDataInProductChartsPool = function(prodle,barchart_analytics,piechart_analytics){
-	if(barchart_analytics.length>0){
-		_getChartsFromDashboardPool(prodle,"bar chart",function(err,result){
-			if(err){
-			   logger.emit("error","Error in _getChartsFromDashboardPool "+err.error.message);
-			}else{
-				logger.emit("log","Result 1: "+JSON.stringify(result));
-			}
-		});
-	}
+// var _addDataInProductChartsPool = function(prodle,barchart_analytics,piechart_analytics){
+// 	if(barchart_analytics.length>0){
+// 		_getChartsFromDashboardPool(prodle,"bar chart",function(err,result){
+// 			if(err){
+// 			   logger.emit("error","Error in _getChartsFromDashboardPool "+err.error.message);
+// 			}else{
+// 				logger.emit("log","Result 1: "+JSON.stringify(result));
+// 			}
+// 		});
+// 	}
 
-	if(piechart_analytics.length>0){
-		_getChartsFromDashboardPool(prodle,"pie chart",function(err,result){
-			if(err){
-			   	logger.emit("error","Error in _getChartsFromDashboardPool "+err.error.message);
-			}else{
-			    logger.emit("log","Result 2: "+JSON.stringify(result));
-			}
-		});
-	}
-}
+// 	if(piechart_analytics.length>0){
+// 		_getChartsFromDashboardPool(prodle,"pie chart",function(err,result){
+// 			if(err){
+// 			   	logger.emit("error","Error in _getChartsFromDashboardPool "+err.error.message);
+// 			}else{
+// 			    logger.emit("log","Result 2: "+JSON.stringify(result));
+// 			}
+// 		});
+// 	}
+// }
 
-var _getChartsFromDashboardPool = function(prodle,chartname,callback){
-	console.log("chartname : "+chartname);
-	DashboardPoolModel.findOne({chartname:chartname}).lean().exec(function(err,doc){
-	    if(err){
-	    	logger.emit("error","Error in db to find dashboard charts");
-	        callback({error:{message:"Error in db to find dashboard charts"}});
-	    }else if(doc){
-	    	doc.charts.chartname = doc.chartname,
-	        doc.charts.description = doc.description;
-	        ProductPoolModel.update({prodle:prodle,$elemMatch:{charts:{chartname:doc.chartname}}},{$push:{charts:doc.charts}},{upsert:true}).exec(function(err,productupdatestatus){
-				if(err){
-					callback({error:{message:"Error in db to update product charts"+err}});
-				}else if(productupdatestatus!=1){
-					callback({error:{message:"prodle is wrong"}});
-				}else{
-					////////////////////////////////
-					callback(null,doc);
-					//////////////////////////////////
-				}
-			})
+// var _getChartsFromDashboardPool = function(prodle,chartname,callback){
+// 	console.log("chartname : "+chartname);
+// 	DashboardPoolModel.findOne({chartname:chartname}).lean().exec(function(err,doc){
+// 	    if(err){
+// 	    	logger.emit("error","Error in db to find dashboard charts");
+// 	        callback({error:{message:"Error in db to find dashboard charts"}});
+// 	    }else if(doc){
+// 	    	doc.charts.chartname = doc.chartname,
+// 	        doc.charts.description = doc.description;
+// 	        ProductPoolModel.update({prodle:prodle,$elemMatch:{charts:{chartname:doc.chartname}}},{$push:{charts:doc.charts}},{upsert:true}).exec(function(err,productupdatestatus){
+// 				if(err){
+// 					callback({error:{message:"Error in db to update product charts"+err}});
+// 				}else if(productupdatestatus!=1){
+// 					callback({error:{message:"prodle is wrong"}});
+// 				}else{
+// 					////////////////////////////////
+// 					callback(null,doc);
+// 					//////////////////////////////////
+// 				}
+// 			})
 	    	
-	    }else{
-	        // callback(null,doc);
-	        logger.emit("error","Dashboard Charts Not Available");
-	        callback({error:{message:"Dashboard Charts Not Available"}});
-	    }
-    })
-}
+// 	    }else{
+// 	        // callback(null,doc);
+// 	        logger.emit("error","Dashboard Charts Not Available");
+// 	        callback({error:{message:"Dashboard Charts Not Available"}});
+// 	    }
+//     })
+// }
 
 // FeatureAnalytics.prototype.getTagAnalyticsForBarChart = function(prodle) {
 // 	var self = this;
