@@ -62,7 +62,8 @@ var userSchema = mongoose.Schema({
   updatedate:{ type:Date},
   removedate:{ type:Date},
   profile_pic:{bucket:{type:String},key:String,image:{type:String}},
-  isAdmin:{type:Boolean,default:false},
+  author:{authorid:{type:String,default:null},isAuthor:{type:Boolean,default:false}},
+  isAuthor:{type:Boolean,default:false},//blog author
   prodousertype:{type:String}
 });
 

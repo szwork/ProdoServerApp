@@ -17,7 +17,8 @@ var logger = require("../../common/js/logger");
 //Camapaign Analytics Model
 var campaignAnalyticsSchema = mongoose.Schema({
   prodle:{type:String},
-  featureid:{type:String,ref:"productFeatureSchema"},
+  campaign_id:{type:String},
+  featurename:{type:String,ref:"productFeatureSchema"},
   analytics: [{tagid:{type:String,ref:"TagReffDictionary"},tagname:{type:String,ref:"TagReffDictionary"},userid:{type:String,ref:"User"},datecreated:{type:Date,default:new Date()}}]
 });
 // campaignAnalyticsSchema.pre('save', function(next) {

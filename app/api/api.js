@@ -29,6 +29,7 @@ var marketingapi = require("../marketing/js/marketing-api");
 var warrantyapi = require("../warranty/js/warranty-api");
 var orgindustrycategoryapi=require("../common/js/org-industry-category-api");
 var productchartsapi = require("../dashboard/js/product-charts-api");
+var blogapi = require("../blog/js/blog-api");
 
 exports.orgapi = orgapi;
 exports.userapi = userapi;
@@ -48,3 +49,4 @@ exports.marketingapi = marketingapi;
 exports.warrantyapi = warrantyapi;
 exports.orgindustrycategoryapi=orgindustrycategoryapi;
 exports.productchartsapi = productchartsapi;
+exports.blogapi = blogapi;
