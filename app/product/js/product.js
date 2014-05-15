@@ -919,59 +919,56 @@ var _sendProductEnquiryRequest=function(self,productenquirydata,orgid,product,us
 	body="<br><br>Enquiry about product <b>"+product.name+"</b><br><br>"+productenquirydata.body;
 	body+="<br><br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
   body+="<br>Disclaimer: We are not responsible for the content of this email as it is produced by "+user.email;
-  UserModel.find({"org.orgid":orgid,status:"active"},{userid:1,email:1},function(err,useremails){
-  	if(err){
-  		logger.emit("error","Database Issue _sendProductEnquiryRequest "+err)
-			self.emit("failedProductEnquiryRequest",{"error":{"message":"Database Issue"}})			
-  	}else if(useremails.length==0){
-  		self.emit("failedProductEnquiryRequest",{"error":{"message":"No Organization member exists"}})			
-  	}else{
-  		orgModel.aggregate({$match:{orgid:orgid}},{$unwind:"$usergrp"},{$match:{"usergrp.grpname":{$in:["sales","marketing","admin"]}}},{$project:{grpname:"$usergrp.grpname",grpmembers:"$usergrp.grpmembers",_id:0}},function(err,usergrps){
-  			if(err){
-  				logger.emit("error","Database Issue _sendProductEnquiryRequest "+err)
-			    self.emit("failedProductEnquiryRequest",{"error":{"code":"ED001","message":"Database Issue"}})			
-  			}else if(usergrps.length==0){
-  				self.emit("failedProductEnquiryRequest",{"error":{"message":"There is no admin,sales,marketing user exists"}})			
-  			}else{
-  				var useremailsarray=[];
-  				for(var i=0;i<useremails.length;i++){
-  					useremailsarray.push(useremails[i].userid)
-  				}
-  				var usergrpemailsarray=[];
-  				for(var j=0;j<usergrps.length;j++){
-  					usergrpemailsarray=__.union(usergrpemailsarray,usergrps[j].grpmembers);
-  				}
-  				var validproductenquiryuserids=__.difference(useremailsarray,usergrpemailsarray);
-  				var validproductenquiryemils=[];
-  				for(var i=0;i<useremails.length;i++){
-  					if(validproductenquiryuserids.indexOf(useremails[i].userid)>=0){
-  						validproductenquiryemils.push(useremails[i].email)
-  					}
-  				}
-  				var message = {
+    var grparray=[new RegExp("admin",'i'),new RegExp("sales",'i'),new RegExp("sales",'i')];
+		orgModel.aggregate({$match:{orgid:orgid}},{$unwind:"$usergrp"},{$match:{"usergrp.grpname":{$in:grparray}}},{$project:{grpname:"$usergrp.grpname",grpmembers:"$usergrp.grpmembers",_id:0}},function(err,usergrps){
+			if(err){
+				logger.emit("error","Database Issue _sendProductEnquiryRequest "+err)
+		    self.emit("failedProductEnquiryRequest",{"error":{"code":"ED001","message":"Database Issue"}})			
+			}else if(usergrps.length==0){
+				self.emit("failedProductEnquiryRequest",{"error":{"message":"There is no admin,sales,marketing user exists"}})			
+			}else{
+				var usergrpidsarray=[];
+				for(var j=0;j<usergrps.length;j++){
+					usergrpidsarray=__.union(usergrpidsarray,usergrps[j].grpmembers);
+				}
+				UserModel.find({userid:{$in:usergrpidsarray},status:"active"},{userid:1,email:1},function(err,useremails){
+  				if(err){
+  					logger.emit("error","Database Issue _sendProductEnquiryRequest "+err)
+						self.emit("failedProductEnquiryRequest",{"error":{"message":"Database Issue"}})			
+  				}else if(useremails.length==0){
+  					self.emit("failedProductEnquiryRequest",{"error":{"message":"No Organization member exists"}})			
+  				}else{
+  					var emailarray=[];
+  					var validproductenquiryuserids=[];
+						for(var i=0;i<useremails.length;i++){
+							emailarray.push(useremails[i].email);	
+							validproductenquiryuserids.push(useremails[i].userid);	
+						}
+						var message = {
 		        from: "Prodonus  <business@prodonus.com>", // sender address
-		        to: validproductenquiryemils+"", // list of receivers
+		        to: emailarray+"", // list of receivers
 		        subject:subject, // Subject line
 		        html: body // html body
-           };
-           ////////////////////////////////////
-			   _addNotificationToGroupMemberInbox(message,validproductenquiryuserids,user)
-			     ///////////////////////////////////
-           /////////////////////////////////////	
-           _addToTheProductEnquiry(self,orgid,product.prodle,message,user.userid)
-           //////////////////////////////////////
+		       };
+		       console.log("message"+JSON.stringify(message))
+         ////////////////////////////////////
+		   _addNotificationToGroupMemberInbox(message,validproductenquiryuserids,user)
+		     ///////////////////////////////////
+         /////////////////////////////////////	
+         _addToTheProductEnquiry(self,orgid,product.prodle,message,user.userid)
+         //////////////////////////////////////
 
-			    commonapi.sendMail(message,CONFIG.smtp_business, function (result){
-			      if(result=="failure"){
-			        logger.emit("error","Product enquiry request not sent to "+message.to+" by"+user.email);
-			      }else{
-			        logger.emit("log","Product enquiry request Sent Successfully to"+message.to+" by"+user.email);
-			      }
-			    });
+		    commonapi.sendMail(message,CONFIG.smtp_business, function (result){
+		      if(result=="failure"){
+		        logger.emit("error","Product enquiry request not sent to "+message.to+" by"+user.email);
+		      }else{
+		        logger.emit("log","Product enquiry request Sent Successfully to"+message.to+" by"+user.email);
+		      }
+		    });
 
-  			}
-  		})
-  	}
+			}
+		})
+	}
   })
     
 }
@@ -1002,11 +999,11 @@ var _addNotificationToGroupMemberInbox=function(message,userids,user){
 		}else{
 			var inboxarray=[]
 			for(var i=0;i<users.length;i++){
-				var inbox;
+				var inbox
 				if(user.firstname==undefined){
-					inbox={userid:users[i].userid,from:user.email,subject:message.subject,body:message.body}
+					inbox={messagetype:"enquiry",userid:users[i].userid,from:{email:user.email,userid:user.userid},subject:message.subject,body:message.body}
 				}else{
-					inbox={userid:users[i].userid,from:user.firstname+"<"+user.email+">",subject:message.subject,body:message.body}
+					inbox={messagetype:"enquiry",userid:users[i].userid,from:{email:user.email,userid:user.userid,name:user.firstname},subject:message.subject,body:message.body}
 				}
 				inboxarray.push(inbox)
 			}

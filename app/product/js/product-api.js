@@ -561,6 +561,7 @@ exports.productEnquiryRequest=function(req,res){
   var prodle=req.params.prodle;
   var orgid=req.params.orgid;
   var productenquirydata=req.body.productenquirydata;
+  logger.emit("log","productenquirydata"+JSON.stringify(req.body));
   product.removeAllListeners("failedProductEnquiryRequest");
   product.on("failedProductEnquiryRequest",function(err){
     logger.emit("error", err.error.message,sessionuserid);
