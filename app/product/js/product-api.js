@@ -555,3 +555,25 @@ exports.getAllCommentTags=function(req,res){
     product.getAllCommentTags();
     ////////////////////////////////  
 }
+exports.productEnquiryRequest=function(req,res){
+  var product = new Product();
+  var sessionuserid=req.user.userid;
+  var prodle=req.params.prodle;
+  var orgid=req.params.orgid;
+  var productenquirydata=req.body.productenquirydata;
+  product.removeAllListeners("failedProductEnquiryRequest");
+  product.on("failedProductEnquiryRequest",function(err){
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+  });
+  product.removeAllListeners("successfulProductEnquiryRequest");
+  product.on("successfulProductEnquiryRequest",function(result){
+    // logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(result);
+  });
+  ///////////////////////////////////////////////////////////////
+  product.productEnquiryRequest(productenquirydata,orgid,prodle,req.user);
+  //////////////////////////////// ///////////////////////////// 
+}

@@ -23,4 +23,5 @@ exports.init = function (app) {
  app.get("/api/categorytags",auth,api.productapi.getAllCategoryTags);
  app.get("/api/commenttags",auth,api.productapi.getAllCommentTags);
  app.get('/api/latestproduct',api.productapi.getLatestAddedProduct);
+ app.post('/api/productenquiry/:orgid/:prodle',auth,api.productapi.productEnquiryRequest)
 }
