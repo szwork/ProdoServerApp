@@ -8,4 +8,5 @@ exports.init = function (app) {
  
   app.get("/api/dashboard/icons",auth,api.managedashboardapi.getDashboardIcons);//get dashboard icons
   app.post("/api/dashboard/addquery",auth,api.managedashboardapi.addQuery);//Add Query for Dashboard
+  app.get("/api/dashboard/queries",auth,api.managedashboardapi.getAllDashboardQuery);//get dashboard querys
 }

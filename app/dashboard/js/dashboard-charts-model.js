@@ -17,16 +17,16 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger");
 
 var DashboardChartsSchema = mongoose.Schema({
-  // marketing_id:{type:String},
+  query:{queryid:{type:String,unique:true,ref:"managedashboard"},queryname:{type:String}},
   chartname:{type:String},
   description:{type:String},
   category:{type:String},
   type:{type:String},
   charts:{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}},
-  // status:{type:String,default:"active"}
+  status:{type:String,default:"active"}
 });
 
-//generate the marketing_id when you save.
+//call when you save.
 DashboardChartsSchema.pre('save', function(next) {
   console.log("calling to dashboardchart save pre");
   var dashboardchart = this;

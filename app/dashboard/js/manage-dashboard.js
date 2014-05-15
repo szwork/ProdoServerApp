@@ -63,9 +63,9 @@ ManageDashboard.prototype.addQuery=function(sessionuserid){
 var _validateAddQueryData = function(self,querydata,sessionuserid) {
 	if(querydata==undefined){
 		self.emit("failedAddDashboardQuery",{"error":{"code":"AV001","message":"Please provide querydata"}});
-	}else if(querydata.queryname==undefined){
+	}else if(querydata.queryname==undefined || querydata.queryname==""){
    		self.emit("failedAddDashboardQuery",{"error":{"code":"AV001","message":"Please pass queryname"}});
-   	}else if(querydata.description==undefined){
+   	}else if(querydata.description==undefined || querydata.description==""){
     	self.emit("failedAddDashboardQuery",{"error":{"code":"AV001","message":"please pass description "}});
   	}else{
   	 	//////////////////////////////////////////
@@ -102,4 +102,30 @@ var _addQuery = function(self,querydata){
 var _successfulAddDashboardQuery=function(self){
 	logger.emit("log","_successfulAddDashboardQuery");
 	self.emit("successfulAddDashboardQuery", {"success":{"message":"Dashboard Query Added Successfully"}});
+}
+
+ManageDashboard.prototype.getAllDashboardQuery = function() {
+	var self=this;
+	/////////////////////////
+	_getAllDashboardQuery(self);
+	////////////////////////
+};
+
+var _getAllDashboardQuery=function(self){
+	manageDashboardModel.find({}).exec(function(err,dashboardquery){
+		if(err){
+			self.emit("failedGetAllDashboardQuery",{"error":{"code":"ED001","message":"Error in db to find dashboard icons"}});
+		}else if(dashboardquery.length>0){
+			 ////////////////////////////////
+			_successfulGetAllDashboardQuery(self,dashboardquery);
+			//////////////////////////////////
+		}else{			
+			self.emit("failedGetAllDashboardQuery",{"error":{"code":"AP001","message":"Dashboard Queries Not Available"}});
+		}
+	})
+}
+
+var _successfulGetAllDashboardQuery=function(self,dashboardquery){
+	logger.emit("log","_successfulGetAllDashboardQuery");
+	self.emit("successfulGetAllDashboardQuery", {"success":{"message":"Getting Dashboard Queries Successfully","doc":dashboardquery}});
 }

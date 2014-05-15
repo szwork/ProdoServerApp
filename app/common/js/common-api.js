@@ -538,6 +538,12 @@ exports.uploadFiles=function(io,__dirname){
         socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass chartname"}});
       }else if(dashboarddata.description==undefined){
         socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass description"}});
+      }else if(dashboarddata.query==undefined){
+        socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass query detail"}});
+      }else if(dashboarddata.query.queryid==undefined){
+        socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass queryid"}});
+      }else if(dashboarddata.query.queryname==undefined){
+        socket.emit("addDashboardChartResponse",{"error":{"code":"AV001","message":"Please pass queryname"}});
       }else{
         ///////////////////////////////////////////////////////
         _validateAddDashboardDataFile(userid,dashboarddata,file);

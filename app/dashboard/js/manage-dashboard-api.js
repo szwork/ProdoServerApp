@@ -62,3 +62,31 @@ exports.addQuery = function(req,res){
       managedashboard.addQuery(sessionuserid);
     }
 }
+
+exports.getAllDashboardQuery = function(req,res){
+  logger.emit("log","///////Calling to Get Dashboard Icons///////");
+  var sessionuserid=req.user.userid;
+  var managedashboard= new ManageDashboard();
+  managedashboard.removeAllListeners("failedGetAllDashboardQuery");
+  managedashboard.on("failedGetAllDashboardQuery",function(err){
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // managedashboard.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  managedashboard.removeAllListeners("successfulGetAllDashboardQuery");
+  managedashboard.on("successfulGetAllDashboardQuery",function(result){
+    logger.emit("log","Getting All Dashboard Query Successfully");
+    // logger.emit("info", result.success.message,sessionuserid);
+    // managedashboard.removeAllListeners();
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  });
+  if(req.user.isAdmin==false){
+    logger.emit("error","You are not an admin to get dashboard query",sessionuserid);
+    managedashboard.emit("failedAddDashboardQuery",{"error":{"code":"EA001","message":"You have not authorize to get dashboard query"}});
+  }else{
+    managedashboard.getAllDashboardQuery();
+   }
+}
