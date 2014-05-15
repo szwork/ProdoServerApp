@@ -30,6 +30,7 @@ var warrantyapi = require("../warranty/js/warranty-api");
 var orgindustrycategoryapi=require("../common/js/org-industry-category-api");
 var managedashboardapi = require("../dashboard/js/manage-dashboard-api");
 var blogapi = require("../blog/js/blog-api");
+var inboxapi=require("../inbox/js/inbox-api")
 
 exports.orgapi = orgapi;
 exports.userapi = userapi;
@@ -50,3 +51,5 @@ exports.warrantyapi = warrantyapi;
 exports.orgindustrycategoryapi=orgindustrycategoryapi;
 exports.managedashboardapi = managedashboardapi;
 exports.blogapi = blogapi;
+exports.inboxapi=inboxapi;
+

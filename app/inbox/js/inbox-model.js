@@ -17,13 +17,20 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger");
 
 var InboxSchema = mongoose.Schema({
+  inboxid:{type:String,unique:true},
   userid:{type:String,ref:"users"},
-  from:{type:String},//email
+  from:{email:String,userid:String,name:String},//email
   body:{type:String},
   subject:{type:String},
-  status:{type:String,default:"init"}
+  messagetype:{type:String,default:"normal"},
+  status:{type:String,default:"unread"},
+  createdate:{type:Date,default:new Date()}
 });
-
+InboxSchema.pre('save', function(next) {
+  var inbox = this;
+  inbox.inboxid=shortId.generate();  
+  next(); 
+})
 InboxSchema.set('redisCache', true);
  InboxSchema.set('expires', 90);
 //Seed a product Comment
