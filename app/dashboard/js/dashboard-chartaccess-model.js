@@ -17,19 +17,10 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger");
 
 var DashboardChartAccessSchema = mongoose.Schema({
-  code:{type:String},
+  code:{type:String,default:true},
   chartids:[{type:String}],
   status:{type:String,default:"active"}//active,deactive
 });
-
-//call when you save.
-// DashboardChartAccessSchema.pre('save', function(next) {
-//   console.log("calling to dashboard chart access save pre");
-//   var dashboardchart = this;
-//   logger.emit("log","dashboardchart in pre "+dashboardchart);
-//   logger.emit("log","shortid : "+dashboardchart.chartname);
-//   next();
-// });
 
 DashboardChartAccessSchema.set('redisCache', true);
 DashboardChartAccessSchema.set('expires', 90);

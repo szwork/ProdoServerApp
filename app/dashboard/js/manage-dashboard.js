@@ -16,8 +16,13 @@ var events = require("events");
 var logger = require("../../common/js/logger");
 var S=require('string');
 var shortId = require('shortid');
-var DashboardModel = require("../../dashboard/js/dashboard-charts-model");
-var manageDashboardModel = require("../../dashboard/js/manage-dashboard-model");
+var DashboardModel = require("./dashboard-charts-model");
+var manageDashboardModel = require("./manage-dashboard-model");
+var chartAccessModel = require("./dashboard-chartaccess-model");
+
+function isArray(what) {
+    return Object.prototype.toString.call(what) === '[object Array]';
+}
 
 var ManageDashboard = function(dashboarddata) {
 	this.dashboarddata = dashboarddata;
@@ -26,12 +31,13 @@ var ManageDashboard = function(dashboarddata) {
 ManageDashboard.prototype = new events.EventEmitter;
 module.exports = ManageDashboard;
 
-ManageDashboard.prototype.getDashboardIcons = function() {
+ManageDashboard.prototype.getDashboardIcons = function(dashboard_access_code) {
 	var self=this;
 	/////////////////////////
 	_getDashboardIcons(self);
 	////////////////////////
 };
+
 var _getDashboardIcons=function(self){
 	DashboardModel.aggregate([{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
 		if(err){
@@ -73,7 +79,7 @@ var _getDashboardChartsData=function(self){
 
 var _successfulGetDashboardChartsData=function(self,dashboardchartdata){
 	logger.emit("log","_successfulGetDashboardChartsData");
-	self.emit("successfulGetDashboardChartsData", {"success":{"message":"Getting Dashboard Icons Successfully","doc":dashboardchartdata}});
+	self.emit("successfulGetDashboardChartsData", {"success":{"message":"Getting Dashboard Chart Details Successfully","doc":dashboardchartdata}});
 }
 
 ManageDashboard.prototype.addQuery=function(sessionuserid){
@@ -153,4 +159,58 @@ var _getAllDashboardQuery=function(self){
 var _successfulGetAllDashboardQuery=function(self,dashboardquery){
 	logger.emit("log","_successfulGetAllDashboardQuery");
 	self.emit("successfulGetAllDashboardQuery", {"success":{"message":"Getting Dashboard Queries Successfully","doc":dashboardquery}});
+}
+
+ManageDashboard.prototype.addRBONDS_Mapping=function(sessionuserid){
+	var self=this;
+	var chartaccessdata=this.dashboarddata;
+	console.log("chartaccessdata : "+JSON.stringify(chartaccessdata));
+	////////////////////////////////////////////////////////////
+	_validateAddRBONDS_Mapping(self,chartaccessdata,sessionuserid);
+	//////////////////////////////////////////////////////////
+}
+
+var _validateAddRBONDS_Mapping = function(self,chartaccessdata,userid){
+	if(chartaccessdata.code==undefined){
+		self.emit("failedAddRBONDS_Mapping",{"error":{"code":"AV001","message":"Please pass data"}});
+    }else if(chartaccessdata.chartids==undefined){
+	  	self.emit("failedAddRBONDS_Mapping",{"error":{"code":"AV001","message":"Please pass chartids"}});
+    }else if(!isArray(chartaccessdata.chartids)){
+	  	self.emit("failedAddRBONDS_Mapping",{"error":{"code":"AV001","message":"chartids should be an array"}});
+    }else{
+    	_checkRBONDS_MappingAlreadyExist(self,chartaccessdata,userid);
+		
+    }
+}
+
+var _checkRBONDS_MappingAlreadyExist = function(self,chartaccessdata,userid){
+	chartAccessModel.findOne({code:chartaccessdata.code},function(err,product){
+		if(err){
+			self.emit("failedAddRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
+		}else if(product){
+			self.emit("failedAddRBONDS_Mapping",{"error":{"message":"RBONDS_Mapping Code Already Exist"}});
+		}else{
+			////////////////////////////////////////////////
+	   		_addRBONDS_Mapping(self,chartaccessdata,userid);
+	   		///////////////////////////////////////////////		
+		}
+	});
+}
+
+var _addRBONDS_Mapping = function(self,chartaccessdata,userid){
+	var chartaccess=new chartAccessModel(chartaccessdata);
+	chartaccess.save(function(err,addstatus){
+	   	if(err){
+	  		self.emit("failedAddRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
+	   	}else{
+		    /////////////////////////////////////////////
+			_successfulAddRBONDS_Mapping(self,addstatus);
+	  		/////////////////////////////////////////////
+	   	}
+	});
+}
+
+var _successfulAddRBONDS_Mapping=function(self,dashboardquery){
+	logger.emit("log","_successfulAddRBONDS_Mapping");
+	self.emit("successfulAddRBONDS_Mapping", {"success":{"message":"RBONDS_Mapping Added Successfully"}});
 }

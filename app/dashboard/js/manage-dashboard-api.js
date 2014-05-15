@@ -10,6 +10,7 @@ var ManageDashboard = require("./manage-dashboard");
 exports.getDashboardIcons = function(req,res){
   logger.emit("log","///////Calling to Get Dashboard Icons///////");
   var sessionuserid=req.user.userid;
+  var dashboard_access_code = req.user.dashboard_access_code;
   // logger.emit("log","prodle"+prodle+"\nsessionid:"+sessionuserid);
   var managedashboard= new ManageDashboard();
   managedashboard.removeAllListeners("failedGetDashboardIcons");
@@ -27,12 +28,11 @@ exports.getDashboardIcons = function(req,res){
     // managedashboard.removeAllListeners();
     res.send(result);
     // eventEmitter.removeListener(this);
-  }); 
-  managedashboard.getDashboardIcons();
+  });
+  managedashboard.getDashboardIcons(dashboard_access_code);
 }
 
 exports.getDashboardChartsData = function(req,res){
-  logger.emit("log","///////Calling to Get Dashboard Icons///////");
   var sessionuserid=req.user.userid;
   // logger.emit("log","prodle"+prodle+"\nsessionid:"+sessionuserid);
   var managedashboard= new ManageDashboard();
@@ -83,7 +83,7 @@ exports.addQuery = function(req,res){
 }
 
 exports.getAllDashboardQuery = function(req,res){
-  logger.emit("log","///////Calling to Get Dashboard Icons///////");
+  logger.emit("log","///////Calling to Get Dashboard Query///////");
   var sessionuserid=req.user.userid;
   var managedashboard= new ManageDashboard();
   managedashboard.removeAllListeners("failedGetAllDashboardQuery");
@@ -108,4 +108,31 @@ exports.getAllDashboardQuery = function(req,res){
   }else{
     managedashboard.getAllDashboardQuery();
    }
+}
+
+exports.addRBONDS_Mapping = function(req,res){    
+    var chartaccessdata = req.body;
+    logger.emit("log","req product body"+JSON.stringify(req.body));
+    var managedashboard = new ManageDashboard(chartaccessdata);
+  
+    var sessionuserid=req.user.userid;
+     logger.emit("log","sessionid:"+sessionuserid);
+    managedashboard.removeAllListeners("failedAddRBONDS_Mapping");
+    managedashboard.on("failedAddRBONDS_Mapping",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // managedashboard.removeAllListeners();
+      res.send(err);
+    });
+    managedashboard.removeAllListeners("successfulAddRBONDS_Mapping");
+    managedashboard.on("successfulAddRBONDS_Mapping",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // managedashboard.removeAllListeners();
+      res.send(result);
+    });   
+    if(req.user.isAdmin==false){
+      logger.emit("error","You are not an admin to manage RBONDS_Mapping",sessionuserid);
+      managedashboard.emit("failedAddDashboardQuery",{"error":{"code":"EA001","message":"You have not authorize to manage RBONDS_Mapping"}});
+    }else{
+      managedashboard.addRBONDS_Mapping(sessionuserid);
+    }
 }
