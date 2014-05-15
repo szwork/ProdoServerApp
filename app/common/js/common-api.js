@@ -583,8 +583,7 @@ exports.uploadFiles=function(io,__dirname){
                    ContentType: file_type
                };
                fs.close(fd, function() {
-                  exec("rm -rf '"+fileName+"'");
-                             
+                  exec("rm -rf '"+fileName+"'");                             
                 });
                //////////////////////////////////////////////////
                _addDashboardDataWithImages(userid,dashboarddata,params);
@@ -769,15 +768,14 @@ var _validateProductCampaignData = function(campaigndata,orgid,prodle,sessionuse
         }
       })  
     }
-    socket.on('uploadFiles', function(file,action) {
-      
+    socket.on('uploadFiles', function(file,action) {      
       redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
         if(err){
           logger.emit("log","Errrr in get sessionid client");
         }else{ 
           if(action==undefined){
             logger.emit("error","uploadFiles doesn't know action");
-          }else{          
+          }else{
           checkSocketSession(reply,file,action,function(err,result){
             if(err){
               socket.emit(err,{"error":{"code":"AL001","message":"User Session Expired"}});
@@ -1307,7 +1305,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
   var ext = path.extname(file_name||'').split('.');
   ext=ext[ext.length - 1];
   var fileName = dirname + '/tmp/uploads/' + file_name;
- if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains("png")  ){
+ if(!S(file_type).contains("image") || !S(file_type).contains("jpeg") && !S(file_type).contains("gif") && !S(file_type).contains("png") && !S(file_type).contains("jpg")  ){
     callback({"error":{"message":"You can upload only image of type jpeg or gif"}});
   }else if(file_length>500000){
     callback({"error":{"message":"You can upload  image of size less than 1mb"}});
@@ -1324,7 +1322,7 @@ var __productLogoFileBuffer=function(action,file,dirname,action,sessionuser,call
            
             fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
               if(err){
-                callback({"error":{"message":"uploadFile fs.write:"+err}})
+                callback({"error":{"message":"uploadFile fs.write:"+err}});
               }else{
                 // console.log(written+" bytes are written from buffer");
                 var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
