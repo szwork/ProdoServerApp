@@ -20,7 +20,7 @@ var shortId = require('shortid');
 var logger=require("../../common/js/logger")
 var userSchema = mongoose.Schema({
   userid:{type:String},
-  usertype:{type:String,default:null},//type many be individual,company or manufacturer
+  usertype:{type:String,default:null},//type may be individual,company or manufacturer
   fullname:{type:String,default:null},
   username:{type:String,required: true, unique: true},
   firstname: { type: String ,default:null},
@@ -63,6 +63,7 @@ var userSchema = mongoose.Schema({
   removedate:{ type:Date},
   profile_pic:{bucket:{type:String},key:String,image:{type:String}},
   author:{authorid:{type:String,default:null},isAuthor:{type:Boolean,default:false}},
+  dashboard_access_code:{type:String,default:null},
   isAuthor:{type:Boolean,default:false},//blog author
   prodousertype:{type:String}
 });
