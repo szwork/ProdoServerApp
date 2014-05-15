@@ -612,7 +612,7 @@ var _loadMoreCampaignComment=function(self,sessionuserid,commentid){
 			self.emit("failedLoadMoreCampaignComment",{"error":{"code":"AC001","message":"Wrong commentid"}});
 		}else{
 			logger.emit("log",comment);
-			var query=CommentModel.find({campaign_id:comment.campaign_id,status:"active",datecreated:{$lt:comment.datecreated}},{_id:0,status:0}).sort({datecreated:-1}).limit(10);
+			var query=CommentModel.find({campaign_id:comment.campaign_id,type:"campaign",status:"active",datecreated:{$lt:comment.datecreated}},{_id:0,status:0}).sort({datecreated:-1}).limit(10);
 			query.exec(function(err,nextcomments){
 				if(err){
 					self.emit("failedLoadMoreCampaignComment",{"error":{"code":"ED001","message":"_loadMoreCampaignComment: Error in db to get comment "+err}});
@@ -865,7 +865,7 @@ var _addCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,produ
     console.log("_addCampaignCommentFeatureAnalytics");
     console.log("CDA " + analytics);
     console.log("CDAFID " + analytics.featureid);
-    CampaignAnalyticsModel.findOne({featureid:analytics.featureid}).lean().exec(function(err,analyticsdata){
+    CampaignAnalyticsModel.findOne({featurename:analytics.featurename}).lean().exec(function(err,analyticsdata){
         if(err){
           logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
         }else if(!analyticsdata){

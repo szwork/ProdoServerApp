@@ -35,7 +35,7 @@ var _getDashboardIcons=function(self){
 	DashboardModel.aggregate([{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
 		if(err){
 			self.emit("failedGetProductCharts",{"error":{"code":"ED001","message":"Error in db to find dashboard icons"}});
-		}else if(dashboardicons){
+		}else if(dashboardicons.length>0){
 			 ////////////////////////////////
 			_successfulGetProductCharts(self,dashboardicons);
 			//////////////////////////////////

@@ -79,13 +79,13 @@ var productSchema = mongoose.Schema({
   pricinghistory:[pricingHistorySchema],
   blogs: [{blogid:{type:String}}]
 });
+
 productSchema.pre('save', function(next) {
   var product = this;
   product.prodle=shortId.generate();  
    console.log("product pre"+product);
   next(); 
- 
-  })
+})
 //Seed a product
  productSchema.set('redisCache', true);
  productSchema.set('expires', 6000);
