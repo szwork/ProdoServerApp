@@ -28,7 +28,7 @@ var productcampaignapi = require("../productcampaign/js/product-campaign-api");
 var marketingapi = require("../marketing/js/marketing-api");
 var warrantyapi = require("../warranty/js/warranty-api");
 var orgindustrycategoryapi=require("../common/js/org-industry-category-api");
-var productchartsapi = require("../dashboard/js/product-charts-api");
+var managedashboardapi = require("../dashboard/js/manage-dashboard-api");
 var blogapi = require("../blog/js/blog-api");
 var inboxapi=require("../inbox/js/inbox-api")
 
@@ -49,6 +49,7 @@ exports.productcampaignapi = productcampaignapi;
 exports.marketingapi = marketingapi;
 exports.warrantyapi = warrantyapi;
 exports.orgindustrycategoryapi=orgindustrycategoryapi;
-exports.productchartsapi = productchartsapi;
+exports.managedashboardapi = managedashboardapi;
 exports.blogapi = blogapi;
 exports.inboxapi=inboxapi;
+
