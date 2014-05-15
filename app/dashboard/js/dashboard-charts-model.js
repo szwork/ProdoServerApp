@@ -1,5 +1,5 @@
 /*
-* Overview: Product Marketing Model
+* Overview: Dashboard Charts Model
 * Dated: 18-04-2014
 * Author: Dinesh Sawant
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
@@ -17,13 +17,14 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger");
 
 var DashboardChartsSchema = mongoose.Schema({
-  query:{queryid:{type:String,unique:true,ref:"managedashboard"},queryname:{type:String}},
+  chartid:{type:String,unique:true},
   chartname:{type:String},
   description:{type:String},
   category:{type:String},
   type:{type:String},
   charts:{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}},
-  status:{type:String,default:"active"}
+  query:{queryid:{type:String,unique:true,ref:"managedashboard"},queryname:{type:String}},
+  // status:{type:String,default:"active"}
 });
 
 //call when you save.
@@ -31,8 +32,9 @@ DashboardChartsSchema.pre('save', function(next) {
   console.log("calling to dashboardchart save pre");
   var dashboardchart = this;
   logger.emit("log","dashboardchart in pre "+dashboardchart);
+  dashboardchart.chartid = "DC"+shortId.generate();
   dashboardchart.chartname = dashboardchart.chartname.toLowerCase();
-  logger.emit("log","shortid : "+dashboardchart.chartname);
+  logger.emit("log","shortid : "+dashboardchart.chartid);
   next();
 });
 

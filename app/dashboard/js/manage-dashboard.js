@@ -51,6 +51,31 @@ var _successfulGetDashboardIcons=function(self,dashboardicons){
 	self.emit("successfulGetDashboardIcons", {"success":{"message":"Getting Dashboard Icons Successfully","doc":dashboardicons}});
 }
 
+ManageDashboard.prototype.getDashboardChartsData = function() {
+	var self=this;
+	/////////////////////////
+	_getDashboardChartsData(self);
+	////////////////////////
+};
+var _getDashboardChartsData=function(self){
+	DashboardModel.find({},{chartid:1,chartname:1,_id:0}).exec(function(err,dashboardchartdata){
+		if(err){
+			self.emit("failedGetDashboardChartsData",{"error":{"code":"ED001","message":"Error in db to find dashboard icons"}});
+		}else if(dashboardchartdata.length>0){
+			///////////////////////////////////////////////////////////
+			_successfulGetDashboardChartsData(self,dashboardchartdata);
+			///////////////////////////////////////////////////////////
+		}else{			
+			self.emit("failedGetDashboardChartsData",{"error":{"code":"AP001","message":"Dashboard Icons Not Available"}});
+		}
+	})
+}
+
+var _successfulGetDashboardChartsData=function(self,dashboardchartdata){
+	logger.emit("log","_successfulGetDashboardChartsData");
+	self.emit("successfulGetDashboardChartsData", {"success":{"message":"Getting Dashboard Icons Successfully","doc":dashboardchartdata}});
+}
+
 ManageDashboard.prototype.addQuery=function(sessionuserid){
 	var self=this;
 	var querydata=this.dashboarddata;

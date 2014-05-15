@@ -10,11 +10,8 @@ var ManageDashboard = require("./manage-dashboard");
 exports.getDashboardIcons = function(req,res){
   logger.emit("log","///////Calling to Get Dashboard Icons///////");
   var sessionuserid=req.user.userid;
-  // var prodle=req.params.prodle;
-  // var orgid=req.params.orgid;
   // logger.emit("log","prodle"+prodle+"\nsessionid:"+sessionuserid);
-   var managedashboard= new ManageDashboard();
-     // product.setMaxListeners(0); 
+  var managedashboard= new ManageDashboard();
   managedashboard.removeAllListeners("failedGetDashboardIcons");
   managedashboard.on("failedGetDashboardIcons",function(err){
     logger.emit("log","error:"+err.error.message+":"+sessionuserid);
@@ -28,12 +25,34 @@ exports.getDashboardIcons = function(req,res){
     logger.emit("log","Getting Dashboard Icons Successfully");
     // logger.emit("info", result.success.message,sessionuserid);
     // managedashboard.removeAllListeners();
-
     res.send(result);
     // eventEmitter.removeListener(this);
-  });
- 
+  }); 
   managedashboard.getDashboardIcons();
+}
+
+exports.getDashboardChartsData = function(req,res){
+  logger.emit("log","///////Calling to Get Dashboard Icons///////");
+  var sessionuserid=req.user.userid;
+  // logger.emit("log","prodle"+prodle+"\nsessionid:"+sessionuserid);
+  var managedashboard= new ManageDashboard();
+  managedashboard.removeAllListeners("failedGetDashboardChartsData");
+  managedashboard.on("failedGetDashboardChartsData",function(err){
+    logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // managedashboard.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  managedashboard.removeAllListeners("successfulGetDashboardChartsData");
+  managedashboard.on("successfulGetDashboardChartsData",function(result){
+    logger.emit("log","Getting Dashboard Chart Details Successfully");
+    // logger.emit("info", result.success.message,sessionuserid);
+    // managedashboard.removeAllListeners();
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  }); 
+  managedashboard.getDashboardChartsData();
 }
 
 exports.addQuery = function(req,res){    
