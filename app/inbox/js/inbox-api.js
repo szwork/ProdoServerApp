@@ -2,7 +2,7 @@ var Inbox=require("./inbox");
 var logger=require("../../common/js/logger");
 
 exports.inboxAction = function(req, res) {
-  var inboxid=req.params.inboxid;
+  var messageid=req.params.messageid;
   var action=req.query.action;
   var sessionuserid=req.user.userid;
   var inbox=new Inbox();
@@ -17,7 +17,7 @@ exports.inboxAction = function(req, res) {
     
     res.send(result);
     });
-  inbox.inboxAction(sessionuserid,inboxid,action);
+  inbox.inboxAction(sessionuserid,messageid,action);
     
 }
 exports.getMyLatestInbox=function(req,res){
@@ -43,7 +43,7 @@ exports.getMyLatestInbox=function(req,res){
 }
 exports.loadMoreInboxMessages=function(req,res){
   var userid=req.params.userid;
-  var inboxid=req.params.inboxid;
+  var messageid=req.params.messageid;
   var sessionuserid=req.user.userid;
   var inbox=new Inbox();
   inbox.removeAllListeners("failedLoadMoreInboxMessages");
@@ -60,12 +60,12 @@ exports.loadMoreInboxMessages=function(req,res){
   if(userid!=sessionuserid){
     inbox.emit("failedLoadMoreInboxMessages",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
   }else{
-    inbox.loadMoreInboxMessages(sessionuserid,inboxid); 
+    inbox.loadMoreInboxMessages(sessionuserid,messageid); 
   }
 }
 exports.replyToInboxMessage=function(req,res){
   var userid=req.params.userid;
-  var inboxid=req.params.inboxid;
+  var messageid=req.params.messageid;
   var sessionuserid=req.user.userid;
   var replytext=req.body.replytext;
   var inbox=new Inbox();
@@ -84,7 +84,7 @@ exports.replyToInboxMessage=function(req,res){
   }else if(req.user.org.orgid==null){
     inbox.emit("failedReplyToInboxMessage",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
   }else{
-    inbox.replyToInboxMessage(sessionuserid,inboxid,replytext); 
+    inbox.replyToInboxMessage(sessionuserid,messageid,replytext); 
   }
 }
 

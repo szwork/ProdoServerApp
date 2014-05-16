@@ -17,18 +17,19 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger");
 
 var InboxSchema = mongoose.Schema({
-  inboxid:{type:String,unique:true},
+  messageid:{type:String,unique:true},
   userid:{type:String,ref:"users"},
   from:{email:String,userid:String,name:String},//email
   body:{type:String},
   subject:{type:String},
   messagetype:{type:String,default:"normal"},
   status:{type:String,default:"unread"},
-  createdate:{type:Date,default:new Date()}
+  createdate:{type:Date,default:new Date()},
+  parentid:{type:String,default:null}
 });
 InboxSchema.pre('save', function(next) {
   var inbox = this;
-  inbox.inboxid=shortId.generate();  
+  inbox.messageid=shortId.generate();  
   next(); 
 })
 InboxSchema.set('redisCache', true);
