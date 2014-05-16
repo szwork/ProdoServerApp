@@ -1521,7 +1521,7 @@ var _addOtherOrganizationInviteIntoBusinessOpportunity=function(self,subject,bod
 		}
 	}
 	if(business_opportunity.length==0){
-		self.emit("failedOtherOrgInvites",{"error":{"message":"Pleae provider company emailids"}});	
+		self.emit("failedOtherOrgInvites",{"error":{"message":"Please provider company emailids"}});	
 	}else{
 		self.emit("sendotherorginvite",subject,body,toemailids,user,organization);
 		BusinessOpportunityModel.create(business_opportunity,function(err,business_opportunitydata){

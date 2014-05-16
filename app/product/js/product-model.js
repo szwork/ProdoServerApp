@@ -31,20 +31,20 @@ var productFeatureSchema = mongoose.Schema({
   featuredescription:{type:String}
 });
 
-var commentSchema = mongoose.Schema({
-  commentid:{type:String},
-  user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
-  //orgname and grpname set when user is organization  user
-  status:{type:String},
-  datecreated:{type:Date}, 
-  dateremoved:{type:Date},   
-  commenttext:{type:String},
-  agreecount:{type:Number},
-  disagreecount:{type:Number},
-  commentcategory:{type:String},  
-  tags:[{type:String,ref:"Tags"}], 
-  comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]
-});
+// var commentSchema = mongoose.Schema({
+//   commentid:{type:String},
+//   user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
+//   //orgname and grpname set when user is organization  user
+//   status:{type:String},
+//   datecreated:{type:Date}, 
+//   dateremoved:{type:Date},   
+//   commenttext:{type:String},
+//   agreecount:{type:Number},
+//   disagreecount:{type:Number},
+//   commentcategory:{type:String},  
+//   tags:[{type:String,ref:"Tags"}], 
+//   comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]
+// });
 
 ////////////
 //Product Data Model
@@ -74,7 +74,7 @@ var productSchema = mongoose.Schema({
   modifieddate:{type:Date},
   removeddate:{type:Date},
   comments_shown:{type:Number},
-  product_comments: [commentSchema], 
+  // product_comments: [commentSchema], 
   pricing:[pricingSchema],
   pricinghistory:[pricingHistorySchema],
   blogs: [{blogid:{type:String}}]

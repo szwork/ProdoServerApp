@@ -290,7 +290,7 @@ var _addComment=function(self,prodle,commentdata,product){
 		}else{
       
       	if(product_commentdata.type=="product"){
-      		updateLatestProductComment(product_commentdata.prodle);
+      		// updateLatestProductComment(product_commentdata.prodle);
       	}else{
       		//updateLatestWarrantyComment(product_commentdata.prodle);
       	}
@@ -439,7 +439,7 @@ var _deleteComment=function(self,commentid){
 		}else{
   
 			if(comment.type="product"){
-       			updateLatestProductComment(comment.prodle);
+       			// updateLatestProductComment(comment.prodle);
 			}else{
        			//updateLatestWarrantyComment
 			}
@@ -462,7 +462,7 @@ var _validateDeleteFeatureAnalytics = function(prodle,commentdata){
         console.log("_validateDeleteFeatureAnalytics");
         // var analytics = commentdata.analytics;
         if(commentdata.featureanalytics==undefined){
-        	console.log("featureanalytics is undefined");
+        	console.log("featureanalytics is undefined")
         }else{
         	if(commentdata.featureanalytics.length>0){
             	var initialvalue=0;            
@@ -540,7 +540,7 @@ var _deleteCampaignComment=function(self,commentid){
 			self.emit("failedCampaignCommentDeletion",{"error":{"code":"AC001","message":"Provided commentid is wrong"}});
 		}else{  
 			if(comment.type="campaign"){
-				updateLatestCampaignComment(comment.campaign_id);
+				// updateLatestCampaignComment(comment.campaign_id);
        			// updateLatestProductComment(comment.prodle);
 			}else{
        			//updateLatestWarrantyComment
@@ -823,7 +823,7 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":"Error in db to save new campaign comment"}});
 		}else{      
 	      	if(campaign_commentdata.type=="campaign"){
-	      		updateLatestCampaignComment(campaign_commentdata.campaign_id);
+	      		// updateLatestCampaignComment(campaign_commentdata.campaign_id);
 	      	}else{
 	      		//updateLatestWarrantyComment(campaign_commentdata.prodle);
 	      	}
@@ -1055,7 +1055,7 @@ var _updateAgreeDisagreeCommentModel=function(self,commentid,action){
 	if(action=="agree"){
 		condition={$inc:{agreecount:1}}
 	}else{
-		condition={$inc:{diagreecount:1}}
+		condition={$inc:{disagreecount:1}}
 	}
 	CommentModel.update({commentid:commentid},condition,function(err,commentagreedisagreestatus){
 		if(err){
