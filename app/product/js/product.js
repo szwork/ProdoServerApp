@@ -25,7 +25,7 @@ var shortId = require('shortid');
 var __=require("underscore");
 var UserModel=require("../../user/js/user-model")
 var InboxModel=require("../../inbox/js/inbox-model");
-// var CommentModel=require("./comment-model");
+var CommentModel=require("../../comment/js/comment-model");
 var AWS = require('aws-sdk');
 var ProductEnquiry=require('./product-enquiry-model');
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
@@ -265,18 +265,27 @@ var _getProduct=function(self,orgid,prodle){
 			TrendingModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}},{commentcount:1,followedcount:1,_id:0}).lean().exec(function(err,product_trend){
 				if(err){
 					logger.emit({"message":"Error in db to find ProductTrend"});
-				// }else if(product_trend){
-					// product.trending = product_trend;
-				// 	////////////////////////////////					 
-					// _successfulGetProduct(self,product);
-				// 	//////////////////////////////////
 				}else{
+					CommentModel.find({type:"product",status:"active",prodle:prodle},{prodle:0,type:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
+						if(err){
+							logger.emit("log","Error in updation latest 5 product comment");
+							self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Database Issue"}});
+						}else {
+							var comment_array;
+							if(comment.length==0){
+								comment_array=[];
+							}else{
+								comment_array=comment;
+							}
 					console.log("Error in Db1");
 					logger.emit({"message":"Provided prodle is wrong"});
 					product.trending = product_trend;
+					product.product_comments=comment_array;
 					_successfulGetProduct(self,product);
 				}
 			})
+			}
+		})
 			 ////////////////////////////////
 			// _successfulGetProduct(self,product);
 			//////////////////////////////////
