@@ -29,7 +29,12 @@ exports.getDashboardIcons = function(req,res){
     res.send(result);
     // eventEmitter.removeListener(this);
   });
-  managedashboard.getDashboardIcons(dashboard_access_code);
+  if(dashboard_access_code==undefined || dashboard_access_code==null){
+    logger.emit("error","You are not authorize to get dashboard icons",sessionuserid);
+    managedashboard.emit("failedGetDashboardIcons",{"error":{"code":"EA001","message":"You have not authorize to get dashboard icons"}});
+  }else{
+    managedashboard.getDashboardIcons(dashboard_access_code);  
+  }
 }
 
 exports.getDashboardChartsData = function(req,res){

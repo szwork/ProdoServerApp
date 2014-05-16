@@ -21,6 +21,7 @@ var manageDashboardModel = require("./manage-dashboard-model");
 var chartAccessModel = require("./dashboard-chartaccess-model");
 var TagReffDicModel = require("../../tagreffdictionary/js/tagreffdictionary-model");
 var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
+var __=require("underscore");
 
 function isArray(what) {
     return Object.prototype.toString.call(what) === '[object Array]';
@@ -45,9 +46,31 @@ var _getDashboardIcons=function(self){
 		if(err){
 			self.emit("failedGetDashboardIcons",{"error":{"code":"ED001","message":"Error in db to find dashboard icons"}});
 		}else if(dashboardicons.length>0){
-			 ////////////////////////////////
-			_successfulGetDashboardIcons(self,dashboardicons);
-			//////////////////////////////////
+			if(dashboardicons.length==3){
+				/////////////////////////////////////////////////
+				_successfulGetDashboardIcons(self,dashboardicons);
+				/////////////////////////////////////////////////
+			}else{
+				var resultcategoryarray=[];
+				var categoryarray=["Product","Campaign","Organization"];
+				for(var i=0;i<dashboardicons.length;i++){
+					resultcategoryarray.push(dashboardicons[i].category);
+			    }
+			    var category_array=__.difference(categoryarray,resultcategoryarray);
+			    for(var j=0;j<category_array.length;j++){
+			    	dashboardicons.push({category:category_array[j],charticons:[]});
+			    }
+
+			  //   var result = [];
+			  //   for(var i=0;i<dashboardicons.length;i++){
+			  //   	var name = {category:dashboardicons[i].category,dashboardicons[i].category:dashboardicons[i].charticons}
+
+					// result.push(name);
+			  //   }
+			    /////////////////////////////////////////////////
+				_successfulGetDashboardIcons(self,dashboardicons);
+				/////////////////////////////////////////////////							
+			}
 		}else{			
 			self.emit("failedGetDashboardIcons",{"error":{"code":"AP001","message":"Dashboard Icons Not Available"}});
 		}
