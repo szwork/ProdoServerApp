@@ -19,6 +19,8 @@ var shortId = require('shortid');
 var DashboardModel = require("./dashboard-charts-model");
 var manageDashboardModel = require("./manage-dashboard-model");
 var chartAccessModel = require("./dashboard-chartaccess-model");
+var TagReffDicModel = require("../../tagreffdictionary/js/tagreffdictionary-model");
+var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
 
 function isArray(what) {
     return Object.prototype.toString.call(what) === '[object Array]';
@@ -237,6 +239,89 @@ var _getQueryNameByQueryid = function(self,prodle,queryid,userid){
 	});
 }
 
-var _validateQueryExecution = function(self,prodle,queryname){
-	console.log("QueryNamq #### : "+JSON.stringify(queryname));
+var _validateQueryExecution = function(self,prodle,query){
+	console.log("QueryNamq #### : "+JSON.stringify(query));
+	if(query.queryname == "overall product sentiment"){
+		// Calculate count for each tag from product comments
+		_tagCountForProductComment(self,prodle);
+	}else if(query.queryname == "detailed product comments response"){
+		// Calculate positive, negative and neutral responses from product comments
+		_posiNegaNeutResponseForProductComment(self,prodle);
+	}else{
+
+	}
+}
+
+var _tagCountForProductComment = function(self,prodle){
+	FeatureAnalyticsModel.aggregate([{$unwind:"$analytics"},{$match:{prodle:prodle}},{$group:{_id:{tagid:"$analytics.tagid",tagname:"$analytics.tagname"},tagcount:{$sum:1}}},{$project:{tagid:"$_id.tagid",tagname:"$_id.tagname",tagcount:1,_id:0}}]).exec(function(err,producttagcount){
+		if(err){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"ED001","message":"Error in db to find overall product sentiment"}});
+		}else if(producttagcount.length == 0){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"AU003","message":"overall product sentiment does not exists"}});
+		}else{
+			////////////////////////////////
+			_successfulGetAnalyticsDataForProduct(self,producttagcount);
+			////////////////////////////////
+		}
+	})
+};
+
+var _posiNegaNeutResponseForProductComment = function(self,prodle){
+	//Get Tag and Count of tag
+	FeatureAnalyticsModel.aggregate([{$unwind:"$analytics"},{$match:{prodle:prodle}},{$group:{_id:{tagid:"$analytics.tagid",tagname:"$analytics.tagname"},tagcount:{$sum:1}}},{$project:{tagid:"$_id.tagid",tagname:"$_id.tagname",tagcount:1,_id:0}}]).exec(function(err,producttagcount){
+		if(err){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"ED001","message":"Error in db to find tag analytics"}});
+		}else if(producttagcount.length == 0){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"AU003","message":"Feature analytics does not exists"}});
+		}else{
+			//////////////////////////////////////////////////////////
+			_getTagAnalyticsFromReffDict(self,prodle,producttagcount);
+			//////////////////////////////////////////////////////////
+		}
+	})
+};
+
+var _getTagAnalyticsFromReffDict = function(self,prodle,producttagcount){
+	// Get Positive Negative Neutral Respons for tag
+	var tagids = [];
+	for(var i=0;i<producttagcount.length;i++){
+		tagids.push(producttagcount[i].tagid);
+	}
+
+	TagReffDicModel.aggregate([{$match:{tagid:{$in:tagids}}},{$group:{_id:"$emotions.result",tagid:{"$addToSet":"$tagid"}}}]).exec(function(err,taganalytics){
+		if(err){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"ED001","message":"Error in db to find all tag analytics from tagreffdictionary"}});
+		}else if(taganalytics.length == 0){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"AU003","message":"Tag analytics does not exists in refference dictionary"}});
+		}else{
+			////////////////////////////////
+			_getFinalAnalyticsResult(self,prodle,producttagcount,taganalytics);			
+			////////////////////////////////
+		}
+	})
+};
+
+var _getFinalAnalyticsResult = function(self,prodle,producttagcount,taganalytics){
+	var feature_tagids = [];
+	var productanalytics=[];
+	for(var i=0;i<producttagcount.length;i++){
+		feature_tagids.push(producttagcount[i].tagid);
+	}
+
+	for(var j=0;j<taganalytics.length;j++){
+		var taganalyticscount=0;
+		for(var k=0;k<taganalytics[j].tagid.length;k++){
+			if(feature_tagids.indexOf(taganalytics[j].tagid[k])>=0){
+				taganalyticscount+=producttagcount[feature_tagids.indexOf(taganalytics[j].tagid[k])].tagcount;
+			}
+		}
+		productanalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount});	
+	}
+
+	_successfulGetAnalyticsDataForProduct(self,productanalytics);
+}
+
+var _successfulGetAnalyticsDataForProduct = function(self,doc){
+	logger.emit("log","_successfulGetAnalyticsDataForProduct");
+	self.emit("successfulGetAnalyticsDataForProduct", {"success":{"message":"Getting product chart details successfully","doc":doc}});
 }
