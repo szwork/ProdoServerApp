@@ -540,7 +540,7 @@ var _deleteCampaignComment=function(self,commentid){
 			self.emit("failedCampaignCommentDeletion",{"error":{"code":"AC001","message":"Provided commentid is wrong"}});
 		}else{  
 			if(comment.type="campaign"){
-				updateLatestCampaignComment(comment.campaign_id);
+				// updateLatestCampaignComment(comment.campaign_id);
        			// updateLatestProductComment(comment.prodle);
 			}else{
        			//updateLatestWarrantyComment
@@ -823,7 +823,7 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":"Error in db to save new campaign comment"}});
 		}else{      
 	      	if(campaign_commentdata.type=="campaign"){
-	      		updateLatestCampaignComment(campaign_commentdata.campaign_id);
+	      		// updateLatestCampaignComment(campaign_commentdata.campaign_id);
 	      	}else{
 	      		//updateLatestWarrantyComment(campaign_commentdata.prodle);
 	      	}

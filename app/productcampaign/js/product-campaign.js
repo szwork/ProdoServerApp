@@ -269,15 +269,33 @@ var _getProductCampaign = function(self,prodle,campaign_id){
 				if(err){
 					logger.emit({"message":"Error in db to find ProductTrend"});
 				}else{
-					console.log("Error in Db1");
-					logger.emit({"message":"Provided prodle or campaign_id is wrong"});
-					productcampain.trending = campaign_trend;
-					_successfulGetProductCampaign(self,productcampain);
+					// console.log("Error in Db1");
+					CommentModel.find({type:"campaign",status:"active",campaign_id:campaign_id},{campaign_id:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
+						if(err){
+							logger.emit("error","Database Issue"+err);
+							self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Database Issue"}})
+						}else {
+							var comment_array;
+							if(comment.length==0){
+								comment_array=[];
+							}else{
+								comment_array=comment;
+							}
+							var campaign_tags=productcampain.campaign_tags;
+							var campaign_tags_feature=[];
+							for(var j=0;j<campaign_tags.length;j++){
+								campaign_tags_feature.push({featurename:campaign_tags[j]})
+							}
+							productcampain.trending = campaign_trend;
+							productcampain.campaign_comments=comment_array;
+							productcampain.campaign_tags=campaign_tags_feature;
+							/////////////////////////////////////////////////
+						_successfulGetProductCampaign(self,productcampain);
+						/////////////////////////////////////////////////
+						}
+					})
 				}
 			})
-			//////////////////////////////////////////////////
-			// _successfulGetProductCampaign(self,productcampain);
-			//////////////////////////////////////////////////
 		}else{			
 			self.emit("failedGetProductCampaign",{"error":{"code":"AP001","message":"Provided prodle or campaign_id is wrong"}});
 		}
@@ -329,58 +347,58 @@ var _getAllProductCampaign = function(self,prodle){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(product){
 			// console.log("Product : "+JSON.stringify(product.name));
-			ProductCampaignModel.find({prodle:prodle,status:"active"}).lean().exec(function(err,productcampain){
+			ProductCampaignModel.find({prodle:prodle,status:"active"},{campain_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
 				if(err){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 				}else if(productcampain.length==0){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"AP002","message":"No campaign exists for "+product.name}});
 				}else{
-					var productcampainids=[];
-						productcampain=JSON.stringify(productcampain);
-						productcampain=JSON.parse(productcampain);
-					for(var i=0;i<productcampain.length;i++){
-						var cam_tags = productcampain[i].campaign_tags;
-						productcampain[i].campaign_tags=[];
-						// productcampain[i].trending=[];
-						productcampainids.push(productcampain[i].campaign_id)
-						for(var j=0;j<cam_tags.length;j++){
-							productcampain[i].campaign_tags.push({featurename:cam_tags[j]});
-						}
-					}
-					var camp_trend;
-					console.log("productcampainids"+productcampainids)
-					CampaignTrendModel.find({prodle:prodle,campaign_id:{$in:productcampainids},status:{$ne:"deactive"}},{campaign_id:1,commentcount:1,followedcount:1,_id:0}).lean().exec(function(err,campaign_trend){
-						if(err){
-							logger.emit({"message":"Error in db to find ProductTrend"});
-						}else{
-							if(campaign_trend.length>0){
+					// var productcampainids=[];
+					// 	productcampain=JSON.stringify(productcampain);
+					// 	productcampain=JSON.parse(productcampain);
+					// for(var i=0;i<productcampain.length;i++){
+					// 	var cam_tags = productcampain[i].campaign_tags;
+					// 	productcampain[i].campaign_tags=[];
+					// 	// productcampain[i].trending=[];
+					// 	productcampainids.push(productcampain[i].campaign_id)
+					// 	for(var j=0;j<cam_tags.length;j++){
+					// 		productcampain[i].campaign_tags.push({featurename:cam_tags[j]});
+					// 	}
+					// }
+					// var camp_trend;
+					// console.log("productcampainids"+productcampainids)
+					// CampaignTrendModel.find({prodle:prodle,campaign_id:{$in:productcampainids},status:{$ne:"deactive"}},{campaign_id:1,commentcount:1,followedcount:1,_id:0}).lean().exec(function(err,campaign_trend){
+					// 	if(err){
+					// 		logger.emit({"message":"Error in db to find ProductTrend"});
+					// 	}else{
+					// 		if(campaign_trend.length>0){
 
-								console.log("test"+campaign_trend);
-								for(var j=0;j<campaign_trend.length;j++){
-									if(productcampainids.indexOf(campaign_trend[j].campaign_id)>=0){
+					// 			console.log("test"+campaign_trend);
+					// 			for(var j=0;j<campaign_trend.length;j++){
+					// 				if(productcampainids.indexOf(campaign_trend[j].campaign_id)>=0){
 
-										productcampain[productcampainids.indexOf(campaign_trend[j].campaign_id)].trending={commentcount:campaign_trend[j].commentcount,followedcount:campaign_trend[j].followedcount};
-									}
-								}
-								console.log("Error in Db1 : "+JSON.stringify(campaign_trend));
-								// logger.emit({"message":"Provided prodle or campaign_id is wrong : "+campaign_trend});
-								// camp_trend = campaign_trend;
-								console.log("camp_trend 1 : "+camp_trend);
-			             ////////////////////////////////////////////////////
-					      _successfulGetAllProductCampaign(self,productcampain,product.name);
-					     ////////////////////////////////////////////////////
-								// _successfulGetProductCampaign(self,productcampain);
-							}else{
-								_successfulGetAllProductCampaign(self,productcampain,product.name);
-							}
+					// 					productcampain[productcampainids.indexOf(campaign_trend[j].campaign_id)].trending={commentcount:campaign_trend[j].commentcount,followedcount:campaign_trend[j].followedcount};
+					// 				}
+					// 			}
+					// 			console.log("Error in Db1 : "+JSON.stringify(campaign_trend));
+					// 			// logger.emit({"message":"Provided prodle or campaign_id is wrong : "+campaign_trend});
+					// 			// camp_trend = campaign_trend;
+					// 			console.log("camp_trend 1 : "+camp_trend);
+			  //            ////////////////////////////////////////////////////
+					//       _successfulGetAllProductCampaign(self,productcampain,product.name);
+					//      ////////////////////////////////////////////////////
+					// 			// _successfulGetProductCampaign(self,productcampain);
+					// 		}else{
+					// 			_successfulGetAllProductCampaign(self,productcampain,product.name);
+					// 		}
 							
-						}
-					})
-						// console.log("camp_trend : "+camp_trend);
-						////////////////////////////////////////////////////
-					// _successfulGetAllProductCampaign(self,productcampain,product.name);
-					////////////////////////////////////////////////////
-						// productcampain[i].trending = camp_trend;			
+					// 	}
+					// })
+					// 	// console.log("camp_trend : "+camp_trend);
+					// 	////////////////////////////////////////////////////
+					 _successfulGetAllProductCampaign(self,productcampain,product.name);
+					// ////////////////////////////////////////////////////
+					// 	// productcampain[i].trending = camp_trend;			
 					}
 					
 				

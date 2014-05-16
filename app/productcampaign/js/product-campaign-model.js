@@ -15,19 +15,19 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger");
 
 //Product Campaign Comment Model
-var commentSchema = mongoose.Schema({
-  commentid:{type:String},
-  user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
-  //orgname and grpname set when user is organization  user
-  status:{type:String},
-  datecreated:{type:Date}, 
-  agreecount:{type:Number},
-  disagreecount:{type:Number},
-  dateremoved:{type:Date},   
-  commenttext:{type:String},   
-  tags:[{type:String,ref:"Tags"}], 
-  comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]
-});
+// var commentSchema = mongoose.Schema({
+//   commentid:{type:String},
+//   user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
+//   //orgname and grpname set when user is organization  user
+//   status:{type:String},
+//   datecreated:{type:Date}, 
+//   agreecount:{type:Number},
+//   disagreecount:{type:Number},
+//   dateremoved:{type:Date},   
+//   commenttext:{type:String},   
+//   tags:[{type:String,ref:"Tags"}], 
+//   comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]
+// });
 //Product Campaign Model
 var productCampaignSchema = mongoose.Schema({
   orgid:{type:String,ref:"Organisation"},
@@ -45,7 +45,7 @@ var productCampaignSchema = mongoose.Schema({
   enddate:{type:Date},
   status:{type:String,default:"init"},//init,active,deactive
   artwork:[{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}}],
-  campaign_comments: [commentSchema], 
+  // campaign_comments: [commentSchema], 
 });
 
 productCampaignSchema.pre('save', function(next) {
