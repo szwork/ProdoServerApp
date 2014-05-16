@@ -20,6 +20,7 @@ var CampaignTrendModel = require("../../featuretrending/js/campaign-trending-mod
 var ProductCampaignModel = require("./product-campaign-model");
 var CONFIG = require('config').Prodonus;
 var AWS = require('aws-sdk');
+var CommentModel=require("../../comment/js/comment-model");
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
@@ -347,7 +348,7 @@ var _getAllProductCampaign = function(self,prodle){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(product){
 			// console.log("Product : "+JSON.stringify(product.name));
-			ProductCampaignModel.find({prodle:prodle,status:"active"},{campain_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
+			ProductCampaignModel.find({prodle:prodle,status:"active"},{campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
 				if(err){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 				}else if(productcampain.length==0){
