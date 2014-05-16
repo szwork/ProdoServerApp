@@ -12,4 +12,5 @@ exports.init = function (app) {
   app.get("/api/dashboard/queries",auth,api.managedashboardapi.getAllDashboardQuery);//get dashboard querys
 
   app.post("/api/dashboard/RBONDS_Mapping",auth,api.managedashboardapi.addRBONDS_Mapping);//Add Query for Dashboard
+  app.get("/api/chart/:prodle/:queryid",auth,api.managedashboardapi.getAnalyticsDataForProduct);//get analytics data for product
 }
