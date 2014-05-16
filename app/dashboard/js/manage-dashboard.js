@@ -39,7 +39,7 @@ ManageDashboard.prototype.getDashboardIcons = function(dashboard_access_code) {
 };
 
 var _getDashboardIcons=function(self){
-	DashboardModel.aggregate([{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
+	DashboardModel.aggregate([{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts",query:"$query"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
 		if(err){
 			self.emit("failedGetDashboardIcons",{"error":{"code":"ED001","message":"Error in db to find dashboard icons"}});
 		}else if(dashboardicons.length>0){
@@ -213,4 +213,30 @@ var _addRBONDS_Mapping = function(self,chartaccessdata,userid){
 var _successfulAddRBONDS_Mapping=function(self,dashboardquery){
 	logger.emit("log","_successfulAddRBONDS_Mapping");
 	self.emit("successfulAddRBONDS_Mapping", {"success":{"message":"RBONDS_Mapping Added Successfully"}});
+}
+
+ManageDashboard.prototype.getAnalyticsDataForProduct=function(prodle,queryid,sessionuserid){
+	var self=this;
+	////////////////////////////////////////////////////////////
+	_getQueryNameByQueryid(self,prodle,queryid,sessionuserid);
+	//////////////////////////////////////////////////////////
+	console.log("prodle : "+prodle+" queryid : "+queryid+" sessionuserid : "+sessionuserid);
+}
+
+var _getQueryNameByQueryid = function(self,prodle,queryid,userid){
+	manageDashboardModel.findOne({queryid:queryid},function(err,queryname){
+		if(err){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"ED001","message":"Error in db to find queryname"}});	
+		}else if(queryname){
+			///////////////////////////////////////////////
+	   		_validateQueryExecution(self,prodle,queryname);
+	   		///////////////////////////////////////////////	
+		}else{
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"message":"Wrong queryid"}});
+		}
+	});
+}
+
+var _validateQueryExecution = function(self,prodle,queryname){
+	console.log("QueryNamq #### : "+JSON.stringify(queryname));
 }

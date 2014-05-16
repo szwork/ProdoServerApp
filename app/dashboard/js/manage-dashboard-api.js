@@ -136,3 +136,23 @@ exports.addRBONDS_Mapping = function(req,res){
       managedashboard.addRBONDS_Mapping(sessionuserid);
     }
 }
+
+exports.getAnalyticsDataForProduct = function(req, res) {
+  var sessionuserid = req.user.userid;
+  var prodle = req.params.prodle;
+  var queryid = req.params.queryid;
+  var managedashboard = new ManageDashboard();
+
+  managedashboard.removeAllListeners("failedGetAnalyticsDataForProduct");
+    managedashboard.on("failedGetAnalyticsDataForProduct",function(err){
+      logger.emit("error", err.error.message,req.user.userid);
+      res.send(err);
+    });
+
+    managedashboard.removeAllListeners("successfulGetAnalyticsDataForProduct");
+  managedashboard.on("successfulGetAnalyticsDataForProduct",function(result){
+      logger.emit("info", result.success.message);      
+    res.send(result);
+  });
+  managedashboard.getAnalyticsDataForProduct(prodle,queryid,sessionuserid);
+}
