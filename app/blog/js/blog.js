@@ -306,7 +306,7 @@ Blog.prototype.getAllRegistration = function() {
 };
 
 var _getAllRegistration = function(self){
-	authorModel.find({},{authorid:1,firstname:1,lastname:1,email:1,posted_date:1,status:1,_id:0}).lean().exec(function(err,authorstatus){
+	authorModel.find({}).lean().exec(function(err,authorstatus){
 		if(err){
 			self.emit("failedGetAllRegistration",{"error":{"code":"ED001","message":"Error in db to get author registration details"}});
 		}else if(authorstatus){
@@ -317,9 +317,9 @@ var _getAllRegistration = function(self){
 	})
 }
 
-var _successfulGetAllRegistration = function(self,blog){
+var _successfulGetAllRegistration = function(self,author){
 	logger.emit("log","_successfulGetAllRegistration");
-	self.emit("successfulGetAllRegistration", {"success":{"message":"Getting Author Registration Details Successfully","blog":blog}});
+	self.emit("successfulGetAllRegistration", {"success":{"message":"Getting Author Registration Details Successfully","author":author}});
 }
 
 Blog.prototype.authorAcceptance=function(authorid,sessionuserid){
