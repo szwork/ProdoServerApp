@@ -616,7 +616,7 @@ exports.uploadFiles=function(io,__dirname){
              var dashboard_obj = new DashboardPoolModel(dashboarddata);
              dashboard_obj.save(function(err,upload_result){
               if(err){
-                socket.emit("addDashboardChartResponse",{"error":{"message":"Database Isssue"}})
+                socket.emit("addDashboardChartResponse",{"error":{"message":"Database Isssue "+err}});
               }else{
                 socket.emit("addDashboardChartResponse",null,{"success":{"message":"Dashboard Chart Added successfully","chartname":upload_result.chartname,"chartimage":url}});
               }
