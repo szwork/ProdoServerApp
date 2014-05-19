@@ -16,29 +16,25 @@ var commonapi=require('../../common/js/common-api');
 var shortId = require('shortid');
 var logger = require("../../common/js/logger")
 
-// var tesllusaboutyouSchema = mongoose.Schema({
-//   facebook:[{type:String], 
-//   twitter:[{type:String],
-//   google:[{type:String],
-//   other:[{type:String]
-// });
-
 var authorSchema = mongoose.Schema({
   authorid:{type:String,unique:true},
-  userid:{type:String},
+  userid:{type:String,unique:true},
   firstname:{type:String},
   lastname:{type:String},
   email:{type:String,required:true,unique:true},
+  aboutyou:{type:String},
   country:{type:String,default:null},
   category:[{type:String}],
-  postedon:{type:String},
+  posted_date:{type:Date},
+  accepted_date:{type:Date},
   status:{type:String,default:"requested"},//init,active,deactive
-  tellus_about_you:{
-    facebook:[{type:String}], 
-    twitter:[{type:String}],
-    google:[{type:String}],
-    other:[{type:String}]
-  }
+  portfolio:[{type:{type:String},url:{type:String}}]
+  // portfolio:{
+  //   facebook:[{type:String}],
+  //   twitter:[{type:String}],
+  //   google:[{type:String}],
+  //   other:[{type:String}]
+  // }
 });
 
 authorSchema.pre('save', function(next) {

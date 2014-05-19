@@ -112,7 +112,7 @@ exports.getAllDashboardQuery = function(req,res){
     managedashboard.emit("failedAddDashboardQuery",{"error":{"code":"EA001","message":"You have not authorize to get dashboard query"}});
   }else{
     managedashboard.getAllDashboardQuery();
-   }
+  }
 }
 
 exports.addRBONDS_Mapping = function(req,res){    

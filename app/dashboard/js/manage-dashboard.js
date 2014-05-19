@@ -37,12 +37,28 @@ module.exports = ManageDashboard;
 ManageDashboard.prototype.getDashboardIcons = function(dashboard_access_code) {
 	var self=this;
 	/////////////////////////
-	_getDashboardIcons(self);
+	// _getDashboardIcons(self);
+	_getChartIdsByCode(self,dashboard_access_code);
 	////////////////////////
 };
 
-var _getDashboardIcons=function(self){
-	DashboardModel.aggregate([{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts",query:"$query"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
+var _getChartIdsByCode=function(self,code){
+	chartAccessModel.findOne({code:code}).exec(function(err,accesscoderesult){
+		if(err){
+			self.emit("failedGetDashboardIcons",{"error":{"code":"ED001","message":"Error in db to find chartids by code"}});
+		}else if(accesscoderesult){
+			console.log("ABC : "+JSON.stringify(accesscoderesult.chartids));
+			/////////////////////////////////////////////////////////
+			_getDashboardIcons(self,accesscoderesult.chartids);
+			/////////////////////////////////////////////////////////
+		}else{			
+			self.emit("failedGetDashboardIcons",{"error":{"code":"AP001","message":"Dashboard Icons Not Available"}});
+		}
+	})
+}
+
+var _getDashboardIcons=function(self,chartids){
+	DashboardModel.aggregate([{$match:{chartid:{$in:chartids}}},{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts",query:"$query"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
 		if(err){
 			self.emit("failedGetDashboardIcons",{"error":{"code":"ED001","message":"Error in db to find dashboard icons"}});
 		}else if(dashboardicons.length>0){
@@ -60,13 +76,6 @@ var _getDashboardIcons=function(self){
 			    for(var j=0;j<category_array.length;j++){
 			    	dashboardicons.push({category:category_array[j],charticons:[]});
 			    }
-
-			  //   var result = [];
-			  //   for(var i=0;i<dashboardicons.length;i++){
-			  //   	var name = {category:dashboardicons[i].category,dashboardicons[i].category:dashboardicons[i].charticons}
-
-					// result.push(name);
-			  //   }
 			    /////////////////////////////////////////////////
 				_successfulGetDashboardIcons(self,dashboardicons);
 				/////////////////////////////////////////////////							
@@ -88,6 +97,7 @@ ManageDashboard.prototype.getDashboardChartsData = function() {
 	_getDashboardChartsData(self);
 	////////////////////////
 };
+
 var _getDashboardChartsData=function(self){
 	DashboardModel.find({},{chartid:1,chartname:1,_id:0}).exec(function(err,dashboardchartdata){
 		if(err){

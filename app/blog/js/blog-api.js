@@ -7,6 +7,27 @@ var logger=require("../../common/js/logger");
 var orgModel = require('../../org//js/org-model');
 var Blog = require('./blog');
 
+exports.authorRegistration=function(req,res){
+    var authordata = req.body.author;
+    // logger.emit("log","req authordata "+JSON.stringify(authordata));
+    var blog = new Blog(authordata);  
+    var sessionuserid=req.user.userid;
+    logger.emit("log","sessionid:"+sessionuserid);
+    blog.removeAllListeners("failedauthorRegistration");
+    blog.on("failedauthorRegistration",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(err);
+    });
+    blog.removeAllListeners("successfulauthorRegistration");
+    blog.on("successfulauthorRegistration",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(result);
+    });
+    blog.authorRegistration(sessionuserid);
+}
+
 exports.addBlog=function(req,res){
     var authorid = req.user.author.authorid;
   	var blogdata = req.body.blog;

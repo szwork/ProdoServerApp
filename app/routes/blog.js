@@ -8,6 +8,6 @@ exports.init = function (app) {
   	app.get("/api/blog/:authorid/:authorid",auth,api.blogapi.getBlog);//get blog
   	app.get("/api/blog/:authorid",auth,api.blogapi.getAllBlogs);//get all blogs
 	app.delete("/api/blog/:authorid/:blogid",auth,api.blogapi.deleteBlog);//delete blog
-	// app.get("/api/nextwarranties/:userid/:warranty_id",auth,api.warrantyapi.loadMoreWarranties);
-	// app.get('/api/latestwarranty/:userid',auth,api.warrantyapi.getLatestWarranty)
+	
+	app.post("/api/author",auth,api.blogapi.authorRegistration);//author registration
 }

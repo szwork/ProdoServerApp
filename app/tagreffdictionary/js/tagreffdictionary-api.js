@@ -18,6 +18,7 @@ exports.addTag = function(req, res) {
     	logger.emit("info", result.success.message);
 		res.send(result);
 	});
+	console.log("asfseafgsdgg : "+JSON.stringify(req.user.userid));
 	if(req.user.isAdmin==true){
 		tagreffdictionary.addTag(sessionuserid,tagReffDicData);
 	}else{

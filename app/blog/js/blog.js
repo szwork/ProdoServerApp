@@ -16,6 +16,7 @@ var logger = require("../../common/js/logger");
 var productModel = require("../../product/js/product-model");
 var authorModel = require("./author-model");
 var blogModel = require("./blog-model");
+var regxemail = /\S+@\S+\.\S+/; 
 
 var Blog = function(blogdata) {
 	this.blog = blogdata;
@@ -23,6 +24,23 @@ var Blog = function(blogdata) {
 
 Blog.prototype = new events.EventEmitter;
 module.exports = Blog;
+
+function isArray(what) {
+    return Object.prototype.toString.call(what) === '[object Array]';
+}
+
+//To check email validation
+var isValidEmail=function(email){
+	if(email==undefined){
+	 	return {"error":{"code":"AV001","message":"please pass emailid"}};
+	}else if(email.trim().length==0){
+		return {"error":{"code":"AV001","message":"please enter emailid"}};
+	}else if(!regxemail.test(email)){
+		return {"error":{"code":"AV001","message":"please enter valid email"}};
+ 	}else{
+ 		return {"success":{"message":"Valid email id"}};
+ 	}
+}
 
 Blog.prototype.addBlog=function(authorid,sessionuserid){
 	var self=this;
@@ -210,4 +228,72 @@ var _deleteBlog = function(self,authorid,blogid){
 var _successfulDeleteBlog = function(self,blog){
 	logger.emit("log","_successfulDeleteBlog");
 	self.emit("successfulDeleteBlog", {"success":{"message":"Blog Deleted Successfully"}});
+}
+
+Blog.prototype.authorRegistration=function(sessionuserid){
+	var self=this;
+	var authordata=this.blog;
+	
+	////////////////////////////////////////////////////////
+	_validateAuthorData(self,authordata,sessionuserid);
+	////////////////////////////////////////////////////////
+}
+
+var _validateAuthorData = function(self,authordata,userid){
+	if(authordata==undefined){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass authordata"}});
+	}else if(authordata.firstname==undefined){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass firstname"}});
+	}else if(authordata.lastname==undefined){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass lastname"}});
+	}else if(isValidEmail(authordata.email).error!=undefined){
+		self.emit("failedauthorRegistration",isValidEmail(authordata.email));
+	}else if(authordata.country==undefined){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass country"}});
+	}else if(authordata.category==undefined){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass category"}});
+	}else if(!isArray(authordata.category)){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"category should be an array"}});
+	}else if(authordata.category.length==0){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Pleas pass atleast one category"}});
+	}else if(authordata.portfolio==undefined){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass portfolio"}});
+	}else if(!isArray(authordata.portfolio)){
+		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"portfolio should be an array"}});
+	}else{
+		_checkEmailAlreadyExist(self,authordata,userid);
+	}
+}
+
+var _checkEmailAlreadyExist = function(self,authordata,userid){
+	authorModel.findOne({userid:userid}).lean().exec(function(err,authorstatus){
+		if(err){
+			self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to check valid email"}});
+		}else if(authorstatus){
+			self.emit("failedauthorRegistration",{"error":{"code":"AP001","message":"You have already registered for author application"}});
+		}else{
+			_authorRegistration(self,authordata,userid);		
+		}
+	})
+}
+
+var _authorRegistration = function(self,authordata,userid){
+	authordata.userid = userid;
+	authordata.posted_date = new Date();
+	var author_model = new authorModel(authordata);
+	console.log("AuthorData : "+JSON.stringify(authordata));
+	author_model.save(function(err,addstatus){
+	   	if(err){
+	  		self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to add new author "+err}});	
+	   	}else{
+		    /////////////////////////////////////////////
+			_successfulauthorRegistration(self,addstatus);
+	  		/////////////////////////////////////////////
+	   	}
+	});
+}
+
+var _successfulauthorRegistration = function(self,blog){
+	logger.emit("log","_successfulauthorRegistration");
+	self.emit("successfulauthorRegistration", {"success":{"message":"Author Added Successfully"}});
 }
