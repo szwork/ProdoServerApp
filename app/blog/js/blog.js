@@ -103,6 +103,46 @@ var _successfulAddBlog = function(self,blogstatus){
 	self.emit("successfulAddBlog",{"success":{"message":"Blog added sucessfully"}});
 }
 
+Blog.prototype.getProductNameByCategory = function(authorid,userid){
+	var self=this;
+	////////////////////////////////////////////////////////
+	_getAuthorCategory(self,authorid,userid);
+	////////////////////////////////////////////////////////
+}
+
+var _getAuthorCategory = function(self,authorid,userid){
+	authorModel.findOne({authorid:authorid,userid:userid}).lean().exec(function(err,authordata){
+		if(err){
+			self.emit("failedGetProductNameByCategory",{"error":{"code":"ED001","message":"Error in db to get author category"}});
+		}else if(authordata){
+			_getProductNameByCategory(self,authordata.category);			
+		}else{			
+			self.emit("failedGetProductNameByCategory",{"error":{"code":"AP001","message":"Wrong authorid"}});
+		}
+	})
+}
+
+var _getProductNameByCategory = function(self,category_arr){
+	productModel.find({status:"active",category:{$in:category_arr}},{name:1,_id:0}).lean().exec(function(err,productname){
+		if(err){
+			self.emit("failedGetProductNameByCategory",{"error":{"code":"ED001","message":"Error in db to get product name"}});
+		}else if(productname){
+			var prod_name_arr = [];
+			for(var i=0;i<productname.length;i++){
+				prod_name_arr.push(productname[i].name);
+			}
+			_successfulGetProductNameByCategory(self,prod_name_arr);
+		}else{
+			self.emit("failedGetProductNameByCategory",{"error":{"code":"AP001","message":"Product not found"}});
+		}
+	})
+}
+
+var _successfulGetProductNameByCategory = function(self,productname){
+	logger.log("log","_successfulGetProductNameByCategory");
+	self.emit("successfulGetProductNameByCategory",{"success":{"message":"Getting productname sucessfully","productname":productname}});
+}
+
 Blog.prototype.updateBlog=function(authorid,blogid,sessionuserid){
 	var self=this;
 	var blogdata=this.blog;

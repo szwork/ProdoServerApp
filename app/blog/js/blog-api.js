@@ -106,6 +106,27 @@ exports.addBlog=function(req,res){
     }    
 }
 
+exports.getProductNameByCategory = function(req,res){
+    var authorid = req.params.authorid;
+    // logger.emit("log","authorid : "+authorid+" \nreq blogdata "+JSON.stringify(blogdata));
+    var blog = new Blog();  
+    var sessionuserid=req.user.userid;
+    logger.emit("log","sessionid:"+sessionuserid);
+    blog.removeAllListeners("failedGetProductNameByCategory");
+    blog.on("failedGetProductNameByCategory",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(err);
+    });
+    blog.removeAllListeners("successfulGetProductNameByCategory");
+    blog.on("successfulGetProductNameByCategory",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(result);
+    });
+    blog.getProductNameByCategory(authorid,sessionuserid);
+}
+
 exports.updateBlog=function(req,res){
     var authorid = req.params.authorid;
     var blogid = req.params.blogid;
