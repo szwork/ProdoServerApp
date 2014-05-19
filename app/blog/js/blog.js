@@ -16,6 +16,7 @@ var logger = require("../../common/js/logger");
 var productModel = require("../../product/js/product-model");
 var authorModel = require("./author-model");
 var blogModel = require("./blog-model");
+var userModel = require('../../user/js/user-model');
 var EmailTemplateModel=require('../../common/js/email-template-model');
 var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
@@ -133,7 +134,7 @@ var _getProductNameByCategory = function(self,category_arr){
 			}
 			_successfulGetProductNameByCategory(self,prod_name_arr);
 		}else{
-			self.emit("failedGetProductNameByCategory",{"error":{"code":"AP001","message":"Product not found"}});
+			self.emit("failedGetProductNameByCategory",{"error":{"code":"AP001","message":"Product not found for category which is entered by author"}});
 		}
 	})
 }
@@ -405,11 +406,11 @@ var _successfulGetAllRegistration = function(self,author){
 Blog.prototype.authorAcceptance=function(authorid,sessionuserid){
 	var self=this;
 	////////////////////////////////////////////////////////
-	_authorAcceptance(self,authorid);
+	_authorAcceptance(self,authorid,sessionuserid);
 	////////////////////////////////////////////////////////
 }
 
-var _authorAcceptance = function(self,authorid){
+var _authorAcceptance = function(self,authorid,userid){
 	authorModel.update({authorid:authorid},{$set:{status:"accepted",accepted_date:new Date()}}).lean().exec(function(err,blogupdatestatus){
 		if(err){
 			self.emit("failedauthorAcceptance",{"error":{"code":"ED001","message":"Error in db to accept author request"}});
@@ -419,18 +420,33 @@ var _authorAcceptance = function(self,authorid){
 			////////////////////////////////
 			// _successfulauthorAcceptance(self);
 			//////////////////////////////////
+			_changeIsAuthorInUserModel(self,authorid,userid);
+			
+		}
+	})
+};
+
+var _changeIsAuthorInUserModel = function(self,authorid,userid){
+	userModel.update({userid:userid},{$set:{"author.authorid":authorid,"author.isAuthor":true}}).lean().exec(function(err,blogupdatestatus){
+		if(err){
+			self.emit("failedauthorAcceptance",{"error":{"code":"ED001","message":"Error in db to update user detail"}});
+		}else if(blogupdatestatus!=1){
+			self.emit("failedauthorAcceptance",{"error":{"code":"AP001","message":"userid is wrong"}});
+		}else{
 			authorModel.findOne({authorid:authorid}).lean().exec(function(err,author){
 				if(err){
 					self.emit("failedauthorAcceptance",{"error":{"code":"ED001","message":"Error in db to get author details"}});
 				}else if(author){
+					///////////////////////////////////////////
 					_sendAuthorReqAcceptanceEmail(self,author);
+					///////////////////////////////////////////
 				}else{			
 					self.emit("failedauthorAcceptance",{"error":{"code":"AP001","message":"wrong authorid"}});
 				}
 			})
 		}
 	})
-};
+}
 
 //find authoracceptance template and send mail
 var _sendAuthorReqAcceptanceEmail = function(self,author) {
