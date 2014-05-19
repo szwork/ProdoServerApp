@@ -16,8 +16,11 @@ var logger = require("../../common/js/logger");
 var productModel = require("../../product/js/product-model");
 var authorModel = require("./author-model");
 var blogModel = require("./blog-model");
-var regxemail = /\S+@\S+\.\S+/; 
-
+var EmailTemplateModel=require('../../common/js/email-template-model');
+var commonapi = require('../../common/js/common-api');
+var CONFIG = require('config').Prodonus;
+var regxemail = /\S+@\S+\.\S+/;
+var S=require('string');
 var Blog = function(blogdata) {
 	this.blog = blogdata;
 };
@@ -287,13 +290,50 @@ var _authorRegistration = function(self,authordata,userid){
 	  		self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to add new author "+err}});	
 	   	}else{
 		    /////////////////////////////////////////////
-			_successfulauthorRegistration(self,addstatus);
+			// _successfulauthorRegistration(self,addstatus);
+			_sendSuccessfulAuthorRegiEmail(self,addstatus);
 	  		/////////////////////////////////////////////
 	   	}
 	});
 }
 
-var _successfulauthorRegistration = function(self,blog){
+//find author registration template and send mail
+var _sendSuccessfulAuthorRegiEmail = function(self,author) {
+	//send successful author registration email to author 
+	EmailTemplateModel.findOne({"templatetype":"authorregistrationsuccess"}).lean().exec(function(err,emailtemplate){
+		if(err){
+			self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to find authorregistrationsuccess emailtemplate"}});
+		}else if(emailtemplate){
+			// var url = "http://"+host+"/api/verify/"+token;
+			var html=emailtemplate.description;
+	        html=S(html);
+	        html=html.replaceAll("<email>",author.email);
+	        // html=html.replaceAll("<url>",url);
+	        var message = {
+	            from: "Prodonus <noreply@prodonus.com>", // sender address
+	            to: author.email, // list of receivers
+	            subject:emailtemplate.subject, // Subject line
+	            html: html.s // html body
+	        };
+	        // logger.emit("log",JSON.stringify(message));
+	 	 	// calling to sendmail method
+	        commonapi.sendMail(message,CONFIG.smtp_general,function (result){
+	            if(result=="failure"){
+	            	self.emit("failedauthorRegistration",{"error":{"code":"AT001","message":"Error to send verification email"}});
+	            }else{
+	            	logger.emit("info","Author Added successfully");
+	            	/////////////////////////////////
+	            	_successfulauthorRegistration(self,author);
+	            	////////////////////////////////
+	            }
+	        });
+	    }else{
+	        self.emit("failedauthorRegistration",{"error":{"code":"ED002","message":"Server setup template issue"}});
+		}
+	})
+}
+
+var _successfulauthorRegistration = function(self,author){
 	logger.emit("log","_successfulauthorRegistration");
 	self.emit("successfulauthorRegistration", {"success":{"message":"Author Added Successfully"}});
 }
@@ -337,11 +377,57 @@ var _authorAcceptance = function(self,authorid){
 			self.emit("failedauthorAcceptance",{"error":{"code":"AP001","message":"authorid is wrong"}});
 		}else{
 			////////////////////////////////
-			_successfulauthorAcceptance(self);
+			// _successfulauthorAcceptance(self);
 			//////////////////////////////////
+			authorModel.findOne({authorid:authorid}).lean().exec(function(err,author){
+				if(err){
+					self.emit("failedauthorAcceptance",{"error":{"code":"ED001","message":"Error in db to get author details"}});
+				}else if(author){
+					_sendAuthorReqAcceptanceEmail(self,author);
+				}else{			
+					self.emit("failedauthorAcceptance",{"error":{"code":"AP001","message":"wrong authorid"}});
+				}
+			})
 		}
 	})
 };
+
+//find authoracceptance template and send mail
+var _sendAuthorReqAcceptanceEmail = function(self,author) {
+	//send authoracceptance email to author
+	console.log("Author ## : "+author.email);
+	EmailTemplateModel.findOne({"templatetype":"authoracceptance"}).lean().exec(function(err,emailtemplate){
+		if(err){
+			self.emit("failedauthorAcceptance",{"error":{"code":"ED001","message":"Error in db to find authorregistrationsuccess emailtemplate"}});
+		}else if(emailtemplate){
+			// var url = "http://"+host+"/api/verify/"+token;
+			var html=emailtemplate.description;
+	        html=S(html);
+	        html=html.replaceAll("<email>",author.email);
+	        // html=html.replaceAll("<url>",url);
+	        var message = {
+	            from: "Prodonus <noreply@prodonus.com>", // sender address
+	            to: author.email, // list of receivers
+	            subject:emailtemplate.subject, // Subject line
+	            html: html.s // html body
+	        };
+	        // logger.emit("log",JSON.stringify(message));
+	 	 	// calling to sendmail method
+	        commonapi.sendMail(message,CONFIG.smtp_general,function (result){
+	            if(result=="failure"){
+	            	self.emit("failedauthorAcceptance",{"error":{"code":"AT001","message":"Error to send verification email"}});
+	            }else{
+	            	logger.emit("info","Author request accepted successfully");
+	            	/////////////////////////////////
+	            	_successfulauthorAcceptance(self);
+	            	////////////////////////////////
+	            }
+	        });
+	    }else{
+	        self.emit("failedauthorAcceptance",{"error":{"code":"ED002","message":"Server setup template issue"}});
+		}
+	})
+}
 
 var _successfulauthorAcceptance = function(self){
 	logger.log("log","_successfulauthorAcceptance");

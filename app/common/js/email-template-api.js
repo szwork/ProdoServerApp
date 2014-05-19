@@ -29,7 +29,7 @@ exports.loadEmailTemplate=function(req,res){
 		{
 			templatetype: "welcome",
 			subject: "Welcome To Prodonus",
-			description: "Hi <username>,<br> Welcome to Prodonus! You’ve just joined a community of product 			manufacturers and users who are sharing their insights on products. <br>At Prodonus, we strive to			 bring business closer to their customers to enable conversation, in addition to managing their	warranties.<br>Talk to manufacturers, interact with consumers from around the world, and explore 			  tons of interesting questions and insights.<br>We are committed to bring all the manufacturers 			  available to everyone.<br><br>Eager to start? Start following the products that interests you, 			  and there’s no limit to the number of products you can follow.<br>We are thrilled that you have 			  joined us! Congratulations! Leave comments and suggestions, and share your story!<br>During your 			  free trial period, you will be able to use prodonus as you would like, of any number of products.			  <br>At the end of the free trial period, you will be asked to select a plan according to the user type - manfacturer's, companies, or individuals .<br><br><br>Cheers,<br><br>Prodonus Team<br><br>You are receiving this email because you registered with Prodonus. Please do not reply directly to noreply@prodonus.com. If you have any questions or feedback, please visit our support link or write to support@prodonus.com<br><br>"
+			description: "Hi <username>,<br> Welcome to Prodonus! You’ve just joined a community of product manufacturers and users who are sharing their insights on products. <br>At Prodonus, we strive to			 bring business closer to their customers to enable conversation, in addition to managing their	warranties.<br>Talk to manufacturers, interact with consumers from around the world, and explore 			  tons of interesting questions and insights.<br>We are committed to bring all the manufacturers 			  available to everyone.<br><br>Eager to start? Start following the products that interests you, 			  and there’s no limit to the number of products you can follow.<br>We are thrilled that you have 			  joined us! Congratulations! Leave comments and suggestions, and share your story!<br>During your 			  free trial period, you will be able to use prodonus as you would like, of any number of products.			  <br>At the end of the free trial period, you will be asked to select a plan according to the user type - manfacturer's, companies, or individuals .<br><br><br>Cheers,<br><br>Prodonus Team<br><br>You are receiving this email because you registered with Prodonus. Please do not reply directly to noreply@prodonus.com. If you have any questions or feedback, please visit our support link or write to support@prodonus.com<br><br>"
 		},
 		{
 			templatetype: "welcomeinvite",
@@ -95,6 +95,16 @@ exports.loadEmailTemplate=function(req,res){
 			templatetype: "activateaccount",
 			subject: "Activate Account Request",
 			description: "Dear <email> You are requested to activate your account,So to activate your account please copy and pasteu this address into your web browser's address bar:<br><br><url><br><br>Have fun, and don't hesitate to contact us with your feedback <feedbackurl>.<br><br>- The Prodonus Team <br><br><br>Please do not reply to this e-mail; if you require assistance, please visit our support link <support link url> or write to - support@prodonus.com"
+		},
+		{
+			templatetype: "authorregistrationsuccess",
+			subject: "Blog Author Request",
+			description: "Dear <email>,<br><br> Prodonus received a request for blog author.<br><br> Please wait for reply from Prodonus<br><br>After successful verifiaction of your application you will get a mail of accepatance for your application.<br><br>The Prodonus Support Team <br><br>If you don't want to receive these emails from Prodonus in the future, please write to support@prodonus.com."
+		},
+		{
+			templatetype: "authoracceptance",
+			subject: "Blog Author Request",
+			description: "Dear <email> Congratulations,<br><br> Prodonus accepated your request for blog author.<br><br>"
 		}]
 
 
