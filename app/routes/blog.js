@@ -10,4 +10,6 @@ exports.init = function (app) {
 	app.delete("/api/blog/:authorid/:blogid",auth,api.blogapi.deleteBlog);//delete blog
 	
 	app.post("/api/author",auth,api.blogapi.authorRegistration);//author registration
+	app.get("/api/author",auth,api.blogapi.getAllRegistration);//get author registration for admin screen
+	app.put("/api/author/:authorid",auth,api.blogapi.authorAcceptance);//author acceptance by admin screen
 }

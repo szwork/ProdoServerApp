@@ -297,3 +297,53 @@ var _successfulauthorRegistration = function(self,blog){
 	logger.emit("log","_successfulauthorRegistration");
 	self.emit("successfulauthorRegistration", {"success":{"message":"Author Added Successfully"}});
 }
+
+Blog.prototype.getAllRegistration = function() {
+	var self=this;
+	/////////////////////////
+	_getAllRegistration(self);
+	////////////////////////
+};
+
+var _getAllRegistration = function(self){
+	authorModel.find({},{authorid:1,firstname:1,lastname:1,email:1,posted_date:1,status:1,_id:0}).lean().exec(function(err,authorstatus){
+		if(err){
+			self.emit("failedGetAllRegistration",{"error":{"code":"ED001","message":"Error in db to get author registration details"}});
+		}else if(authorstatus){
+			_successfulGetAllRegistration(self,authorstatus);			
+		}else{			
+			self.emit("failedGetAllRegistration",{"error":{"code":"AP001","message":"Author registration does not exist"}});
+		}
+	})
+}
+
+var _successfulGetAllRegistration = function(self,blog){
+	logger.emit("log","_successfulGetAllRegistration");
+	self.emit("successfulGetAllRegistration", {"success":{"message":"Getting Author Registration Details Successfully","blog":blog}});
+}
+
+Blog.prototype.authorAcceptance=function(authorid,sessionuserid){
+	var self=this;
+	////////////////////////////////////////////////////////
+	_authorAcceptance(self,authorid);
+	////////////////////////////////////////////////////////
+}
+
+var _authorAcceptance = function(self,authorid){
+	authorModel.update({authorid:authorid},{$set:{status:"accepted",accepted_date:new Date()}}).lean().exec(function(err,blogupdatestatus){
+		if(err){
+			self.emit("failedauthorAcceptance",{"error":{"code":"ED001","message":"Error in db to accept author request"}});
+		}else if(blogupdatestatus!=1){
+			self.emit("failedauthorAcceptance",{"error":{"code":"AP001","message":"authorid is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulauthorAcceptance(self);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulauthorAcceptance = function(self){
+	logger.log("log","_successfulauthorAcceptance");
+	self.emit("successfulauthorAcceptance",{"success":{"message":"Author request accepted sucessfully"}});
+}
