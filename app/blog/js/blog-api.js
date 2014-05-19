@@ -106,6 +106,34 @@ exports.addBlog=function(req,res){
     }    
 }
 
+exports.publishBlog=function(req,res){
+    var authorid = req.params.authorid;
+    var blogid = req.params.blogid;
+    var blogdata = req.body.blog;
+    // logger.emit("log","userid : "+userid+" \nreq blogdata "+JSON.stringify(blogdata));
+    var blog = new Blog(blogdata);  
+    var sessionuserid=req.user.userid;
+    logger.emit("log","sessionid:"+sessionuserid);
+    blog.removeAllListeners("failedPublishBlog");
+    blog.on("failedPublishBlog",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(err);
+    });
+    blog.removeAllListeners("successfulPublishBlog");
+    blog.on("successfulPublishBlog",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(result);
+    });
+    if(req.user.author.isAuthor==false){
+      // logger.emit("error","You are not an author to add blog",sessionuserid);
+      blog.emit("failedPublishBlog",{"error":{"code":"EA001","message":"You are not an author to publish blog"}});
+    }else{
+      blog.publishBlog(authorid,blogid,sessionuserid);
+    }    
+}
+
 exports.getProductNameByCategory = function(req,res){
     var authorid = req.params.authorid;
     // logger.emit("log","authorid : "+authorid+" \nreq blogdata "+JSON.stringify(blogdata));

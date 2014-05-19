@@ -13,6 +13,6 @@ exports.init = function (app) {
 	app.put("/api/blog/:authorid/:blogid",auth,api.blogapi.updateBlog);//update blog	
   	app.get("/api/blog/:authorid/:authorid",auth,api.blogapi.getBlog);//get blog
   	app.get("/api/blog/:authorid",auth,api.blogapi.getAllBlogs);//get all blogs
+  	app.post("/api/blogpublish/:authorid/:blogid",auth,api.blogapi.publishBlog);//publish blog
 	app.delete("/api/blog/:authorid/:blogid",auth,api.blogapi.deleteBlog);//delete blog
-	
 }

@@ -24,6 +24,7 @@ var blogSchema = mongoose.Schema({
   content:{type:String},
   blog_images:[{bucket:String,key:String,image:{type:String},imageid:{type:String}}],
   datecreated:{type:Date},
+  datepublished:{type:Date},
   dateupdated:{type:Date},
   dateremoved:{type:Date},
   status:{type:String,default:"init"},//init,active,deactive  

@@ -104,6 +104,49 @@ var _successfulAddBlog = function(self,blogstatus){
 	self.emit("successfulAddBlog",{"success":{"message":"Blog added sucessfully"}});
 }
 
+Blog.prototype.publishBlog=function(authorid,blogid,sessionuserid){
+	var self=this;
+	var blogdata=this.blog;
+	////////////////////////////////////////////////////////
+	_checkAlreadyPublishOrNot(self,authorid,blogid,sessionuserid);
+	////////////////////////////////////////////////////////
+}
+
+var _checkAlreadyPublishOrNot = function(self,authorid,blogid,userid){
+	blogModel.findOne({authorid:authorid,blogid:blogid},{status:1}).lean().exec(function(err,blogdata){
+		if(err){
+			self.emit("failedPublishBlog",{"error":{"code":"ED001","message":"Error in db to get author category"}});
+		}else if(blogdata){
+			if(blogdata.status=="active"){
+				self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"Blog was already published"}});
+			}else{
+				_publishBlog(self,authorid,blogid,userid);
+			}			
+		}else{			
+			self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"Wrong authorid or blogid"}});
+		}
+	})
+}
+
+var _publishBlog = function(self,authorid,blogid,userid){
+	blogModel.update({authorid:authorid,blogid:blogid},{$set:{status:"active",datepublished:new Date()}}).lean().exec(function(err,blogupdatestatus){
+		if(err){
+			self.emit("failedPublishBlog",{"error":{"code":"ED001","message":"Error in db to publish blog"}});
+		}else if(blogupdatestatus!=1){
+			self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulPublishBlog(self);
+			//////////////////////////////////
+		}
+	})
+}
+
+var _successfulPublishBlog = function(self,blogstatus){
+	logger.log("log","_successfulPublishBlog");
+	self.emit("successfulPublishBlog",{"success":{"message":"Blog Published Sucessfully"}});
+}
+
 Blog.prototype.getProductNameByCategory = function(authorid,userid){
 	var self=this;
 	////////////////////////////////////////////////////////
