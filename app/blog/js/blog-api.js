@@ -47,7 +47,7 @@ exports.getAllRegistration=function(req,res){
     });
     if(req.user.isAdmin==false){
       // logger.emit("error","You are not an author to add blog",sessionuserid);
-      blog.emit("failedAddBlog",{"error":{"code":"EA001","message":"You are not an admin user to get author registration details"}});
+      blog.emit("failedGetAllRegistration",{"error":{"code":"EA001","message":"You are not an admin user to get author registration details"}});
     }else{
       blog.getAllRegistration();
     } 
@@ -73,9 +73,35 @@ exports.authorAcceptance=function(req,res){
     });
     if(req.user.isAdmin==false){
       // logger.emit("error","You are not an author to add blog",sessionuserid);
-      blog.emit("failedAddBlog",{"error":{"code":"EA001","message":"You are not an admin user to get author registration details"}});
+      blog.emit("failedauthorAcceptance",{"error":{"code":"EA001","message":"You are not an admin user to get author registration details"}});
     }else{
       blog.authorAcceptance(authorid,sessionuserid);
+    } 
+}
+
+exports.authorRejection = function(req,res){
+  var authorid = req.params.authorid;
+    // logger.emit("log","authorid : "+authorid+" \nreq blogdata "+JSON.stringify(blogdata));
+    var blog = new Blog();  
+    var sessionuserid=req.user.userid;
+    logger.emit("log","sessionid:"+sessionuserid);
+    blog.removeAllListeners("failedAuthorRejection");
+    blog.on("failedAuthorRejection",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(err);
+    });
+    blog.removeAllListeners("successfulAuthorRejection");
+    blog.on("successfulAuthorRejection",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(result);
+    });
+    if(req.user.isAdmin==false){
+      // logger.emit("error","You are not an author to add blog",sessionuserid);
+      blog.emit("failedAuthorRejection",{"error":{"code":"EA001","message":"You are not an admin user to get author registration details"}});
+    }else{
+      blog.authorRejection(authorid,sessionuserid);
     } 
 }
 

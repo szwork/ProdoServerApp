@@ -27,6 +27,7 @@ var authorSchema = mongoose.Schema({
   category:[{type:String}],
   posted_date:{type:Date},
   accepted_date:{type:Date},
+  rejected_date:{type:Date},
   status:{type:String,default:"requested"},//requested,accepted
   portfolio:[{type:{type:String},url:{type:String}}]
   // portfolio:{

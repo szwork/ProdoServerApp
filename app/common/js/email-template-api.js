@@ -100,11 +100,16 @@ exports.loadEmailTemplate=function(req,res){
 			templatetype: "authorregistrationsuccess",
 			subject: "Blog Author Request",
 			description: "Dear <email>,<br><br> Prodonus received a request for blog author.<br><br> Please wait for reply from Prodonus<br><br>After successful verifiaction of your application you will get a mail of accepatance for your application.<br><br>The Prodonus Support Team <br><br>If you don't want to receive these emails from Prodonus in the future, please write to support@prodonus.com."
-		},
+		}, 
 		{
 			templatetype: "authoracceptance",
-			subject: "Blog Author Request",
+			subject: "Blog Author Request Accepted",
 			description: "Dear <email> Congratulations,<br><br> Prodonus accepated your request for blog author.<br><br>"
+		},
+		{
+			templatetype: "authorrejection",
+			subject: "Blog Author Request Rejected",
+			description: "Dear <email>,<br><br> Thanks to create blog for Prodonus, Prodonus rejected your request for blog author.<br><br>"
 		}]
 
 

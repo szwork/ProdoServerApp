@@ -394,7 +394,7 @@ var _sendSuccessfulAuthorRegiEmail = function(self,author) {
 	        html=html.replaceAll("<email>",author.email);
 	        // html=html.replaceAll("<url>",url);
 	        var message = {
-	            from: "Prodonus <noreply@prodonus.com>", // sender address
+	            from: "Prodonus <authorblog@prodonus.com>", // sender address
 	            to: author.email, // list of receivers
 	            subject:emailtemplate.subject, // Subject line
 	            html: html.s // html body
@@ -505,7 +505,7 @@ var _sendAuthorReqAcceptanceEmail = function(self,author) {
 	        html=html.replaceAll("<email>",author.email);
 	        // html=html.replaceAll("<url>",url);
 	        var message = {
-	            from: "Prodonus <noreply@prodonus.com>", // sender address
+	            from: "Prodonus <authorblog@prodonus.com>", // sender address
 	            to: author.email, // list of receivers
 	            subject:emailtemplate.subject, // Subject line
 	            html: html.s // html body
@@ -514,7 +514,7 @@ var _sendAuthorReqAcceptanceEmail = function(self,author) {
 	 	 	// calling to sendmail method
 	        commonapi.sendMail(message,CONFIG.smtp_general,function (result){
 	            if(result=="failure"){
-	            	self.emit("failedauthorAcceptance",{"error":{"code":"AT001","message":"Error to send verification email"}});
+	            	self.emit("failedauthorAcceptance",{"error":{"code":"AT001","message":"Error to send author request acceptance"}});
 	            }else{
 	            	logger.emit("info","Author request accepted successfully");
 	            	/////////////////////////////////
@@ -531,4 +531,89 @@ var _sendAuthorReqAcceptanceEmail = function(self,author) {
 var _successfulauthorAcceptance = function(self){
 	logger.log("log","_successfulauthorAcceptance");
 	self.emit("successfulauthorAcceptance",{"success":{"message":"Author request accepted sucessfully"}});
+}
+
+Blog.prototype.authorRejection=function(authorid,sessionuserid){
+	var self=this;
+	////////////////////////////////////////////////////////
+	_authorRejection(self,authorid,sessionuserid);
+	////////////////////////////////////////////////////////
+}
+
+var _authorRejection = function(self,authorid,userid){
+	authorModel.update({authorid:authorid},{$set:{status:"rejected",rejected_date:new Date()}}).lean().exec(function(err,blogupdatestatus){
+		if(err){
+			self.emit("failedAuthorRejection",{"error":{"code":"ED001","message":"Error in db to reject author request"}});
+		}else if(blogupdatestatus!=1){
+			self.emit("failedAuthorRejection",{"error":{"code":"AP001","message":"authorid is wrong"}});
+		}else{
+			////////////////////////////////
+			// _successfulAuthorRejection(self);
+			//////////////////////////////////
+			_changeIsAuthorFalseInUserModel(self,authorid,userid);			
+		}
+	})
+};
+
+var _changeIsAuthorFalseInUserModel = function(self,authorid,userid){
+	userModel.update({userid:userid},{$set:{"author.isAuthor":false}}).lean().exec(function(err,blogupdatestatus){
+		if(err){
+			self.emit("failedAuthorRejection",{"error":{"code":"ED001","message":"Error in db to update user details"}});
+		}else if(blogupdatestatus!=1){
+			self.emit("failedAuthorRejection",{"error":{"code":"AP001","message":"userid is wrong"}});
+		}else{
+			authorModel.findOne({authorid:authorid}).lean().exec(function(err,author){
+				if(err){
+					self.emit("failedAuthorRejection",{"error":{"code":"ED001","message":"Error in db to get author details"}});
+				}else if(author){
+					///////////////////////////////////////////
+					_sendAuthorReqRejectionEmail(self,author);
+					///////////////////////////////////////////
+				}else{			
+					self.emit("failedAuthorRejection",{"error":{"code":"AP001","message":"wrong authorid"}});
+				}
+			})
+		}
+	})
+}
+
+//find authorrejection template and send mail
+var _sendAuthorReqRejectionEmail = function(self,author) {
+	//send authorrejection email to author
+	EmailTemplateModel.findOne({"templatetype":"authorrejection"}).lean().exec(function(err,emailtemplate){
+		if(err){
+			self.emit("failedAuthorRejection",{"error":{"code":"ED001","message":"Error in db to find authorregistrationsuccess emailtemplate"}});
+		}else if(emailtemplate){
+			// var url = "http://"+host+"/api/verify/"+token;
+			var html=emailtemplate.description;
+	        html=S(html);
+	        html=html.replaceAll("<email>",author.email);
+	        // html=html.replaceAll("<url>",url);
+	        var message = {
+	            from: "Prodonus <authorblog@prodonus.com>", // sender address
+	            to: author.email, // list of receivers
+	            subject:emailtemplate.subject, // Subject line
+	            html: html.s // html body
+	        };
+	        // logger.emit("log",JSON.stringify(message));
+	 	 	// calling to sendmail method
+	        commonapi.sendMail(message,CONFIG.smtp_general,function (result){
+	            if(result=="failure"){
+	            	self.emit("failedAuthorRejection",{"error":{"code":"AT001","message":"Error to author request rejection email"}});
+	            }else{
+	            	logger.emit("info","Author request rejected successfully");
+	            	/////////////////////////////////
+	            	_successfulAuthorRejection(self);
+	            	////////////////////////////////
+	            }
+	        });
+	    }else{
+	        self.emit("failedAuthorRejection",{"error":{"code":"ED002","message":"Server setup template issue"}});
+		}
+	})
+}
+
+var _successfulAuthorRejection = function(self){
+	logger.log("log","_successfulAuthorRejection");
+	self.emit("successfulAuthorRejection",{"success":{"message":"Author request rejected sucessfully"}});
 }
