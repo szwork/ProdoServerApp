@@ -22,6 +22,7 @@ var blogSchema = mongoose.Schema({
   productname:{type:String,ref:"productTagsSchema"},
   title:{type:String},
   content:{type:String},
+  category:[{type:String}],
   blog_images:[{bucket:String,key:String,image:{type:String},imageid:{type:String}}],
   datecreated:{type:Date},
   datepublished:{type:Date},

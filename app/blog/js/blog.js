@@ -64,6 +64,10 @@ var _validateBlogData = function(self,blogdata,authorid,userid){
 		self.emit("failedAddBlog",{"error":{"code":"AV001","message":"Please pass title"}});
 	}else if(blogdata.content==undefined){
 		self.emit("failedAddBlog",{"error":{"code":"AV001","message":"Please pass content"}});
+	}else if(blogdata.category==undefined){
+		self.emit("failedAddBlog",{"error":{"code":"AV001","message":"Please pass category"}});
+	}else if(!isArray(blogdata.category)){
+		self.emit("failedAddBlog",{"error":{"code":"AV001","message":"category should be an array"}});
 	}else{
 		_checkProductNameIsValid(self,blogdata,authorid,userid);
 	}

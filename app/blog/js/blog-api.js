@@ -124,12 +124,12 @@ exports.addBlog=function(req,res){
       // blog.removeAllListeners();
       res.send(result);
     });
-    if(req.user.author.isAuthor==false){
-      // logger.emit("error","You are not an author to add blog",sessionuserid);
-      blog.emit("failedAddBlog",{"error":{"code":"EA001","message":"You are not an author to add blog"}});
-    }else{
+    // if(req.user.author.isAuthor==false){
+    //   // logger.emit("error","You are not an author to add blog",sessionuserid);
+    //   blog.emit("failedAddBlog",{"error":{"code":"EA001","message":"You are not an author to add blog"}});
+    // }else{
       blog.addBlog(authorid,sessionuserid);
-    }    
+    // }    
 }
 
 exports.publishBlog=function(req,res){
