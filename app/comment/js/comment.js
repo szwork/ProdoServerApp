@@ -580,7 +580,7 @@ var _validateDeleteCampaignCommentFeatureAnalytics = function(prodle,commentdata
 
 var _deleteCampaignCommentFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
 	var analytics=analyticsdata[initialvalue];
-	console.log("analytics : "+analytics+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
+	console.log("analytics : "+JSON.stringify(analytics)+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
 	if(analyticsdata.length>initialvalue){//,"analytics.userid":userid,"analytics.tagname":analytics.tag
 		CampaignAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
 	        if(err){
@@ -857,7 +857,7 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 
 	commentdata.tags=tags_array;
 	commentdata.featureanalytics=analytics_array;
-	
+
 	// var tags_array=[];
 	// if(commentdata.analytics.length>0){
 	// 	for(var i=0;i<commentdata.analytics.length;i++){
