@@ -845,14 +845,28 @@ var _campaignCommentImageUpload=function(self,prodle,campaign_id,commentdata,pro
 
 var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 	var tags_array=[];
+	var analytics_array = [];
 	if(commentdata.analytics.length>0){
 		for(var i=0;i<commentdata.analytics.length;i++){
 			if(commentdata.analytics[i].tag!=undefined){
 				tags_array.push(commentdata.analytics[i].tag);
+				analytics_array.push(commentdata.analytics[i]);
 			}
 		}
 	}
+
 	commentdata.tags=tags_array;
+	commentdata.featureanalytics=analytics_array;
+	
+	// var tags_array=[];
+	// if(commentdata.analytics.length>0){
+	// 	for(var i=0;i<commentdata.analytics.length;i++){
+	// 		if(commentdata.analytics[i].tag!=undefined){
+	// 			tags_array.push(commentdata.analytics[i].tag);
+	// 		}
+	// 	}
+	// }
+	// commentdata.tags=tags_array;
 
 	var comment_data=new CommentModel(commentdata);
 
