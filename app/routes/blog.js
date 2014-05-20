@@ -9,7 +9,7 @@ exports.init = function (app) {
 	app.put("/api/author/acceptance/:authorid",auth,api.blogapi.authorAcceptance);//author acceptance by admin screen
 	app.put("/api/author/rejection/:authorid",auth,api.blogapi.authorRejection);//author rejection by admin screen
 
-	app.post("/api/blog",auth,api.blogapi.addBlog);//add new blog
+	app.post("/api/blog/:prodle",auth,api.blogapi.addBlog);//add new blog
 	app.get("/api/productname/:authorid",auth,api.blogapi.getProductNameByCategory);//get product name
 	app.put("/api/blog/:authorid/:blogid",auth,api.blogapi.updateBlog);//update blog	
   	app.get("/api/blog/:authorid/:blogid",auth,api.blogapi.getBlog);//get blog

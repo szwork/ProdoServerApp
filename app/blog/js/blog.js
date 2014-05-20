@@ -47,16 +47,15 @@ var isValidEmail=function(email){
  	}
 }
 
-Blog.prototype.addBlog=function(authorid,sessionuserid){
+Blog.prototype.addBlog=function(prodle,authorid,sessionuserid){
 	var self=this;
 	var blogdata=this.blog;
 	////////////////////////////////////////////////////////
-	_validateBlogData(self,blogdata,authorid,sessionuserid);
+	_validateBlogData(self,blogdata,prodle,authorid,sessionuserid);
 	////////////////////////////////////////////////////////
 }
 
-var _validateBlogData = function(self,blogdata,authorid,userid){
-	console.log(" blogdata : "+JSON.stringify(blogdata));
+var _validateBlogData = function(self,blogdata,prodle,authorid,userid){
 	if(blogdata==undefined){
 		self.emit("failedAddBlog",{"error":{"code":"AV001","message":"Please pass blog data"}});
 	}else if(blogdata.productname==undefined){
@@ -70,12 +69,12 @@ var _validateBlogData = function(self,blogdata,authorid,userid){
 	}else if(!isArray(blogdata.category)){
 		self.emit("failedAddBlog",{"error":{"code":"AV001","message":"category should be an array"}});
 	}else{
-		_checkProductNameIsValid(self,blogdata,authorid,userid);
+		_checkProdleIsValid(self,blogdata,prodle,authorid,userid);
 	}
 }
 
-var _checkProductNameIsValid = function(self,blogdata,authorid,userid){
-	productModel.findOne({status:{$ne:"deactive"},name:blogdata.productname},function(err,product){
+var _checkProdleIsValid = function(self,blogdata,prodle,authorid,userid){
+	productModel.findOne({status:{$ne:"deactive"},prodle:prodle},function(err,product){
 		if(err){
 			self.emit("failedAddBlog",{"error":{"code":"ED001","message":"Error in db to find product"}});	
 		}else if(product){
@@ -84,7 +83,7 @@ var _checkProductNameIsValid = function(self,blogdata,authorid,userid){
 			blogdata.orgid = product.orgid;
 			_addBlog(self,blogdata,userid);
 		}else{
-			self.emit("failedAddBlog",{"error":{"code":"AV001","message":"Provided product name is wrong"}});
+			self.emit("failedAddBlog",{"error":{"code":"AV001","message":"Provided prodle is wrong"}});
 		}
 	});
 }

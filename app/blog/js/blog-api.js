@@ -107,6 +107,7 @@ exports.authorRejection = function(req,res){
 
 exports.addBlog=function(req,res){
     var authorid = req.user.author.authorid;
+    var prodle = req.params.prodle;
   	var blogdata = req.body.blog;
     // logger.emit("log","userid : "+userid+" \nreq blogdata "+JSON.stringify(blogdata));
   	var blog = new Blog(blogdata);  
@@ -128,7 +129,7 @@ exports.addBlog=function(req,res){
       // logger.emit("error","You are not an author to add blog",sessionuserid);
       blog.emit("failedAddBlog",{"error":{"code":"EA001","message":"You are not an author to add blog"}});
     }else{
-      blog.addBlog(authorid,sessionuserid);
+      blog.addBlog(prodle,authorid,sessionuserid);
     }    
 }
 
