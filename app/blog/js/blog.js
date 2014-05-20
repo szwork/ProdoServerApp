@@ -172,13 +172,13 @@ var _getAuthorCategory = function(self,authorid,userid){
 }
 
 var _getProductNameByCategory = function(self,category_arr){
-	productModel.find({status:"active",category:{$in:category_arr}},{name:1,_id:0}).lean().exec(function(err,productname){
+	productModel.find({status:"active",category:{$in:category_arr}},{name:1,prodle:1,_id:0}).lean().exec(function(err,productname){
 		if(err){
 			self.emit("failedGetProductNameByCategory",{"error":{"code":"ED001","message":"Error in db to get product name"}});
 		}else if(productname){
 			var prod_name_arr = [];
 			for(var i=0;i<productname.length;i++){
-				prod_name_arr.push(productname[i].name);
+				prod_name_arr.push(productname[i]);
 			}
 			_successfulGetProductNameByCategory(self,prod_name_arr);
 		}else{
@@ -253,11 +253,16 @@ Blog.prototype.getAllBlogs = function(authorid,userid) {
 	////////////////////////
 };
 
-var _getAllBlogs=function(self,authorid,userid){
+var _getAllBlogs = function(self,authorid,userid){
 	blogModel.find({status:{$ne:"deactive"},authorid:authorid},{authorid:1,blog_images:1,blogid:1,orgid:1,prodle:1,title:1,_id:0}).sort({datecreated:-1}).lean().exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetAllBlogs",{"error":{"code":"ED001","message":"Error in db to find all blog"}});
-		}else if(blogdata.length>0){			
+		}else if(blogdata.length>0){
+			for(var i=0;i<blogdata.length;i++){
+				if(blogdata[i].blog_images.length>0){
+					blogdata[i].blog_images = [blogdata[i].blog_images[0]];
+				}
+			}
 			_successfulGetAllBlogs(self,blogdata);			
 		}else{			
 			self.emit("failedGetAllBlogs",{"error":{"code":"AP001","message":"Provided authorid is wrong"}});
@@ -278,7 +283,7 @@ Blog.prototype.getBlog = function(authorid,blogid) {
 };
 
 var _getBlog=function(self,authorid,blogid){
-	blogModel.findOne({status:{$ne:"deactive"},authorid:authorid,blogid:blogid},{authorid:1,blog_images:1,blogid:1,orgid:1,prodle:1,title:1,_id:0}).lean().exec(function(err,blogdata){
+	blogModel.findOne({status:{$ne:"deactive"},authorid:authorid,blogid:blogid}).lean().exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetBlog",{"error":{"code":"ED001","message":"Error in db to find blog"}});
 		}else if(blogdata){
