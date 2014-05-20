@@ -566,6 +566,8 @@ var _validateDeleteCampaignCommentFeatureAnalytics = function(prodle,commentdata
         if(commentdata.featureanalytics==undefined){
         	console.log("featureanalytics is undefined");
         }else{
+        	console.log("commentdata ### :"+JSON.stringify(commentdata));
+        	console.log("commentdata.featureanalytics : ### :"+JSON.stringify(commentdata.featureanalytics));
         	if(commentdata.featureanalytics.length>0){
             	var initialvalue=0;            
             	_deleteCampaignCommentFeatureAnalytics(prodle,commentdata.featureanalytics,commentdata.user.userid,initialvalue);
@@ -589,7 +591,7 @@ var _deleteCampaignCommentFeatureAnalytics = function(prodle,analyticsdata,useri
 	        	logger.emit("error","Given campaign commentdata is wrong to delete featureanalytics");
 	        }
     	});
-    	_deleteFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+    	_deleteCampaignCommentFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
 	}else{
        logger.emit("log","all campaign comment featureanalytics deletion is done");
 	}
