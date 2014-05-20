@@ -253,6 +253,49 @@ exports.getBlog=function(req,res){
     blog.getBlog(authorid,blogid);
 }
 
+exports.getAllBlogsForProduct = function(req,res){
+    var prodle = req.params.prodle;
+    logger.emit("log","prodle : "+prodle);
+    var blog = new Blog();  
+    var sessionuserid=req.user.userid;
+    logger.emit("log","sessionid:"+sessionuserid);
+    blog.removeAllListeners("failedGetAllBlogsForProduct");
+    blog.on("failedGetAllBlogsForProduct",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(err);
+    });
+    blog.removeAllListeners("successfulGetAllBlogsForProduct");
+    blog.on("successfulGetAllBlogsForProduct",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(result);
+    });
+    blog.getAllBlogsForProduct(prodle,sessionuserid);
+}
+
+exports.getBlogForProduct = function(req,res){
+    var prodle = req.params.prodle;
+    var blogid = req.params.blogid;
+    logger.emit("log","prodle : "+prodle);
+    var blog = new Blog();  
+    var sessionuserid=req.user.userid;
+    logger.emit("log","sessionid:"+sessionuserid);
+    blog.removeAllListeners("failedGetBlogForProduct");
+    blog.on("failedGetBlogForProduct",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(err);
+    });
+    blog.removeAllListeners("successfulGetBlogForProduct");
+    blog.on("successfulGetBlogForProduct",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(result);
+    });
+    blog.getBlogForProduct(prodle,blogid,sessionuserid);
+}
+
 exports.deleteBlog=function(req,res){
     var authorid = req.params.authorid;
     var blogid = req.params.blogid;

@@ -547,6 +547,7 @@ var _deleteCampaignComment=function(self,commentid){
 			}
 			/////////////////////////////
 			_successfulCampaignCommentDeletion(self,comment.prodle,comment.campaign_id);
+			_validateDeleteCampaignCommentFeatureAnalytics(comment.prodle,comment);
 			////////////////////////////
 		}
 	})
@@ -557,6 +558,41 @@ var _successfulCampaignCommentDeletion = function(self,prodle,campaign_id) {
 	updateLatestCampaignCommentDecCount(prodle,campaign_id);
 	logger.emit("log","_successfulCampaignCommentDeletion");
   	self.emit("successfulCampaignCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
+}
+
+var _validateDeleteCampaignCommentFeatureAnalytics = function(prodle,commentdata){
+        console.log("_validateDeleteCampaignCommentFeatureAnalytics");
+        // var analytics = commentdata.analytics;
+        if(commentdata.featureanalytics==undefined){
+        	console.log("featureanalytics is undefined");
+        }else{
+        	if(commentdata.featureanalytics.length>0){
+            	var initialvalue=0;            
+            	_deleteCampaignCommentFeatureAnalytics(prodle,commentdata.featureanalytics,commentdata.user.userid,initialvalue);
+        	}else{
+            	console.log("Please pass campaign comment featureanalytics data");
+        	}
+        }
+       
+}
+
+var _deleteCampaignCommentFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
+	var analytics=analyticsdata[initialvalue];
+	console.log("analytics : "+analytics+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
+	if(analyticsdata.length>initialvalue){//,"analytics.userid":userid,"analytics.tagname":analytics.tag
+		CampaignAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
+	        if(err){
+	            logger.emit("error","Error in deletion of campaign featureanalytics");
+	        }else if(updatestatus == 1){
+	            logger.emit("log","campaign comment featureanalytics deleted sucessfully");
+	        }else{
+	        	logger.emit("error","Given campaign commentdata is wrong to delete featureanalytics");
+	        }
+    	});
+    	_deleteFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+	}else{
+       logger.emit("log","all campaign comment featureanalytics deletion is done");
+	}
 }
 
 var updateLatestCampaignCommentDecCount = function(prodle,campaign_id){
@@ -704,9 +740,9 @@ var _isValidProdle=function(self,prodle,campaign_id,commentdata,__dirname){
 var _isValidCampaignId=function(self,prodle,campaign_id,commentdata,productdata,__dirname){
 	ProductCampaignModel.findOne({campaign_id:campaign_id},function(err,campaigndata){
 		if(err){
-			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidCampaignId \nError ind db to find product err message: "+err}})
+			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidCampaignId \nError ind db to find product err message: "+err}});
 		}else if(!campaigndata){
-			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":"Campaign id is wrong"}})
+			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":"Campaign id is wrong"}});
 		}else{
 			/////////////////////////////////////////////////////////////////////////////////////////////
 			__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
@@ -865,31 +901,31 @@ var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata,produ
                 console.log("analytics featureid" + commentdata.analytics[i].featureitad);
                 console.log("analytics featurename" + commentdata.analytics[i].featurename);
                 console.log("analytics tag" + commentdata.analytics[i].tag);
-                _addCampaignCommentFeatureAnalytics(prodle,commentdata.analytics[i],commentdata.user.userid,product);
+                _addCampaignCommentFeatureAnalytics(prodle,commentdata.campaign_id,commentdata.analytics[i],commentdata.user.userid,product);
             }
         }else{
             console.log("Please pass analytics data");
         }
 }
 
-var _addCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,product){
+var _addCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analytics,userid,product){
     console.log("_addCampaignCommentFeatureAnalytics");
     console.log("CDA " + analytics);
     console.log("CDAFID " + analytics.featureid);
-    CampaignAnalyticsModel.findOne({featurename:analytics.featurename}).lean().exec(function(err,analyticsdata){
+    CampaignAnalyticsModel.findOne({campaign_id:campaign_id,featurename:analytics.featurename}).lean().exec(function(err,analyticsdata){
         if(err){
-          logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find feature id err message: "+err}})
+          logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find featurename err message: "+err}});
         }else if(!analyticsdata){
             console.log("calling to add new analytics with prodle and featureid");
-            _addNewCampaignCommentFeatureAnalytics(prodle,analytics,userid,product);
+            _addNewCampaignCommentFeatureAnalytics(prodle,campaign_id,analytics,userid,product);
         }else{
             console.log("calling to update analytics");
-            _updateCampignCommentFeatureAnalytics(prodle,analytics,userid,product);
+            _updateCampignCommentFeatureAnalytics(prodle,campaign_id,analytics,userid,product);
         }
     });
 }
 
-var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,product){
+var _addNewCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analytics,userid,product){
 	console.log("_addNewCampaignCommentFeatureAnalytics");
 	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
 	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
@@ -899,6 +935,7 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,pr
             console.log("Tag name does not exist to get tagid");
         }else{
         	analytics.prodle = prodle;
+        	analytics.campaign_id = campaign_id;
             analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid}];
             var analytics_data = new CampaignAnalyticsModel(analytics);
         	analytics_data.save(function(err,analyticsdata){
@@ -912,7 +949,7 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,pr
 	});        
 }
 
-var _updateCampignCommentFeatureAnalytics = function(prodle,analytics,userid,product){
+var _updateCampignCommentFeatureAnalytics = function(prodle,campaign_id,analytics,userid,product){
     console.log("_updateCampignCommentFeatureAnalytics");
     //checking tagid and tagname exist
     var query = {prodle:prodle,featureid:analytics.featureid};

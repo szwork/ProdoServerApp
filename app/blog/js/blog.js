@@ -298,6 +298,59 @@ var _successfulGetBlog = function(self,blog){
 	self.emit("successfulGetBlog", {"success":{"message":"Getting Blog Details Successfully","blog":blog}});
 }
 
+Blog.prototype.getAllBlogsForProduct = function(prodle,userid) {
+	var self=this;
+	/////////////////////////
+	_getAllBlogsForProduct(self,prodle,userid);
+	////////////////////////
+};
+
+var _getAllBlogsForProduct = function(self,prodle,userid){
+	blogModel.find({status:{$ne:"deactive"},prodle:prodle},{authorid:1,blog_images:1,blogid:1,orgid:1,prodle:1,title:1,_id:0}).sort({datecreated:-1}).lean().exec(function(err,blogdata){
+		if(err){
+			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"ED001","message":"Error in db to find all blog"}});
+		}else if(blogdata.length>0){
+			// for(var i=0;i<blogdata.length;i++){
+			// 	if(blogdata[i].blog_images.length>0){
+			// 		blogdata[i].blog_images = [blogdata[i].blog_images[0]];
+			// 	}
+			// }
+			_successfulGetAllBlogsForProduct(self,blogdata);			
+		}else{			
+			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"AP001","message":"Provided prodle is wrong"}});
+		}
+	})
+}
+
+var _successfulGetAllBlogsForProduct = function(self,blog){
+	logger.emit("log","_successfulGetAllBlogsForProduct");
+	self.emit("successfulGetAllBlogsForProduct", {"success":{"message":"Getting Product Blogs Successfully","blog":blog}});
+}
+
+Blog.prototype.getBlogForProduct = function(prodle,blogid,sessionuserid) {
+	var self=this;
+	/////////////////////////
+	_getBlogForProduct(self,prodle,blogid,sessionuserid);
+	////////////////////////
+};
+
+var _getBlogForProduct = function(self,prodle,blogid,userid){
+	blogModel.findOne({status:{$ne:"deactive"},prodle:prodle,blogid:blogid},{blogid:1,productname:1,title:1,content:1,_id:0}).lean().exec(function(err,blogdata){
+		if(err){
+			self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find blog"}});
+		}else if(blogdata){
+			_successfulGetBlogForProduct(self,blogdata);			
+		}else{			
+			self.emit("failedGetBlogForProduct",{"error":{"code":"AP001","message":"Provided authorid or blogid is wrong"}});
+		}
+	})
+}
+
+var _successfulGetBlogForProduct = function(self,blog){
+	logger.emit("log","_successfulGetBlogForProduct");
+	self.emit("successfulGetBlogForProduct", {"success":{"message":"Getting Product Blog Successfully","blog":blog}});
+}
+
 Blog.prototype.deleteBlog=function(authorid,blogid,sessionuserid){
 	var self=this;
 	////////////////////////////////////////////////////////

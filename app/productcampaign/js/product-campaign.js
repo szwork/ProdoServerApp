@@ -502,7 +502,7 @@ var _publishCampaign=function(self,orgid,campaign_id){
 		}
 	})
 }
-var _setActiveCampaing=function(self,campaign){
+var _setActiveCampaing = function(self,campaign){
 	ProductCampaignModel.update({campaign_id:campaign.campaign_id},{$set:{status:"active"}},function(err,campaignactivestatus){
 		if(err){
 			self.emit("failedPublishCampaign",{"error":{code:"ED001",message:"Database issue"}});
@@ -515,6 +515,7 @@ var _setActiveCampaing=function(self,campaign){
 		}
 	})
 }
+
 var _successfullPublishCampaign=function(self){
 	self.emit("successfulpublishCampaign",{"success":{"message":"Campaign Published successfully"}});
 }
