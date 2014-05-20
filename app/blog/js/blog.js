@@ -253,7 +253,7 @@ Blog.prototype.getAllBlogs = function(authorid,userid) {
 };
 
 var _getAllBlogs=function(self,authorid,userid){
-	blogModel.find({status:"active",authorid:authorid}).lean().exec(function(err,blogdata){
+	blogModel.find({authorid:authorid}).lean().exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetAllBlogs",{"error":{"code":"ED001","message":"Error in db to find all blog"}});
 		}else if(blogdata.length>0){			

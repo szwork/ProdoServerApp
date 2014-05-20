@@ -1676,7 +1676,7 @@ var __blogFileBuffer = function(action,file,dirname,action,sessionuser,callback)
                         }else{
                           var currentdate=new Date();
                           var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
-                          bucketFolder=amazonbucket+"/blog/user/"+action.userid+"/"+action.blogid;
+                          bucketFolder=amazonbucket+"/blog/user/"+action.blog.userid+"/"+action.blog.blogid;
                           params = {
                              Bucket: bucketFolder,
                              Key: action.authorid+s3filekey,
@@ -1685,7 +1685,8 @@ var __blogFileBuffer = function(action,file,dirname,action,sessionuser,callback)
                              ACL: 'public-read',
                              ContentType: file_type
                           };
-                        blogFileUpload(action.blogid,params,file_name,function(err,result){
+                          console.log("action : ############ : "+JSON.stringify(action));
+                        blogFileUpload(action.blog.blogid,params,file_name,function(err,result){
                           if(err){
                             callback(err);
                           }else{
