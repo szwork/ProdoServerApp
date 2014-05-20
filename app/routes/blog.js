@@ -12,7 +12,7 @@ exports.init = function (app) {
 	app.post("/api/blog",auth,api.blogapi.addBlog);//add new blog
 	app.get("/api/productname/:authorid",auth,api.blogapi.getProductNameByCategory);//get product name
 	app.put("/api/blog/:authorid/:blogid",auth,api.blogapi.updateBlog);//update blog	
-  	app.get("/api/blog/:authorid/:authorid",auth,api.blogapi.getBlog);//get blog
+  	app.get("/api/blog/:authorid/:blogid",auth,api.blogapi.getBlog);//get blog
   	app.get("/api/blog/:authorid",auth,api.blogapi.getAllBlogs);//get all blogs
   	app.post("/api/blogpublish/:authorid/:blogid",auth,api.blogapi.publishBlog);//publish blog
 	app.delete("/api/blog/:authorid/:blogid",auth,api.blogapi.deleteBlog);//delete blog

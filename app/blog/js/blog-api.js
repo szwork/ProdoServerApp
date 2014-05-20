@@ -233,7 +233,7 @@ exports.getAllBlogs=function(req,res){
 exports.getBlog=function(req,res){
     var authorid = req.params.authorid;
     var blogid = req.params.blogid;
-    // logger.emit("log","authorid : "+authorid+" \nreq blogdata "+JSON.stringify(blogdata));
+    logger.emit("log","blogid : "+blogid);
     var blog = new Blog();  
     var sessionuserid=req.user.userid;
     logger.emit("log","sessionid:"+sessionuserid);
