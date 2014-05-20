@@ -22,6 +22,7 @@ var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var regxemail = /\S+@\S+\.\S+/;
 var S=require('string');
+
 var Blog = function(blogdata) {
 	this.blog = blogdata;
 };
@@ -337,8 +338,8 @@ var _validateAuthorData = function(self,authordata,userid){
 		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass firstname"}});
 	}else if(authordata.lastname==undefined){
 		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass lastname"}});
-	}else if(isValidEmail(authordata.email).error!=undefined){
-		self.emit("failedauthorRegistration",isValidEmail(authordata.email));
+	// }else if(isValidEmail(authordata.email).error!=undefined){
+	// 	self.emit("failedauthorRegistration",isValidEmail(authordata.email));
 	}else if(authordata.country==undefined){
 		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"Please pass country"}});
 	}else if(authordata.category==undefined){
@@ -352,18 +353,19 @@ var _validateAuthorData = function(self,authordata,userid){
 	}else if(!isArray(authordata.portfolio)){
 		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"portfolio should be an array"}});
 	}else{
-		_checkEmailAlreadyExist(self,authordata,userid);
+		_getMailIdFromUserModel(self,authordata,userid);
 	}
 }
 
-var _checkEmailAlreadyExist = function(self,authordata,userid){
-	authorModel.findOne({userid:userid}).lean().exec(function(err,authorstatus){
+var _getMailIdFromUserModel = function(self,authordata,userid){
+	userModel.findAndModify({userid:userid},[],{$set:{firstname:authordata.firstname,lastname:authordata.lastname}},{new:false},function(err,authorstatus){
 		if(err){
-			self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to check valid email"}});
+			self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to check get emailid from user model"}});
 		}else if(authorstatus){
-			self.emit("failedauthorRegistration",{"error":{"code":"AP001","message":"You have already registered for author application"}});
+			authordata.email = authorstatus.email;
+			_authorRegistration(self,authordata,userid);	
 		}else{
-			_authorRegistration(self,authordata,userid);		
+			self.emit("failedauthorRegistration",{"error":{"code":"AP001","message":"Wrong userid"}});
 		}
 	})
 }
