@@ -132,16 +132,26 @@ var _checkAlreadyPublishOrNot = function(self,authorid,blogid,userid){
 	})
 }
 
-var _publishBlog = function(self,authorid,blogid,userid){
-	blogModel.update({authorid:authorid,blogid:blogid},{$set:{status:"active",datepublished:new Date()}}).lean().exec(function(err,blogupdatestatus){
+var _publishBlog = function(self,authorid,blogid,userid){	
+	blogModel.findAndModify({authorid:authorid,blogid:blogid},[],{$set:{status:"active",datepublished:new Date()}},{new:false},function(err,blogdata){
 		if(err){
 			self.emit("failedPublishBlog",{"error":{"code":"ED001","message":"Error in db to publish blog"}});
-		}else if(blogupdatestatus!=1){
-			self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
+		}else if(blogdata){
+			blogdata.datepublished = new Date();
+			blogdata.status = "active";
+			blogModel.update({authorid:authorid,blogid:blogid},{$set:{publishblog:[blogdata]}}).lean().exec(function(err,blogupdatestatus){
+				if(err){
+					self.emit("failedPublishBlog",{"error":{"code":"ED001","message":"Error in db to publish blog"}});
+				}else if(blogupdatestatus!=1){
+					self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
+				}else{
+					////////////////////////////////
+					_successfulPublishBlog(self);
+					//////////////////////////////////
+				}
+			})
 		}else{
-			////////////////////////////////
-			_successfulPublishBlog(self);
-			//////////////////////////////////
+			self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"Wrong authorid or blogid"}});
 		}
 	})
 }
@@ -194,39 +204,40 @@ var _successfulGetProductNameByCategory = function(self,productname){
 Blog.prototype.updateBlog=function(authorid,blogid,sessionuserid){
 	var self=this;
 	var blogdata=this.blog;
-	////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 	_validateUpdateBlogData(self,blogdata,authorid,blogid,sessionuserid);
-	////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 }
 
 var _validateUpdateBlogData = function(self,blogdata,authorid,blogid,userid){
 	if(blogdata==undefined){
 		self.emit("failedUpdateBlog",{"error":{"code":"AV001","message":"Please pass blog data"}});
+	}else if(blogdata.productname!=undefined){
+		self.emit("failedUpdateBlog",{"error":{"code":"AV001","message":"Can't update productname"}});
 	}else if(blogdata.prodle!=undefined){
 		self.emit("failedUpdateBlog",{"error":{"code":"EA001","message":"Can't update prodle"}});
 	}else if(blogdata.blogid!=undefined){
 		self.emit("failedUpdateBlog",{"error":{"code":"EA001","message":"Can't update blogid"}});
 	}else{
-		_checkProductNameIsValidToUpdate(self,blogdata,authorid,blogid);
+		_updateBlog(self,blogdata,authorid,blogid);
 	}
 }
 
-var _checkProductNameIsValidToUpdate = function(self,blogdata,authorid,blogid){
-	productModel.findOne({status:{$ne:"deactive"},name:blogdata.productname},function(err,product){
-		if(err){
-			self.emit("failedUpdateBlog",{"error":{"code":"ED001","message":"Error in db to find product"}});	
-		}else if(product){
-			_updateBlog(self,blogdata,authorid,blogid);
-		}else{
-			self.emit("failedUpdateBlog",{"error":{"code":"AV001","message":"Provided product name is wrong"}});
-		}
-	});
-}
+// var _checkProductNameIsValidToUpdate = function(self,blogdata,authorid,blogid){
+// 	productModel.findOne({status:{$ne:"deactive"},name:blogdata.productname},function(err,product){
+// 		if(err){
+// 			self.emit("failedUpdateBlog",{"error":{"code":"ED001","message":"Error in db to find product"}});	
+// 		}else if(product){
+// 			_updateBlog(self,blogdata,authorid,blogid);
+// 		}else{
+// 			self.emit("failedUpdateBlog",{"error":{"code":"AV001","message":"Provided product name is wrong"}});
+// 		}
+// 	});
+// }
 
 var _updateBlog = function(self,blogdata,authorid,blogid){
-	console.log("Blog## : "+JSON.stringify(blogdata));
-	console.log("authorid : "+authorid+" blogid : "+blogid);
 	blogdata.dateupdated = new Date();
+	blogdata.status = "init";
 	blogModel.update({authorid:authorid,blogid:blogid},{$set:blogdata}).lean().exec(function(err,blogupdatestatus){
 		if(err){
 			self.emit("failedUpdateBlog",{"error":{"code":"ED001","message":"Error in db to update blog"}});
@@ -238,6 +249,7 @@ var _updateBlog = function(self,blogdata,authorid,blogid){
 			//////////////////////////////////
 		}
 	})
+	
 };
 
 var _successfulUpdateBlog = function(self){
@@ -306,7 +318,8 @@ Blog.prototype.getAllBlogsForProduct = function(prodle,userid) {
 };
 
 var _getAllBlogsForProduct = function(self,prodle,userid){
-	blogModel.find({status:{$ne:"deactive"},prodle:prodle},{authorid:1,blog_images:1,blogid:1,orgid:1,prodle:1,title:1,_id:0}).sort({datecreated:-1}).lean().exec(function(err,blogdata){
+	// {status:{$ne:"deactive"},prodle:prodle},{authorid:1,blog_images:1,blogid:1,orgid:1,prodle:1,title:1,_id:0}).sort({datecreated:-1}
+	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active","publishblog.prodle":prodle}},{$group:{_id:{prodle:"$prodle",blogid:"$publishblog.blogid",authorid:"$publishblog.authorid",productname:"$publishblog.productname",title:"$publishblog.title",content:"$publishblog.content",datepublished:"$publishblog.datepublished"}}},{$project:{prodle:"$_id.prodle",blogid:"$_id.blogid",authorid:"$_id.authorid",productname:"$_id.productname",title:"$_id.title",content:"$_id.content",datepublished:"$_id.datepublished",_id:0}},{$sort:{datepublished:-1}}]).exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"ED001","message":"Error in db to find all blog"}});
 		}else if(blogdata.length>0){
@@ -324,7 +337,7 @@ var _getAllBlogsForProduct = function(self,prodle,userid){
 
 var _successfulGetAllBlogsForProduct = function(self,blog){
 	logger.emit("log","_successfulGetAllBlogsForProduct");
-	self.emit("successfulGetAllBlogsForProduct", {"success":{"message":"Getting Product Blogs Successfully","blog":blog}});
+	self.emit("successfulGetAllBlogsForProduct", {"success":{"message":"Getting Product Blogs Successfully","doc":blog}});
 }
 
 Blog.prototype.getBlogForProduct = function(prodle,blogid,sessionuserid) {
@@ -335,7 +348,7 @@ Blog.prototype.getBlogForProduct = function(prodle,blogid,sessionuserid) {
 };
 
 var _getBlogForProduct = function(self,prodle,blogid,userid){
-	blogModel.findOne({status:{$ne:"deactive"},prodle:prodle,blogid:blogid},{blogid:1,productname:1,title:1,content:1,_id:0}).lean().exec(function(err,blogdata){
+	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active","publishblog.prodle":prodle,"publishblog.blogid":blogid}},{$group:{_id:{prodle:"$prodle",blogid:"$publishblog.blogid",authorid:"$publishblog.authorid",productname:"$publishblog.productname",title:"$publishblog.title",content:"$publishblog.content",datepublished:"$publishblog.datepublished"}}},{$project:{prodle:"$_id.prodle",blogid:"$_id.blogid",authorid:"$_id.authorid",productname:"$_id.productname",title:"$_id.title",content:"$_id.content",datepublished:"$_id.datepublished",_id:0}}]).exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find blog"}});
 		}else if(blogdata){
@@ -348,7 +361,7 @@ var _getBlogForProduct = function(self,prodle,blogid,userid){
 
 var _successfulGetBlogForProduct = function(self,blog){
 	logger.emit("log","_successfulGetBlogForProduct");
-	self.emit("successfulGetBlogForProduct", {"success":{"message":"Getting Product Blog Successfully","blog":blog}});
+	self.emit("successfulGetBlogForProduct", {"success":{"message":"Getting Product Blog Successfully","doc":blog}});
 }
 
 Blog.prototype.deleteBlog=function(authorid,blogid,sessionuserid){
@@ -679,4 +692,68 @@ var _sendAuthorReqRejectionEmail = function(self,author) {
 var _successfulAuthorRejection = function(self){
 	logger.log("log","_successfulAuthorRejection");
 	self.emit("successfulAuthorRejection",{"success":{"message":"Author request rejected sucessfully"}});
+}
+
+Blog.prototype.deleteBlogImage = function(blogimageids,authorid,blogid) {
+	var self=this;
+	if(blogimageids==undefined){
+		self.emit("failedDeleteBlogImage",{"error":{"code":"AV001","message":"Please provide campaign image ids"}});
+	}else if(blogimageids.length==0){
+		self.emit("failedDeleteBlogImage",{"error":{"message":"Given blogimageids is empty "}});
+	}else{
+		///////////////////////////////////////////////////////////////////
+		_deleteBlogImage(self,blogimageids,authorid,blogid);
+		/////////////////////////////////////////////////////////////////	
+	}
+};
+
+var _deleteBlogImage = function(self,blogimageids,authorid,blogid){
+	var blog_imagearray=[];
+	blogimageids=S(blogimageids);
+	// db.products.update({"product_images.imageid":{$in:["7pz904msymu","333"]}},{$pull:{"product_images":{imageid:{$in:["7pz904msymu","333"]}}}});
+   	if(blogimageids.contains(",")){
+   		blog_imagearray=blogimageids.split(",");
+   	}else{
+   		blog_imagearray.push(blogimageids.s);
+   	}
+	blogModel.findAndModify({authorid:authorid,blogid:blogid,"blog_images.imageid":{$in:blog_imagearray}},[],{$pull:{blog_images:{imageid:{$in:blog_imagearray}}}},{new:false},function(err,deleteimagestatus){
+		if(err){
+			self.emit("failedDeleteBlogImage",{"error":{"code":"ED001","message":"function:_deleteCampaignImage\nError in db to "}});
+		}else if(!deleteimagestatus){
+			self.emit("failedDeleteBlogImage",{"error":{"message":"blogid or given blogimageids is wrong "}});
+		}else{
+			var blog_images=deleteimagestatus.blog_images;
+			// blog_images=JSON.parse(blog_images);
+			logger.emit("log","dd"+JSON.stringify(blog_images));
+			var object_array=[];
+			for(var i=0;i<blog_images.length;i++){
+				object_array.push({Key:blog_images[i].key});
+				console.log("test"+blog_images[i]);
+			}
+			logger.emit("log","object_array:"+JSON.stringify(object_array));
+			var delete_aws_params={
+				Bucket: blog_images[0].bucket, // required
+  			Delete: { // required
+    			Objects: object_array,
+      			Quiet: true || false
+      		}
+      	}
+      	logger.emit('log',"delete_aws_params:"+JSON.stringify(delete_aws_params));
+      	s3bucket.deleteObjects(delete_aws_params, function(err, data) {
+			if (err){
+			  	logger.emit("error","Blog images not deleted from amazon s3 blogid:"+blogid);
+			} else{
+			  	logger.emit("log","Blog images deleted from amazon s3 blogid:"+blogid);
+			} 
+		})
+			//////////////////////////////////
+			_successfulDeleteBlogImage(self);
+			/////////////////////////////////////
+		}
+	})
+}
+
+var _successfulDeleteBlogImage=function(self){
+	logger.emit("log","_successfulDeleteBlogImage");
+	self.emit("successfulDeleteBlogImage",{"success":{"message":"Delete Blog Images Successfully"}});
 }

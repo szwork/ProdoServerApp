@@ -323,3 +323,39 @@ exports.deleteBlog=function(req,res){
       blog.deleteBlog(authorid,blogid,sessionuserid);
     }
 }
+
+exports.deleteBlogImage=function(req,res){ 
+  var sessionuserid=req.user.userid;  
+  var blogimageids=req.query.blogimageids;
+  var authorid = req.params.authorid;
+  var blogid = req.params.blogid;
+  logger.emit("log","sessionuserid : "+sessionuserid+"blogid : "+blogid+"blogimageids : "+JSON.stringify(blogimageids));
+  
+  var blog= new Blog();
+  blog.removeAllListeners("failedDeleteBlogImage");
+  blog.on("failedDeleteBlogImage",function(err){
+    // logger.emit("log","error:"+err.error.message+":"+sessionuserid);
+    logger.emit("error", err.error.message,sessionuserid);
+    // product.removeAllListeners();
+    res.send(err);
+     // eventEmitter.removeListener(this);
+  });
+  blog.removeAllListeners("successfulDeleteBlogImage");
+  blog.on("successfulDeleteBlogImage",function(result){
+    //logger.emit("log","Getting Product details successfully");
+    // logger.emit("info", result.success.message,sessionuserid);
+    // product.removeAllListeners();
+
+    res.send(result);
+    // eventEmitter.removeListener(this);
+  });
+
+  if(req.user.author.isAuthor==false){
+    logger.emit("log","You are not author to delete blog image");
+    blog.emit("failedDeleteBlogImage",{"error":{"code":"EA001","message":"You are not authorized to delete blog image"}}); 
+  }else{
+    ///////////////////////////////////////////////////
+    blog.deleteBlogImage(blogimageids,authorid,blogid);
+    ///////////////////////////////////////////////////
+  }
+}

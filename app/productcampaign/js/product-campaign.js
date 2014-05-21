@@ -476,10 +476,12 @@ var _deleteCampaignImage=function(self,camimageids,campaign_id){
 		}
 	})
 }
+
 var _successfulDeleteCampaignImage=function(self){
 	logger.emit("log","_successfulDeleteCampaignImage");
 	self.emit("successfulDeleteCampaignImage",{"success":{"message":"Delete Campaign Images Successfully"}});
 }
+
 ProductCampaign.prototype.publishCampaign = function(orgid,campaign_id) {
 	var self=this;
 	
