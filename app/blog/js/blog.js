@@ -447,7 +447,7 @@ var _validateAuthorData = function(self,authordata,userid){
 }
 
 var _checkAlreadyRegisterAuthor = function(self,authordata,userid){
-	userModel.findOne({userid:userid}).exec(function(err,userstatus){
+	authorModel.findOne({userid:userid}).exec(function(err,userstatus){
 		if(err){
 			self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to check user alredy register"}});
 		}else if(userstatus){
@@ -553,10 +553,10 @@ var _successfulGetAllRegistration = function(self,author){
 	self.emit("successfulGetAllRegistration", {"success":{"message":"Getting Author Registration Details Successfully","author":author}});
 }
 
-Blog.prototype.authorAcceptance=function(authorid,sessionuserid){
+Blog.prototype.authorAcceptance=function(authorid,userid){
 	var self=this;
 	////////////////////////////////////////////////////////
-	_authorAcceptance(self,authorid,sessionuserid);
+	_authorAcceptance(self,authorid,userid);
 	////////////////////////////////////////////////////////
 }
 
@@ -640,10 +640,10 @@ var _successfulauthorAcceptance = function(self){
 	self.emit("successfulauthorAcceptance",{"success":{"message":"Author request accepted sucessfully"}});
 }
 
-Blog.prototype.authorRejection=function(authorid,sessionuserid){
+Blog.prototype.authorRejection=function(authorid,userid){
 	var self=this;
 	////////////////////////////////////////////////////////
-	_authorRejection(self,authorid,sessionuserid);
+	_authorRejection(self,authorid,userid);
 	////////////////////////////////////////////////////////
 }
 

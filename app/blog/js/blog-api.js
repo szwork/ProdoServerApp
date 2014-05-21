@@ -57,6 +57,7 @@ exports.authorAcceptance=function(req,res){
   var authorid = req.params.authorid;
     // logger.emit("log","authorid : "+authorid+" \nreq blogdata "+JSON.stringify(blogdata));
     var blog = new Blog();  
+    var userid=req.params.userid;
     var sessionuserid=req.user.userid;
     logger.emit("log","sessionid:"+sessionuserid);
     blog.removeAllListeners("failedauthorAcceptance");
@@ -75,7 +76,7 @@ exports.authorAcceptance=function(req,res){
       // logger.emit("error","You are not an author to add blog",sessionuserid);
       blog.emit("failedauthorAcceptance",{"error":{"code":"EA001","message":"You are not an admin user to get author registration details"}});
     }else{
-      blog.authorAcceptance(authorid,sessionuserid);
+      blog.authorAcceptance(authorid,userid);
     } 
 }
 
@@ -83,6 +84,7 @@ exports.authorRejection = function(req,res){
   var authorid = req.params.authorid;
     // logger.emit("log","authorid : "+authorid+" \nreq blogdata "+JSON.stringify(blogdata));
     var blog = new Blog();  
+    var userid=req.params.userid;
     var sessionuserid=req.user.userid;
     logger.emit("log","sessionid:"+sessionuserid);
     blog.removeAllListeners("failedAuthorRejection");
@@ -101,7 +103,7 @@ exports.authorRejection = function(req,res){
       // logger.emit("error","You are not an author to add blog",sessionuserid);
       blog.emit("failedAuthorRejection",{"error":{"code":"EA001","message":"You are not an admin user to get author registration details"}});
     }else{
-      blog.authorRejection(authorid,sessionuserid);
+      blog.authorRejection(authorid,userid);
     } 
 }
 
