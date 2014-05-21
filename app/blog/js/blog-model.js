@@ -15,19 +15,20 @@ var ObjectId = mongoose.Schema.ObjectId;
 var shortId = require('shortid');
 
 var PublishBlogSchema = mongoose.Schema({
-  blogid:{type:String},
-  prodle:{type:String,ref:"productSchema"},
-  orgid:{type:String},
-  authorid:{type:String},
-  productname:{type:String,ref:"productTagsSchema"},
+  // blogid:{type:String},
+  // prodle:{type:String,ref:"productSchema"},
+  // orgid:{type:String},
+  // authorid:{type:String},
+  // productname:{type:String,ref:"productTagsSchema"},
   title:{type:String},
   content:{type:String},
   category:[{type:String}],
-  blog_images:[{bucket:String,key:String,image:{type:String},imageid:{type:String}}],
-  datecreated:{type:Date},
-  datepublished:{type:Date},
-  dateupdated:{type:Date},
-  dateremoved:{type:Date},
+  postedby:{type:String},
+  // blog_images:[{bucket:String,key:String,image:{type:String},imageid:{type:String}}],
+  // datecreated:{type:Date},
+  // datepublished:{type:Date},
+  // dateupdated:{type:Date},
+  // dateremoved:{type:Date},
   status:{type:String,default:"init"},//init,active,deactive
 });
 

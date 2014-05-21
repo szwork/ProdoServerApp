@@ -316,7 +316,7 @@ exports.deleteBlog=function(req,res){
       res.send(result);
     });
 
-    if(req.user.author.isAuthor!=true){
+    if(req.user.author.isAuthor==false){
       // logger.emit("error","You are not an author to update blog data",sessionuserid);
       blog.emit("failedDeleteBlog",{"error":{"code":"EA001","message":"You are not an author to update blog data"}});
     }else{

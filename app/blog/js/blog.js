@@ -137,19 +137,28 @@ var _publishBlog = function(self,authorid,blogid,userid){
 		if(err){
 			self.emit("failedPublishBlog",{"error":{"code":"ED001","message":"Error in db to publish blog"}});
 		}else if(blogdata){
-			blogdata.datepublished = new Date();
-			blogdata.status = "active";
-			blogModel.update({authorid:authorid,blogid:blogid},{$set:{publishblog:[blogdata]}}).lean().exec(function(err,blogupdatestatus){
+			authorModel.findOne({authorid:authorid},{firstname:1,lastname:1}).lean().exec(function(err,authordata){
 				if(err){
-					self.emit("failedPublishBlog",{"error":{"code":"ED001","message":"Error in db to publish blog"}});
-				}else if(blogupdatestatus!=1){
-					self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
+					self.emit("failedPublishBlog",{"error":{"code":"ED001","message":"Error in db to get authorname"}});
+				}else if(authordata){
+					blogdata.postedby = authordata.firstname+" "+authordata.lastname;
+					blogdata.status = "active";
+					blogModel.update({authorid:authorid,blogid:blogid},{$set:{publishblog:[blogdata]}}).lean().exec(function(err,blogupdatestatus){
+						if(err){
+							self.emit("failedPublishBlog",{"error":{"code":"ED001","message":"Error in db to publish blog"}});
+						}else if(blogupdatestatus!=1){
+							self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
+						}else{
+							////////////////////////////////
+							_successfulPublishBlog(self);
+							//////////////////////////////////
+						}
+					})
 				}else{
-					////////////////////////////////
-					_successfulPublishBlog(self);
-					//////////////////////////////////
+					self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"authorid is wrong"}});
 				}
 			})
+			
 		}else{
 			self.emit("failedPublishBlog",{"error":{"code":"AP001","message":"Wrong authorid or blogid"}});
 		}
@@ -294,7 +303,7 @@ Blog.prototype.getBlog = function(authorid,blogid) {
 };
 
 var _getBlog=function(self,authorid,blogid){
-	blogModel.findOne({status:{$ne:"deactive"},authorid:authorid,blogid:blogid}).lean().exec(function(err,blogdata){
+	blogModel.findOne({status:{$ne:"deactive"},authorid:authorid,blogid:blogid},{publishblog:0}).lean().exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetBlog",{"error":{"code":"ED001","message":"Error in db to find blog"}});
 		}else if(blogdata){
@@ -319,7 +328,7 @@ Blog.prototype.getAllBlogsForProduct = function(prodle,userid) {
 
 var _getAllBlogsForProduct = function(self,prodle,userid){
 	// {status:{$ne:"deactive"},prodle:prodle},{authorid:1,blog_images:1,blogid:1,orgid:1,prodle:1,title:1,_id:0}).sort({datecreated:-1}
-	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active","publishblog.prodle":prodle}},{$group:{_id:{prodle:"$prodle",blogid:"$publishblog.blogid",authorid:"$publishblog.authorid",productname:"$publishblog.productname",title:"$publishblog.title",content:"$publishblog.content",datepublished:"$publishblog.datepublished"}}},{$project:{prodle:"$_id.prodle",blogid:"$_id.blogid",authorid:"$_id.authorid",productname:"$_id.productname",title:"$_id.title",content:"$_id.content",datepublished:"$_id.datepublished",_id:0}},{$sort:{datepublished:-1}}]).exec(function(err,blogdata){
+	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:prodle}},{$group:{_id:{authorid:"$authorid",blogid:"$blogid",prodle:"$prodle",orgid:"$orgid",postedby:"$publishblog.postedby",title:"$publishblog.title",content:"$publishblog.content"}}},{$project:{authorid:"$_id.authorid",blogid:"$_id.blogid",prodle:"$_id.prodle",orgid:"$_id.orgid",postedby:"$_id.postedby",title:"$_id.title",content:"$_id.content",_id:0}}]).exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"ED001","message":"Error in db to find all blog"}});
 		}else if(blogdata.length>0){
@@ -348,11 +357,21 @@ Blog.prototype.getBlogForProduct = function(prodle,blogid,sessionuserid) {
 };
 
 var _getBlogForProduct = function(self,prodle,blogid,userid){
-	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active","publishblog.prodle":prodle,"publishblog.blogid":blogid}},{$group:{_id:{prodle:"$prodle",blogid:"$publishblog.blogid",authorid:"$publishblog.authorid",productname:"$publishblog.productname",title:"$publishblog.title",content:"$publishblog.content",datepublished:"$publishblog.datepublished"}}},{$project:{prodle:"$_id.prodle",blogid:"$_id.blogid",authorid:"$_id.authorid",productname:"$_id.productname",title:"$_id.title",content:"$_id.content",datepublished:"$_id.datepublished",_id:0}}]).exec(function(err,blogdata){
+	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:prodle,blogid:blogid}},{$project:{authorid:"$authorid",blog_images:"$blog_images",blogid:"$blogid",category:"$publishblog.category",orgid:"$orgid",prodle:"$prodle",productname:"$productname",title:"$publishblog.title",content:"$publishblog.content",datepublished:"$datepublished",authorname:"$publishblog.postedby"}}]).exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find blog"}});
 		}else if(blogdata){
-			_successfulGetBlogForProduct(self,blogdata);			
+			userModel.findOne({userid:userid}).exec(function(err,userdata){
+				if(err){
+					self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find user profile_pic"}});
+				}else if(userdata){
+					blogdata[0].profile_pic = userdata.profile_pic;
+					_successfulGetBlogForProduct(self,blogdata);		
+				}else{
+					self.emit("failedGetBlogForProduct",{"error":{"code":"AP001","message":"Wrong userid"}});
+				}
+			})
+					
 		}else{			
 			self.emit("failedGetBlogForProduct",{"error":{"code":"AP001","message":"Provided authorid or blogid is wrong"}});
 		}
