@@ -1679,7 +1679,7 @@ var __blogFileBuffer = function(action,file,dirname,action,sessionuser,callback)
                           bucketFolder=amazonbucket+"/blog/user/"+action.blog.userid+"/"+action.blog.blogid;
                           params = {
                              Bucket: bucketFolder,
-                             Key: action.authorid+s3filekey,
+                             Key: action.blog.authorid+s3filekey,
                              Body: writebuffer,
                              Expires:expirydate,
                              ACL: 'public-read',

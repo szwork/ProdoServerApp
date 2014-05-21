@@ -18,5 +18,5 @@ exports.init = function (app) {
   	app.get("/api/productblog/:prodle/:blogid",auth,api.blogapi.getBlogForProduct);//get blog for a product
   	app.post("/api/blogpublish/:authorid/:blogid",auth,api.blogapi.publishBlog);//publish blog
 	app.delete("/api/blog/:authorid/:blogid",auth,api.blogapi.deleteBlog);//delete blog
-	app.delete("/api/blog/image/:authorid/:blogid",auth,api.blogapi.deleteBlogImage);//delete blog artwork
+	app.delete("/api/blog/image/:authorid/:blogid",auth,api.blogapi.deleteBlogImage);//delete blog images
 }
