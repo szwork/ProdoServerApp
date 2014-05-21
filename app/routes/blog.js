@@ -6,8 +6,8 @@ exports.init = function (app) {
 
   	app.post("/api/author",auth,api.blogapi.authorRegistration);//author registration
 	app.get("/api/author",auth,api.blogapi.getAllRegistration);//get author registration for admin screen
-	app.put("/api/author/acceptance/:authorid",auth,api.blogapi.authorAcceptance);//author acceptance by admin screen
-	app.put("/api/author/rejection/:authorid",auth,api.blogapi.authorRejection);//author rejection by admin screen
+	app.put("/api/author/acceptance/:authorid/:userid",auth,api.blogapi.authorAcceptance);//author acceptance by admin screen
+	app.put("/api/author/rejection/:authorid/:userid",auth,api.blogapi.authorRejection);//author rejection by admin screen
 
 	app.post("/api/blog/:prodle",auth,api.blogapi.addBlog);//add new blog
 	app.get("/api/productname/:authorid",auth,api.blogapi.getProductNameByCategory);//get product name

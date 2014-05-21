@@ -498,8 +498,8 @@ var _sendSuccessfulAuthorRegiEmail = function(self,author) {
 			// var url = "http://"+host+"/api/verify/"+token;
 			var html=emailtemplate.description;
 	        html=S(html);
-	        html=html.replaceAll("<email>",author.email);
-	        // html=html.replaceAll("<url>",url);
+	        html=html.replaceAll("<firstname>",author.firstname);
+	        html=html.replaceAll("<lastname>",author.lastname);
 	        var message = {
 	            from: "Prodonus <authorblog@prodonus.com>", // sender address
 	            to: author.email, // list of receivers
@@ -609,8 +609,8 @@ var _sendAuthorReqAcceptanceEmail = function(self,author) {
 			// var url = "http://"+host+"/api/verify/"+token;
 			var html=emailtemplate.description;
 	        html=S(html);
-	        html=html.replaceAll("<email>",author.email);
-	        // html=html.replaceAll("<url>",url);
+	        html=html.replaceAll("<firstname>",author.firstname);
+	        html=html.replaceAll("<lastname>",author.lastname);
 	        var message = {
 	            from: "Prodonus <authorblog@prodonus.com>", // sender address
 	            to: author.email, // list of receivers
@@ -694,8 +694,8 @@ var _sendAuthorReqRejectionEmail = function(self,author) {
 			// var url = "http://"+host+"/api/verify/"+token;
 			var html=emailtemplate.description;
 	        html=S(html);
-	        html=html.replaceAll("<email>",author.email);
-	        // html=html.replaceAll("<url>",url);
+	        html=html.replaceAll("<firstname>",author.firstname);
+	        html=html.replaceAll("<lastname>",author.lastname);
 	        var message = {
 	            from: "Prodonus <authorblog@prodonus.com>", // sender address
 	            to: author.email, // list of receivers

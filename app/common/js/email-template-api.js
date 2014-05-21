@@ -98,18 +98,18 @@ exports.loadEmailTemplate=function(req,res){
 		},
 		{
 			templatetype: "authorregistrationsuccess",
-			subject: "Blog Author Request",
-			description: "Dear <email>,<br><br> Prodonus received a request for blog author.<br><br> Please wait for reply from Prodonus<br><br>After successful verifiaction of your application you will get a mail of accepatance for your application.<br><br>The Prodonus Support Team <br><br>If you don't want to receive these emails from Prodonus in the future, please write to support@prodonus.com."
+			subject: "Author Request application received",
+			description: "Dear <firstname> <lastname>,<br><br> We have received your author application request.<br><br> Our team will get back to you immediately after processing the application request.<br><br>Sincerely,<br><br>Prodonus Blog Team."
 		}, 
 		{
 			templatetype: "authoracceptance",
-			subject: "Blog Author Request Accepted",
-			description: "Dear <email> Congratulations,<br><br> Prodonus accepated your request for blog author.<br><br>"
+			subject: "Author Request application accept",
+			description: "Dear <firstname> <lastname>,<br><br>We are excited to have you onboard prodonus blog authors group. You are part of select few authors to write for Prodonus under different categories you selected.<br><br>Bloggers have access to manage blog console and the blog wall. The author uses the manage blog console to create, update, remove or publish blogs. Until the blog is published it is not available for social view of prodonus.<br><br>We expect the author's to thoroughly edit and correct their blogs before publishing. We do not have any in-house editor to go through each blog to approve it. We expect the blogger to follow in right spirit without blasphemy or plagirism. It is important that the blogger should have original content and have licensed copies of photos they use. Please read our terms and conditions and privacy policy for further detailed information.<br>Please indicate your agreement by signing and returning this letter to me, and specifying any other conditions you may require.<br><br>Sincerely,<br><br>Prodonus Blog Team."
 		},
 		{
 			templatetype: "authorrejection",
-			subject: "Blog Author Request Rejected",
-			description: "Dear <email>,<br><br> Thanks to create blog for Prodonus, Prodonus rejected your request for blog author.<br><br>"
+			subject: "Author Request application reject",
+			description: "Dear <firstname> <lastname>,<br><br>We unfortunately not able to accomodate you currently. However, we might reconsider our decision in future. We will continue keeping your details, if any future opportunities arrive we would defintely be pleased to have you onboard.<br><br>Sincerely,<br><br>Prodonus Blog Team."
 		}]
 
 
