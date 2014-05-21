@@ -582,7 +582,7 @@ var _deleteCampaignCommentFeatureAnalytics = function(prodle,analyticsdata,useri
 	var analytics=analyticsdata[initialvalue];
 	console.log("analytics : "+JSON.stringify(analytics)+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
 	if(analyticsdata.length>initialvalue){//,"analytics.userid":userid,"analytics.tagname":analytics.tag
-		CampaignAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
+		CampaignAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid,commentavailable:true}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
 	        if(err){
 	            logger.emit("error","Error in deletion of campaign featureanalytics");
 	        }else if(updatestatus == 1){

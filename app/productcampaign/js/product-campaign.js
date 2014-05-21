@@ -262,7 +262,9 @@ ProductCampaign.prototype.getProductCampaign = function(prodle,campain_id) {
 };
 
 var _getProductCampaign = function(self,prodle,campaign_id){
-	ProductCampaignModel.findOne({status:"active",prodle:prodle,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
+	var a=new Date();
+  	var today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
+	ProductCampaignModel.findOne({status:"active",prodle:prodle,campaign_id:campaign_id,startdate:{$lte:today},enddate:{$gte:today}}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
 		}else if(productcampain){
