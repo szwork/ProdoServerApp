@@ -2027,7 +2027,7 @@ var blogFileUpload =function(blogid,awsparams,filename,callback){
         if(err){
           callback({"error":{"message":"blogFileUpload : Error in getting getSignedUrl"+err}});
         }else{
-          var blog_object={bucket:params1.Bucket,key:params1.Key,image:url};
+          var blog_object={bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId()};
            blogModel.update({blogid:blogid},{$push:{blog_images:blog_object}},function(err,blogupdatestatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"blogFileUpload : DBerror : "+err}});
