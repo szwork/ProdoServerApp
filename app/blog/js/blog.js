@@ -442,8 +442,20 @@ var _validateAuthorData = function(self,authordata,userid){
 	}else if(!isArray(authordata.portfolio)){
 		self.emit("failedauthorRegistration",{"error":{"code":"AV001","message":"portfolio should be an array"}});
 	}else{
-		_getMailIdFromUserModel(self,authordata,userid);
+		_checkAlreadyRegisterAuthor(self,authordata,userid);
 	}
+}
+
+var _checkAlreadyRegisterAuthor = function(self,authordata,userid){
+	userModel.findOne({userid:userid}).exec(function(err,userstatus){
+		if(err){
+			self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to check user alredy register"}});
+		}else if(userstatus){
+			self.emit("failedauthorRegistration",{"error":{"code":"AP001","message":"You are already register for blog author"}});
+		}else{
+			_getMailIdFromUserModel(self,authordata,userid);
+		}
+	})
 }
 
 var _getMailIdFromUserModel = function(self,authordata,userid){
