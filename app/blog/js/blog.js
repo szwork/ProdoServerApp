@@ -285,7 +285,7 @@ var _getAllBlogs = function(self,authorid,userid){
 			}
 			_successfulGetAllBlogs(self,blogdata);			
 		}else{			
-			self.emit("failedGetAllBlogs",{"error":{"code":"AP001","message":"Provided authorid is wrong"}});
+			self.emit("failedGetAllBlogs",{"error":{"code":"AP001","message":"No blog exist for this author"}});
 		}
 	})
 }
@@ -730,7 +730,7 @@ Blog.prototype.deleteBlogImage = function(blogimageids,authorid,blogid) {
 	if(blogimageids==undefined){
 		self.emit("failedDeleteBlogImage",{"error":{"code":"AV001","message":"Please provide campaign image ids"}});
 	}else if(blogimageids.length==0){
-		self.emit("failedDeleteBlogImage",{"error":{"message":"Given blogimageids is empty "}});
+		self.emit("failedDeleteBlogImage",{"error":{"message":"Given blogimageids is empty"}});
 	}else{
 		///////////////////////////////////////////////////////////////////
 		_deleteBlogImage(self,blogimageids,authorid,blogid);

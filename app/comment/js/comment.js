@@ -570,7 +570,7 @@ var _validateDeleteCampaignCommentFeatureAnalytics = function(prodle,commentdata
         	console.log("commentdata.featureanalytics : ### :"+JSON.stringify(commentdata.featureanalytics));
         	if(commentdata.featureanalytics.length>0){
             	var initialvalue=0;            
-            	_deleteCampaignCommentFeatureAnalytics(prodle,commentdata.featureanalytics,commentdata.user.userid,initialvalue);
+            	_deleteCampaignCommentFeatureAnalytics(prodle,commentdata,commentdata.user.userid,initialvalue);
         	}else{
             	console.log("Please pass campaign comment featureanalytics data");
         	}
@@ -578,11 +578,12 @@ var _validateDeleteCampaignCommentFeatureAnalytics = function(prodle,commentdata
        
 }
 
-var _deleteCampaignCommentFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
+var _deleteCampaignCommentFeatureAnalytics = function(prodle,commentdata,userid,initialvalue){
+	var analyticsdata = commentdata.featureanalytics;
 	var analytics=analyticsdata[initialvalue];
 	console.log("analytics : "+JSON.stringify(analytics)+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
 	if(analyticsdata.length>initialvalue){//,"analytics.userid":userid,"analytics.tagname":analytics.tag
-		CampaignAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid,commentavailable:true}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
+		CampaignAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid,datecreated:commentdata.datecreated,commentavailable:true}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
 	        if(err){
 	            logger.emit("error","Error in deletion of campaign featureanalytics");
 	        }else if(updatestatus == 1){
@@ -1052,8 +1053,7 @@ var _checkItIsAlreadyAgreedOrDisagreed=function(self,sessionuserid,commentid,act
 	 					_agreeDisagreeComment(self,sessionuserid,commentid,action)
 	 					//////////////////////////////////////////
 	 				}
- 				}
- 				
+ 				} 				
  			}
  		})
  	}
@@ -1075,7 +1075,7 @@ var _agreeDisagreeComment=function(self,sessionuserid,commentid,action){
 			////////////////////////////////////////////
 			_updateAgreeDisagreeCommentModel(self,commentid,action)
 			////////////////////////////////////////////
-				////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////
 			_successfullAgreeDisagreeComment(self,action)
 			//////////////////////////////////////////////////////
 		}
