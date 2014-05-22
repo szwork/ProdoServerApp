@@ -478,7 +478,7 @@ var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue)
 	var analytics=analyticsdata[initialvalue];
 	console.log("analytics : "+analytics+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
 	if(analyticsdata.length>initialvalue){//,"analytics.userid":userid,"analytics.tagname":analytics.tag
-		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
+		FeatureAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid,commentavailable:true}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
 	        if(err){
 	            logger.emit("error","Error in deletion of featureanalytics");
 	        }else if(updatestatus == 1){
@@ -952,7 +952,7 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analyti
         }else{
         	analytics.prodle = prodle;
         	analytics.campaign_id = campaign_id;
-            analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid}];
+            analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid,datecreated:new Date()}];
             var analytics_data = new CampaignAnalyticsModel(analytics);
         	analytics_data.save(function(err,analyticsdata){
             	if(err){
@@ -975,7 +975,7 @@ var _updateCampignCommentFeatureAnalytics = function(prodle,campaign_id,analytic
         }else if(!tagdata){
             console.log("Tag name does not exist to get tagid");
         }else{		    
-		    CampaignAnalyticsModel.update(query,{$push:{analytics:{tagid:tagdata.tagid,tagname:tagdata.tagname,userid:userid}}},function(err,analyticsupdatedata){
+		    CampaignAnalyticsModel.update(query,{$push:{analytics:{tagid:tagdata.tagid,tagname:tagdata.tagname,userid:userid,datecreated:new Date()}}},function(err,analyticsupdatedata){
 	            if(err){
 	                console.log("Error in db to update count err message: " + err);
 	            }else if(!analyticsupdatedata){

@@ -42,7 +42,11 @@ exports.getAllTag = function(req, res) {
     	logger.emit("info", result.success.message);      
 		res.send(result);
 	});
-    tagreffdictionary.getAllTag();
+	if(req.user.isAdmin==true){
+		tagreffdictionary.getAllTag();
+	}else{
+		tagreffdictionary.emit("failedGetAllTagReffDictionary",{"error":{"message":"You are not authorized to get all tag details"}});
+	}    
 }
 
 exports.getAllDomainTags = function(req, res) {
@@ -60,5 +64,9 @@ exports.getAllDomainTags = function(req, res) {
     	logger.emit("info", result.success.message);      
 		res.send(result);
 	});
-    tagreffdictionary.getAllDomainTags();
+	if(req.user.isAdmin==true){
+		tagreffdictionary.getAllDomainTags();
+	}else{
+		tagreffdictionary.emit("failedGetAllDomainTag",{"error":{"message":"You are not authorized to get all domain tag details"}});
+	}    
 }
