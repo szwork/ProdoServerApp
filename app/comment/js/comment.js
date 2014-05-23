@@ -1594,3 +1594,52 @@ var _successfulGetUserInfoCommentedOnProduct = function(self,userdata){
 	self.emit("successfulGetUserInfoCommentedOnProduct",{"success":{"message":"Getting user details sucessfully","userdata":userdata}});
 
 }
+Comment.prototype.replyToComment=function(sessionuserid,commentid,replydata){
+	var self=this;
+	//////////////////////////////////////////////////////////
+	_validateReplyData(self,sessionuserid,commentid,replydata)
+	///////////////////////////////////////////////////////////
+    
+}
+var _validateReplyData=function(self,user,commentid,replydata){
+	if(replydata==undefined){
+		self.emit("failedReplyToComment",{"error":{"code":"AV001","message":"Please provide replydata"}});	
+	}else if(replydata.replytext==undefined || replydata.replytext==""){
+		self.emit("failedReplyToComment",{"error":{"code":"AV001","message":"Please enter replytext"}});	
+	}else if(replydata.user==undefined){
+		self.emit("failedReplyToComment",{"error":{"code":"AV001","message":"Please  provide user detais"}});	
+	}else if(replydata.user.userid==undefined){
+		self.emit("failedReplyToComment",{"error":{"code":"AV001","message":"Please  provide userid with user detais"}});	
+	}else{
+	   ///////////////////////////////////////////////////////////////////
+	   _IsAuthorizedToReplyComment(self,user,commentid,replydata)
+	   ///////////////////////////////////////////////////////////////////	
+	}
+}
+var _IsAuthorizedToReplyComment=function(self,user,commentid,replydata){
+	CommentModel.findOne({commentid:commentid},{commentid:1,prodle:1},function(err,comment){
+		if(err){
+			logger.emit("error","Database Issue :_IsAuthorizedToReplyComment"+err);
+			self.emit("failedReplyToComment",{"error":{"code":"ED001","message":"Database Server Issue"}});	
+		}else if(!comment){
+		  self.emit("failedReplyToComment",{"error":{"message":"commentid is wrong or not exists"}});	
+		}else{
+			ProductModel.findOne({prodle:comment.prodle},{orgid:1,prodle:1},function(err,product){
+				if(err){
+					logger.emit("error","Database Issue :_IsAuthorizedToReplyComment"+err);
+			    self.emit("failedReplyToComment",{"error":{"code":"ED001","message":"Database Server Issue"}});	
+				}else if(!product){
+					self.emit("failedReplyToComment",{"error":{"message":"product does not exists"}});	
+				}else{
+					////////////////////////////////////////////////////////////////////////////
+					_isAuthorizedUserToReplyComment(self,user,comment,product,replydata)
+					////////////////////////////////////////////////////////////////////////////
+				}
+			})
+		}
+	})
+}
+var _isAuthorizedUserToReplyComment=function(self,user,comment,product,replydata){
+	// if(user.usertype)
+}
+
