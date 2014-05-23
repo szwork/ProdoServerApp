@@ -82,7 +82,13 @@ var _isProductFeatureContainInFeatureRating=function(self,prodle,featureratingda
 			callback({error:{message:"Database Issue"}})
 		}else if(!userfeaturerating){//new feature rating
 			//////////////////////////////////
-			_addNewFeatureRatingToUser(self,prodle,featureratingdata,userid)
+			_addNewFeatureRatingToUser(self,prodle,featureratingdata,userid,function(err,result){
+					if(err){
+						callback(err)
+					}else{
+						callback(null,result)
+					}
+				})
 			/////////////////////////////////	
 		}else{//change the existing feature rate
 			///////////////////////////////////////////////////
