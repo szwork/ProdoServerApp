@@ -2,35 +2,7 @@ var Comment=require("./comment");
 var logger=require("../../common/js/logger");
 
 var redisClient = require("redis").createClient();
-// var io=require("../../../prodonus-app");
-// exports.addCommentBySocket=function(sessionuserid,prodle,commentdata,callback){
-  
-  
-//   // var userdata=commentdata.user;
-//   logger.emit("log","coming commentdata"+JSON.stringify(commentdata));
-   
-//   var comment = new Comment(commentdata);
-//   comment.removeListener("failedAddComment",function(stream){  
-//     logger.emit("log","failedAddComment listener removed");
 
-//   });
-//   comment.on("failedAddComment",function(err){
-//       logger.emit("error", err.error.message);
-//       // comment.removeAllListeners(); 
-//       io.socket.emit("addcommentResponse",err);
-//       callback(err);
-//     });
-//   comment.removeListener("successfulAddComment",function(stream){
-//     logger.emit("log","successfulAddComment listener removed");
-//   });
-//   comment.on("successfulAddComment",function(result){
-//     logger.emit("info", result.success.message);
-//     // comment.removeAllListeners();
-//     io.socket.emit("addcommentResponse",null,result);
-//     // callback(null,result);
-//   });
-//   comment.addComment(sessionuserid,prodle);
-// }
 exports.deleteComment = function(req, res) {
   var commentid=req.params.commentid;
   var sessionuserid=req.user.userid;
@@ -65,8 +37,25 @@ exports.deleteCampaignComment = function(req, res) {
       
       res.send(result);
     });
-  comment.deleteCampaignComment(sessionuserid,commentid);
-    
+  comment.deleteCampaignComment(sessionuserid,commentid);    
+}
+
+exports.deleteBlogComment = function(req, res) {
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var comment=new Comment();
+  comment.removeAllListeners("failedBlogCommentDeletion");
+  comment.on("failedBlogCommentDeletion",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+     comment.removeAllListeners("successfulBlogCommentDeletion");
+    comment.on("successfulBlogCommentDeletion",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+    });
+  comment.deleteBlogComment(sessionuserid,commentid);    
 }
 
 exports.loadMoreComment=function(req,res){
@@ -96,13 +85,31 @@ exports.loadMoreCampaignComment=function(req,res){
     logger.emit("error", err.error.message,req.user.userid);
     res.send(err);
   });
-    comment.removeAllListeners("successfulLoadMoreCampaignComment");
-    comment.on("successfulLoadMoreCampaignComment",function(result){
-      logger.emit("info", result.success.message);
+  comment.removeAllListeners("successfulLoadMoreCampaignComment");
+  comment.on("successfulLoadMoreCampaignComment",function(result){
+    logger.emit("info", result.success.message);
       
-      res.send(result);
-    });
+    res.send(result);
+  });
   comment.loadMoreCampaignComment(sessionuserid,commentid);
+}
+
+exports.loadMoreBlogComment=function(req,res){
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var comment=new Comment();
+  comment.removeAllListeners("failedLoadMoreBlogComment");
+  comment.on("failedLoadMoreBlogComment",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  comment.removeAllListeners("successfulLoadMoreBlogComment");
+  comment.on("successfulLoadMoreBlogComment",function(result){
+    logger.emit("info", result.success.message);
+      
+    res.send(result);
+  });
+  comment.loadMoreBlogComment(sessionuserid,commentid);
 }
 
 exports.comment=function(io,__dirname){
@@ -169,6 +176,38 @@ exports.comment=function(io,__dirname){
         }      
       });
     })
+    
+    socket.on('addBlogComment', function(prodle,blogid,commentdata) {
+      var comment = new Comment(commentdata);      
+      logger.emit("log","blogid : "+blogid+" commentdata : "+JSON.stringify(commentdata));
+      comment.removeAllListeners("failedAddBlogComment");
+      comment.on("failedAddBlogComment",function(err){
+        logger.emit("error", err.error.message,sessionuserid);
+        socket.emit("addBlogCommentResponse",err);
+      });
+      comment.removeAllListeners("successfulAddBlogComment");
+      comment.on("successfulAddBlogComment",function(result){
+        logger.emit("info", result.success.message,sessionuserid);
+        socket.emit("addBlogCommentResponse",null,result);
+        if(result.success.blog_comment.type=="blog"){
+          socket.broadcast.emit("blogCommentResponse"+blogid,null,result);
+        }else{
+          socket.broadcast.emit("warrantycommentResponse"+blogid,null,result);
+        }
+      });
+      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+        if(err){
+          logger.emit("log","Errrr in get sessionid client");
+        }else if(reply==null){
+          socket.emit("addBlogCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+        }else if(JSON.parse(reply).passport.user==undefined){
+          socket.emit("addBlogCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+        }else{
+          comment.addBlogComment(sessionuserid,prodle,blogid,__dirname);   
+        }      
+      });
+    })
+
   })
 }
 

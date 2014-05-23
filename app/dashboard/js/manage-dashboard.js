@@ -21,6 +21,7 @@ var manageDashboardModel = require("./manage-dashboard-model");
 var chartAccessModel = require("./dashboard-chartaccess-model");
 var TagReffDicModel = require("../../tagreffdictionary/js/tagreffdictionary-model");
 var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
+var __=require("underscore");
 
 function isArray(what) {
     return Object.prototype.toString.call(what) === '[object Array]';
@@ -36,18 +37,49 @@ module.exports = ManageDashboard;
 ManageDashboard.prototype.getDashboardIcons = function(dashboard_access_code) {
 	var self=this;
 	/////////////////////////
-	_getDashboardIcons(self);
+	// _getDashboardIcons(self);
+	_getChartIdsByCode(self,dashboard_access_code);
 	////////////////////////
 };
 
-var _getDashboardIcons=function(self){
-	DashboardModel.aggregate([{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts",query:"$query"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
+var _getChartIdsByCode=function(self,code){
+	chartAccessModel.findOne({code:code}).exec(function(err,accesscoderesult){
+		if(err){
+			self.emit("failedGetDashboardIcons",{"error":{"code":"ED001","message":"Error in db to find chartids by code"}});
+		}else if(accesscoderesult){
+			console.log("ABC : "+JSON.stringify(accesscoderesult.chartids));
+			/////////////////////////////////////////////////////////
+			_getDashboardIcons(self,accesscoderesult.chartids);
+			/////////////////////////////////////////////////////////
+		}else{			
+			self.emit("failedGetDashboardIcons",{"error":{"code":"AP001","message":"Dashboard Icons Not Available"}});
+		}
+	})
+}
+
+var _getDashboardIcons=function(self,chartids){
+	DashboardModel.aggregate([{$match:{chartid:{$in:chartids}}},{$group:{_id:{category:"$category"},charticons:{"$addToSet":{chartname:"$chartname",description:"$description",type:"$type",charts:"$charts",query:"$query"}}}},{$project:{category:"$_id.category",charticons:"$charticons",_id:0}}]).exec(function(err,dashboardicons){
 		if(err){
 			self.emit("failedGetDashboardIcons",{"error":{"code":"ED001","message":"Error in db to find dashboard icons"}});
 		}else if(dashboardicons.length>0){
-			 ////////////////////////////////
-			_successfulGetDashboardIcons(self,dashboardicons);
-			//////////////////////////////////
+			if(dashboardicons.length==3){
+				/////////////////////////////////////////////////
+				_successfulGetDashboardIcons(self,dashboardicons);
+				/////////////////////////////////////////////////
+			}else{
+				var resultcategoryarray=[];
+				var categoryarray=["Product","Campaign","Organization"];
+				for(var i=0;i<dashboardicons.length;i++){
+					resultcategoryarray.push(dashboardicons[i].category);
+			    }
+			    var category_array=__.difference(categoryarray,resultcategoryarray);
+			    for(var j=0;j<category_array.length;j++){
+			    	dashboardicons.push({category:category_array[j],charticons:[]});
+			    }
+			    /////////////////////////////////////////////////
+				_successfulGetDashboardIcons(self,dashboardicons);
+				/////////////////////////////////////////////////							
+			}
 		}else{			
 			self.emit("failedGetDashboardIcons",{"error":{"code":"AP001","message":"Dashboard Icons Not Available"}});
 		}
@@ -65,6 +97,7 @@ ManageDashboard.prototype.getDashboardChartsData = function() {
 	_getDashboardChartsData(self);
 	////////////////////////
 };
+
 var _getDashboardChartsData=function(self){
 	DashboardModel.find({},{chartid:1,chartname:1,_id:0}).exec(function(err,dashboardchartdata){
 		if(err){

@@ -18,6 +18,7 @@ exports.addTag = function(req, res) {
     	logger.emit("info", result.success.message);
 		res.send(result);
 	});
+	console.log("asfseafgsdgg : "+JSON.stringify(req.user.userid));
 	if(req.user.isAdmin==true){
 		tagreffdictionary.addTag(sessionuserid,tagReffDicData);
 	}else{
@@ -41,7 +42,7 @@ exports.getAllTag = function(req, res) {
     	logger.emit("info", result.success.message);      
 		res.send(result);
 	});
-    tagreffdictionary.getAllTag();
+	tagreffdictionary.getAllTag();
 }
 
 exports.getAllDomainTags = function(req, res) {
@@ -59,5 +60,5 @@ exports.getAllDomainTags = function(req, res) {
     	logger.emit("info", result.success.message);      
 		res.send(result);
 	});
-    tagreffdictionary.getAllDomainTags();
+	tagreffdictionary.getAllDomainTags();
 }

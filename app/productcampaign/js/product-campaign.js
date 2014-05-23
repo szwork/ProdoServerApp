@@ -348,7 +348,10 @@ var _getAllProductCampaign = function(self,prodle){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(product){
 			// console.log("Product : "+JSON.stringify(product.name));
-			ProductCampaignModel.find({prodle:prodle,status:"active"},{artwork:1,name:1,campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
+
+			var a=new Date();
+            var today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
+			ProductCampaignModel.find({prodle:prodle,status:"active",startdate:{$lte:today},enddate:{$gte:today}},{campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
 				if(err){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 				}else if(productcampain.length==0){
@@ -474,10 +477,12 @@ var _deleteCampaignImage=function(self,camimageids,campaign_id){
 		}
 	})
 }
+
 var _successfulDeleteCampaignImage=function(self){
 	logger.emit("log","_successfulDeleteCampaignImage");
 	self.emit("successfulDeleteCampaignImage",{"success":{"message":"Delete Campaign Images Successfully"}});
 }
+
 ProductCampaign.prototype.publishCampaign = function(orgid,campaign_id) {
 	var self=this;
 	
@@ -502,7 +507,7 @@ var _publishCampaign=function(self,orgid,campaign_id){
 		}
 	})
 }
-var _setActiveCampaing=function(self,campaign){
+var _setActiveCampaing = function(self,campaign){
 	ProductCampaignModel.update({campaign_id:campaign.campaign_id},{$set:{status:"active"}},function(err,campaignactivestatus){
 		if(err){
 			self.emit("failedPublishCampaign",{"error":{code:"ED001",message:"Database issue"}});
@@ -515,6 +520,7 @@ var _setActiveCampaing=function(self,campaign){
 		}
 	})
 }
+
 var _successfullPublishCampaign=function(self){
 	self.emit("successfulpublishCampaign",{"success":{"message":"Campaign Published successfully"}});
 }

@@ -504,9 +504,10 @@ var _isOrganizationUser=function(user,callback){
 	}
 }
 var getUserRequiredData=function(user,callback){
-   var user_senddata={isOtpPassword:user.isOtpPassword,email:user.email,usertype:user.usertype,userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype,campaign_followed:user.campaign_followed};
-	// user=JSON.stringify(user);
-	// user=JSON.parse(user);
+    user=JSON.stringify(user);
+	user=JSON.parse(user);
+   	var user_senddata={isAdmin:user.isAdmin,firstname:user.firstname,lastname:user.lastname,author:user.author,isOtpPassword:user.isOtpPassword,email:user.email,usertype:user.usertype,userid:user.userid,username:user.username,products_followed:user.products_followed,subscription:user.subscription,profile_pic:user.profile_pic,isAdmin:user.isAdmin ,prodousertype:user.prodousertype,campaign_followed:user.campaign_followed};
+	
 	// console.log("log","user"+user);
   // user=JSON.stringify(user);
    console.log("org length" +Object.keys(user.org).length)

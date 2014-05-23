@@ -209,7 +209,7 @@ exports.getbcrypstring=function(data,callback){
 exports.sendMail = function(message,smtpconfig,callback){
   var smtpTransport = nodemailer.createTransport("SMTP",smtpconfig);
 
-  message.html="<div width=500 height=100 style='background-color:black'><img src='http://prodonus.com/assets/images/prodonus.png'></img><h2><font color=white>Social Network And Warranty Platform for Products</font></h2></div><br>"+message.html;
+  message.html="<div width=500 height=100 style='background-color:black'><img src='http://prodonus.com/assets/images/prodonus.png'></img><h2><font color=white>Reach. Share. Know. </font></h2></div><br>"+message.html;
   smtpTransport.sendMail(message, 
  	  function (error, success) {
       if(error){
@@ -616,7 +616,7 @@ exports.uploadFiles=function(io,__dirname){
              var dashboard_obj = new DashboardPoolModel(dashboarddata);
              dashboard_obj.save(function(err,upload_result){
               if(err){
-                socket.emit("addDashboardChartResponse",{"error":{"message":"Database Isssue"}})
+                socket.emit("addDashboardChartResponse",{"error":{"message":"Database Isssue "+err}});
               }else{
                 socket.emit("addDashboardChartResponse",null,{"success":{"message":"Dashboard Chart Added successfully","chartname":upload_result.chartname,"chartimage":url}});
               }
@@ -1676,16 +1676,17 @@ var __blogFileBuffer = function(action,file,dirname,action,sessionuser,callback)
                         }else{
                           var currentdate=new Date();
                           var expirydate=currentdate.setFullYear(currentdate.getFullYear()+2); 
-                          bucketFolder=amazonbucket+"/blog/user/"+action.userid+"/"+action.blogid;
+                          bucketFolder=amazonbucket+"/blog/user/"+action.blog.userid+"/"+action.blog.blogid;
                           params = {
                              Bucket: bucketFolder,
-                             Key: action.authorid+s3filekey,
+                             Key: action.blog.authorid+s3filekey,
                              Body: writebuffer,
                              Expires:expirydate,
                              ACL: 'public-read',
                              ContentType: file_type
                           };
-                        blogFileUpload(action.blogid,params,file_name,function(err,result){
+                          console.log("action : ############ : "+JSON.stringify(action));
+                        blogFileUpload(action.blog.blogid,params,file_name,function(err,result){
                           if(err){
                             callback(err);
                           }else{
@@ -2026,7 +2027,7 @@ var blogFileUpload =function(blogid,awsparams,filename,callback){
         if(err){
           callback({"error":{"message":"blogFileUpload : Error in getting getSignedUrl"+err}});
         }else{
-          var blog_object={bucket:params1.Bucket,key:params1.Key,image:url};
+          var blog_object={bucket:params1.Bucket,key:params1.Key,image:url,imageid:generateId()};
            blogModel.update({blogid:blogid},{$push:{blog_images:blog_object}},function(err,blogupdatestatus){
             if(err){
               callback({"error":{"code":"EDOO1","message":"blogFileUpload : DBerror : "+err}});

@@ -23,7 +23,7 @@ var DashboardChartsSchema = mongoose.Schema({
   category:{type:String},
   type:{type:String},
   charts:{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}},
-  query:{queryid:{type:String,unique:true,ref:"managedashboard"},queryname:{type:String}},
+  query:{queryid:{type:String,ref:"managedashboard"},queryname:{type:String}},
   // status:{type:String,default:"active"}
 });
 

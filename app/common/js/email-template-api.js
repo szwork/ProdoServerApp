@@ -29,7 +29,7 @@ exports.loadEmailTemplate=function(req,res){
 		{
 			templatetype: "welcome",
 			subject: "Welcome To Prodonus",
-			description: "Hi <username>,<br> Welcome to Prodonus! You’ve just joined a community of product 			manufacturers and users who are sharing their insights on products. <br>At Prodonus, we strive to			 bring business closer to their customers to enable conversation, in addition to managing their	warranties.<br>Talk to manufacturers, interact with consumers from around the world, and explore 			  tons of interesting questions and insights.<br>We are committed to bring all the manufacturers 			  available to everyone.<br><br>Eager to start? Start following the products that interests you, 			  and there’s no limit to the number of products you can follow.<br>We are thrilled that you have 			  joined us! Congratulations! Leave comments and suggestions, and share your story!<br>During your 			  free trial period, you will be able to use prodonus as you would like, of any number of products.			  <br>At the end of the free trial period, you will be asked to select a plan according to the user type - manfacturer's, companies, or individuals .<br><br><br>Cheers,<br><br>Prodonus Team<br><br>You are receiving this email because you registered with Prodonus. Please do not reply directly to noreply@prodonus.com. If you have any questions or feedback, please visit our support link or write to support@prodonus.com<br><br>"
+			description: "Hi <username>,<br> Welcome to Prodonus! You’ve just joined a community of product manufacturers and users who are sharing their insights on products. <br>At Prodonus, we strive to			 bring business closer to their customers to enable conversation, in addition to managing their	warranties.<br>Talk to manufacturers, interact with consumers from around the world, and explore 			  tons of interesting questions and insights.<br>We are committed to bring all the manufacturers 			  available to everyone.<br><br>Eager to start? Start following the products that interests you, 			  and there’s no limit to the number of products you can follow.<br>We are thrilled that you have 			  joined us! Congratulations! Leave comments and suggestions, and share your story!<br>During your 			  free trial period, you will be able to use prodonus as you would like, of any number of products.			  <br>At the end of the free trial period, you will be asked to select a plan according to the user type - manfacturer's, companies, or individuals .<br><br><br>Cheers,<br><br>Prodonus Team<br><br>You are receiving this email because you registered with Prodonus. Please do not reply directly to noreply@prodonus.com. If you have any questions or feedback, please visit our support link or write to support@prodonus.com<br><br>"
 		},
 		{
 			templatetype: "welcomeinvite",
@@ -95,6 +95,21 @@ exports.loadEmailTemplate=function(req,res){
 			templatetype: "activateaccount",
 			subject: "Activate Account Request",
 			description: "Dear <email> You are requested to activate your account,So to activate your account please copy and pasteu this address into your web browser's address bar:<br><br><url><br><br>Have fun, and don't hesitate to contact us with your feedback <feedbackurl>.<br><br>- The Prodonus Team <br><br><br>Please do not reply to this e-mail; if you require assistance, please visit our support link <support link url> or write to - support@prodonus.com"
+		},
+		{
+			templatetype: "authorregistrationsuccess",
+			subject: "Author Request application received",
+			description: "Dear <firstname> <lastname>,<br><br> We have received your author application request.<br>Our team will get back to you immediately one's a processing id done.<br><br>Sincerely,<br><br>Prodonus Blog Team."
+		}, 
+		{
+			templatetype: "authoracceptance",
+			subject: "Author Request application accept",
+			description: "Dear <firstname> <lastname>,<br><br>We are excited to have you onboard prodonus blog authors group. You are part of select few authors to write for Prodonus under different categories you selected.<br><br>Bloggers have access to manage blog console and the blog wall. The author uses the manage blog console to create, update, remove or publish blogs. Until the blog is published it is not available for social view of prodonus.<br><br>We expect the author's to thoroughly edit and correct their blogs before publishing. We do not have any in-house editor to go through each blog to approve it. We expect the blogger to follow in right spirit without blasphemy or plagirism. It is important that the blogger should have original content and have licensed copies of photos they use. Please read our terms and conditions and privacy policy for further detailed information.<br><br>Please indicate your agreement by signing and returning this letter to me, and specifying any other conditions you may require.<br><br>Sincerely,<br><br>Prodonus Blog Team."
+		},
+		{
+			templatetype: "authorrejection",
+			subject: "Author Request application reject",
+			description: "Dear <firstname> <lastname>,<br><br>We unfortunately not able to accomodate you currently. However, we might reconsider our decision in future. We will continue keeping your details, if any future opportunities arrive we would defintely be pleased to have you onboard.<br><br>Sincerely,<br><br>Prodonus Blog Team."
 		}]
 
 

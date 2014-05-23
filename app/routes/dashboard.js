@@ -11,6 +11,8 @@ exports.init = function (app) {
   app.post("/api/dashboard/addquery",auth,api.managedashboardapi.addQuery);//Add Query for Dashboard
   app.get("/api/dashboard/queries",auth,api.managedashboardapi.getAllDashboardQuery);//get dashboard querys
 
-  app.post("/api/dashboard/RBONDS_Mapping",auth,api.managedashboardapi.addRBONDS_Mapping);//Add Query for Dashboard
+  app.post("/api/dashboard/RBONDS_Mapping",auth,api.managedashboardapi.addRBONDS_Mapping);
+  // app.put("/api/dashboard/RBONDS_Mapping",auth,api.managedashboardapi.updateRBONDS_Mapping);
+  
   app.get("/api/chart/:prodle/:queryid",auth,api.managedashboardapi.getAnalyticsDataForProduct);//get analytics data for product
 }

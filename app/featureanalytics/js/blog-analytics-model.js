@@ -1,5 +1,5 @@
 /*
-* Overview: Feature Analytics Model
+* Overview: Blog Analytics Model
 * Dated:
 * Author: Dinesh Sawant
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
@@ -7,28 +7,30 @@
 * ----------------------------------------------------------------------
 * Date | author | description 
 * ----------------------------------------------------------------------
-* 04-02-2014 | xyx | Add a new property
+* 24-05-2014 | xyx | Add a new property
 */
 
 var mongoose = require('../../common/js/db');
-// var ObjectId = mongoose.Schema.ObjectId;
-// var commonapi=require('../../common/js/common-api');
 var shortId = require('shortid');
 var logger = require("../../common/js/logger");
 
-//Feature Analytics Model
-var featureAnalyticsSchema = mongoose.Schema({
+//Camapaign Analytics Model
+var blogAnalyticsSchema = mongoose.Schema({
   prodle:{type:String},
+  blogid:{type:String},
   featurename:{type:String,ref:"productFeatureSchema"},
-  // featureid:{type:String,ref:"productFeatureSchema"},
   analytics: [{tagid:{type:String,ref:"TagReffDictionary"},tagname:{type:String,ref:"TagReffDictionary"},userid:{type:String,ref:"User"},datecreated:{type:Date},commentavailable:{type:Boolean,default:true}}]
-
 });
-
-//Seed a feature analytics
- featureAnalyticsSchema.set('redisCache', true);
- featureAnalyticsSchema.set('expires', 90);
+// blogAnalyticsSchema.pre('save', function(next) {
+//   var product = this;
+//   product.prodle=shortId.generate();  
+//    console.log("product pre"+product);
+//   next();
+// })
+//Seed a campaign analytics
+ blogAnalyticsSchema.set('redisCache', true);
+ blogAnalyticsSchema.set('expires', 90);
  
-var FeatureAnalytics = mongoose.model('featureanalytics', featureAnalyticsSchema);
+var BlogAnalytics = mongoose.model('bloganalytics', blogAnalyticsSchema);
 
-module.exports = FeatureAnalytics;
+module.exports = BlogAnalytics;

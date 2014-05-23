@@ -1,13 +1,13 @@
 /*
-* Overview: Product/Campaign Comments Model
+* Overview: Blog Comments Model
 * Dated: 24-Nov-2013
-* Author: Ramesh Kunhiraman
+* Author: Dinesh Sawant
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
 * Change History:
 * ----------------------------------------------------------------------
 * date | author | description 
 * ----------------------------------------------------------------------
-* 27-3-2013 | xyx | Add a new property 
+* 22-05-2014 | xyx | Add a new property 
 */
 
 var mongoose = require('../../common/js/db');
@@ -15,24 +15,17 @@ var ObjectId = mongoose.Schema.ObjectId;
 var commonapi=require('../../common/js/common-api');
 var shortId = require('shortid');
 var logger = require("../../common/js/logger");
-var replySchema=mongoose.Schema({
-  replyid:{type:String},
-  user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
-  datecreated:{type:Date},
-  replytext:{type:String}
-  
-})
-var CommentSchema = mongoose.Schema({
+
+var BlogCommentSchema = mongoose.Schema({
   commentid:{type:String}, 
   user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
   prodle:{type:String, ref:"Product"},
-  campaign_id:{type:String},
+  blogid:{type:String},
   commentcategory:{type:String},//its mandetory
   status:{type:String,default:"active"}, 
-  agreecount:{type:Number,default:0},
-  disagreecount:{type:Number,default:0},
-  type:{type:String},//proudct,campain
-  replies:[replySchema],
+  // agreecount:{type:Number,default:0},
+  // disagreecount:{type:Number,default:0},
+  type:{type:String},//blog
   datecreated:{type:Date,default:Date.now}, 
   dateremoved:{type:Date},   
   commenttext:{type:String},   
@@ -41,12 +34,12 @@ var CommentSchema = mongoose.Schema({
   comment_image:[{bucket:String,key:String,imageid:{type:String},image:{type:String}}]  
 });
 
-CommentSchema.set('redisCache', true);
- CommentSchema.set('expires', 90);
-//Seed a product Comment
-CommentSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
-    return this.collection.findAndModify(query, sort, doc, options, callback);
+BlogCommentSchema.set('redisCache', true);
+BlogCommentSchema.set('expires', 90);
+//Seed a blog Comment
+BlogCommentSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+  return this.collection.findAndModify(query, sort, doc, options, callback);
 };
-var ProductComment = mongoose.model('comments', CommentSchema);
+var BlogComment = mongoose.model('blogcomments', BlogCommentSchema);
 
-module.exports = ProductComment;
+module.exports = BlogComment;

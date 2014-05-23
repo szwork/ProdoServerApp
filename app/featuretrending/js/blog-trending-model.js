@@ -1,5 +1,5 @@
 /*
-* Overview: Campaign Trending Model
+* Overview: Blog Trending Model
 * Dated:
 * Author: Dinesh Sawant
 * Copyright: Prodonus Software Private Limited and GiantLeap Systems Private Limited 2013
@@ -7,27 +7,28 @@
 * ----------------------------------------------------------------------
 * Date | author | description 
 * ----------------------------------------------------------------------
-* 19-02-2014 | xyx | Add a new property
+* 23-05-2014 | xyx | Add a new property
 */
 
 var mongoose = require('../../common/js/db');
 var logger = require("../../common/js/logger");
 
 //Campign Trending Model
-var campaignTrendingSchema = mongoose.Schema({
-	productname:{type:String},
+var blogTrendingSchema = mongoose.Schema({
+	name:{type:String},
 	orgid:{type:String},
   	prodle:{type:String},
-  	campaign_id:{type:String},
+  	authorid:{type:String},
+  	blogid:{type:String},
   	commentcount:{type:Number,default:0},
-  	followedcount:{type:Number,default:0},
+  	likecount:{type:Number,default:0},
   	status:{type:String,default:"active"}//active,deactive
 });
 
 //Seed a campaign trending
- campaignTrendingSchema.set('redisCache', true);
- campaignTrendingSchema.set('expires', 90);
+ blogTrendingSchema.set('redisCache', true);
+ blogTrendingSchema.set('expires', 90);
  
-var CampaignTrending = mongoose.model('campaigntrendings', campaignTrendingSchema);
+var BlogTrending = mongoose.model('blogtrendings', blogTrendingSchema);
 
-module.exports = CampaignTrending;
+module.exports = BlogTrending;

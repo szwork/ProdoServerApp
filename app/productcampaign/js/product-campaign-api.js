@@ -197,10 +197,10 @@ exports.deleteCampaignImage=function(req,res){
     res.send(result);
     // eventEmitter.removeListener(this);
   });
-   if(req.user.org.orgid!=orgid){
+  if(req.user.org.orgid!=orgid){
     logger.emit("error","given orgid does not match with session orgid");
     productcampaign.emit("failedDeleteCampaignImage",{"error":{"code":"EA001","message":"You are not authorized to delete campaign image"}}); 
-   }else if(req.user.org.isAdmin==false){
+  }else if(req.user.org.isAdmin==false){
     logger.emit("log","You are not an admin to delete product image");
     productcampaign.emit("failedDeleteCampaignImage",{"error":{"code":"EA001","message":"You are not authorized to delete campaign image"}}); 
   }else{
@@ -209,6 +209,7 @@ exports.deleteCampaignImage=function(req,res){
     //////////////////////////////////////////////// ///////////
   }
 }
+
 exports.publishCampaign=function(req,res){
   var sessionuserid=req.user.userid;
   
