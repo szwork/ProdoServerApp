@@ -7,6 +7,8 @@ var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics
 var CampaignAnalyticsModel = require("../../featureanalytics/js/campaign-analytics-model");
 var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 var CampaignTrendModel = require("../../featuretrending/js/campaign-trending-model");
+var blogModel = require("../../blog/js/blog-model");
+var BlogCommentModel = require("./blogcomment-model");
 var events = require("events");
 var shortId = require('shortid');
 var logger=require("../../common/js/logger");
@@ -1043,11 +1045,11 @@ var _isValidProdleForBlogComment=function(self,prodle,blogid,commentdata,__dirna
 	})
 }
 
-var _isValidBlogId=function(self,prodle,blogid,commentdata,productdata,__dirname){
-	ProductCampaignModel.findOne({blogid:blogid},function(err,campaigndata){
+var _isValidBlogId = function(self,prodle,blogid,commentdata,productdata,__dirname){
+	blogModel.findOne({blogid:blogid},function(err,blogdata){
 		if(err){
 			self.emit("failedAddBlogComment",{"error":{"code":"ED001","message":" function:_isValidBlogId \nError in db to find blog err message: "+err}});
-		}else if(!campaigndata){
+		}else if(!blogdata){
 			self.emit("failedAddBlogComment",{"error":{"code":"AP001","message":"Blog id is wrong"}});
 		}else{
 			/////////////////////////////////////////////////////////////////////////////////////////////
@@ -1135,7 +1137,7 @@ var _blogCommentImageUpload=function(self,prodle,blogid,commentdata,product,awsp
 	        	}else{
 	        		commentdata.comment_image=[{imageid:generateId(),image:url}];
 	          		/////////////////////////////////////////////////////////////
-	          		_addCampaignComment(self,prodle,blogid,commentdata,product);
+	          		_addBlogComment(self,prodle,blogid,commentdata,product);
 	          		/////////////////////////////////////////////////////////////
 		        }
 	    	});
@@ -1143,7 +1145,7 @@ var _blogCommentImageUpload=function(self,prodle,blogid,commentdata,product,awsp
   	}) 
 }
 
-var _addCampaignComment=function(self,prodle,blogid,commentdata,product){
+var _addBlogComment = function(self,prodle,blogid,commentdata,product){
 	var tags_array=[];
 	var analytics_array = [];
 	if(commentdata.analytics.length>0){
@@ -1158,7 +1160,7 @@ var _addCampaignComment=function(self,prodle,blogid,commentdata,product){
 	commentdata.tags=tags_array;
 	commentdata.featureanalytics=analytics_array;
 
-	var comment_data=new CommentModel(commentdata);
+	var comment_data=new BlogCommentModel(commentdata);
 
 	comment_data.save(function(err,blog_commentdata){
 		if(err){
@@ -1173,14 +1175,14 @@ var _addCampaignComment=function(self,prodle,blogid,commentdata,product){
 	   		//blog_commentdata.prodle=undefined;
 			// ///////////////////////////////////		
 			_successfulAddBlogComment(self,blog_commentdata);
-			_validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
+			// _validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
 			/////////////////////////////////
 		}
 	})
 }
 
 var _successfulAddBlogComment=function(self,newcomment){
-	updateBlogTrendingForCommentCount(newcomment.prodle,newcomment.blogid);
+	// updateBlogTrendingForCommentCount(newcomment.prodle,newcomment.blogid);
 	logger.emit("log","successfulAddBlogComment");
 	self.emit("successfulAddBlogComment",{"success":{"message":"Gave comment to blog sucessfully","blog_comment":newcomment}});
 }
