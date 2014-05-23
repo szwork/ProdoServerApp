@@ -328,7 +328,7 @@ Blog.prototype.getAllBlogsForProduct = function(prodle,userid) {
 
 var _getAllBlogsForProduct = function(self,prodle,userid){
 	// {status:{$ne:"deactive"},prodle:prodle},{authorid:1,blog_images:1,blogid:1,orgid:1,prodle:1,title:1,_id:0}).sort({datecreated:-1}
-	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:prodle}},{$group:{_id:{authorid:"$authorid",blogid:"$blogid",prodle:"$prodle",orgid:"$orgid",postedby:"$publishblog.postedby",title:"$publishblog.title",content:"$publishblog.content"}}},{$project:{authorid:"$_id.authorid",blogid:"$_id.blogid",prodle:"$_id.prodle",orgid:"$_id.orgid",postedby:"$_id.postedby",title:"$_id.title",content:"$_id.content",_id:0}}]).exec(function(err,blogdata){
+	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:prodle}},{$group:{_id:{authorid:"$authorid",blogid:"$blogid",prodle:"$prodle",orgid:"$orgid",postedby:"$publishblog.postedby",title:"$publishblog.title",content:"$publishblog.content",productname:"$productname"}}},{$project:{authorid:"$_id.authorid",blogid:"$_id.blogid",prodle:"$_id.prodle",orgid:"$_id.orgid",postedby:"$_id.postedby",title:"$_id.title",content:"$_id.content",productname:"$_id.productname",_id:0}}]).exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"ED001","message":"Error in db to find all blog"}});
 		}else if(blogdata.length>0){
