@@ -15,7 +15,13 @@ var ObjectId = mongoose.Schema.ObjectId;
 var commonapi=require('../../common/js/common-api');
 var shortId = require('shortid');
 var logger = require("../../common/js/logger");
-
+var replySchema=mongoose.Schema({
+  replyid:{type:String},
+  user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
+  datecreated:{type:Date},
+  replytext:{type:String}
+  
+})
 var CommentSchema = mongoose.Schema({
   commentid:{type:String}, 
   user:{userid:{type:String,ref:"User"},profilepic:{type:String},username:{type:String},orgname:{type:String},grpname:{type:String}},
@@ -26,7 +32,7 @@ var CommentSchema = mongoose.Schema({
   agreecount:{type:Number,default:0},
   disagreecount:{type:Number,default:0},
   type:{type:String},//proudct,campain
-
+  replies:[replySchema],
   datecreated:{type:Date,default:Date.now}, 
   dateremoved:{type:Date},   
   commenttext:{type:String},   

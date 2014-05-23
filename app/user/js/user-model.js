@@ -60,12 +60,19 @@ var userSchema = mongoose.Schema({
   terms:{type:Boolean},
   adddate:{ type:Date,default:Date.now },
   updatedate:{ type:Date},
+  // featurerating:[{}]
   removedate:{ type:Date},
   profile_pic:{bucket:{type:String},key:String,image:{type:String}},
   author:{authorid:{type:String,default:null},isAuthor:{type:Boolean,default:false}},
   dashboard_access_code:{type:String,default:null},
   isAuthor:{type:Boolean,default:false},//blog author
-  prodousertype:{type:String}
+  prodousertype:{type:String},
+  featurerating:[{
+    prodle:{type:String},
+    featurename:{type:String},
+    featurerates:{type:Number}
+  }]
+
 });
 
 //Encrypt the password and generate the idwhen you save.

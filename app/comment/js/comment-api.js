@@ -213,6 +213,32 @@ exports.getUserInfoCommentedOnProduct = function(req,res){
     comment.emit("failedGetUserInfoCommentedOnProduct",{"error":{"code":"EA001","message":"You have not authorize to done this action"}});
   }
 }
+exports.replyToComment = function(req,res){
+  // var prodle = req.params.prodle;
+  var sessionuserid=req.user.userid;
+  var commentid=req.params.commentid;
+  var replydata=req.body.replydata;
+  var comment=new Comment();
+  comment.removeAllListeners("failedReplyToComment");
+  comment.on("failedReplyToComment",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+    comment.removeAllListeners("successfulReplyToComment");
+    comment.on("successfulReplyToComment",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+      
+    });
+  if(req.user.org.isAdmin == true) {
+    comment.replyToComment(req.user,commentid,replydata);
+  }else{
+    comment.emit("failedReplyToComment",{"error":{"code":"EA001","message":"You have not authorize to done this action"}});
+  }
+}
+  
+
   
   
 

@@ -163,11 +163,12 @@ var _updateTrendingForProdonusFollowedCount = function(self,product){
 		if(userdata.prodousertype=="individual"){
 			userdata.usertype="individual";
 		}
+		
 		userdata.username=userdata.username.toLowerCase();
 		var user=userModel(userdata);
 	    user.save(function(err,user){
-	    	console.log("after save"+user);
-	    	console.log("errr"+err);
+	    	// console.log("after save"+user);
+	    	// console.log("errr"+err);
 	      	if(err){
 	        	self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to add user"}});
 	      	}else if(user){  

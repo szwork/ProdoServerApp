@@ -348,7 +348,7 @@ var _getAllProductCampaign = function(self,prodle){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(product){
 			// console.log("Product : "+JSON.stringify(product.name));
-			ProductCampaignModel.find({prodle:prodle,status:"active"},{campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
+			ProductCampaignModel.find({prodle:prodle,status:"active"},{artwork:1,name:1,campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
 				if(err){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 				}else if(productcampain.length==0){
