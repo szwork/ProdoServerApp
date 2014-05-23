@@ -37,8 +37,25 @@ exports.deleteCampaignComment = function(req, res) {
       
       res.send(result);
     });
-  comment.deleteCampaignComment(sessionuserid,commentid);
-    
+  comment.deleteCampaignComment(sessionuserid,commentid);    
+}
+
+exports.deleteBlogComment = function(req, res) {
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var comment=new Comment();
+  comment.removeAllListeners("failedBlogCommentDeletion");
+  comment.on("failedBlogCommentDeletion",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+     comment.removeAllListeners("successfulBlogCommentDeletion");
+    comment.on("successfulBlogCommentDeletion",function(result){
+      logger.emit("info", result.success.message);
+      
+      res.send(result);
+    });
+  comment.deleteBlogComment(sessionuserid,commentid);    
 }
 
 exports.loadMoreComment=function(req,res){
@@ -68,13 +85,31 @@ exports.loadMoreCampaignComment=function(req,res){
     logger.emit("error", err.error.message,req.user.userid);
     res.send(err);
   });
-    comment.removeAllListeners("successfulLoadMoreCampaignComment");
-    comment.on("successfulLoadMoreCampaignComment",function(result){
-      logger.emit("info", result.success.message);
+  comment.removeAllListeners("successfulLoadMoreCampaignComment");
+  comment.on("successfulLoadMoreCampaignComment",function(result){
+    logger.emit("info", result.success.message);
       
-      res.send(result);
-    });
+    res.send(result);
+  });
   comment.loadMoreCampaignComment(sessionuserid,commentid);
+}
+
+exports.loadMoreBlogComment=function(req,res){
+  var commentid=req.params.commentid;
+  var sessionuserid=req.user.userid;
+  var comment=new Comment();
+  comment.removeAllListeners("failedLoadMoreBlogComment");
+  comment.on("failedLoadMoreBlogComment",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  comment.removeAllListeners("successfulLoadMoreBlogComment");
+  comment.on("successfulLoadMoreBlogComment",function(result){
+    logger.emit("info", result.success.message);
+      
+    res.send(result);
+  });
+  comment.loadMoreBlogComment(sessionuserid,commentid);
 }
 
 exports.comment=function(io,__dirname){

@@ -5,9 +5,11 @@ var ProductModel=require("../../product/js/product-model");
 var ProductCampaignModel=require("../../productcampaign/js/product-campaign-model");
 var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
 var CampaignAnalyticsModel = require("../../featureanalytics/js/campaign-analytics-model");
+var BlogAnalyticsModel = require("../../featureanalytics/js/blog-analytics-model");
 var TrendingModel = require("../../featuretrending/js/feature-trending-model");
 var CampaignTrendModel = require("../../featuretrending/js/campaign-trending-model");
 var blogModel = require("../../blog/js/blog-model");
+var BlogTrendModel = require("../../featuretrending/js/blog-trending-model");
 var BlogCommentModel = require("./blogcomment-model");
 var events = require("events");
 var shortId = require('shortid');
@@ -311,7 +313,7 @@ var _validateFeatureAnalytics = function(prodle,commentdata){
 	    if(commentdata.analytics==undefined){
 	    	console.log("analytics does not exists");
 	    }else{
-		     if(commentdata.analytics.length>0){
+		    if(commentdata.analytics.length>0){
 	             var initialvalue=0;            
 	            _addFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);            
 	        }else{
@@ -611,6 +613,109 @@ var updateLatestCampaignCommentDecCount = function(prodle,campaign_id){
 	})	
 }
 
+Comment.prototype.deleteBlogComment = function(sessionuserid,commentid) {
+	var self=this;
+    /////////////////////////////////////////////////////////////
+	_isAuhorizedUserToDeleteBlogComment(self,sessionuserid,commentid);
+	/////////////////////////////////////////////////////////////	
+};
+
+var _isAuhorizedUserToDeleteBlogComment = function(self,sessionuserid,commentid){	
+  BlogCommentModel.findOne({commentid:commentid,status:"active"},{user:1},function(err,comment){
+  	if(err){
+  		self.emit("failedBlogCommentDeletion",{"error":{"code":"ED001","message":"Error in db to find Comment"}});
+  	}else if(comment){
+  		if(comment.user.userid!=sessionuserid){
+  		 	self.emit("failedBlogCommentDeletion",{"error":{"code":"EA001","message":"You are not authorize to delete this comment"}});	
+  		}else{
+  		 	//////////////////////////////
+        	_deleteBlogComment(self,commentid);
+		    /////////////////////////////
+		}
+	}else{
+  		self.emit("failedBlogCommentDeletion",{"error":{"code":"AC001","message":"Comment already deleted"}});
+  	}
+  })
+}
+
+var _deleteBlogComment=function(self,commentid){
+	var commentdata={status:"deactive",dateremoved:new Date()};	
+  	BlogCommentModel.findAndModify({commentid:commentid},[],{$set:commentdata},{new:false},function(err,comment){
+		if(err){
+			self.emit("failedBlogCommentDeletion",{"error":{"code":"ED001","message":"Error in db to delete comment"}});
+		}else if(!comment){
+			self.emit("failedBlogCommentDeletion",{"error":{"code":"AC001","message":"Provided commentid is wrong"}});
+		}else{  
+			if(comment.type="blog"){
+				// updateLatestBlogComment(comment.blogid);
+       			// updateLatestProductComment(comment.prodle);
+			}else{
+       			//updateLatestWarrantyComment
+			}
+			/////////////////////////////
+			_successfulBlogCommentDeletion(self,comment.prodle,comment.blogid);
+			_validateDeleteBlogCommentFeatureAnalytics(comment.prodle,comment);
+			////////////////////////////
+		}
+	})
+}
+
+var _successfulBlogCommentDeletion = function(self,prodle,blogid) {
+	updateLatestBlogCommentDecCount(prodle,blogid);
+	logger.emit("log","_successfulBlogCommentDeletion");
+  	self.emit("successfulBlogCommentDeletion", {"success":{"message":"Comment Deleted Successfully"}});
+}
+
+var _validateDeleteBlogCommentFeatureAnalytics = function(prodle,commentdata){
+        console.log("_validateDeleteBlogCommentFeatureAnalytics");
+        // var analytics = commentdata.analytics;
+        if(commentdata.featureanalytics==undefined){
+        	console.log("featureanalytics is undefined");
+        }else{
+        	console.log("commentdata ### :"+JSON.stringify(commentdata));
+        	console.log("commentdata.featureanalytics : ### :"+JSON.stringify(commentdata.featureanalytics));
+        	if(commentdata.featureanalytics.length>0){
+            	var initialvalue=0;            
+            	_deleteBlogCommentFeatureAnalytics(prodle,commentdata.featureanalytics,commentdata.user.userid,initialvalue);
+        	}else{
+            	console.log("Please pass campaign comment featureanalytics data");
+        	}
+        }
+       
+}
+
+var _deleteBlogCommentFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
+	var analytics=analyticsdata[initialvalue];
+	console.log("analytics : "+JSON.stringify(analytics)+" analyticsdata : "+JSON.stringify(analyticsdata)+" initialvalue : "+initialvalue);
+	if(analyticsdata.length>initialvalue){//,"analytics.userid":userid,"analytics.tagname":analytics.tag
+		BlogAnalyticsModel.update({prodle:prodle,featurename:analytics.featurename,analytics:{$elemMatch:{tagname:analytics.tag,userid:userid,commentavailable:true}}},{$set:{"analytics.$.commentavailable":false}}).lean().exec(function(err,updatestatus){
+	        if(err){
+	            logger.emit("error","Error in deletion of blog featureanalytics");
+	        }else if(updatestatus == 1){
+	            logger.emit("log","blog comment featureanalytics deleted sucessfully");
+	        }else{
+	        	logger.emit("error","Given blog commentdata is wrong to delete featureanalytics");
+	        }
+    	});
+    	_deleteBlogCommentFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+	}else{
+       logger.emit("log","all blog comment featureanalytics deletion is done");
+	}
+}
+
+var updateLatestBlogCommentDecCount = function(prodle,blogid){
+	console.log("prodle : "+prodle+" blogid : "+blogid);
+    BlogTrendModel.update({prodle:prodle,blogid:blogid},{$inc:{commentcount:-1}},function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest comment count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest comment count(Decrement) for blog updated");
+		}else{
+			logger.emit("error","Given product id or blogid is wrong to update latest comment count");
+		}
+	})	
+}
+
 Comment.prototype.loadMoreComment = function(sessionuserid,commentid) {
 	var self=this;
 
@@ -681,6 +786,42 @@ var _loadMoreCampaignComment=function(self,sessionuserid,commentid){
 var _successfulLoadMoreCampaignComment=function(self,nextcomments){
 	logger.emit("log","_successfulLoadMoreCampaignComment");
 	self.emit("successfulLoadMoreCampaignComment", {"success":{"message":"Next comments","comment":nextcomments}});
+}
+
+Comment.prototype.loadMoreBlogComment = function(sessionuserid,commentid) {
+	var self=this;
+    ///////////////////////////////////////////////////////
+    _loadMoreBlogComment(self,sessionuserid,commentid);
+    ///////////////////////////////////////////////////////
+};
+
+var _loadMoreBlogComment=function(self,sessionuserid,commentid){	
+	BlogCommentModel.findOne({commentid:commentid,status:"active"},{blogid:1,commentid:1,datecreated:1},function(err,comment){
+		if(err){
+			self.emit("failedLoadMoreCampaignComment",{"error":{"code":"ED001","message":"_loadMoreBlogComment:Error in db to get comment"+err}});
+		}else if(!comment){
+			self.emit("failedLoadMoreCampaignComment",{"error":{"code":"AC001","message":"Wrong commentid"}});
+		}else{
+			logger.emit("log",comment);
+			var query=BlogCommentModel.find({blogid:comment.blogid,type:"blog",status:"active",datecreated:{$lt:comment.datecreated}},{_id:0,status:0}).sort({datecreated:-1}).limit(10);
+			query.exec(function(err,nextcomments){
+				if(err){
+					self.emit("failedLoadMoreCampaignComment",{"error":{"code":"ED001","message":"_loadMoreBlogComment: Error in db to get comment "+err}});
+				}else if(nextcomments.length==0){
+					self.emit("failedLoadMoreCampaignComment",{"error":{"code":"AC002","message":"No More Comment(s)"}});
+				}else{
+					//////////////////////////////////////////////////
+					_successfulLoadMoreBlogComment(self,nextcomments);
+					//////////////////////////////////////////////////
+				}
+			})
+		}
+	})
+}
+
+var _successfulLoadMoreBlogComment=function(self,nextcomments){
+	logger.emit("log","_successfulLoadMoreBlogComment");
+	self.emit("successfulLoadMoreBlogComment", {"success":{"message":"Next comments","comment":nextcomments}});
 }
 
 Comment.prototype.addCampaignComment=function(sessionuserid,prodle,campaign_id,__dirname){
@@ -908,41 +1049,40 @@ var updateCampaignTrendingForCommentCount=function(prodle,campaign_id){
 	});
 }
 
-var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata,product){
-        console.log("_validateCampaignCommentFeatureAnalytics");
-        // var analytics = commentdata.analytics;
-        if(commentdata.analytics.length>0){
-            console.log("analytics array " + commentdata.analytics);
-            console.log("analytics array leangth " + commentdata.analytics.length);
-            for(var i=0;i<commentdata.analytics.length;i++){
-                console.log("analytics featureid" + commentdata.analytics[i].featureitad);
-                console.log("analytics featurename" + commentdata.analytics[i].featurename);
-                console.log("analytics tag" + commentdata.analytics[i].tag);
-                _addCampaignCommentFeatureAnalytics(prodle,commentdata.campaign_id,commentdata.analytics[i],commentdata.user.userid,product);
-            }
-        }else{
-            console.log("Please pass analytics data");
-        }
+var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata){
+	if(commentdata.analytics==undefined){
+	   	console.log("analytics does not exists");
+	}else{
+		if(commentdata.analytics.length>0){
+	        var initialvalue=0;            
+	        _addCampaignCommentFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);            
+	    }else{
+	        console.log("Please pass analytics data");
+	    }
+	}
+    console.log("_validateCampaignCommentFeatureAnalytics");
 }
 
-var _addCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analytics,userid,product){
-    console.log("_addCampaignCommentFeatureAnalytics");
-    console.log("CDA " + analytics);
-    console.log("CDAFID " + analytics.featureid);
-    CampaignAnalyticsModel.findOne({campaign_id:campaign_id,featurename:analytics.featurename}).lean().exec(function(err,analyticsdata){
-        if(err){
-          logger.emit("failedAddFeatureAnalytics",{"error":{"code":"ED001","message":" Error in db to find featurename err message: "+err}});
-        }else if(!analyticsdata){
-            console.log("calling to add new analytics with prodle and featureid");
-            _addNewCampaignCommentFeatureAnalytics(prodle,campaign_id,analytics,userid,product);
-        }else{
-            console.log("calling to update analytics");
-            _updateCampignCommentFeatureAnalytics(prodle,campaign_id,analytics,userid,product);
-        }
-    });
+var _addCampaignCommentFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
+	var analytics=analyticsdata[initialvalue];
+	if(analyticsdata.length>initialvalue){		
+		CampaignAnalyticsModel.findOne({prodle:prodle,featurename:analytics.featurename}).lean().exec(function(err,analyticsresult){
+	        if(err){
+	            logger.emit("error","Error in db to find feature id err message: "+err);
+	        }else if(!analyticsresult){
+	            console.log("calling to add new analytics with prodle and featurename");
+	            _addNewCampaignCommentFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
+	        }else{
+	            console.log("calling to update analytics");
+	            _updateCampaignCommentFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
+	        }
+    	});
+	}else{
+       console.log("all feature analytics done");
+	}
 }
 
-var _addNewCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analytics,userid,product){
+var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
 	console.log("_addNewCampaignCommentFeatureAnalytics");
 	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
 	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
@@ -952,24 +1092,27 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analyti
             console.log("Tag name does not exist to get tagid");
         }else{
         	analytics.prodle = prodle;
-        	analytics.campaign_id = campaign_id;
             analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid,datecreated:new Date()}];
             var analytics_data = new CampaignAnalyticsModel(analytics);
-        	analytics_data.save(function(err,analyticsdata){
+        	analytics_data.save(function(err,analyticsresult){
             	if(err){
                	 	console.log("Error in db to save feature analytics" + err);
             	}else{
-                	console.log("Feature analytics added sucessfully" + analyticsdata);
+                	console.log("Feature analytics added sucessfully" + analyticsresult);
             	}
+            	/////////////////////////////////////////////////////////////////////////////////////////
+            	_addCampaignCommentFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+            	/////////////////////////////////////////////////////////////////////////////////
         	})
         }
 	});        
 }
 
-var _updateCampignCommentFeatureAnalytics = function(prodle,campaign_id,analytics,userid,product){
-    console.log("_updateCampignCommentFeatureAnalytics");
+
+var _updateCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
+    console.log("_updateCampaignCommentFeatureAnalytics");
     //checking tagid and tagname exist
-    var query = {prodle:prodle,featureid:analytics.featureid};
+    var query = {prodle:prodle,featurename:analytics.featurename};
     TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1,tagname:1}).lean().exec(function(err,tagdata){
 		if(err){
             console.log("Error in db to find feature id err message: " + err);
@@ -985,6 +1128,9 @@ var _updateCampignCommentFeatureAnalytics = function(prodle,campaign_id,analytic
 	                console.log("Feature analytics updated sucessfully analytics_data : " + analyticsupdatedata);
 	                // _successfulAddComment(self,analyticsdata);
 	            }
+	            /////////////////////////////////////////////////////////////////////////////////////////
+            	_addCampaignCommentFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+            	/////////////////////////////////////////////////////////////////////////////////
 	        });
 		}
 	})	
@@ -1166,25 +1312,122 @@ var _addBlogComment = function(self,prodle,blogid,commentdata,product){
 		if(err){
 			self.emit("failedAddBlogComment",{"error":{"code":"ED001","message":"Error in db to save new blog comment"}});
 		}else{      
-	      	if(blog_commentdata.type=="campaign"){
+	      	if(blog_commentdata.type=="blog"){
 	      		// updateLatestCampaignComment(blog_commentdata.campaign_id);
 	      	}else{
 	      		//updateLatestWarrantyComment(blog_commentdata.prodle);
 	      	}
-	  		//blog_commentdata.status=undefined;
-	   		//blog_commentdata.prodle=undefined;
-			// ///////////////////////////////////		
+			////////////////////////////////////////////////	
 			_successfulAddBlogComment(self,blog_commentdata);
-			// _validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
-			/////////////////////////////////
+			_validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
+			////////////////////////////////////////////////
 		}
 	})
 }
 
-var _successfulAddBlogComment=function(self,newcomment){
-	// updateBlogTrendingForCommentCount(newcomment.prodle,newcomment.blogid);
+var _successfulAddBlogComment = function(self,newcomment){
+	updateBlogTrendingForCommentCount(newcomment.prodle,newcomment.blogid);
 	logger.emit("log","successfulAddBlogComment");
 	self.emit("successfulAddBlogComment",{"success":{"message":"Gave comment to blog sucessfully","blog_comment":newcomment}});
+}
+
+var updateBlogTrendingForCommentCount=function(prodle,blogid){
+	BlogTrendModel.update({prodle:prodle,blogid:blogid},{$inc:{commentcount:1}},{upsert:true}).exec(function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest campaign comment count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest campaign comment count updated");
+		}else{
+			logger.emit("error","Given product id or campaign id is wrong to update latest campaign comment count");
+		}
+	});
+}
+
+var _validateBlogCommentFeatureAnalytics = function(prodle,commentdata){
+	if(commentdata.analytics==undefined){
+	  	console.log("analytics does not exists");
+	}else{
+		if(commentdata.analytics.length>0){
+	        var initialvalue=0;            
+	        _addBlogCommentFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);            
+	    }else{
+	        console.log("Please pass analytics data");
+	    }
+	}
+    console.log("_validateBlogCommentFeatureAnalytics");
+}
+
+var _addBlogCommentFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
+	var analytics=analyticsdata[initialvalue];
+	if(analyticsdata.length>initialvalue){		
+		BlogAnalyticsModel.findOne({prodle:prodle,featurename:analytics.featurename}).lean().exec(function(err,analyticsresult){
+	        if(err){
+	            logger.emit("error"," Error in db to find feature id err message: "+err)
+	        }else if(!analyticsresult){
+	            console.log("calling to add new analytics with prodle and featurename");
+	            _addNewBlogFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
+	        }else{
+	            console.log("calling to update analytics");
+	            _updateBlogFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
+	        }
+    	});
+	}else{
+       console.log("all feature analytics done");
+	}
+}
+
+var _addNewBlogFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
+	console.log("_addNewBlogFeatureAnalytics");
+	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
+	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
+		if(err){
+            console.log("Error in db to find feature id err message: " + err);
+        }else if(!tagdata){
+            console.log("Tag name does not exist to get tagid");
+        }else{
+        	analytics.prodle = prodle;
+            analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid,datecreated:new Date()}];
+            var analytics_data = new BlogAnalyticsModel(analytics);
+        	analytics_data.save(function(err,analyticsresult){
+            	if(err){
+               	 	console.log("Error in db to save feature analytics" + err);
+            	}else{
+                	console.log("Feature analytics added sucessfully" + analyticsresult);
+            	}
+            	/////////////////////////////////////////////////////////////////////////////////////////
+            	_addBlogCommentFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+            	/////////////////////////////////////////////////////////////////////////////////
+        	})
+        }
+	});        
+}
+
+
+var _updateBlogFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
+    console.log("_updateBlogFeatureAnalytics");
+    //checking tagid and tagname exist
+    var query = {prodle:prodle,featurename:analytics.featurename};
+    TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1,tagname:1}).lean().exec(function(err,tagdata){
+		if(err){
+            console.log("Error in db to find feature id err message: " + err);
+        }else if(!tagdata){
+            console.log("Tag name does not exist to get tagid");
+        }else{		    
+		    BlogAnalyticsModel.update(query,{$push:{analytics:{tagid:tagdata.tagid,tagname:tagdata.tagname,userid:userid,datecreated:new Date()}}},function(err,analyticsupdatedata){
+	            if(err){
+	                console.log("Error in db to update count err message: " + err);
+	            }else if(!analyticsupdatedata){
+	                console.log("Feature analytics not updated");
+	            }else{
+	                console.log("Feature analytics updated sucessfully analytics_data : " + analyticsupdatedata);
+	                // _successfulAddBlogComment(self,analyticsdata);
+	            }
+	            ////////////////////////////////////////////////////////////////////////////
+            	_addBlogCommentFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+            	////////////////////////////////////////////////////////////////////////////
+	        });
+		}
+	})	
 }
 
 Comment.prototype.agreeDisagreeComment=function(sessionuserid,commentid,action){

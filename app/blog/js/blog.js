@@ -18,6 +18,7 @@ var authorModel = require("./author-model");
 var blogModel = require("./blog-model");
 var userModel = require('../../user/js/user-model');
 var EmailTemplateModel=require('../../common/js/email-template-model');
+var BlogTrendModel = require("../../featuretrending/js/blog-trending-model");
 var commonapi = require('../../common/js/common-api');
 var CONFIG = require('config').Prodonus;
 var regxemail = /\S+@\S+\.\S+/;
@@ -98,6 +99,7 @@ var _addBlog = function(self,blogdata,userid){
 	   	}else{
 		 	////////////////////////////////////
 			_successfulAddBlog(self,blogstatus);
+			_addBlogInTrending(self,blogstatus);
 			////////////////////////////////////
 	   	}
     });
@@ -106,6 +108,18 @@ var _addBlog = function(self,blogdata,userid){
 var _successfulAddBlog = function(self,blogstatus){
 	logger.log("log","_successfulAddBlog");
 	self.emit("successfulAddBlog",{"success":{"message":"Blog added sucessfully"}});
+}
+
+var _addBlogInTrending = function(self,blog){	
+	var trend={blogid:blog.blogid,prodle:blog.prodle,commentcount:0,likecount:0,productname:blog.productname,orgid:blog.orgid,authorid:blog.authorid};
+	var trend_data = new BlogTrendModel(trend);
+	trend_data.save(function(err,analyticsdata){
+	  	if(err){
+	   	 	logger.emit("error","Error in db to save trending data" + err);
+	   	}else{
+	       	logger.emit("log","Trending for new blog added sucessfully" + analyticsdata);
+	  	}
+	});
 }
 
 Blog.prototype.publishBlog=function(authorid,blogid,sessionuserid){
@@ -402,13 +416,25 @@ var _deleteBlog = function(self,authorid,blogid){
 			self.emit("failedDeleteBlog",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
 		}else{
 			////////////////////////////
-			_successfulDeleteBlog(self);
+			// _successfulDeleteBlog(self,blogid);
+			_changeBlogStatusInTrending(self,blogid);
 			////////////////////////////
 		}
 	})
 };
 
-var _successfulDeleteBlog = function(self,blog){
+var _changeBlogStatusInTrending = function(self,prodle){
+	console.log("_changeBlogStatusInTrending");
+	BlogTrendModel.update({blogid:blogid},{$set:{status:"deactive"}}).lean().exec(function(err,status){
+		if(err){
+			self.emit("failedDeleteBlog",{"error":{"code":"ED001","message":"Error in db to update blog status in trending" + err}});
+	  	}else{
+			_successfulDeleteBlog(self,blogid);
+		}
+	})
+}
+
+var _successfulDeleteBlog = function(self){
 	logger.emit("log","_successfulDeleteBlog");
 	self.emit("successfulDeleteBlog", {"success":{"message":"Blog Deleted Successfully"}});
 }
