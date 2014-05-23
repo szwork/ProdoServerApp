@@ -13,6 +13,7 @@ exports.init = function (app) {
 
   app.post("/api/dashboard/RBONDS_Mapping",auth,api.managedashboardapi.addRBONDS_Mapping);
   // app.put("/api/dashboard/RBONDS_Mapping",auth,api.managedashboardapi.updateRBONDS_Mapping);
-  
+  app.get("/api/dashboard/RBONDS_Mapping",auth,api.managedashboardapi.getRBONDS_Mapping);
+
   app.get("/api/chart/:prodle/:queryid",auth,api.managedashboardapi.getAnalyticsDataForProduct);//get analytics data for product
 }

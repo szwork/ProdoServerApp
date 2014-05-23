@@ -142,6 +142,30 @@ exports.addRBONDS_Mapping = function(req,res){
     }
 }
 
+exports.getRBONDS_Mapping = function(req,res){    
+    var managedashboard = new ManageDashboard();  
+    var sessionuserid=req.user.userid;
+     logger.emit("log","sessionid:"+sessionuserid);
+    managedashboard.removeAllListeners("failedGetRBONDS_Mapping");
+    managedashboard.on("failedGetRBONDS_Mapping",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // managedashboard.removeAllListeners();
+      res.send(err);
+    });
+    managedashboard.removeAllListeners("successfulGetRBONDS_Mapping");
+    managedashboard.on("successfulGetRBONDS_Mapping",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // managedashboard.removeAllListeners();
+      res.send(result);
+    });   
+    if(req.user.isAdmin==false){
+      logger.emit("error","You are not an admin to get RBONDS_Mapping code",sessionuserid);
+      managedashboard.emit("failedGetRBONDS_Mapping",{"error":{"code":"EA001","message":"You have not authorize to get RBONDS_Mapping"}});
+    }else{
+      managedashboard.getRBONDS_Mapping(sessionuserid);
+    }
+}
+
 exports.getAnalyticsDataForProduct = function(req, res) {
   var sessionuserid = req.user.userid;
   var prodle = req.params.prodle;

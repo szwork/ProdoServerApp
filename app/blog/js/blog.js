@@ -335,22 +335,16 @@ var _successfulGetBlog = function(self,blog){
 
 Blog.prototype.getAllBlogsForProduct = function(prodle,userid) {
 	var self=this;
-	/////////////////////////
+	///////////////////////////////////////////
 	_getAllBlogsForProduct(self,prodle,userid);
-	////////////////////////
+	///////////////////////////////////////////
 };
 
 var _getAllBlogsForProduct = function(self,prodle,userid){
-	// {status:{$ne:"deactive"},prodle:prodle},{authorid:1,blog_images:1,blogid:1,orgid:1,prodle:1,title:1,_id:0}).sort({datecreated:-1}
 	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:prodle}},{$group:{_id:{authorid:"$authorid",blogid:"$blogid",prodle:"$prodle",orgid:"$orgid",postedby:"$publishblog.postedby",title:"$publishblog.title",content:"$publishblog.content",productname:"$productname"}}},{$project:{authorid:"$_id.authorid",blogid:"$_id.blogid",prodle:"$_id.prodle",orgid:"$_id.orgid",postedby:"$_id.postedby",title:"$_id.title",content:"$_id.content",productname:"$_id.productname",_id:0}}]).exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"ED001","message":"Error in db to find all blog"}});
 		}else if(blogdata.length>0){
-			// for(var i=0;i<blogdata.length;i++){
-			// 	if(blogdata[i].blog_images.length>0){
-			// 		blogdata[i].blog_images = [blogdata[i].blog_images[0]];
-			// 	}
-			// }
 			_successfulGetAllBlogsForProduct(self,blogdata);			
 		}else{			
 			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"AP001","message":"No blog exist for this product"}});
@@ -416,20 +410,20 @@ var _deleteBlog = function(self,authorid,blogid){
 			self.emit("failedDeleteBlog",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
 		}else{
 			////////////////////////////
-			// _successfulDeleteBlog(self,blogid);
+			_successfulDeleteBlog(self);
 			_changeBlogStatusInTrending(self,blogid);
 			////////////////////////////
 		}
 	})
 };
 
-var _changeBlogStatusInTrending = function(self,prodle){
+var _changeBlogStatusInTrending = function(self,blogid){
 	console.log("_changeBlogStatusInTrending");
 	BlogTrendModel.update({blogid:blogid},{$set:{status:"deactive"}}).lean().exec(function(err,status){
 		if(err){
-			self.emit("failedDeleteBlog",{"error":{"code":"ED001","message":"Error in db to update blog status in trending" + err}});
+			logger.emit("error","Error in db to update blog status in trending" + err);
 	  	}else{
-			_successfulDeleteBlog(self,blogid);
+			logger.emit("log","Blog trending status deleted sucessfully");
 		}
 	})
 }
