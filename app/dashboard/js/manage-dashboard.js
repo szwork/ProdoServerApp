@@ -219,10 +219,10 @@ var _validateAddRBONDS_Mapping = function(self,chartaccessdata,userid){
 }
 
 var _checkRBONDS_MappingAlreadyExist = function(self,chartaccessdata,userid){
-	chartAccessModel.findOne({code:chartaccessdata.code},function(err,product){
+	chartAccessModel.findOne({code:chartaccessdata.code},function(err,chartaccesscode){
 		if(err){
-			self.emit("failedAddRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to add new product "}});	
-		}else if(product){
+			self.emit("failedAddRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to check RBONDS_Mapping "}});	
+		}else if(chartaccesscode){
 			self.emit("failedAddRBONDS_Mapping",{"error":{"message":"RBONDS_Mapping Code Already Exist"}});
 		}else{
 			////////////////////////////////////////////////
@@ -248,6 +248,49 @@ var _addRBONDS_Mapping = function(self,chartaccessdata,userid){
 var _successfulAddRBONDS_Mapping=function(self,dashboardquery){
 	logger.emit("log","_successfulAddRBONDS_Mapping");
 	self.emit("successfulAddRBONDS_Mapping", {"success":{"message":"RBONDS_Mapping Added Successfully"}});
+}
+
+ManageDashboard.prototype.getRBONDS_Mapping=function(sessionuserid){
+	var self=this;
+	///////////////////////////////////////
+	_getRBONDS_Mapping(self,sessionuserid);
+	///////////////////////////////////////
+}
+
+var _getRBONDS_Mapping = function(self,sessionuserid){
+	chartAccessModel.find({},function(err,RBONDS_Mapping){
+		if(err){
+			self.emit("failedGetRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to get RBONDS_Mapping"}});	
+		}else if(RBONDS_Mapping){
+			var result_arr = [];
+			for(var i=0;i<RBONDS_Mapping.length;i++){
+				var code = RBONDS_Mapping[i].code;
+				DashboardModel.find({chartid:{$in:RBONDS_Mapping[i].chartids}},function(err,doc){
+					if(err){
+						self.emit("failedGetRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to get RBONDS_Mapping"}});	
+					}else if(doc){
+						var chartarr = [];
+						for(var j=0;j<doc.length;j++){
+							chartarr.push({chartid:doc[j].chartid,chartname:doc[j].chartname});
+						}
+						result_arr.push({code:code,charts:chartarr});
+						if(i==RBONDS_Mapping.length){
+							_successfulGetRBONDS_Mapping(self,result_arr);
+						}
+					}else{
+						self.emit("failedGetRBONDS_Mapping",{"error":{"message":"RBONDS_Mapping Code Does Not Exist"}});
+					}
+				});
+			}			
+		}else{
+			self.emit("failedGetRBONDS_Mapping",{"error":{"message":"RBONDS_Mapping Code Does Not Exist"}});
+		}
+	});
+}
+
+var _successfulGetRBONDS_Mapping=function(self,RBONDS_Mapping){
+	logger.emit("log","_successfulGetRBONDS_Mapping");
+	self.emit("successfulGetRBONDS_Mapping", {"success":{"message":"Getting RBONDS_Mapping Details Successfully","RBONDS_Mapping":RBONDS_Mapping}});
 }
 
 ManageDashboard.prototype.getAnalyticsDataForProduct=function(prodle,queryid,sessionuserid){

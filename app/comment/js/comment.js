@@ -1334,11 +1334,11 @@ var _successfulAddBlogComment = function(self,newcomment){
 var updateBlogTrendingForCommentCount=function(prodle,blogid){
 	BlogTrendModel.update({prodle:prodle,blogid:blogid},{$inc:{commentcount:1}},{upsert:true}).exec(function(err,latestupatestatus){
 		if(err){
-			logger.emit("error","Error in updation latest campaign comment count");
+			logger.emit("error","Error in updation latest blog comment count");
 		}else if(latestupatestatus==1){
-			logger.emit("log","Latest campaign comment count updated");
+			logger.emit("log","Latest blog comment count updated");
 		}else{
-			logger.emit("error","Given product id or campaign id is wrong to update latest campaign comment count");
+			logger.emit("error","Given productid or blogid is wrong to update latest blog comment count");
 		}
 	});
 }
