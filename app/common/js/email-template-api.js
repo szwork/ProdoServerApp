@@ -99,12 +99,12 @@ exports.loadEmailTemplate=function(req,res){
 		{
 			templatetype: "authorregistrationsuccess",
 			subject: "Author Request application received",
-			description: "Dear <firstname> <lastname>,<br><br> We have received your author application request.<br><br> Our team will get back to you immediately after processing the application request.<br><br>Sincerely,<br><br>Prodonus Blog Team."
+			description: "Dear <firstname> <lastname>,<br><br> We have received your author application request.<br>Our team will get back to you immediately one's a processing id done.<br><br>Sincerely,<br><br>Prodonus Blog Team."
 		}, 
 		{
 			templatetype: "authoracceptance",
 			subject: "Author Request application accept",
-			description: "Dear <firstname> <lastname>,<br><br>We are excited to have you onboard prodonus blog authors group. You are part of select few authors to write for Prodonus under different categories you selected.<br><br>Bloggers have access to manage blog console and the blog wall. The author uses the manage blog console to create, update, remove or publish blogs. Until the blog is published it is not available for social view of prodonus.<br><br>We expect the author's to thoroughly edit and correct their blogs before publishing. We do not have any in-house editor to go through each blog to approve it. We expect the blogger to follow in right spirit without blasphemy or plagirism. It is important that the blogger should have original content and have licensed copies of photos they use. Please read our terms and conditions and privacy policy for further detailed information.<br>Please indicate your agreement by signing and returning this letter to me, and specifying any other conditions you may require.<br><br>Sincerely,<br><br>Prodonus Blog Team."
+			description: "Dear <firstname> <lastname>,<br><br>We are excited to have you onboard prodonus blog authors group. You are part of select few authors to write for Prodonus under different categories you selected.<br><br>Bloggers have access to manage blog console and the blog wall. The author uses the manage blog console to create, update, remove or publish blogs. Until the blog is published it is not available for social view of prodonus.<br><br>We expect the author's to thoroughly edit and correct their blogs before publishing. We do not have any in-house editor to go through each blog to approve it. We expect the blogger to follow in right spirit without blasphemy or plagirism. It is important that the blogger should have original content and have licensed copies of photos they use. Please read our terms and conditions and privacy policy for further detailed information.<br><br>Please indicate your agreement by signing and returning this letter to me, and specifying any other conditions you may require.<br><br>Sincerely,<br><br>Prodonus Blog Team."
 		},
 		{
 			templatetype: "authorrejection",

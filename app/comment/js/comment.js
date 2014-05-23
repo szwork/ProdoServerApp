@@ -470,8 +470,7 @@ var _validateDeleteFeatureAnalytics = function(prodle,commentdata){
         	}else{
             	console.log("Please pass featureanalytics data");
         	}
-        }
-       
+        }       
 }
 
 var _deleteFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
@@ -742,7 +741,7 @@ var _isValidProdle=function(self,prodle,campaign_id,commentdata,__dirname){
 var _isValidCampaignId=function(self,prodle,campaign_id,commentdata,productdata,__dirname){
 	ProductCampaignModel.findOne({campaign_id:campaign_id},function(err,campaigndata){
 		if(err){
-			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidCampaignId \nError ind db to find product err message: "+err}});
+			self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":" function:_isValidCampaignId \nError in db to find campaign err message: "+err}});
 		}else if(!campaigndata){
 			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":"Campaign id is wrong"}});
 		}else{
@@ -987,6 +986,203 @@ var _updateCampignCommentFeatureAnalytics = function(prodle,campaign_id,analytic
 	        });
 		}
 	})	
+}
+
+Comment.prototype.addBlogComment=function(sessionuserid,prodle,blogid,__dirname){
+	var self=this;
+    //////////////////////////////////////////////////////////////////////////////
+	_validateBlogCommentData(self,sessionuserid,prodle,blogid,__dirname);
+	//////////////////////////////////////////////////////////////////////////////
+}
+
+var _validateBlogCommentData=function(self,sessionuserid,prodle,blogid,__dirname) {
+	var commentdata=self.comment;
+	console.log("blog commentdata ########## : "+JSON.stringify(commentdata));
+	if(commentdata==undefined){
+	   self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please provide commentdata"}});	
+	}else if(commentdata.user==undefined){
+		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please provide user to commentdata"}});		
+	}else if(commentdata.user.userid==undefined){
+		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please provide userid with user object"}});		
+	} else if(commentdata.commenttext==undefined){
+		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass commenttext"}});			
+	}else if(commentdata.commenttext.trim().length==0){
+		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
+	}else if(commentdata.type==undefined){
+		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
+	}else if(commentdata.analytics==undefined){
+		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass analytics"}});
+	}else{
+		////////////////////////////////////////////////////////////////////////////////////////////////
+		_isSessionUserToAddBlogComment(self,sessionuserid,prodle,blogid,commentdata,__dirname);
+		////////////////////////////////////////////////////////////////////////////////////////////////
+	}
+}
+
+var _isSessionUserToAddBlogComment = function(self,sessionuserid,prodle,blogid,commentdata,__dirname){
+	if(sessionuserid!=commentdata.user.userid){
+		self.emit("failedAddBlogComment",{"error":{"code":"EA001","message":"Provided userid is not match with sessionuserid"}});
+	}else{
+		//////////////////////////////////////////////
+		_isValidProdleForBlogComment(self,prodle,blogid,commentdata,__dirname);
+		/////////////////////////////////////////////		
+	}
+}
+
+var _isValidProdleForBlogComment=function(self,prodle,blogid,commentdata,__dirname){
+	ProductModel.findOne({prodle:prodle},function(err,productdata){
+		if(err){
+			self.emit("failedAddBlogComment",{"error":{"code":"ED001","message":" function:_isValidProdleForBlogComment \nError in db to find product err message: "+err}});
+		}else if(!productdata){
+			self.emit("failedAddBlogComment",{"error":{"code":"AP001","message":" Wrong prodle"}});
+		}else{
+			//////////////////////////////////////////////////////////////////////////////
+			_isValidBlogId(self,prodle,blogid,commentdata,productdata,__dirname);
+			//////////////////////////////////////////////////////////////////////////////
+		}
+	})
+}
+
+var _isValidBlogId=function(self,prodle,blogid,commentdata,productdata,__dirname){
+	ProductCampaignModel.findOne({blogid:blogid},function(err,campaigndata){
+		if(err){
+			self.emit("failedAddBlogComment",{"error":{"code":"ED001","message":" function:_isValidBlogId \nError in db to find blog err message: "+err}});
+		}else if(!campaigndata){
+			self.emit("failedAddBlogComment",{"error":{"code":"AP001","message":"Blog id is wrong"}});
+		}else{
+			/////////////////////////////////////////////////////////////////////////////////////////////
+			__checkBlogCommentImageExists(self,prodle,blogid,commentdata,productdata,__dirname);
+			/////////////////////////////////////////////////////////////////////////////////////////////
+		}
+	})
+}
+
+var __checkBlogCommentImageExists=function(self,prodle,blogid,commentdata,product,__dirname){
+	// commentdata.commentid=generateId();
+	commentdata.status="active";
+	commentdata.datecreated=new Date();
+	commentdata.prodle=prodle;
+	commentdata.blogid=blogid;
+	if(commentdata.comment_image==undefined || commentdata.comment_image==""){
+		////////////////////////////////////////////////////////
+        _addBlogComment(self,prodle,blogid,commentdata,product);
+		////////////////////////////////////////////////////////
+	}else{
+		////////////////////////////////////////////////////////////////////////
+        _readBlogCommentImage(self,prodle,blogid,commentdata,product,__dirname);
+		////////////////////////////////////////////////////////////////////////
+	}
+}
+
+var _readBlogCommentImage=function(self,prodle,blogid,commentdata,product,dirname){
+	var file_name=commentdata.comment_image.filename;
+  	var file_buffer=commentdata.comment_image.filebuffer;
+   	// var file_length=commentdata.comment_image.filelength;  
+  	var file_type=commentdata.comment_image.filetype;
+	var ext = path.extname(fileName||'').split('.');
+	ext=ext[ext.length - 1];
+	if(file_name==undefined){
+		self.emit("failedAddBlogComment",{"error":{"message":"Please provide comment image file_name"}});
+	}else if(file_buffer==undefined){
+  		self.emit("failedAddBlogComment",{"error":{"message":"Please provide comment image file_buffer"}});
+	}else if(file_type==undefined){
+		self.emit("failedAddBlogComment",{"error":{"message":"Please provide comment image file_type"}});
+	}else if(ext=="jpeg" || ext=="jpg" || ext=="png" || ext=="gif"){
+		self.emit("failedAddBlogComment",{"error":{"message":"You can add only image of type jpeg,jpg,gif,png"}});
+	}else{
+		var fileName = dirname + '/tmp/uploads/' + file_name;
+		fs.open(fileName, 'a', 0755, function(err, fd) {
+	    if (err) {
+	      self.emit("failedAddBlogComment",{"error":{"message":" function:_readBlogCommentImage \nError in open image "+err}});
+	    }else{	      
+	      console.log("buffer size"+file_buffer.size);
+	      console.log("file extension"+ext);
+	      fs.write(fd, file_buffer, null, 'Binary', function(err, written, writebuffer) {
+	        if(err){
+	       		self.emit("failedAddBlogComment",{"error":{"message":" function:_readBlogCommentImage \nError in write image "+err}});  
+	        }else{
+				var s3filekey=Math.floor((Math.random()*1000)+1)+"."+ext;
+				var bucketFolder;
+				var params;
+				bucketFolder=amazonbucket+"/product/"+product.prodle+"/blog/"+blogid+"/comment";
+		      	params = {
+		            Bucket: bucketFolder,
+		            Key: blogid+product.prodle+s3filekey,
+		            Body: writebuffer,
+		            //ACL: 'public-read-write',
+		            ContentType: file_type
+		        };
+		        ////////////////////////////////////////
+		        _blogCommentImageUpload(self,prodle,blogid,commentdata,product,params);
+		        //////////////////////////////////////
+	     	}
+	     })
+	    }
+	  })
+	}
+}
+
+var _blogCommentImageUpload=function(self,prodle,blogid,commentdata,product,awsparams){
+	s3bucket.putObject(awsparams, function(err, data) {
+	    if (err) {
+	    	self.emit("failedAddBlogComment",{"error":{"message":" function:_blogCommentImageUpload \nError in s3buctke put object "+err}});
+	    } else {
+	    	logger.emit("log","filecomment  saved");
+	      	var params1 = {Bucket: awsparams.Bucket, Key: awsparams.Key,Expires: 60*60*24*365};
+	      	s3bucket.getSignedUrl('getObject',params1, function (err, url) {
+	        	if(err){
+	         	self.emit("failedAddBlogComment",{"error":{"message":" function:_blogCommentImageUpload \nError in s3aws getSignedUrl "+err}});
+	        	}else{
+	        		commentdata.comment_image=[{imageid:generateId(),image:url}];
+	          		/////////////////////////////////////////////////////////////
+	          		_addCampaignComment(self,prodle,blogid,commentdata,product);
+	          		/////////////////////////////////////////////////////////////
+		        }
+	    	});
+	    }
+  	}) 
+}
+
+var _addCampaignComment=function(self,prodle,blogid,commentdata,product){
+	var tags_array=[];
+	var analytics_array = [];
+	if(commentdata.analytics.length>0){
+		for(var i=0;i<commentdata.analytics.length;i++){
+			if(commentdata.analytics[i].tag!=undefined){
+				tags_array.push(commentdata.analytics[i].tag);
+				analytics_array.push(commentdata.analytics[i]);
+			}
+		}
+	}
+
+	commentdata.tags=tags_array;
+	commentdata.featureanalytics=analytics_array;
+
+	var comment_data=new CommentModel(commentdata);
+
+	comment_data.save(function(err,blog_commentdata){
+		if(err){
+			self.emit("failedAddBlogComment",{"error":{"code":"ED001","message":"Error in db to save new blog comment"}});
+		}else{      
+	      	if(blog_commentdata.type=="campaign"){
+	      		// updateLatestCampaignComment(blog_commentdata.campaign_id);
+	      	}else{
+	      		//updateLatestWarrantyComment(blog_commentdata.prodle);
+	      	}
+	  		//blog_commentdata.status=undefined;
+	   		//blog_commentdata.prodle=undefined;
+			// ///////////////////////////////////		
+			_successfulAddBlogComment(self,blog_commentdata);
+			_validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
+			/////////////////////////////////
+		}
+	})
+}
+
+var _successfulAddBlogComment=function(self,newcomment){
+	updateBlogTrendingForCommentCount(newcomment.prodle,newcomment.blogid);
+	logger.emit("log","successfulAddBlogComment");
+	self.emit("successfulAddBlogComment",{"success":{"message":"Gave comment to blog sucessfully","blog_comment":newcomment}});
 }
 
 Comment.prototype.agreeDisagreeComment=function(sessionuserid,commentid,action){
