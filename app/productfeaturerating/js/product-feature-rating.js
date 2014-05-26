@@ -21,11 +21,11 @@ ProductFeatureRating.prototype.rateProductFeature=function(prodle,featureratingd
 }
 var _validateProductFeatureRatingData=function(self,prodle,featureratingdata,userid){
 	if(featureratingdata==undefined){
-		self.emit("failedGetOverallProductFeatureRating",{error:{code:"AV001",message:"Please pass feature rating data"}})
+		self.emit("failedRateProductFeature",{error:{code:"AV001",message:"Please pass feature rating data"}})
 	}else if(!isArray(featureratingdata)){
-	  self.emit("failedGetOverallProductFeatureRating",{error:{code:"AV001",message:"featureratingdata should be an Array"}})
+	  self.emit("failedRateProductFeature",{error:{code:"AV001",message:"featureratingdata should be an Array"}})
 	}else if(featureratingdata.length==0){
-		self.emit("failedGetOverallProductFeatureRating",{error:{code:"AV001",message:"featureratingdata should not be empty array"}})
+		self.emit("failedRateProductFeature",{error:{code:"AV001",message:"featureratingdata should not be empty array"}})
 	}else{
 		var featureratingdataarray=[]
 		for(var i=0;i<featureratingdata.length;i++){
@@ -43,7 +43,8 @@ var _rateAllFeatures=function(self,featureratingdataarray,userid,prodle,indexval
 		_isProductFeatureExistsToRate(self,prodle,featureratingdataarray[indexvalue],userid,function(err,result){
 			if(err){
 				console.log("tessssss"+indexvalue)
-				_rateAllFeatures(self,featureratingdataarray,userid,prodle,++indexvalue)
+				self.emit("failedRateProductFeature",err)
+				// _rateAllFeatures(self,featureratingdataarray,userid,prodle,++indexvalue)
 			}else{
 				console.log("tessssssssssssssssss"+indexvalue)
 				_rateAllFeatures(self,featureratingdataarray,userid,prodle,++indexvalue)
@@ -134,7 +135,7 @@ var _updateNewFeatureRatingToUser=function(self,prodle,featureratingdata,userid,
 		}else{
 			var user_feature_data=userfeaturerate[0];
 			console.log("user_feature_data"+JSON.stringify(user_feature_data))
-			UserModel.update({userid:userid,"featurerating.prodle":prodle,"featurerating.featurename":user_feature_data.featurerating.featurename},{$set:{"featurerating.$.featurerates":featureratingdata.featurerates}},function(err,featurratestatus){
+			UserModel.update({userid:userid,featurerating:{$elemMatch:{prodle:prodle,featurename:user_feature_data.featurerating.featurename}}},{$set:{"featurerating.$.featurerates":featureratingdata.featurerates}},function(err,featurratestatus){
 				if(err){
 					logger.emit("error","Database Issue :_addNewFeatureRatingToUser"+err)
 			    callback({error:{code:"ED001",message:"Database Issue"}})
