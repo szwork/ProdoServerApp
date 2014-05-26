@@ -25,6 +25,10 @@ var blogTrendingSchema = mongoose.Schema({
   	status:{type:String,default:"active"}//active,deactive
 });
 
+blogTrendingSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+    return this.collection.findAndModify(query, sort, doc, options, callback);
+};
+
 //Seed a campaign trending
  blogTrendingSchema.set('redisCache', true);
  blogTrendingSchema.set('expires', 90);

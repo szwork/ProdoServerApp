@@ -206,15 +206,16 @@ ManageDashboard.prototype.addRBONDS_Mapping=function(sessionuserid){
 }
 
 var _validateAddRBONDS_Mapping = function(self,chartaccessdata,userid){
-	if(chartaccessdata.code==undefined){
+	if(chartaccessdata==undefined){
 		self.emit("failedAddRBONDS_Mapping",{"error":{"code":"AV001","message":"Please pass data"}});
+    }else if(chartaccessdata.code==undefined){
+		self.emit("failedAddRBONDS_Mapping",{"error":{"code":"AV001","message":"Please pass code"}});
     }else if(chartaccessdata.chartids==undefined){
 	  	self.emit("failedAddRBONDS_Mapping",{"error":{"code":"AV001","message":"Please pass chartids"}});
     }else if(!isArray(chartaccessdata.chartids)){
 	  	self.emit("failedAddRBONDS_Mapping",{"error":{"code":"AV001","message":"chartids should be an array"}});
     }else{
-    	_checkRBONDS_MappingAlreadyExist(self,chartaccessdata,userid);
-		
+    	_checkRBONDS_MappingAlreadyExist(self,chartaccessdata,userid);		
     }
 }
 
@@ -248,6 +249,48 @@ var _addRBONDS_Mapping = function(self,chartaccessdata,userid){
 var _successfulAddRBONDS_Mapping=function(self,dashboardquery){
 	logger.emit("log","_successfulAddRBONDS_Mapping");
 	self.emit("successfulAddRBONDS_Mapping", {"success":{"message":"RBONDS_Mapping Added Successfully"}});
+}
+
+ManageDashboard.prototype.updateRBONDS_Mapping=function(code,sessionuserid){
+	var self=this;
+	var chartaccessdata=this.dashboarddata;
+	console.log("chartaccessdata : "+JSON.stringify(chartaccessdata));
+	////////////////////////////////////////////////////////////
+	_validateUpdateRBONDS_Mapping(self,code,chartaccessdata,sessionuserid);
+	//////////////////////////////////////////////////////////
+}
+
+var _validateUpdateRBONDS_Mapping = function(self,code,chartaccessdata,userid){
+	if(chartaccessdata==undefined){
+		self.emit("failedUpdateRBONDS_Mapping",{"error":{"code":"AV001","message":"Please pass data"}});
+    }else if(chartaccessdata.code!=undefined){
+		self.emit("failedUpdateRBONDS_Mapping",{"error":{"code":"AV001","message":"Can't update code"}});
+    }else if(chartaccessdata.chartids==undefined){
+	  	self.emit("failedUpdateRBONDS_Mapping",{"error":{"code":"AV001","message":"Please pass chartids"}});
+    }else if(!isArray(chartaccessdata.chartids)){
+	  	self.emit("failedUpdateRBONDS_Mapping",{"error":{"code":"AV001","message":"chartids should be an array"}});
+    }else{
+    	_updateRBONDS_Mapping(self,code,chartaccessdata,userid);		
+    }
+}
+
+var _updateRBONDS_Mapping = function(self,code,chartaccessdata,userid){
+	chartAccessModel.update({code:code},{$set:chartaccessdata}).lean().exec(function(err,RBONDS_MappingUpdateStatus){
+		if(err){
+			self.emit("failedUpdateRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to update RBONDS_Mapping"}});
+		}else if(RBONDS_MappingUpdateStatus!=1){
+			self.emit("failedUpdateRBONDS_Mapping",{"error":{"code":"AP001","message":"Wrong code"}});
+		}else{
+			////////////////////////////////
+			_successfulUpdateRBONDS_Mapping(self);
+			//////////////////////////////////
+		}
+	})	
+}
+
+var _successfulUpdateRBONDS_Mapping=function(self){
+	logger.emit("log","_successfulUpdateRBONDS_Mapping");
+	self.emit("successfulUpdateRBONDS_Mapping", {"success":{"message":"RBONDS_Mapping Updated Successfully"}});
 }
 
 ManageDashboard.prototype.getRBONDS_Mapping=function(sessionuserid){
