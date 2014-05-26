@@ -372,7 +372,7 @@ exports.deleteBlog=function(req,res){
 
 exports.deleteBlogImage=function(req,res){ 
   var sessionuserid=req.user.userid;  
-  var blogimageids=req.query.blogimageids;
+  var blogimageids=req.query.imageids;
   var authorid = req.params.authorid;
   var blogid = req.params.blogid;
   logger.emit("log","sessionuserid : "+sessionuserid+"blogid : "+blogid+"blogimageids : "+JSON.stringify(blogimageids));

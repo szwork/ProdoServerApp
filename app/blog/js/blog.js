@@ -20,8 +20,14 @@ var userModel = require('../../user/js/user-model');
 var EmailTemplateModel=require('../../common/js/email-template-model');
 var BlogTrendModel = require("../../featuretrending/js/blog-trending-model");
 var commonapi = require('../../common/js/common-api');
-var CONFIG = require('config').Prodonus;
 var regxemail = /\S+@\S+\.\S+/;
+var CONFIG = require('config').Prodonus;
+var AWS = require('aws-sdk');
+var CommentModel=require("../../comment/js/comment-model");
+AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
+AWS.config.update({region:'ap-southeast-1'});
+var s3bucket = new AWS.S3();
+var __=require("underscore");
 var S=require('string');
 
 var Blog = function(blogdata) {
@@ -110,7 +116,7 @@ var _successfulAddBlog = function(self,blogstatus){
 	self.emit("successfulAddBlog",{"success":{"message":"Blog added sucessfully"}});
 }
 
-var _addBlogInTrending = function(self,blog){	
+var _addBlogInTrending = function(self,blog){
 	var trend={blogid:blog.blogid,prodle:blog.prodle,commentcount:0,likecount:0,productname:blog.productname,orgid:blog.orgid,authorid:blog.authorid};
 	var trend_data = new BlogTrendModel(trend);
 	trend_data.save(function(err,analyticsdata){
@@ -374,7 +380,7 @@ var _getBlogForProduct = function(self,prodle,blogid,userid){
 					self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find user profile_pic"}});
 				}else if(userdata){
 					blogdata[0].profile_pic = userdata.profile_pic;
-					console.log("Blog @ : "+JSON.stringify(blogdata));
+					// console.log("Blog @ : "+JSON.stringify(blogdata));
 					// CommentModel.find({type:"blog",status:"active",blogid:blogid},{blogid:0,type:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
 					// 	if(err){
 					// 		logger.emit("log","Error in updation latest 5 blog comment");
@@ -861,7 +867,7 @@ var _successfulAuthorRejection = function(self){
 Blog.prototype.deleteBlogImage = function(blogimageids,authorid,blogid) {
 	var self=this;
 	if(blogimageids==undefined){
-		self.emit("failedDeleteBlogImage",{"error":{"code":"AV001","message":"Please provide campaign image ids"}});
+		self.emit("failedDeleteBlogImage",{"error":{"code":"AV001","message":"Please provide blog image ids"}});
 	}else if(blogimageids.length==0){
 		self.emit("failedDeleteBlogImage",{"error":{"message":"Given blogimageids is empty"}});
 	}else{
