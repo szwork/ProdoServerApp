@@ -262,30 +262,33 @@ var _getRBONDS_Mapping = function(self,sessionuserid){
 		if(err){
 			self.emit("failedGetRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to get RBONDS_Mapping"}});	
 		}else if(RBONDS_Mapping){
-			var result_arr = [];
+			var rbond_code = [];
 			for(var i=0;i<RBONDS_Mapping.length;i++){
-				var code = RBONDS_Mapping[i].code;
-				DashboardModel.find({chartid:{$in:RBONDS_Mapping[i].chartids}},function(err,doc){
-					if(err){
-						self.emit("failedGetRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to get RBONDS_Mapping"}});	
-					}else if(doc){
-						var chartarr = [];
-						for(var j=0;j<doc.length;j++){
-							chartarr.push({chartid:doc[j].chartid,chartname:doc[j].chartname});
-						}
-						result_arr.push({code:code,charts:chartarr});
-						if(i==RBONDS_Mapping.length){
-							_successfulGetRBONDS_Mapping(self,result_arr);
-						}
-					}else{
-						self.emit("failedGetRBONDS_Mapping",{"error":{"message":"RBONDS_Mapping Code Does Not Exist"}});
-					}
-				});
-			}			
+				rbond_code.push({code:RBONDS_Mapping[i].code,chartids:RBONDS_Mapping[i].chartids});
+			}
+			var initialvalue=0;     
+			var result_arr =[];
+	        _getChartIDAndName(self,rbond_code,initialvalue,result_arr);
 		}else{
 			self.emit("failedGetRBONDS_Mapping",{"error":{"message":"RBONDS_Mapping Code Does Not Exist"}});
 		}
 	});
+}
+
+var _getChartIDAndName = function(self,rbond_code,initialvalue,result_arr){
+	var code=rbond_code[initialvalue];
+	if(rbond_code.length>initialvalue){
+		DashboardModel.find({chartid:{$in:code.chartids}},{chartid:1,chartname:1,_id:0}).lean().exec(function(err,doc){
+	        if(err){
+	            self.emit("failedGetRBONDS_Mapping",{"error":{"code":"ED001","message":"Error in db to get RBONDS_Mapping"}});	
+	        }else{
+	            result_arr.push({code:code.code,charts:doc});
+	            _getChartIDAndName(self,rbond_code,++initialvalue,result_arr);
+	        }
+    	});
+	}else{
+       _successfulGetRBONDS_Mapping(self,result_arr);
+	}
 }
 
 var _successfulGetRBONDS_Mapping=function(self,RBONDS_Mapping){
