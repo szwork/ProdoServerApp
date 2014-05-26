@@ -142,6 +142,34 @@ exports.addRBONDS_Mapping = function(req,res){
     }
 }
 
+exports.updateRBONDS_Mapping = function(req,res){    
+    var chartaccessdata = req.body;
+    var code = req.params.code;
+    logger.emit("log","req product body"+JSON.stringify(req.body));
+    var managedashboard = new ManageDashboard(chartaccessdata);
+  
+    var sessionuserid=req.user.userid;
+     logger.emit("log","sessionid:"+sessionuserid);
+    managedashboard.removeAllListeners("failedUpdateRBONDS_Mapping");
+    managedashboard.on("failedUpdateRBONDS_Mapping",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // managedashboard.removeAllListeners();
+      res.send(err);
+    });
+    managedashboard.removeAllListeners("successfulUpdateRBONDS_Mapping");
+    managedashboard.on("successfulUpdateRBONDS_Mapping",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // managedashboard.removeAllListeners();
+      res.send(result);
+    });   
+    if(req.user.isAdmin==false){
+      logger.emit("error","You are not an admin to manage RBONDS_Mapping",sessionuserid);
+      managedashboard.emit("failedAddDashboardQuery",{"error":{"code":"EA001","message":"You have not authorize to manage RBONDS_Mapping"}});
+    }else{
+      managedashboard.updateRBONDS_Mapping(code,sessionuserid);
+    }
+}
+
 exports.getRBONDS_Mapping = function(req,res){    
     var managedashboard = new ManageDashboard();  
     var sessionuserid=req.user.userid;

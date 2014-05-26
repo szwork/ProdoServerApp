@@ -271,8 +271,7 @@ var _updateBlog = function(self,blogdata,authorid,blogid){
 			_successfulUpdateBlog(self);
 			//////////////////////////////////
 		}
-	})
-	
+	})	
 };
 
 var _successfulUpdateBlog = function(self){
@@ -376,7 +375,23 @@ var _getBlogForProduct = function(self,prodle,blogid,userid){
 				}else if(userdata){
 					blogdata[0].profile_pic = userdata.profile_pic;
 					console.log("Blog @ : "+JSON.stringify(blogdata));
-					_successfulGetBlogForProduct(self,blogdata[0]);		
+					// CommentModel.find({type:"blog",status:"active",blogid:blogid},{blogid:0,type:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
+					// 	if(err){
+					// 		logger.emit("log","Error in updation latest 5 blog comment");
+					// 		self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Database Issue"}});
+					// 	}else {
+					// 		var comment_array;
+					// 		if(comment.length==0){
+					// 			comment_array=[];
+					// 		}else{
+					// 			comment_array=comment;
+					// 		}
+					// 		console.log("Error in DB");
+					// 		logger.emit({"message":"Provided blogid is wrong"});
+					// 		blogdata[0].blog_comments=comment_array;
+							_successfulGetBlogForProduct(self,blogdata[0]);
+					// 	}
+					// });						
 				}else{
 					self.emit("failedGetBlogForProduct",{"error":{"code":"AP001","message":"Wrong userid"}});
 				}
@@ -393,11 +408,107 @@ var _successfulGetBlogForProduct = function(self,blog){
 	self.emit("successfulGetBlogForProduct", {"success":{"message":"Getting Product Blog Successfully","doc":blog}});
 }
 
+Blog.prototype.blogLike=function(authorid,blogid,sessionuserid){
+	var self=this;
+	//////////////////////////////////////////////
+	_checkAlreadyLikeBlog(self,authorid,blogid,sessionuserid);
+	/////////////////////////////////////////////
+}
+
+var _checkAlreadyLikeBlog = function(self,authorid,blogid,sessionuserid){
+	userModel.findOne({userid:sessionuserid,"blog_likes.blogid":blogid},function(err,userBlogStatus){
+		if(err){
+			self.emit("failedBlogLike",{"error":{"code":"ED001","message":"Error in db to _checkAlreadyLikeBlog"}});
+		}else if(userBlogStatus){
+			self.emit("failedBlogLike",{"error":{"code":"AP001","message":"You are already like this blog"}});
+		}else{
+			_blogLike(self,authorid,blogid,sessionuserid);
+		}
+	})
+}
+
+var _blogLike = function(self,authorid,blogid,userid){
+	console.log("_blogLike");
+	BlogTrendModel.findAndModify({authorid:authorid,blogid:blogid},[],{$inc:{likecount:1}},{new:false},function(err,blogupdatestatus){
+		if(err){
+			self.emit("failedBlogLike",{"error":{"code":"ED001","message":"Error in db to find blog in trending"}});
+		}else if(blogupdatestatus){
+			var blog_like_arr = {blogid:blogid,prodle:blogupdatestatus.prodle,authorid:authorid};
+			userModel.update({userid:userid},{$push:{blog_likes:blog_like_arr}}).lean().exec(function(err,blogupdatestatus){
+				if(err){
+					self.emit("failedBlogLike",{"error":{"code":"ED001","message":"Error in db to update user blog likes"}});
+				}else if(blogupdatestatus!=1){
+					self.emit("failedBlogLike",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
+				}else{
+					//////////////////////////
+					_successfulBlogLike(self);
+					//////////////////////////
+				}
+			})						
+		}else{
+			self.emit("failedBlogLike",{"error":{"code":"AP001","message":"authorid or blogid is wrong"}});
+		}
+	})
+}
+
+var _successfulBlogLike = function(self){
+	logger.emit("log","_successfulBlogLike");
+	self.emit("successfulBlogLike",{"success":{"message":"Blog Like Successfully"}});
+}
+
+Blog.prototype.blogDislike=function(authorid,blogid,sessionuserid){
+	var self=this;
+	//////////////////////////////////////////////
+	_checkAlreadyDislikeBlog(self,authorid,blogid,sessionuserid);
+	/////////////////////////////////////////////
+}
+
+var _checkAlreadyDislikeBlog = function(self,authorid,blogid,sessionuserid){
+	userModel.findOne({userid:sessionuserid,"blog_likes.blogid":blogid},function(err,userBlogStatus){
+		if(err){
+			self.emit("failedBlogDislike",{"error":{"code":"ED001","message":"Error in db to _checkAlreadyDislikeBlog"}});
+		}else if(userBlogStatus){
+			_blogDislike(self,authorid,blogid,sessionuserid);			
+		}else{
+			self.emit("failedBlogDislike",{"error":{"code":"AP001","message":"You are already dislike this blog"}});
+		}
+	})
+}
+
+var _blogDislike = function(self,authorid,blogid,userid){
+	console.log("_blogDislike");
+	BlogTrendModel.findAndModify({authorid:authorid,blogid:blogid},[],{$inc:{likecount:-1}},{new:false},function(err,blogupdatestatus){
+		if(err){
+			self.emit("failedBlogDislike",{"error":{"code":"ED001","message":"Error in db to find blog in trending"}});
+		}else if(blogupdatestatus){
+			console.log("authorid : "+authorid+" blogid : "+blogid);
+			userModel.update({userid:userid},{$pull:{blog_likes:{authorid:authorid,blogid:blogid}}}).lean().exec(function(err,blogupdatestatus){
+				if(err){
+					self.emit("failedBlogDislike",{"error":{"code":"ED001","message":"Error in db to update user blog likes"}});
+				}else if(blogupdatestatus!=1){
+					self.emit("failedBlogDislike",{"error":{"code":"AP001","message":"authorid or blogid is wrong to update user blog likes"}});
+				}else{
+					//////////////////////////
+					_successfulBlogDislike(self);
+					//////////////////////////
+				}
+			})						
+		}else{
+			self.emit("failedBlogLike",{"error":{"code":"AP001","message":"1authorid or blogid is wrong"}});
+		}
+	})
+}
+
+var _successfulBlogDislike = function(self){
+	logger.emit("log","_successfulBlogDislike");
+	self.emit("successfulBlogDislike",{"success":{"message":"Blog Dislike Successfully"}});
+}
+
 Blog.prototype.deleteBlog=function(authorid,blogid,sessionuserid){
 	var self=this;
-	////////////////////////////////////////////////////////
+	//////////////////////////////////
 	_deleteBlog(self,authorid,blogid);
-	////////////////////////////////////////////////////////
+	//////////////////////////////////
 }
 
 var _deleteBlog = function(self,authorid,blogid){

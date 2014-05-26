@@ -17,7 +17,7 @@ var shortId = require('shortid');
 var logger = require("../../common/js/logger");
 
 var DashboardChartAccessSchema = mongoose.Schema({
-  code:{type:String,default:true},
+  code:{type:String,unique:true},
   chartids:[{type:String}],
   status:{type:String,default:"active"}//active,deactive
 });
