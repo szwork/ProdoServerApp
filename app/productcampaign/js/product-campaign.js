@@ -26,6 +26,7 @@ AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
 var S=require("string");
 var __=require("underscore");
+
 var ProductCampaign = function(campaigndata) {
 	this.productcampaign = campaigndata;
 };
