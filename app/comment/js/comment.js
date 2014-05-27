@@ -903,8 +903,16 @@ var _checkCampaignImpressionLimitExceedOrNot = function(self,prodle,campaign_id,
 	  		self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"campaign_id is wrong"}});
 	  	}else{
 	  		console.log("impression_limit : "+impression_limit+" userdata.length : "+userdata.length);
-	  		if(userdata.length == impression_limit){
-	  			self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"Can't comment "}});
+	  		if(userdata.length > impression_limit){
+	  			ProductCampaignModel.update({campaign_id:campaign_id},{$set:{status:"done"}}).exec(function(err,latestupatestatus){
+					if(err){
+						self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":"Error in db to update campaign"}});
+					}else if(latestupatestatus==1){
+						self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"Campaign commenting stop"}});
+					}else{
+						self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"Wrong campaignid"}});
+					}
+				});	  			
 	  		}else{
 		  		/////////////////////////////////////////////////////////////////////////////////////////////
 		  		__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);

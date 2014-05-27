@@ -269,7 +269,7 @@ ProductCampaign.prototype.getProductCampaign = function(prodle,campain_id) {
 };
 
 var _getProductCampaign = function(self,prodle,campaign_id){
-	ProductCampaignModel.findOne({status:"active",prodle:prodle,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
+	ProductCampaignModel.findOne({status:{$in:["active","done"]},prodle:prodle,campaign_id:campaign_id}).lean().exec(function(err,productcampain){
 		if(err){
 			self.emit("failedGetProductCampaign",{"error":{"code":"ED001","message":"Error in db to find Product Campaign : " +err}});
 		}else if(productcampain){
@@ -350,7 +350,7 @@ ProductCampaign.prototype.getAllProductCampaign = function(prodle) {
 
 var _getAllProductCampaign = function(self,prodle){
 
-	ProductModel.findOne({prodle:prodle,status:"active"},{name:1,_id:0}).lean().exec(function(err,product){
+	ProductModel.findOne({prodle:prodle,status:{$in:["active","done"]}},{name:1,_id:0}).lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 		}else if(product){
@@ -605,7 +605,7 @@ ProductCampaign.prototype.getAllActiveCampaign=function(){
 var _getAllActiveCampaign=function(self){
 	var a=new Date();
     var today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
-    ProductCampaignModel.aggregate({$match:{status:"active",startdate:{$lte:today},enddate:{$gte:today}}},{$group:{_id:"$orgid",campaigns:{$addToSet:{campaign_id:"$campaign_id",name:"$name",bannertext:"$bannertext",banner_image:"$banner_image",description:"$description",orgid:"$orgid",prodle:"$prodle"}}}},{$project:{orgid:"$_id",campaigns:1}},function(err,activecampaigns){
+    ProductCampaignModel.aggregate({$match:{status:{$in:["active","done"]},startdate:{$lte:today},enddate:{$gte:today}}},{$group:{_id:"$orgid",campaigns:{$addToSet:{campaign_id:"$campaign_id",name:"$name",bannertext:"$bannertext",banner_image:"$banner_image",description:"$description",orgid:"$orgid",prodle:"$prodle"}}}},{$project:{orgid:"$_id",campaigns:1}},function(err,activecampaigns){
       if(err){
         logger.emit("log","failed to connect to database"+err);
 			  self.emit("failedGetAllActiveCampaign",{"error":{"code":"ED001","message":"Database Issue"}});

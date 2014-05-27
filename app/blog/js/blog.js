@@ -375,12 +375,11 @@ var _getBlogForProduct = function(self,prodle,blogid,userid){
 		if(err){
 			self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find blog"}});
 		}else if(blogdata.length!=0){
-			userModel.findOne({userid:userid}).exec(function(err,userdata){
+			userModel.findOne({"author.authorid":blogdata.authorid}).exec(function(err,userdata){
 				if(err){
 					self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find user profile_pic"}});
 				}else if(userdata){
-					blogdata[0].profile_pic = userdata.profile_pic;
-					
+					blogdata[0].profile_pic = userdata.profile_pic;					
 					BlogCommentModel.find({type:"blog",status:"active",blogid:blogid},{blogid:0,type:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
 						if(err){
 							logger.emit("log","Error in updation latest 5 blog comment");
