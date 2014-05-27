@@ -889,30 +889,30 @@ var _isValidCampaignId=function(self,prodle,campaign_id,commentdata,productdata,
 			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":"Campaign id is wrong"}});
 		}else{
 			/////////////////////////////////////////////////////////////////////////////////////////////
-			// _checkCampaignImpressionLimitExceedOrNot(self,prodle,campaign_id,commentdata,productdata,__dirname,campaigndata.impression_limit);
-			__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
+			_checkCampaignImpressionLimitExceedOrNot(self,prodle,campaign_id,commentdata,productdata,__dirname,campaigndata.impression_limit);
 			/////////////////////////////////////////////////////////////////////////////////////////////
 		}
 	})
 }
 
-// var _checkCampaignImpressionLimitExceedOrNot = function(self,prodle,campaign_id,commentdata,productdata,__dirname,impression_limit){
-// 	CommentModel.aggregate([{$match:{type:"campaign",campaign_id:campaign_id}},{$group:{_id:{user:"$user"}}},{$project:{username:"$_id.user.username",userid:"$_id.user.userid",_id:0}}]).exec(function(err,userdata){
-// 	  	if(err){
-// 	  		self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":"Error in db to find userdata"}});
-// 	  	}else if(userdata.length == 0){
-// 	  		self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"campaign_id is wrong"}});
-// 	  	}else{
-// 	  		if(userdata.length == impression_limit){
-// 	  			self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":""}});
-// 	  		}else{
-// 		  		/////////////////////////////////////////////////////////////////////////////////////////////
-// 		  		__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
-// 		  		/////////////////////////////////////////////////////////////////////////////////////////////
-// 	  		}
-// 	  	}
-// 	});
-// }
+var _checkCampaignImpressionLimitExceedOrNot = function(self,prodle,campaign_id,commentdata,productdata,__dirname,impression_limit){
+	CommentModel.aggregate([{$match:{type:"campaign",campaign_id:campaign_id}},{$group:{_id:{user:"$user"}}},{$project:{username:"$_id.user.username",userid:"$_id.user.userid",_id:0}}]).exec(function(err,userdata){
+	  	if(err){
+	  		self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":"Error in db to find userdata"}});
+	  	}else if(userdata.length == 0){
+	  		self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"campaign_id is wrong"}});
+	  	}else{
+	  		console.log("impression_limit : "+impression_limit+" userdata.length : "+userdata.length);
+	  		if(userdata.length == impression_limit){
+	  			self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"Can't comment "}});
+	  		}else{
+		  		/////////////////////////////////////////////////////////////////////////////////////////////
+		  		__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
+		  		/////////////////////////////////////////////////////////////////////////////////////////////
+	  		}
+	  	}
+	});
+}
 
 var __checkCampaignCommentImageExists=function(self,prodle,campaign_id,commentdata,product,__dirname){
 	// commentdata.commentid=generateId();

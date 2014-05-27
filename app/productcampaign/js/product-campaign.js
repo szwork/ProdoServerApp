@@ -107,6 +107,7 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 
 	var startDate = new Date(campaigndata.startdate);
 	var endDate = new Date(campaigndata.enddate);
+	var resultdate = new Date(campaigndata.resultdate);
 	// startDate.setDate(startDate.getDate()+1);
 	// endDate.setDate(endDate.getDate()+1);
 
@@ -114,11 +115,14 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Invalid start date"}});
 	}else if(endDate == "Invalid Date"){
 		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Invalid end date"}});
+	}else if(resultdate == "Invalid Date"){
+		self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Invalid result date"}});
 	}else{
 		campaigndata.prodle = prodle;
 		campaigndata.orgid = orgid;
 		campaigndata.startdate = startDate;
 		campaigndata.enddate = endDate;
+		campaigndata.resultdate = resultdate;
 		// console.log("campaigndata : "+JSON.stringify(campaigndata));
 		var productcampaign = new ProductCampaignModel(campaigndata);
 		productcampaign.save(function(err,product_campaign_data){
