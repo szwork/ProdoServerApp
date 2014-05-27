@@ -47,5 +47,6 @@ exports.init = function (app) {
  app.delete("/api/organization/broadcast/:orgid/:broadcastid",auth,api.orgapi.deleteBroadcastMessage)
  app.get('/api/organalytics',api.orgapi.getAllOrgnizationAnalytics);
  app.get('/api/loadindustrycategory',auth,api.orgindustrycategoryapi.loadindustrycategory) 
+ app.post('/api/publishorganization/:orgid',auth,api.orgapi.publishOrganization)
 
 }
