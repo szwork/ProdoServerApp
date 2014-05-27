@@ -133,17 +133,18 @@ exports.comment=function(io,__dirname){
           socket.broadcast.emit("warrantycommentResponse"+prodle,null,result);
         }
       });
-      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
-        if(err){
-          logger.emit("log","Errrr in get sessionid client");
-        }else if(reply==null){
-          socket.emit("addcommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
-        }else if(JSON.parse(reply).passport.user==undefined){
-          socket.emit("addcommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
-        }else{
-          comment.addComment(sessionuserid,prodle,__dirname);   
-        }      
-      });
+      comment.addComment(sessionuserid,prodle,__dirname);
+      // redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+      //   if(err){
+      //     logger.emit("log","Errrr in get sessionid client");
+      //   }else if(reply==null){
+      //     socket.emit("addcommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+      //   }else if(JSON.parse(reply).passport.user==undefined){
+      //     socket.emit("addcommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+      //   }else{
+             
+      //   }      
+      // });
     })
 
     socket.on('addCampaignComment', function(prodle,campaign_id,commentdata) {
@@ -164,17 +165,18 @@ exports.comment=function(io,__dirname){
           socket.broadcast.emit("warrantycommentResponse"+campaign_id,null,result);
         }
       });
-      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
-        if(err){
-          logger.emit("log","Errrr in get sessionid client");
-        }else if(reply==null){
-          socket.emit("addCampaignCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
-        }else if(JSON.parse(reply).passport.user==undefined){
-          socket.emit("addCampaignCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
-        }else{
-          comment.addCampaignComment(sessionuserid,prodle,campaign_id,__dirname);   
-        }      
-      });
+      comment.addCampaignComment(sessionuserid,prodle,campaign_id,__dirname);   
+      // redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+      //   if(err){
+      //     logger.emit("log","Errrr in get sessionid client");
+      //   }else if(reply==null){
+      //     socket.emit("addCampaignCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+      //   }else if(JSON.parse(reply).passport.user==undefined){
+      //     socket.emit("addCampaignCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+      //   }else{
+          
+      //   }      
+      // });
     })
     
     socket.on('addBlogComment', function(prodle,blogid,commentdata) {
@@ -195,17 +197,18 @@ exports.comment=function(io,__dirname){
           socket.broadcast.emit("warrantycommentResponse"+blogid,null,result);
         }
       });
-      redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
-        if(err){
-          logger.emit("log","Errrr in get sessionid client");
-        }else if(reply==null){
-          socket.emit("addBlogCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
-        }else if(JSON.parse(reply).passport.user==undefined){
-          socket.emit("addBlogCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
-        }else{
-          comment.addBlogComment(sessionuserid,prodle,blogid,__dirname);   
-        }      
-      });
+      comment.addBlogComment(sessionuserid,prodle,blogid,__dirname);   
+      // redisClient.get("sess:"+socket.handshake.sessionID, function(err, reply) {
+      //   if(err){
+      //     logger.emit("log","Errrr in get sessionid client");
+      //   }else if(reply==null){
+      //     socket.emit("addBlogCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+      //   }else if(JSON.parse(reply).passport.user==undefined){
+      //     socket.emit("addBlogCommentResponse",{"error":{"code":"AL001","message":"User Session Expired"}});
+      //   }else{
+      //     comment.addBlogComment(sessionuserid,prodle,blogid,__dirname);   
+      //   }      
+      // });
     })
 
   })

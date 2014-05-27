@@ -129,25 +129,25 @@ var _sendTestimonialRequestToOrganizationMember=function(self,testimonial,user,p
 		       };
 		      
          ////////////////////////////////////
-		   _addProductTestimonialToGroupMemberInbox(message,validproductenquiryuserids,user)
+		   _addProductTestimonialToGroupMemberInbox(testimonial,message,validproductenquiryuserids,user)
 		     ///////////////////////////////////
          	///////////////////////////////////
 							 _successfullAddTestimonial(self)
 							///////////////////////////////////
 
-		    commonapi.sendMail(message,CONFIG.smtp_business, function (result){
-		      if(result=="failure"){
-		        logger.emit("error","Product enquiry request not sent to "+message.to+" by"+user.email);
-		      }else{
-		        logger.emit("log","Product enquiry request Sent Successfully to"+message.to+" by"+user.email);
-		      }
-		    });
+		    // commonapi.sendMail(message,CONFIG.smtp_business, function (result){
+		    //   if(result=="failure"){
+		    //     logger.emit("error","Product enquiry request not sent to "+message.to+" by"+user.email);
+		    //   }else{
+		    //     logger.emit("log","Product enquiry request Sent Successfully to"+message.to+" by"+user.email);
+		    //   }
+		    // });
 		  }
 		})
 	}
  })
 }
-var _addProductTestimonialToGroupMemberInbox=function(message,userids,user){
+var _addProductTestimonialToGroupMemberInbox=function(testimonial,message,userids,user){
 	UserModel.find({userid:{$in:userids}},{userid:1,email:1,firstname:1},function(err,users){
 		if(err){
 			logger.emit("error","Database Issue"+err)
@@ -158,9 +158,9 @@ var _addProductTestimonialToGroupMemberInbox=function(message,userids,user){
 			for(var i=0;i<users.length;i++){
 				var inbox
 				if(user.firstname==undefined){
-					inbox={messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid},subject:message.subject,body:message.html}
+					inbox={testimonial:testimonial,messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid},subject:message.subject,body:message.html}
 				}else{
-					inbox={messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid,name:user.firstname},subject:message.subject,body:message.html}
+					inbox={testimonial:testimonial,messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid,name:user.firstname},subject:message.subject,body:message.html}
 				}
 				inboxarray.push(inbox)
 			}
