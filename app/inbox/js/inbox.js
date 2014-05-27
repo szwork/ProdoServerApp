@@ -11,19 +11,24 @@ var Inbox = function(inboxdata) {
 Inbox.prototype = new events.EventEmitter;
 module.exports = Inbox
 ;
-Inbox.prototype.getMyLatestInbox=function(sessionuserid){
+Inbox.prototype.getMyLatestInbox=function(sessionuserid,messagetype){
 	var self=this;
-	///////////////////////////////////////////
-	_getMyLatestInbox(self,sessionuserid)
-	///////////////////////////////////////////
+	if(["normal","testimonial","enquiry"].indexOf(messagetype)<0){
+		self.emit("failedGetMyLatestInbox",{error:{code:"AV001",message:"messagetype should be normal,enquiry,testimonial"}})
+	}else{
+	  ///////////////////////////////////////////
+	  _getMyLatestInbox(self,sessionuserid,messagetype)
+	 ///////////////////////////////////////////	
+	}
+	
 }
-var _getMyLatestInbox=function(self,sessionuserid){
+var _getMyLatestInbox=function(self,sessionuserid,messagetype){
 	var query=InboxModel.find({userid:sessionuserid}).sort({createdate:-1}).limit(10).lean()
 	query.exec(function(err,inbox){
 		if(err){
 			self.emit("failedGetMyLatestInbox",{error:{code:"ED001",message:"Database Issue"}})
 		}else if(inbox.length==0){
-			self.emit("failedGetMyLatestInbox",{error:{message:"No message exists"}})
+			self.emit("failedGetMyLatestInbox",{error:{message:"No "+messagetype+" message exists"}})
 		}else{
 			////////////////////////////////////////////////////////
 			_successfullMyLatestInbox(self,inbox)
@@ -47,8 +52,8 @@ var _loadMoreInboxMessage=function(self,sessionuserid,messageid){
 		}else if(!inbox){
 			self.emit("failedLoadMoreInboxMessages",{error:{"message":"inboxd is wrong or not exiss"}})
 		}else{
-			var query=InboxModel.find({userid:sessionuserid,messageid:{$ne:messageid},createdate:{$lte:inbox.createdate}}).sort({createdate:-1}).limit(10).lean()
-	    query.exec(function(err,inbox){
+			var query=InboxModel.find({messagetype:inbox.messagetype,userid:sessionuserid,messageid:{$ne:messageid},createdate:{$lte:inbox.createdate}}).sort({createdate:-1}).limit(10).lean()
+	        query.exec(function(err,inbox){
 				if(err){
 					self.emit("failedLoadMoreInboxMessages",{error:{code:"ED001",message:"Database Issue"}})
 				}else if(inbox.length==0){
@@ -178,4 +183,27 @@ var _replyToInboxMessage=function(self,inbox,replytext,user){
 }
 var _successfullReplyToInboxMessage=function(self){
 	self.emit("successfulReplyToInboxMessage",{success:{message:"Successfully gave reply to the message"}})
+}
+Inbox.prototype.getMessagetypewisecount=function(sessionuserid,messagetype){
+	var self=this;
+	
+	  ///////////////////////////////////////////
+	  _getMessagetypewisecount(self,sessionuserid)
+	 ///////////////////////////////////////////	
+}
+var _getMessagetypewisecount=function(self,sessionuserid){
+	InboxModel.aggregate({$match:{userid:sessionuserid}},{$group:{_id:"$messagetype",messagecount:{$sum:1}}},{$project:{messagetype:"$_id",messagecount:1,_id:0}},function(err,messagecount){
+		if(err){
+			self.emit("failedGetMessagetypewisecount",{error:{code:"ED001",message:"Database Issue"}})
+		}else if(messagecount.length==0){
+			self.emit("failedGetMessagetypewisecount",{error:{message:"No message exists"}})
+		}else{
+			////////////////////////////
+			_successfullGetMessageTypewisecount(self,messagecount);
+			///////////////////////////
+		}
+	})
+}
+var _successfullGetMessageTypewisecount=function(self,messagetypewisecount){
+	self.emit("successfulGetMessageTypewisecount",{success:{message:"Getting messagetype wise count successfully",messagetypewisecount:messagetypewisecount}})
 }

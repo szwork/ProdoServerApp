@@ -25,7 +25,8 @@ var InboxSchema = mongoose.Schema({
   messagetype:{type:String,default:"normal"},
   status:{type:String,default:"unread"},
   createdate:{type:Date,default:new Date()},
-  parentid:{type:String,default:null}
+  parentid:{type:String,default:null},
+  testimonial:{type:Object}//if messagetype is testimonial
 });
 InboxSchema.pre('save', function(next) {
   var inbox = this;

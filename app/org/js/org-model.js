@@ -81,7 +81,8 @@ var OrganizationSchema = mongoose.Schema({
     org_delreqsend:{type:Boolean,default:false},
     broadcast:[{broadcasttype:{type:String},message:{type:String},expirydate:{type:Date},datecreated:{type:Date}}],
     keyclients:[{clientid:{type:String},clientname:{type:String},image:{type:String},bucket:{type:String},key:{type:String}}],
-    industry_category:[{type:String}]
+    industry_category:[{type:String}],
+    status:{type:String,default:'init'}
 });
 
 OrganizationSchema.pre('save', function(next) {

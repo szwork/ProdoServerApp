@@ -23,6 +23,7 @@ exports.inboxAction = function(req, res) {
 exports.getMyLatestInbox=function(req,res){
   var userid=req.params.userid;
   var sessionuserid=req.user.userid;
+  var messagetype=req.query.messagetype;
   var inbox=new Inbox();
   inbox.removeAllListeners("failedGetMyLatestInbox");
   inbox.on("failedGetMyLatestInbox",function(err){
@@ -38,7 +39,7 @@ exports.getMyLatestInbox=function(req,res){
   if(userid!=sessionuserid){
     inbox.emit("failedGetMyLatestInbox",{"error":{"code":"EA001","message":"You have not authorize to done this action"}})
   }else{
-    inbox.getMyLatestInbox(sessionuserid); 
+    inbox.getMyLatestInbox(sessionuserid,messagetype); 
   }
 }
 exports.loadMoreInboxMessages=function(req,res){
@@ -87,6 +88,30 @@ exports.replyToInboxMessage=function(req,res){
     inbox.replyToInboxMessage(sessionuserid,messageid,replytext); 
   }
 }
+exports.getMessagetypewisecount=function(req,res){
+  var userid=req.params.userid;
+  
+  var inbox=new Inbox();
+  inbox.removeAllListeners("failedGetMessagetypewisecount");
+  inbox.on("failedGetMessagetypewisecount",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  inbox.removeAllListeners("successfulGetMessageTypewisecount");
+  inbox.on("successfulGetMessageTypewisecount",function(result){
+    logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  if(userid!=req.user.userid){
+    self.emit("failedGetMessagetypewisecount",{code:"EA001",message:"You can see your own message"})
+  }else{
+    inbox.getMessagetypewisecount(userid); 
+  }
+}
+
+
+
+
 
 
 
