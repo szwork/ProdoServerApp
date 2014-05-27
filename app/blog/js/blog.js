@@ -24,6 +24,7 @@ var regxemail = /\S+@\S+\.\S+/;
 var CONFIG = require('config').Prodonus;
 var AWS = require('aws-sdk');
 var CommentModel=require("../../comment/js/comment-model");
+var BlogCommentModel=require("../../comment/js/blogcomment-model");
 AWS.config.update({accessKeyId:'AKIAJOGXRBMWHVXPSC7Q', secretAccessKey:'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'});
 AWS.config.update({region:'ap-southeast-1'});
 var s3bucket = new AWS.S3();
@@ -374,30 +375,28 @@ var _getBlogForProduct = function(self,prodle,blogid,userid){
 		if(err){
 			self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find blog"}});
 		}else if(blogdata.length!=0){
-			console.log("Blog @ : "+JSON.stringify(blogdata));
 			userModel.findOne({userid:userid}).exec(function(err,userdata){
 				if(err){
 					self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find user profile_pic"}});
 				}else if(userdata){
 					blogdata[0].profile_pic = userdata.profile_pic;
-					// console.log("Blog @ : "+JSON.stringify(blogdata));
-					// CommentModel.find({type:"blog",status:"active",blogid:blogid},{blogid:0,type:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
-					// 	if(err){
-					// 		logger.emit("log","Error in updation latest 5 blog comment");
-					// 		self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Database Issue"}});
-					// 	}else {
-					// 		var comment_array;
-					// 		if(comment.length==0){
-					// 			comment_array=[];
-					// 		}else{
-					// 			comment_array=comment;
-					// 		}
-					// 		console.log("Error in DB");
-					// 		logger.emit({"message":"Provided blogid is wrong"});
-					// 		blogdata[0].blog_comments=comment_array;
+					
+					BlogCommentModel.find({type:"blog",status:"active",blogid:blogid},{blogid:0,type:0}).sort({datecreated:-1}).limit(5).lean().exec(function(err,comment){
+						if(err){
+							logger.emit("log","Error in updation latest 5 blog comment");
+							self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Database Issue"}});
+						}else {
+							var comment_array;
+							if(comment.length==0){
+								comment_array=[];
+							}else{
+								comment_array=comment;
+							}
+							console.log("comment_array : "+comment_array);
+							blogdata[0].blog_comments=comment_array;
 							_successfulGetBlogForProduct(self,blogdata[0]);
-					// 	}
-					// });						
+						}
+					});						
 				}else{
 					self.emit("failedGetBlogForProduct",{"error":{"code":"AP001","message":"Wrong userid"}});
 				}
@@ -520,7 +519,7 @@ Blog.prototype.deleteBlog=function(authorid,blogid,sessionuserid){
 var _deleteBlog = function(self,authorid,blogid){
 	console.log("authorid : "+authorid+" blogid : "+blogid);
 	var removed_date = new Date();
-	blogModel.update({authorid:authorid,blogid:blogid},{$set:{dateremoved:removed_date,status:"deactive"}}).lean().exec(function(err,blogupdatestatus){
+	blogModel.update({authorid:authorid,blogid:blogid},{$set:{dateremoved:removed_date,status:"deactive",publishblog:[]}}).lean().exec(function(err,blogupdatestatus){
 		if(err){
 			self.emit("failedDeleteBlog",{"error":{"code":"ED001","message":"Error in db to delete"}});
 		}else if(blogupdatestatus!=1){

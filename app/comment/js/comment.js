@@ -889,11 +889,30 @@ var _isValidCampaignId=function(self,prodle,campaign_id,commentdata,productdata,
 			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":"Campaign id is wrong"}});
 		}else{
 			/////////////////////////////////////////////////////////////////////////////////////////////
+			// _checkCampaignImpressionLimitExceedOrNot(self,prodle,campaign_id,commentdata,productdata,__dirname,campaigndata.impression_limit);
 			__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
 			/////////////////////////////////////////////////////////////////////////////////////////////
 		}
 	})
 }
+
+// var _checkCampaignImpressionLimitExceedOrNot = function(self,prodle,campaign_id,commentdata,productdata,__dirname,impression_limit){
+// 	CommentModel.aggregate([{$match:{type:"campaign",campaign_id:campaign_id}},{$group:{_id:{user:"$user"}}},{$project:{username:"$_id.user.username",userid:"$_id.user.userid",_id:0}}]).exec(function(err,userdata){
+// 	  	if(err){
+// 	  		self.emit("failedAddCampaignComment",{"error":{"code":"ED001","message":"Error in db to find userdata"}});
+// 	  	}else if(userdata.length == 0){
+// 	  		self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":"campaign_id is wrong"}});
+// 	  	}else{
+// 	  		if(userdata.length == impression_limit){
+// 	  			self.emit("failedAddCampaignComment",{"error":{"code":"EA001","message":""}});
+// 	  		}else{
+// 		  		/////////////////////////////////////////////////////////////////////////////////////////////
+// 		  		__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
+// 		  		/////////////////////////////////////////////////////////////////////////////////////////////
+// 	  		}
+// 	  	}
+// 	});
+// }
 
 var __checkCampaignCommentImageExists=function(self,prodle,campaign_id,commentdata,product,__dirname){
 	// commentdata.commentid=generateId();
@@ -1025,7 +1044,7 @@ var _addCampaignComment=function(self,prodle,campaign_id,commentdata,product){
 	   		//campaign_commentdata.prodle=undefined;
 			// ///////////////////////////////////		
 			_successfulAddCampaignComment(self,campaign_commentdata);
-			_validateCampaignCommentFeatureAnalytics(prodle,commentdata,product);		
+			_validateCampaignCommentFeatureAnalytics(prodle,commentdata,product);
 			/////////////////////////////////
 		}
 	})
@@ -1135,6 +1154,8 @@ var _updateCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,in
 		}
 	})	
 }
+
+
 
 Comment.prototype.addBlogComment=function(sessionuserid,prodle,blogid,__dirname){
 	var self=this;

@@ -90,12 +90,14 @@ var _validateProductCampaignData = function(self,campaigndata,orgid,prodle,sessi
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass start date"}});
 	}else if(campaigndata.enddate==undefined){
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass end date"}});
-	// }else if(campaigndata.bannertext==undefined){
-	//   	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass bannertext"}});
+	}else if(campaigndata.resultdate==undefined){
+	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass resultdate"}});
 	}else if(campaigndata.campaign_tags==undefined){
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"please pass campaign_tags"}});
 	}else if(!isArray(campaigndata.campaign_tags)){
 	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"campaign_tags should be an array"}});
+	}else if(campaigndata.impression_limit==undefined){
+	  	self.emit("failedAddProductCampaign",{"error":{"code":"AV001","message":"Please pass campaign impression limit"}});
 	}else{
 	  	_addProductCampaign(self,campaigndata,orgid,prodle);	   	
 	}
