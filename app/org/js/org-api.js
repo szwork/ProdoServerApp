@@ -999,13 +999,13 @@ exports.publishOrganization=function(req,res){
   
   if(req.user.org.orgid!=orgid){
     logger.emit("log","You have not authorized to publish organization");
-    organization.emit("failedBroadcastMessage",{"error":{"code":"EA001","message":"You have not authorized to publish organization"}});
+    organization.emit("failedPublishOrganization",{"error":{"code":"EA001","message":"You have not authorized to publish organization"}});
   }else if(req.user.org.isAdmin==false){
     logger.emit("log","You are not an admin to see group member details");
-    organization.emit("failedBroadcastMessage",{"error":{"code":"EA001","message":"You have not authorized to publish organization"}}); 
+    organization.emit("failedPublishOrganization",{"error":{"code":"EA001","message":"You have not authorized to publish organization"}}); 
   }else{
     /////////////////////////////////
-    organization.broadCastMessage(req.user,orgid,broadcastmessagedata);
+    organization.publishOrganization(orgid);
     //////////////////////////////// 
   }
 }

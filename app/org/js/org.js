@@ -1997,4 +1997,38 @@ var _getAllOrgnizationAnalytics=function(self){
 var _successfullOrgAnalytics=function(self,result){
 	self.emit("successfulgetAllOrgnizationAnalytics",result)
 }
-
+Organization.prototype.publishOrganization = function(orgid) {
+	var self=this;
+  ///////////////////////////////////
+  _publishOrganization(self,orgid)
+  ///////////////////////////////////
+	
+}
+var _publishOrganization=function(self,orgid){
+	orgModel.findOne({orgid:orgid,status:{$ne:"deactive"}},function(err,organziation){
+		if(err){
+			self.emit("failedPublishOrganization",{error:{code:"ED001",message:"Database Issue"}})
+		}else if(!organziation){
+			self.emit("failedPublishOrganization",{error:{message:"orgid is wrong"}})	
+		}else{
+			if(organziation.status=="active"){
+				self.emit("failedPublishOrganization",{error:{message:"Organization already published"}})	
+			}else{
+				orgModel.update({orgid:orgid},{$set:{status:"active"}},function(err,orgstaus){
+					if(err){
+						self.emit("failedPublishOrganization",{error:{code:"ED001",message:"Database Issue"}})
+					}else if(orgstaus==0){
+						self.emit("failedPublishOrganization",{error:{message:"orgid is wrong"}})		
+					}else{
+						//////////////////////////////////
+						_successfullPublishOrganization(self)
+						//////////////////////////////////
+					}
+				})
+			}
+		}
+	})
+}
+var _successfullPublishOrganization=function(self){
+	self.emit("successfulPublishOrganization",{success:{message:"Organization successfully published"}})
+}
