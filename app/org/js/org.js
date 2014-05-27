@@ -1975,8 +1975,8 @@ var _getAllOrgnizationAnalytics=function(self){
 
     var lastWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 14);
 	
-    var queryall=orgModel.find({orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
-    var querylatest=orgModel.find({prodo_setupdate:{$lte:today},prodo_setupdate:{$gte:lastWeek}, orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
+    var queryall=orgModel.find({status:"active",orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
+    var querylatest=orgModel.find({status:"active",prodo_setupdate:{$lte:today},prodo_setupdate:{$gte:lastWeek}, orgtype:{$regex:"manufacturer",$options:"i"}},{orgid:1,name:1,description:1,org_logo:1}).sort({prodo_setupdate:-1});
  	  queryall.exec(function(err,organalyticsall){
 			if(err){
 				self.emit("failedgetAllOrgnizationAnalytics",{error:{code:"ED001",message:"Database Issue"+err}})
