@@ -67,7 +67,7 @@ var OrganizationSchema = mongoose.Schema({
     prodo_closedate: { type:Date },/* the date the company was closed on Prodonus*/
     location:[LocationSchema],
     usergrp:[UserGroupSchema],
-    status: { type:String,default:"active"},/*wheather organization is active(1) or deactive(0)*/
+    status: { type:String,default:"init"},/*wheather organization is active(1) or deactive(0)*/
     contractid:{type:String},
     subscription:{
       planid:{type:String,ref:"Subscription"} ,//individdual
@@ -82,7 +82,7 @@ var OrganizationSchema = mongoose.Schema({
     broadcast:[{broadcasttype:{type:String},message:{type:String},expirydate:{type:Date},datecreated:{type:Date}}],
     keyclients:[{clientid:{type:String},clientname:{type:String},image:{type:String},bucket:{type:String},key:{type:String}}],
     industry_category:[{type:String}],
-    status:{type:String,default:'init'}
+   
 });
 
 OrganizationSchema.pre('save', function(next) {
