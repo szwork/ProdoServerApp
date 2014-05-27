@@ -375,7 +375,8 @@ var _getBlogForProduct = function(self,prodle,blogid,userid){
 		if(err){
 			self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find blog"}});
 		}else if(blogdata.length!=0){
-			userModel.findOne({"author.authorid":blogdata.authorid}).exec(function(err,userdata){
+			console.log("blogdata.authorid : "+JSON.stringify(blogdata[0].authorid));
+			userModel.findOne({"author.authorid":blogdata[0].authorid}).exec(function(err,userdata){
 				if(err){
 					self.emit("failedGetBlogForProduct",{"error":{"code":"ED001","message":"Error in db to find user profile_pic"}});
 				}else if(userdata){
