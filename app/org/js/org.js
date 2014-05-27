@@ -173,7 +173,7 @@ var _applyDefaultOrganisationTrialPlan=function(self,organizationdata,sessionuse
     
 	var _addOrgDetailsToUser = function(self,organization,sessionuserid,sessionuser,usergrp) {
     var organizationsubscription={planid:organization.subscription.planid,planstartdate:new Date(organization.subscription.planstartdate),planexpirydate:new Date(organization.subscription.planexpirydate)};
-		userModel.update({userid:sessionuserid},{$set:{payment:{paymentid:organization.payment.paymentid},subscription:organizationsubscription,usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,isAdmin:true,orgtype:organization.orgtype,orgname:organization.name}}},function(err,userupdatestatus){
+		userModel.update({userid:sessionuserid},{$set:{payment:{paymentid:organization.payment.paymentid},subscription:organizationsubscription,usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,isAdmin:true,orgtype:organization.orgtype,orgname:organization.name,status:"init"}}},function(err,userupdatestatus){
 	 	  if(err){
 	   	 self.emit("failedOrgAdd",{"error":{"code":"ED001","message":"Error in db to update user"+err}});
 	  	}else if(userupdatestatus!=1){
@@ -1212,9 +1212,9 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 		     			  	isAdmin=true;
 		     			  }
 		     			  if(product){
-		     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:isAdmin,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+		     			  	userdata[i]={products_followed:[{prodle:product.prodle,orgid:product.orgid}],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:isAdmin,orgname:organization.name,status:organization.status},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
 		     			  }else{
-		    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:isAdmin,orgname:organization.name},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
+		    				userdata[i]={products_followed:[],prodousertype:"business",email:newusers[i],username:newusers[i],usertype:S(organization.orgtype).toLowerCase().s,org:{orgid:organization.orgid,orgtype:organization.orgtype,isAdmin:isAdmin,orgname:organization.name,status:organization.status},subscription:{planid:organization.subscription.planid,planexpirydate:organization.subscription.planexpirydate,planstartdate:organization.subscription.planstartdate,discountcode:null},payment:{paymentid:organization.payment.paymentid}}; 			  	
 		     			  }
 					      
 		      	        }
@@ -1315,7 +1315,7 @@ var _addOrgInvitees = function(self,orgid,usergrp,sessionuser) {
 var _associateOrganizationToUser=function(self,existingusers,organization,sessionuser){
 	// existingusers=__.difference(existingusers,sessionuser.email);
 	console.log("existingusers  _associateOrganizationToUser"+existingusers+organization.orgname);
-	var org={orgid:organization.orgid,orgname:organization.name,orgtype:organization.orgtype,isAdmin:true};
+	var org={status:organization.status,aorgid:organization.orgid,orgname:organization.name,orgtype:organization.orgtype,isAdmin:true};
 	userModel.update({email:{$in:existingusers}},{$set:{org:org,prodousertype:"business",usertype:organization.orgtype}},{multi:true},function(err,updateuserorgstatus){
 		if(err){
 			logger.emit("error",{"error":{"message":"Database Issue"+err}});
@@ -2026,6 +2026,9 @@ var _publishOrganization=function(self,orgid){
 							}else if(orgstaus==0){
 								self.emit("failedPublishOrganization",{error:{message:"orgid is wrong"}})		
 							}else{
+								//////////////////////////////
+								_updatePublishtUserOrgDetails(organziation)
+								////////////////////////
 								//////////////////////////////////
 								_successfullPublishOrganization(self)
 								//////////////////////////////////
@@ -2040,4 +2043,15 @@ var _publishOrganization=function(self,orgid){
 }
 var _successfullPublishOrganization=function(self){
 	self.emit("successfulPublishOrganization",{success:{message:"Organization successfully published"}})
+}
+var _updatePublishtUserOrgDetails=function(organziation){
+	userModel.update({"org.orgid":organziation.orgid},{$set:{"org.status":organziation.status}},{multi:true},function(err,userorgstatus){
+		if(err){
+			logger.emit("error","Database Issue")
+		}else if(userorgstatus==0){
+			logger.emit("error","No organization user")
+		}else{
+			logger.emit("log","successfully change user org status");
+		}
+	})
 }

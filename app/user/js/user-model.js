@@ -42,7 +42,7 @@ var userSchema = mongoose.Schema({
     country:{type:String,default:null},
     zipcode:{type:String,default:null}
    },
-  org:{orgid:{type:String,default:null},orgname:{type:String},orgtype:{type:String,default:null},isAdmin:{type:Boolean,default:null}},
+  org:{status:{type:String},orgid:{type:String,default:null},orgname:{type:String},orgtype:{type:String,default:null},isAdmin:{type:Boolean,default:null}},
   // orgid: { type:String, ref: 'Organization'}pe,
   // isAdmin:{type:Boolean,default:false},
   subscription:{
