@@ -979,3 +979,33 @@ exports.getAllOrgnizationAnalytics=function(req,res){
     organization.getAllOrgnizationAnalytics();
     ////////////////////////////////   
 }
+exports.publishOrganization=function(req,res){
+  var orgid=req.params.orgid;
+  var sessionuserid=req.user.userid;
+  // var broadcastmessagedata=req.body.broadcast;
+  var organization=new Organization();
+  
+  // logger.emit("log","orgid:"+orgid+"grpid:"+grpid+"usermemberid:"+usermemberid);
+  organization.removeAllListeners("failedPublishOrganization");
+  organization.on("failedPublishOrganization",function(err){
+    logger.emit("error", err.error.message,req.user.userid);
+    res.send(err);
+  });
+  organization.removeAllListeners("successfulPublishOrganization");
+  organization.on("successfulPublishOrganization",function(result){
+    // logger.emit("info", result.success.message);
+    res.send(result);
+  });
+  
+  if(req.user.org.orgid!=orgid){
+    logger.emit("log","You have not authorized to publish organization");
+    organization.emit("failedBroadcastMessage",{"error":{"code":"EA001","message":"You have not authorized to publish organization"}});
+  }else if(req.user.org.isAdmin==false){
+    logger.emit("log","You are not an admin to see group member details");
+    organization.emit("failedBroadcastMessage",{"error":{"code":"EA001","message":"You have not authorized to publish organization"}}); 
+  }else{
+    /////////////////////////////////
+    organization.broadCastMessage(req.user,orgid,broadcastmessagedata);
+    //////////////////////////////// 
+  }
+}
