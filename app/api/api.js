@@ -32,6 +32,7 @@ var managedashboardapi = require("../dashboard/js/manage-dashboard-api");
 var blogapi = require("../blog/js/blog-api");
 var inboxapi=require("../inbox/js/inbox-api")
 var productfeatureratingapi=require("../productfeaturerating/js/product-feature-rating-api")
+var testimonialapi=require("../testimonial/js/testimonial-api")
 exports.orgapi = orgapi;
 exports.userapi = userapi;
 exports.productapi = productapi;
@@ -52,5 +53,6 @@ exports.orgindustrycategoryapi=orgindustrycategoryapi;
 exports.managedashboardapi = managedashboardapi;
 exports.blogapi = blogapi;
 exports.inboxapi=inboxapi;
-exports.productfeatureratingapi=productfeatureratingapi
+exports.productfeatureratingapi=productfeatureratingapi;
+exports.testimonialapi=testimonialapi;
 
