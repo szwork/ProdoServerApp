@@ -41,8 +41,10 @@ var productCampaignSchema = mongoose.Schema({
   name:{type:String},
   description:{type:String},
   createdate:{type:Date,default:Date.now},
-  startdate:{type:Date},//,default:Date.now
+  startdate:{type:Date},
+  resultdate:{type:Date},
   enddate:{type:Date},
+  impression_limit:{type:Number},// talkins + comment = 1 impression
   status:{type:String,default:"init"},//init,active,deactive
   artwork:[{bucket:{type:String},key:{type:String},image:{type:String},imageid:{type:String}}],
   // campaign_comments: [commentSchema], 
