@@ -2014,17 +2014,26 @@ var _publishOrganization=function(self,orgid){
 			if(organziation.status=="active"){
 				self.emit("failedPublishOrganization",{error:{message:"Organization already published"}})	
 			}else{
-				orgModel.update({orgid:orgid},{$set:{status:"active"}},function(err,orgstaus){
+				productModel.find({orgid:orgid},function(err,products){
 					if(err){
 						self.emit("failedPublishOrganization",{error:{code:"ED001",message:"Database Issue"}})
-					}else if(orgstaus==0){
-						self.emit("failedPublishOrganization",{error:{message:"orgid is wrong"}})		
+					}else if(products.length==0){
+						self.emit("failedPublishOrganization",{error:{message:"Please add atleast one product to publish your organization"}})		
 					}else{
-						//////////////////////////////////
-						_successfullPublishOrganization(self)
-						//////////////////////////////////
+						orgModel.update({orgid:orgid},{$set:{status:"active"}},function(err,orgstaus){
+							if(err){
+								self.emit("failedPublishOrganization",{error:{code:"ED001",message:"Database Issue"}})
+							}else if(orgstaus==0){
+								self.emit("failedPublishOrganization",{error:{message:"orgid is wrong"}})		
+							}else{
+								//////////////////////////////////
+								_successfullPublishOrganization(self)
+								//////////////////////////////////
+							}
+						})
 					}
 				})
+				
 			}
 		}
 	})
