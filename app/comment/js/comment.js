@@ -924,8 +924,9 @@ var _checkCampaignImpressionLimitExceedOrNot = function(self,prodle,campaign_id,
 							}
 						});	  			
 			  		}else{
+			  			self.emit("failedAddCampaignComment",{"error":{"code":"AP001","message":"Campaign is closed for further comments"}});
 				  		/////////////////////////////////////////////////////////////////////////////////////////////
-				  		__checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
+				  		// __checkCampaignCommentImageExists(self,prodle,campaign_id,commentdata,productdata,__dirname);
 				  		/////////////////////////////////////////////////////////////////////////////////////////////
 			  		}
 	  			}		
