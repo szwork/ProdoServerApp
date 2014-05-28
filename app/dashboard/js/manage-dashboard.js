@@ -369,8 +369,9 @@ var _validateQueryExecution = function(self,prodle,query){
 	}else if(query.queryname == "detailed product comments response"){
 		// Calculate positive, negative and neutral responses from product comments
 		_posiNegaNeutResponseForProductComment(self,prodle);
-	}else{
-
+	}else if(query.queryname == "overall campaign sentiment"){
+		// Based on Emotional Scale Model get overall view of what people are talking about the campaign
+		_posiNegaNeutResponseForCampaignComment(self,prodle);
 	}
 }
 
@@ -447,3 +448,18 @@ var _successfulGetAnalyticsDataForProduct = function(self,doc){
 	logger.emit("log","_successfulGetAnalyticsDataForProduct");
 	self.emit("successfulGetAnalyticsDataForProduct", {"success":{"message":"Getting product chart details successfully","doc":doc}});
 }
+
+var _posiNegaNeutResponseForCampaignComment = function(self,prodle){
+	//Get Tag and Count of tag
+	FeatureAnalyticsModel.aggregate([{$unwind:"$analytics"},{$match:{prodle:prodle}},{$group:{_id:{tagid:"$analytics.tagid",tagname:"$analytics.tagname"},tagcount:{$sum:1}}},{$project:{tagid:"$_id.tagid",tagname:"$_id.tagname",tagcount:1,_id:0}}]).exec(function(err,producttagcount){
+		if(err){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"ED001","message":"Error in db to find tag analytics"}});
+		}else if(producttagcount.length == 0){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"AU003","message":"Feature analytics does not exists"}});
+		}else{
+			//////////////////////////////////////////////////////////
+			_getTagAnalyticsFromReffDict(self,prodle,producttagcount);
+			//////////////////////////////////////////////////////////
+		}
+	})
+};
