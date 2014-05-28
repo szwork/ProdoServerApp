@@ -1095,7 +1095,7 @@ var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata){
 	}else{
 		if(commentdata.analytics.length>0){
 	        var initialvalue=0;            
-	        _addCampaignCommentFeatureAnalytics(prodle,commentdata.analytics,commentdata.user.userid,initialvalue);            
+	        _addCampaignCommentFeatureAnalytics(prodle,commentdata.campaign_id,commentdata.analytics,commentdata.user.userid,initialvalue);            
 	    }else{
 	        console.log("Please pass analytics data");
 	    }
@@ -1103,18 +1103,18 @@ var _validateCampaignCommentFeatureAnalytics = function(prodle,commentdata){
     console.log("_validateCampaignCommentFeatureAnalytics");
 }
 
-var _addCampaignCommentFeatureAnalytics = function(prodle,analyticsdata,userid,initialvalue){
+var _addCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analyticsdata,userid,initialvalue){
 	var analytics=analyticsdata[initialvalue];
 	if(analyticsdata.length>initialvalue){		
-		CampaignAnalyticsModel.findOne({prodle:prodle,featurename:analytics.featurename}).lean().exec(function(err,analyticsresult){
+		CampaignAnalyticsModel.findOne({prodle:prodle,campaign_id:campaign_id,featurename:analytics.featurename}).lean().exec(function(err,analyticsresult){
 	        if(err){
 	            logger.emit("error","Error in db to find feature id err message: "+err);
 	        }else if(!analyticsresult){
 	            console.log("calling to add new analytics with prodle and featurename");
-	            _addNewCampaignCommentFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
+	            _addNewCampaignCommentFeatureAnalytics(prodle,campaign_id,analytics,userid,initialvalue,analyticsdata);
 	        }else{
 	            console.log("calling to update analytics");
-	            _updateCampaignCommentFeatureAnalytics(prodle,analytics,userid,initialvalue,analyticsdata);
+	            _updateCampaignCommentFeatureAnalytics(prodle,campaign_id,analytics,userid,initialvalue,analyticsdata);
 	        }
     	});
 	}else{
@@ -1122,7 +1122,7 @@ var _addCampaignCommentFeatureAnalytics = function(prodle,analyticsdata,userid,i
 	}
 }
 
-var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
+var _addNewCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analytics,userid,initialvalue,analyticsdata){
 	console.log("_addNewCampaignCommentFeatureAnalytics");
 	// var feature_analytics_object={prodle:prodle,featureid:analytics.featureid};
 	TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1}).lean().exec(function(err,tagdata){
@@ -1132,6 +1132,7 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,in
             console.log("Tag name does not exist to get tagid");
         }else{
         	analytics.prodle = prodle;
+        	analytics.campaign_id = campaign_id;
             analytics.analytics = [{tagid:tagdata.tagid,tagname:analytics.tag,userid:userid,datecreated:new Date()}];
             var analytics_data = new CampaignAnalyticsModel(analytics);
         	analytics_data.save(function(err,analyticsresult){
@@ -1141,7 +1142,7 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,in
                 	console.log("Feature analytics added sucessfully" + analyticsresult);
             	}
             	/////////////////////////////////////////////////////////////////////////////////////////
-            	_addCampaignCommentFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+            	_addCampaignCommentFeatureAnalytics(prodle,campaign_id,analyticsdata,userid,++initialvalue);
             	/////////////////////////////////////////////////////////////////////////////////
         	})
         }
@@ -1149,10 +1150,10 @@ var _addNewCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,in
 }
 
 
-var _updateCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,initialvalue,analyticsdata){
+var _updateCampaignCommentFeatureAnalytics = function(prodle,campaign_id,analytics,userid,initialvalue,analyticsdata){
     console.log("_updateCampaignCommentFeatureAnalytics");
     //checking tagid and tagname exist
-    var query = {prodle:prodle,featurename:analytics.featurename};
+    var query = {prodle:prodle,campaign_id:campaign_id,featurename:analytics.featurename};
     TagReferenceDictionary.findOne({tagname:analytics.tag},{tagid:1,tagname:1}).lean().exec(function(err,tagdata){
 		if(err){
             console.log("Error in db to find feature id err message: " + err);
@@ -1169,7 +1170,7 @@ var _updateCampaignCommentFeatureAnalytics = function(prodle,analytics,userid,in
 	                // _successfulAddComment(self,analyticsdata);
 	            }
 	            /////////////////////////////////////////////////////////////////////////////////////////
-            	_addCampaignCommentFeatureAnalytics(prodle,analyticsdata,userid,++initialvalue);
+            	_addCampaignCommentFeatureAnalytics(prodle,campaign_id,analyticsdata,userid,++initialvalue);
             	/////////////////////////////////////////////////////////////////////////////////
 	        });
 		}
@@ -1200,8 +1201,8 @@ var _validateBlogCommentData=function(self,sessionuserid,prodle,blogid,__dirname
 		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
 	}else if(commentdata.type==undefined){
 		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
-	}else if(commentdata.analytics==undefined){
-		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass analytics"}});
+	// }else if(commentdata.analytics==undefined){
+	// 	self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass analytics"}});
 	}else{
 		////////////////////////////////////////////////////////////////////////////////////////////////
 		_isSessionUserToAddBlogComment(self,sessionuserid,prodle,blogid,commentdata,__dirname);
@@ -1373,7 +1374,7 @@ var _addBlogComment = function(self,prodle,blogid,commentdata,product){
 var _successfulAddBlogComment = function(self,newcomment){
 	updateBlogTrendingForCommentCount(newcomment.prodle,newcomment.blogid);
 	logger.emit("log","successfulAddBlogComment");
-	self.emit("successfulAddBlogComment",{"success":{"message":"Gave comment to blog sucessfully","blog_comment":newcomment}});
+	self.emit("successfulAddBlogComment",{"success":{"message":"Gave comment to blog sucessfully","blog_comments":newcomment}});
 }
 
 var updateBlogTrendingForCommentCount=function(prodle,blogid){
