@@ -140,6 +140,7 @@ exports.getAllProduct=function(req,res){
    
    var sessionuserid=req.user.userid;
    var orgid=req.params.orgid;
+   var limit=req.query.limit;
    logger.emit("log","\norgid:"+orgid+"\nsessionid:"+sessionuserid);
   
    var product = new Product();
@@ -162,7 +163,7 @@ exports.getAllProduct=function(req,res){
        //  logger.log("listner "+this+"removed");
        // });
     });
-    product.getAllProduct(orgid);
+    product.getAllProduct(orgid,limit);
     
 }
 
