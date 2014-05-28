@@ -1336,14 +1336,17 @@ var _blogCommentImageUpload=function(self,prodle,blogid,commentdata,product,awsp
 var _addBlogComment = function(self,prodle,blogid,commentdata,product){
 	var tags_array=[];
 	var analytics_array = [];
-	if(commentdata.analytics.length>0){
+	if(commentdata.analytics!=undefined){
+		if(commentdata.analytics.length>0){
 		for(var i=0;i<commentdata.analytics.length;i++){
 			if(commentdata.analytics[i].tag!=undefined){
 				tags_array.push(commentdata.analytics[i].tag);
 				analytics_array.push(commentdata.analytics[i]);
 			}
 		}
+	}	
 	}
+	
 
 	commentdata.tags=tags_array;
 	commentdata.featureanalytics=analytics_array;
@@ -1361,7 +1364,7 @@ var _addBlogComment = function(self,prodle,blogid,commentdata,product){
 	      	}
 			////////////////////////////////////////////////	
 			_successfulAddBlogComment(self,blog_commentdata);
-			_validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
+		// _validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
 			////////////////////////////////////////////////
 		}
 	})
