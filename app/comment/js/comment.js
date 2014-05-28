@@ -1201,8 +1201,8 @@ var _validateBlogCommentData=function(self,sessionuserid,prodle,blogid,__dirname
 		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please enter commenttext"}});			
 	}else if(commentdata.type==undefined){
 		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass comment type"}});			
-	}else if(commentdata.analytics==undefined){
-		self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass analytics"}});
+	// }else if(commentdata.analytics==undefined){
+	// 	self.emit("failedAddBlogComment",{"error":{"code":"AV001","message":"Please pass analytics"}});
 	}else{
 		////////////////////////////////////////////////////////////////////////////////////////////////
 		_isSessionUserToAddBlogComment(self,sessionuserid,prodle,blogid,commentdata,__dirname);
