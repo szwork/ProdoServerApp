@@ -130,15 +130,15 @@ var _addProductCampaign=function(self,campaigndata,orgid,prodle){
 		  		self.emit("failedAddProductCampaign",{"error":{"code":"ED001","message":"Error in db to add new product campain : "+err}});	
 		  	}else{
 		  		//////////////////////////////////
-		  		_successfulProductCampaignAdd(self);
-		  		_addTrendingForProductCampaign(product_campaign_data);
+		  		_successfulProductCampaignAdd(self,product_campaign_data);
 		  		/////////////////////////////////	  
 		  	}
 		});
 	}	
 }
 
-var _successfulProductCampaignAdd = function(self){
+var _successfulProductCampaignAdd = function(self,product_campaign_data){
+	_addTrendingForProductCampaign(product_campaign_data);
 	logger.log("log","_successfulProductCampaignAdd");
 	self.emit("successfulAddProductCampaign",{"success":{"message":"Product Campaign added sucessfully"}});
 }
@@ -358,7 +358,7 @@ var _getAllProductCampaign = function(self,prodle){
 
 			var a=new Date();
             var today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
-			ProductCampaignModel.find({prodle:prodle,status:"active",startdate:{$lte:today},enddate:{$gte:today}},{campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
+			ProductCampaignModel.find({prodle:prodle,status:{$in:["active","done"]},startdate:{$lte:today},enddate:{$gte:today}},{campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
 				if(err){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 				}else if(productcampain.length==0){

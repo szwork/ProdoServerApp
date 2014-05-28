@@ -53,6 +53,33 @@ exports.getAllRegistration=function(req,res){
     } 
 }
 
+exports.updateAuthor = function(req,res){
+    var authorid = req.params.authorid;
+    var authordata = req.body.author;
+    logger.emit("log","req authordata "+JSON.stringify(authordata));
+    var blog = new Blog(authordata);  
+    var sessionuserid=req.user.userid;
+    logger.emit("log","sessionid:"+sessionuserid);
+    blog.removeAllListeners("failedupdateAuthor");
+    blog.on("failedupdateAuthor",function(err){
+      logger.emit("error", err.error.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(err);
+    });
+    blog.removeAllListeners("successfulUpdateAuthor");
+    blog.on("successfulUpdateAuthor",function(result){
+      logger.emit("info", result.success.message,sessionuserid);
+      // blog.removeAllListeners();
+      res.send(result);
+    });
+    if(req.user.author.isAuthor==false){
+      // logger.emit("error","You are not an author to add blog",sessionuserid);
+      blog.emit("failedGetAllRegistration",{"error":{"code":"EA001","message":"You are not an author user to update author details"}});
+    }else{
+      blog.updateAuthor(authorid,sessionuserid);
+    }     
+}
+
 exports.authorAcceptance=function(req,res){
   var authorid = req.params.authorid;
     // logger.emit("log","authorid : "+authorid+" \nreq blogdata "+JSON.stringify(blogdata));
