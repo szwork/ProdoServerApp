@@ -21,6 +21,7 @@ var manageDashboardModel = require("./manage-dashboard-model");
 var chartAccessModel = require("./dashboard-chartaccess-model");
 var TagReffDicModel = require("../../tagreffdictionary/js/tagreffdictionary-model");
 var FeatureAnalyticsModel = require("../../featureanalytics/js/feature-analytics-model");
+var CampaignAnalyticsModel = require("../../featureanalytics/js/campaign-analytics-model");
 var __=require("underscore");
 
 function isArray(what) {
@@ -451,15 +452,55 @@ var _successfulGetAnalyticsDataForProduct = function(self,doc){
 
 var _posiNegaNeutResponseForCampaignComment = function(self,prodle){
 	//Get Tag and Count of tag
-	FeatureAnalyticsModel.aggregate([{$unwind:"$analytics"},{$match:{prodle:prodle}},{$group:{_id:{tagid:"$analytics.tagid",tagname:"$analytics.tagname"},tagcount:{$sum:1}}},{$project:{tagid:"$_id.tagid",tagname:"$_id.tagname",tagcount:1,_id:0}}]).exec(function(err,producttagcount){
+	CampaignAnalyticsModel.aggregate([{$unwind:"$analytics"},{$match:{prodle:prodle}},{$group:{_id:{tagid:"$analytics.tagid",tagname:"$analytics.tagname"},tagcount:{$sum:1}}},{$project:{tagid:"$_id.tagid",tagname:"$_id.tagname",tagcount:1,_id:0}}]).exec(function(err,campaigntagcount){
 		if(err){
 			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"ED001","message":"Error in db to find tag analytics"}});
-		}else if(producttagcount.length == 0){
+		}else if(campaigntagcount.length == 0){
 			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"AU003","message":"Feature analytics does not exists"}});
 		}else{
 			//////////////////////////////////////////////////////////
-			_getTagAnalyticsFromReffDict(self,prodle,producttagcount);
+			_getCampaignTagAnalyticsFromReffDict(self,prodle,campaigntagcount);
 			//////////////////////////////////////////////////////////
 		}
 	})
 };
+
+var _getCampaignTagAnalyticsFromReffDict = function(self,prodle,campaigntagcount){
+	// Get Positive Negative Neutral Respons for tag
+	var tagids = [];
+	for(var i=0;i<campaigntagcount.length;i++){
+		tagids.push(campaigntagcount[i].tagid);
+	}
+
+	TagReffDicModel.aggregate([{$match:{tagid:{$in:tagids}}},{$group:{_id:"$emotions.result",tagid:{"$addToSet":"$tagid"}}}]).exec(function(err,taganalytics){
+		if(err){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"ED001","message":"Error in db to find all tag analytics from tagreffdictionary"}});
+		}else if(taganalytics.length == 0){
+			self.emit("failedGetAnalyticsDataForProduct",{"error":{"code":"AU003","message":"Tag analytics does not exists in refference dictionary"}});
+		}else{
+			////////////////////////////////
+			_getFinalCampaignAnalyticsResult(self,prodle,campaigntagcount,taganalytics);			
+			////////////////////////////////
+		}
+	})
+};
+
+var _getFinalCampaignAnalyticsResult = function(self,prodle,campaigntagcount,taganalytics){
+	var feature_tagids = [];
+	var campaigntaganalytics = [];
+	for(var i=0;i<campaigntagcount.length;i++){
+		feature_tagids.push(campaigntagcount[i].tagid);
+	}
+
+	for(var j=0;j<taganalytics.length;j++){
+		var taganalyticscount=0;
+		for(var k=0;k<taganalytics[j].tagid.length;k++){
+			if(feature_tagids.indexOf(taganalytics[j].tagid[k])>=0){
+				taganalyticscount+=campaigntagcount[feature_tagids.indexOf(taganalytics[j].tagid[k])].tagcount;
+			}
+		}
+		campaigntaganalytics.push({emotionname:taganalytics[j]._id,tagcount:taganalyticscount});	
+	}
+
+	_successfulGetAnalyticsDataForProduct(self,campaigntaganalytics);
+}
