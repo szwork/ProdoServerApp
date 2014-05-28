@@ -693,7 +693,7 @@ Organization.prototype.getOrganization = function(orgid) {
 };
 var _getOrganization=function(self,orgid){
 
-	orgModel.findOne({orgid:orgid,status:"active"},{location:0,subscription:0,payment:0,usergrp:0}).lean().exec(function(err,organization){
+	orgModel.findOne({orgid:orgid,status:{$ne:"deactive"}},{location:0,subscription:0,payment:0,usergrp:0}).lean().exec(function(err,organization){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find organizationdata"}});
 		}else if(organization){
