@@ -2045,7 +2045,7 @@ var _successfullPublishOrganization=function(self){
 	self.emit("successfulPublishOrganization",{success:{message:"Organization successfully published"}})
 }
 var _updatePublishtUserOrgDetails=function(organziation){
-	userModel.update({"org.orgid":organziation.orgid},{$set:{"org.status":organziation.status}},{multi:true},function(err,userorgstatus){
+	userModel.update({"org.orgid":organziation.orgid},{$set:{"org.status":"active"}},{multi:true},function(err,userorgstatus){
 		if(err){
 			logger.emit("error","Database Issue")
 		}else if(userorgstatus==0){
