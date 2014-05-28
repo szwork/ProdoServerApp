@@ -326,14 +326,28 @@ var _successfulGetLatestFiveProducts=function(self,product){
 	self.emit("successfulGetLatestFiveProducts", {"success":{"message":"Getting Latest Five Product Details Successfully","Products":product}});
 }
 
-Product.prototype.getAllProduct = function(orgid) {
+Product.prototype.getAllProduct = function(orgid,limit) {
 	var self=this;
-	//////////////////
-	_getAllProduct(self,orgid);
-	///////////////////
-};
-var _getAllProduct=function(self,orgid){
-	productModel.find({orgid:orgid,status:{$ne:"deactive"}}).lean().exec(function(err,product){
+	if(limit==undefined){
+		var query=productModel.find({orgid:orgid,status:{$ne:"deactive"}})
+		//////////////////
+		_getAllProduct(self,orgid,query);
+		///////////////////	
+	}else{
+		if(!S(limit).isNumeric()){
+			self.emit("failedGetAllProduct",{"error":{"message":"limit should be numeric"}});
+		}else{
+			var query=productModel.find({orgid:orgid,status:{$ne:"deactive"}}).limit(parseInt(limit));
+			//////////////////
+		    _getAllProduct(self,orgid,query);
+		    ///////////////////		
+		}
+	}
+}
+	
+
+var _getAllProduct=function(self,orgid,query){
+	query.lean().exec(function(err,product){
 		if(err){
 			self.emit("failedGetAllProduct",{"error":{"code":"ED001","message":"Error in db to find all product"}});
 		}else if(product.length==0){
