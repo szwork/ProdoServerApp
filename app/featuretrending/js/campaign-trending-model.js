@@ -16,6 +16,7 @@ var logger = require("../../common/js/logger");
 //Campign Trending Model
 var campaignTrendingSchema = mongoose.Schema({
 	productname:{type:String},
+	name:{type:String},
 	orgid:{type:String},
   	prodle:{type:String},
   	campaign_id:{type:String},

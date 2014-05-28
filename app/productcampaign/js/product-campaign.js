@@ -144,7 +144,7 @@ var _successfulProductCampaignAdd = function(self,product_campaign_data){
 }
 
 var _addTrendingForProductCampaign = function(campaigndata){
-	console.log("campaigndata : "+JSON.stringify(campaigndata));
+	console.log("campaigndata name : "+JSON.stringify(campaigndata.name));
 	var trend={campaign_id:campaigndata.campaign_id,orgid:campaigndata.orgid,prodle:campaigndata.prodle,name:campaigndata.name,commentcount:0,followedcount:0};
 	var trend_data = new CampaignTrendModel(trend);
 	trend_data.save(function(err,trenddata){
