@@ -808,7 +808,7 @@ Product.prototype.getAllCategoryTags = function() {
 };
 
 var _getAllCategoryTags=function(self){
-	productModel.find({$where:"this.category.length>0"},{category:1,_id:0},function(err,categorytags){
+	productModel.find({$where:"this.category.length>0",status:"active"},{category:1,_id:0},function(err,categorytags){
 		if(err){
 			logger.emit("error","Database Issue _getAllCategoryTags "+err)
 			self.emit("failedGetAllCategoryTags",{"error":{"message":"Database Issue"}})
