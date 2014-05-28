@@ -3,6 +3,7 @@ var util = require("util");
 var events = require("events");
 var logger=require("../../common/js/logger");
 var userModel=require("./user-model");
+var authorModel=require("../../blog/js/author-model");
 var VerificationTokenModel=require('../../common/js/verification-token-model')
 var EmailTemplateModel=require('../../common/js/email-template-model');
 var S=require('string');
@@ -803,26 +804,38 @@ User.prototype.getUser = function(userid) {
 	var self=this;
 	_getUser(self,userid);
 };
+
 var _getUser=function(self,userid){
 	userModel.findOne({userid:userid,status:"active"},{verified:0,status:0,password:0,subscription:0,payment:0,terms:0,adddate:0,updatedate:0,removedate:0,isAdmin:0}).lean().exec(function(err,user){
 		if(err){
 			self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find user"}});
-		}else if(user){
-			_isOrganizationUser(user,function(user){
-				 ////////////////////////////////
-				_successfulUserGet(self,user);
-				//////////////////////////////////
-			})
-	        
+		}else if(user){			
+			_isOrganizationUser(user,function(user){				
+				authorModel.findOne({userid:userid}).lean().exec(function(err,authordata){
+					if(err){
+						self.emit("failedUserGet",{"error":{"code":"ED001","message":"Error in db to find author"}});
+					}else if(authordata){
+				        user.author_category = authordata.category;
+				        console.log("User##### : "+JSON.stringify(user));
+				        //////////////////////////////
+				        _successfulUserGet(self,user);
+						//////////////////////////////
+					}else{
+					    self.emit("failedUserGet",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
+					}
+				})				
+			})	        
 		}else{
 		    self.emit("failedUserGet",{"error":{"code":"AU005","message":"Provided userid is wrong"}});
 		}
 	})
 }
+
 var _successfulUserGet=function(self,user){
 	logger.emit("log","_successfulUserGet");
 	self.emit("successfulUserGet", {"success":{"message":"Getting User details Successfully","user":user}});
 }
+
 User.prototype.getAllUsers = function() {
 	var self=this;
 	//////////////////

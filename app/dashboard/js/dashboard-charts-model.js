@@ -33,7 +33,7 @@ DashboardChartsSchema.pre('save', function(next) {
   var dashboardchart = this;
   logger.emit("log","dashboardchart in pre "+dashboardchart);
   dashboardchart.chartid = "DC"+shortId.generate();
-  dashboardchart.chartname = dashboardchart.chartname.toLowerCase();
+  // dashboardchart.chartname = dashboardchart.chartname.toLowerCase();
   logger.emit("log","shortid : "+dashboardchart.chartid);
   next();
 });
