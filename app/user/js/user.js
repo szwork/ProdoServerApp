@@ -113,6 +113,7 @@ var _addProductsFollowedByUser = function(self,userdata,host){
 		if(err){
 			self.emit("failedUserRegistration",{"error":{"code":"ED001","message":"Error in db to find product details"}});
 		}else if(product){
+			console.log("user prouct prodonus"+product);
 			userdata.products_followed =[{prodle:product.prodle,orgid:product.orgid}];
 			_updateTrendingForProdonusFollowedCount(self,product);
 			_addUser(self,userdata,host);
@@ -164,6 +165,7 @@ var _updateTrendingForProdonusFollowedCount = function(self,product){
 		if(userdata.prodousertype=="individual"){
 			userdata.usertype="individual";
 		}
+		userdata.dashboard_access_code="RBONDS001";
 		
 		userdata.username=userdata.username.toLowerCase();
 		var user=userModel(userdata);
