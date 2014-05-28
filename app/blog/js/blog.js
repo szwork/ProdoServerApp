@@ -667,6 +667,50 @@ var _successfulauthorRegistration = function(self,author){
 	self.emit("successfulauthorRegistration", {"success":{"message":"Author Added Successfully"}});
 }
 
+Blog.prototype.updateAuthor=function(authorid,sessionuserid){
+	var self=this;
+	var authordata=this.blog;	
+	////////////////////////////////////////////////////////
+	_validateupdateAuthorData(self,authorid,authordata,sessionuserid);
+	////////////////////////////////////////////////////////
+}
+
+var _validateupdateAuthorData = function(self,authorid,authordata,userid){
+	if(authordata==undefined){
+		self.emit("failedupdateAuthor",{"error":{"code":"AV001","message":"Please pass authordata"}});
+	}else if(authordata.authorid!=undefined){
+		self.emit("failedupdateAuthor",{"error":{"code":"AV001","message":"Can't update authorid"}});
+	}else if(authordata.category==undefined){
+		self.emit("failedupdateAuthor",{"error":{"code":"AV001","message":"Please pass category"}});
+	}else if(!isArray(authordata.category)){
+		self.emit("failedupdateAuthor",{"error":{"code":"AV001","message":"category should be an array"}});
+	}else if(authordata.category.length==0){
+		self.emit("failedupdateAuthor",{"error":{"code":"AV001","message":"Pleas pass atleast one category"}});
+	}else{
+		_updateAuthor(self,authorid,authordata,userid);
+	}
+}
+
+var _updateAuthor = function(self,authorid,authordata,userid){
+	console.log("authordata : "+JSON.stringify(authordata));
+	authorModel.update({authorid:authorid},{$set:authordata}).lean().exec(function(err,blogupdatestatus){
+		if(err){
+			self.emit("failedupdateAuthor",{"error":{"code":"ED001","message":"Error in db to accept author request"}});
+		}else if(blogupdatestatus!=1){
+			self.emit("failedupdateAuthor",{"error":{"code":"AP001","message":"authorid is wrong"}});
+		}else{
+			////////////////////////////////
+			_successfulUpdateAuthor(self);
+			//////////////////////////////////
+		}
+	})
+};
+
+var _successfulUpdateAuthor = function(self,author){
+	logger.emit("log","_successfulUpdateAuthor");
+	self.emit("successfulUpdateAuthor", {"success":{"message":"Author updated successfully"}});
+}
+
 Blog.prototype.getAllRegistration = function() {
 	var self=this;
 	/////////////////////////

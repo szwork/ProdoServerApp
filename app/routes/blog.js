@@ -5,7 +5,8 @@ exports.init = function (app) {
   //Blog CRUD
 
   app.post("/api/author",auth,api.blogapi.authorRegistration);//author registration
-	app.get("/api/author",auth,api.blogapi.getAllRegistration);//get author registration for admin screen
+	app.get("/api/author",auth,api.blogapi.getAllRegistration);//get author registration for admin screen  
+  app.put("/api/author/:authorid",auth,api.blogapi.updateAuthor);//author update
 	app.put("/api/author/acceptance/:authorid/:userid",auth,api.blogapi.authorAcceptance);//author acceptance by admin screen
 	app.put("/api/author/rejection/:authorid/:userid",auth,api.blogapi.authorRejection);//author rejection by admin screen
 
