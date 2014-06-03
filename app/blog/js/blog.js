@@ -589,7 +589,7 @@ var _checkAlreadyRegisterAuthor = function(self,authordata,userid){
 		if(err){
 			self.emit("failedauthorRegistration",{"error":{"code":"ED001","message":"Error in db to check user alredy register"}});
 		}else if(userstatus){
-			self.emit("failedauthorRegistration",{"error":{"code":"AP001","message":"You are already register for blog author"}});
+			self.emit("failedauthorRegistration",{"error":{"code":"AP001","message":"You are alredy registered for blog author. We have received your author application request, if you require to change the category. please use manage usser console to do changes"}});
 		}else{
 			_getMailIdFromUserModel(self,authordata,userid);
 		}

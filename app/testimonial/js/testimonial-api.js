@@ -75,6 +75,5 @@ exports.getTestimonialForProduct=function(req,res){
       res.send(result);
     });
     
-     testimonial.getTestimonialForProduct(prodle);
-   
+     testimonial.getTestimonialForProduct(prodle);   
 }
