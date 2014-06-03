@@ -1365,11 +1365,11 @@ var _addBlogComment = function(self,prodle,blogid,commentdata,product){
 	      	}
 			////////////////////////////////////////////////	
 			_successfulAddBlogComment(self,blog_commentdata);
-<<<<<<< HEAD
+
 			// _validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
-=======
+
 		// _validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
->>>>>>> ae421671324bcbb0ca16acbda10f151ef62e9da7
+
 			////////////////////////////////////////////////
 		}
 	})
