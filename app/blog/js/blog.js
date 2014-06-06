@@ -347,11 +347,40 @@ Blog.prototype.getAllBlogsForProduct = function(prodle,userid) {
 };
 
 var _getAllBlogsForProduct = function(self,prodle,userid){
-	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:prodle}},{$group:{_id:{authorid:"$authorid",blogid:"$blogid",prodle:"$prodle",orgid:"$orgid",postedby:"$publishblog.postedby",title:"$publishblog.title",content:"$publishblog.content",productname:"$productname"}}},{$project:{authorid:"$_id.authorid",blogid:"$_id.blogid",prodle:"$_id.prodle",orgid:"$_id.orgid",postedby:"$_id.postedby",title:"$_id.title",content:"$_id.content",productname:"$_id.productname",_id:0}}]).exec(function(err,blogdata){
+	// Old [{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:prodle}},{$group:{_id:{authorid:"$authorid",blogid:"$blogid",prodle:"$prodle",orgid:"$orgid",postedby:"$publishblog.postedby",title:"$publishblog.title",content:"$publishblog.content",productname:"$productname"}}},{$project:{authorid:"$_id.authorid",blogid:"$_id.blogid",prodle:"$_id.prodle",orgid:"$_id.orgid",postedby:"$_id.postedby",title:"$_id.title",content:"$_id.content",productname:"$_id.productname",_id:0}}]
+	//New [{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:"e1Wl6-kgR"}},{$group:{_id:{authorid:"$authorid",blogid:"$blogid",prodle:"$prodle",orgid:"$orgid",postedby:"$publishblog.postedby",title:"$publishblog.title",content:"$publishblog.content",productname:"$productname",datepublished:"$datepublished",blog_images:"$blog_images"}}},{$project:{authorid:"$_id.authorid",blogid:"$_id.blogid",prodle:"$_id.prodle",orgid:"$_id.orgid",postedby:"$_id.postedby",title:"$_id.title",content:"$_id.content",productname:"$_id.productname",datepublished:"$_id.datepublished",blog_images:"$_id.blog_images",_id:0}}]
+	blogModel.aggregate([{"$unwind":"$publishblog"},{$match:{"publishblog.status":"active",prodle:prodle}},{$group:{_id:{authorid:"$authorid",blogid:"$blogid",prodle:"$prodle",orgid:"$orgid",postedby:"$publishblog.postedby",title:"$publishblog.title",content:"$publishblog.content",productname:"$productname",datepublished:"$datepublished",blog_images:"$blog_images"}}},{$project:{authorid:"$_id.authorid",blogid:"$_id.blogid",prodle:"$_id.prodle",orgid:"$_id.orgid",postedby:"$_id.postedby",title:"$_id.title",content:"$_id.content",productname:"$_id.productname",datepublished:"$_id.datepublished",blog_images:"$_id.blog_images",_id:0}}]).exec(function(err,blogdata){
 		if(err){
 			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"ED001","message":"Error in db to find all blog"}});
 		}else if(blogdata.length>0){
-			_successfulGetAllBlogsForProduct(self,blogdata);			
+			var authorid_arr = [];
+			var user_arr = [];
+			for(var i=0;i<blogdata.length;i++){
+				blogdata[i].blog_images.splice(1,blogdata[i].blog_images.length);
+				authorid_arr.push(blogdata[i].authorid);
+			}
+
+			console.log("author "+authorid_arr);
+			userModel.find({"author.authorid":{$in:authorid_arr}},{author:1,profile_pic:1,_id:0}).exec(function(err,userdata){
+				if(err){
+					self.emit("failedGetAllBlogsForProduct",{"error":{"code":"ED001","message":"Error in db to find user profile_pic"}});
+				}else if(userdata){
+					// blogdata[0].profile_pic = userdata.profile_pic;
+					for(var i=0;i<blogdata.length;i++){
+						for(var j=0;j<userdata.length;j++){
+							console.log("111  "+blogdata[i].authorid+" "+userdata[j].author.authorid);
+							if(blogdata[i].authorid==userdata[j].author.authorid){
+								blogdata[i].profile_pic = userdata[j].profile_pic;
+							}
+						}
+					}
+					_successfulGetAllBlogsForProduct(self,blogdata);
+				}else{
+					_successfulGetAllBlogsForProduct(self,blogdata);
+					// self.emit("failedGetAllBlogsForProduct",{"error":{"code":"AP001","message":"Wrong userid"}});
+				}
+			})
+			// _successfulGetAllBlogsForProduct(self,blogdata);			
 		}else{			
 			self.emit("failedGetAllBlogsForProduct",{"error":{"code":"AP001","message":"No blog exist for this product"}});
 		}
