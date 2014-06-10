@@ -156,12 +156,12 @@ var _addProductTestimonialToGroupMemberInbox=function(testimonial,message,userid
 		}else{
 			var inboxarray=[]
 			for(var i=0;i<users.length;i++){
-				var inbox
-				if(user.firstname==undefined){
-					inbox={testimonial:testimonial,messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid},subject:message.subject,body:message.html}
-				}else{
-					inbox={testimonial:testimonial,messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid,name:user.firstname},subject:message.subject,body:message.html}
-				}
+				var inbox={testimonial:testimonial,messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid,username:user.username},subject:message.subject,body:message.html}
+				// if(user.firstname==undefined){
+				// 	inbox={testimonial:testimonial,messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid},subject:message.subject,body:message.html}
+				// }else{
+				// 	inbox={testimonial:testimonial,messagetype:"testimonial",userid:users[i].userid,from:{email:user.email,userid:user.userid,name:user.firstname},subject:message.subject,body:message.html}
+				// }
 				inboxarray.push(inbox)
 			}
 			InboxModel.create(inboxarray,function(err,inboxex){

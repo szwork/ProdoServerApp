@@ -23,7 +23,7 @@ Inbox.prototype.getMyLatestInbox=function(sessionuserid,messagetype){
 	
 }
 var _getMyLatestInbox=function(self,sessionuserid,messagetype){
-	var query=InboxModel.find({userid:sessionuserid}).sort({createdate:-1}).limit(10).lean()
+	var query=InboxModel.find({userid:sessionuserid,messagetype:messagetype}).sort({createdate:-1}).limit(10).lean()
 	query.exec(function(err,inbox){
 		if(err){
 			self.emit("failedGetMyLatestInbox",{error:{code:"ED001",message:"Database Issue"}})
@@ -169,7 +169,7 @@ var _checkInbixIdIsWrong=function(self,sessionuserid,messageid,replytext){
 	})
 }
 var _replyToInboxMessage=function(self,inbox,replytext,user){
-  var newinbox={parentid:inbox.messageid,userid:inbox.from.userid,from:{email:user.email,userid:user.userid,name:user.firstname},body:replytext,subject:inbox.subject}
+  var newinbox={parentid:inbox.messageid,userid:inbox.from.userid,from:{email:user.email,userid:user.userid,username:user.username},body:replytext,subject:inbox.subject}
 	var new_inbox=new InboxModel(newinbox);
 	new_inbox.save(function(err,inbox_data){
 		if(err){
