@@ -218,7 +218,7 @@ var _searchProduct = function(self,productsearchdata,searchCriteria,query){
 		  	}
 		});
 	}else{
-		ProductModel.find(query,{name:1,prodle:1,orgid:1,description:1,_id:0}).limit(50).exec(function(err,doc){
+		ProductModel.find(query,{name:1,prodle:1,orgid:1,product_logo:1,description:1,_id:0}).limit(50).exec(function(err,doc){
 			if(err){
 				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to search product"+err}});
 			}else if(doc.length==0){
@@ -276,7 +276,7 @@ var _getOrgProdle = function(self,doc,i,doc1){
 	// logger.emit("log","doc length"+doc.length+"i:"+i);
 
     if(doc.length>i){
-		ProductModel.find({status:{$ne:"deactive"},orgid:doc[i].orgid},{prodle:1,name:1,description:1,_id:0}).exec(function(err,productdata){
+		ProductModel.find({status:{$ne:"deactive"},orgid:doc[i].orgid},{prodle:1,name:1,description:1,product_logo:1,_id:0}).exec(function(err,productdata){
 			if(err){
 				self.emit("failedToSearchProduct",{"error":{"code":"ED001","message":"Error in db to get org products "+err}});
 			}else if(productdata){

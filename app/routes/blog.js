@@ -13,7 +13,7 @@ exports.init = function (app) {
 	app.post("/api/blog/:prodle",auth,api.blogapi.addBlog);//add new blog
 	app.get("/api/productname/:authorid",auth,api.blogapi.getProductNameByCategory);//get product name
 	app.put("/api/blog/:authorid/:blogid",auth,api.blogapi.updateBlog);//update blog	
-  app.get("/api/blog/:authorid/:blogid",auth,api.blogapi.getBlog);//get blog
+  app.get("/api/authorblog/:authorid/:blogid",auth,api.blogapi.getBlog);//get blog
   app.get("/api/blog/:authorid",auth,api.blogapi.getAllBlogs);//get all blogs
   app.get("/api/productblog/:prodle",auth,api.blogapi.getAllBlogsForProduct);//get all blogs for a product
   app.get("/api/productblog/:prodle/:blogid",auth,api.blogapi.getBlogForProduct);//get blog for a product

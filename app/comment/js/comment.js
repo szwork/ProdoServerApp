@@ -798,17 +798,17 @@ Comment.prototype.loadMoreBlogComment = function(sessionuserid,commentid) {
 var _loadMoreBlogComment=function(self,sessionuserid,commentid){	
 	BlogCommentModel.findOne({commentid:commentid,status:"active"},{blogid:1,commentid:1,datecreated:1},function(err,comment){
 		if(err){
-			self.emit("failedLoadMoreCampaignComment",{"error":{"code":"ED001","message":"_loadMoreBlogComment:Error in db to get comment"+err}});
+			self.emit("failedLoadMoreBlogComment",{"error":{"code":"ED001","message":"_loadMoreBlogComment:Error in db to get comment"+err}});
 		}else if(!comment){
-			self.emit("failedLoadMoreCampaignComment",{"error":{"code":"AC001","message":"Wrong commentid"}});
+			self.emit("failedLoadMoreBlogComment",{"error":{"code":"AC001","message":"Wrong commentid"}});
 		}else{
 			logger.emit("log",comment);
 			var query=BlogCommentModel.find({blogid:comment.blogid,type:"blog",status:"active",datecreated:{$lt:comment.datecreated}},{_id:0,status:0}).sort({datecreated:-1}).limit(10);
 			query.exec(function(err,nextcomments){
 				if(err){
-					self.emit("failedLoadMoreCampaignComment",{"error":{"code":"ED001","message":"_loadMoreBlogComment: Error in db to get comment "+err}});
+					self.emit("failedLoadMoreBlogComment",{"error":{"code":"ED001","message":"_loadMoreBlogComment: Error in db to get comment "+err}});
 				}else if(nextcomments.length==0){
-					self.emit("failedLoadMoreCampaignComment",{"error":{"code":"AC002","message":"No More Comment(s)"}});
+					self.emit("failedLoadMoreBlogComment",{"error":{"code":"AC002","message":"No More Comment(s)"}});
 				}else{
 					//////////////////////////////////////////////////
 					_successfulLoadMoreBlogComment(self,nextcomments);
@@ -1365,7 +1365,11 @@ var _addBlogComment = function(self,prodle,blogid,commentdata,product){
 	      	}
 			////////////////////////////////////////////////	
 			_successfulAddBlogComment(self,blog_commentdata);
+
+			// _validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
+
 		// _validateBlogCommentFeatureAnalytics(prodle,commentdata,product);		
+
 			////////////////////////////////////////////////
 		}
 	})

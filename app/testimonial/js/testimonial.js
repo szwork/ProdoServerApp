@@ -41,7 +41,7 @@ var _addTestimonial=function(self,testimonialdata,orgid,prodle,sessionuserid,hos
 			logger.emit("error","Database Issue _addTestimonial"+err)
 			self.emit("failedAddTestimonial",{error:{code:"ED001",message:"Database Issue"}})
 		}else if(!product){
-			self.emit("failedAddTestimonial",{error:{message:"prodle or orgid is wrong"}})
+			self.emit("failedAddTestimonial",{error:{message:"prodle or orgid is wrong"}});
 		}else{
 			UserModel.findOne({userid:sessionuserid},{username:1,email:1,profile_pic:1,userid:1,org:1},function(err,user){
 				if(err){
@@ -71,7 +71,7 @@ var _addTestimonial=function(self,testimonialdata,orgid,prodle,sessionuserid,hos
 	})
 }
 var _successfullAddTestimonial=function(self){
-	self.emit("successfulAddTestimonial",{success:{message:"Scuccessfully added testimonial"}});
+	self.emit("successfulAddTestimonial",{success:{message:"Successfully added testimonial"}});
 }
 var _sendTestimonialRequestToOrganizationMember=function(self,testimonial,user,product,host){
 	logger.emit("log","host"+host);
