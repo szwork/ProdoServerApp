@@ -19,7 +19,7 @@ var logger = require("../../common/js/logger");
 var InboxSchema = mongoose.Schema({
   messageid:{type:String,unique:true},
   userid:{type:String,ref:"users"},
-  from:{email:String,userid:String,name:String},//email
+  from:{email:String,userid:String,username:String},//email
   body:{type:String},
   subject:{type:String},
   messagetype:{type:String,default:"normal"},

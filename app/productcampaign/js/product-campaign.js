@@ -358,7 +358,7 @@ var _getAllProductCampaign = function(self,prodle){
 
 			var a=new Date();
             var today=new Date(a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate());
-			ProductCampaignModel.find({prodle:prodle,status:{$in:["active","done"]},startdate:{$lte:today},enddate:{$gte:today}},{campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
+			ProductCampaignModel.find({prodle:prodle,status:{$in:["active","done"]},startdate:{$lte:today},enddate:{$gte:today}},{name:1,campaign_id:1,banner_image:1,bannertext:1,description:1}).lean().exec(function(err,productcampain){
 				if(err){
 					self.emit("failedGetAllProductCampaign",{"error":{"code":"ED001","message":"Error in db to find All Product Campain : "+err}});
 				}else if(productcampain.length==0){
