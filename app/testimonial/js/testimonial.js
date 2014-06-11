@@ -235,10 +235,24 @@ var _acceptTestimonial=function(self,testimonial,action){
 		}else if(testimonialstatus==0){
 			self.emit("failedTestimonailAction",{"error":{"message":"testimonialid is wrong"}})			
 		}else{
+			/////////////////////////////////
+			_updateInboxTestimonialStatus(testimonialid,"accept")
+			////////////////////////////////	
 			var message="Successfully accepted the testimonial";
 			////////////////////////////////
 			_successfullTestimonialAction(self,message)
 			////////////////////////////////	
+		}
+	})
+}
+var _updateInboxTestimonialStatus=function(testimonialid,status){
+	InboxModel.update({"testimonial.testimonialid":testimonialid},{$set:{"testimonial.status":status}},function(err,testimonialinboxstatus){
+		if(err){
+			logger.emit("error","Database Issue :_updateInboxTestimonialStatus"+err)
+		}else if(testimonialinboxstatus==0){
+			logger.emit("error","no testimonial message exists in inbox")
+		}else{
+			logger.emit("success","inbox testimonial status updated");
 		}
 	})
 }

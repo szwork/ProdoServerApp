@@ -978,7 +978,7 @@ var _sendProductEnquiryRequest=function(self,productenquirydata,orgid,product,us
 		   _addNotificationToGroupMemberInbox(message,validproductenquiryuserids,user)
 		     ///////////////////////////////////
          /////////////////////////////////////	
-         _addToTheProductEnquiry(self,orgid,product.prodle,message,user.userid)
+         _addToTheProductEnquiry(self,orgid,product.prodle,message,user.userid,body)
          //////////////////////////////////////
 
 		    commonapi.sendMail(message,CONFIG.smtp_business, function (result){
@@ -995,8 +995,8 @@ var _sendProductEnquiryRequest=function(self,productenquirydata,orgid,product,us
   })
     
 }
-var _addToTheProductEnquiry=function(self,orgid,prodle,message,userid){
-	var productenquirydata={orgid:orgid,prodle:prodle,subject:message.subject,body:message.body,userid:userid}
+var _addToTheProductEnquiry=function(self,orgid,prodle,message,userid,body){
+	var productenquirydata={orgid:orgid,prodle:prodle,subject:message.subject,body:body,userid:userid}
 	var productenquiry=new ProductEnquiry(productenquirydata);
 	productenquiry.save(function(err,product_enquiry){
 		if(err){
@@ -1022,12 +1022,8 @@ var _addNotificationToGroupMemberInbox=function(message,userids,user){
 		}else{
 			var inboxarray=[]
 			for(var i=0;i<users.length;i++){
-				var inbox
-				if(user.firstname==undefined){
-					inbox={messagetype:"enquiry",userid:users[i].userid,from:{email:user.email,userid:user.userid},subject:message.subject,body:message.body}
-				}else{
-					inbox={messagetype:"enquiry",userid:users[i].userid,from:{email:user.email,userid:user.userid,name:user.firstname},subject:message.subject,body:message.body}
-				}
+				var inbox=inbox={messagetype:"enquiry",userid:users[i].userid,from:{email:user.email,userid:user.userid,username:user.username},subject:message.subject,body:message.html}
+				
 				inboxarray.push(inbox)
 			}
 			InboxModel.create(inboxarray,function(err,inboxex){
