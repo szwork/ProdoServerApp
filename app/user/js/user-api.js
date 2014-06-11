@@ -509,6 +509,49 @@ exports.unfollowproduct=function(req,res){
  user.unfollowproduct(prodle,sessionuserid);
 
 }
+
+exports.productRecommends=function(req,res){
+  var user=new User();
+  var sessionuserid=req.user.userid;
+  var prodle=req.params.prodle;
+  // var orgid=req.params.orgid;
+  logger.emit("log","prodle"+prodle+"\no\nsessionid:"+sessionuserid);
+  // var product= new Product();
+  user.removeAllListeners("failedProductRecommend");
+  user.on("failedProductRecommend",function(err){
+    logger.emit("error", err.error.message,req.user.email);
+    res.send(err);
+  });
+  user.removeAllListeners("successfulProductRecommend");
+  user.on("successfulProductRecommend",function(result){
+    logger.emit("info", result.success.message,req.user.email);
+    // callback(null,result);
+    res.send(result);
+  });    
+ user.productRecommends(prodle,sessionuserid);
+}
+
+exports.productRecommendCount=function(req,res){
+  var user=new User();
+  var sessionuserid=req.user.userid;
+  var prodle=req.params.prodle;
+  // var orgid=req.params.orgid;
+  logger.emit("log","prodle"+prodle+"\no\nsessionid:"+sessionuserid);
+  // var product= new Product();
+  user.removeAllListeners("failedGetProductRecommendCount");
+  user.on("failedGetProductRecommendCount",function(err){
+    logger.emit("error", err.error.message,req.user.email);
+    res.send(err);
+  });
+  user.removeAllListeners("successfulGetProductRecommendCount");
+  user.on("successfulGetProductRecommendCount",function(result){
+    logger.emit("info", result.success.message,req.user.email);
+    // callback(null,result);
+    res.send(result);
+  });    
+ user.productRecommendCount(prodle,sessionuserid);
+}
+
 exports.checkUsernameExists=function(req,res){
   // var userdata=req.body.user;
   var user=new User();

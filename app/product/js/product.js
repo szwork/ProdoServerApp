@@ -262,7 +262,7 @@ var _getProduct=function(self,orgid,prodle){
 		if(err){
 			self.emit("failedGetProduct",{"error":{"code":"ED001","message":"Error in db to find Product"}});
 		}else if(product){
-			TrendingModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}},{commentcount:1,followedcount:1,_id:0}).lean().exec(function(err,product_trend){
+			TrendingModel.findOne({orgid:orgid,prodle:prodle,status:{$ne:"deactive"}},{commentcount:1,followedcount:1,recommendcount:1,_id:0}).lean().exec(function(err,product_trend){
 				if(err){
 					logger.emit({"message":"Error in db to find ProductTrend"});
 				}else{
