@@ -1436,9 +1436,7 @@ var _applyOrganizatioPlanToUser=function(self,user,paymentdata,subscription){
 var _successfullMakePayment=function(self){
 	logger.emit("log","_successfullMakePayment");
 	self.emit("successfulMakePayment",{"success":{"message":"You have successfully made an payment"}})
-}
-    
-       
+}     
               
 User.prototype.followproduct=function(prodle,sessionuserid){
 	var self=this;
@@ -1597,7 +1595,67 @@ var updateLatestProductUnfollowedCount=function(product){
 		}
 	})
 }
-              
+
+User.prototype.productRecommends=function(prodle,sessionuserid){
+	var self=this;
+	_isValidProductToRecommends(self,prodle,sessionuserid);
+}
+var _isValidProductToRecommends=function(self,prodle,sessionuserid){
+	productModel.findOne({prodle:prodle},function(err,product){
+		if(err){
+			logger.emit("log","failed to connect to database "+err);
+			self.emit("failedProductRecommend",{"error":{"code":"ED001","message":"Error in db to find product data"}});
+		}else if(product){
+			_checkAlreadyRecommendedProductOrNot(self,product,sessionuserid);			
+		}else{
+			logger.emit("log","Incorrect prodle");
+			self.emit("failedProductRecommend",{"error":{"message":"Incorrect prodle","prodle":prodle}});
+		}
+	})
+}
+var _checkAlreadyRecommendedProductOrNot=function(self,product,sessionuserid){
+	userModel.findOne({userid:sessionuserid,"products_recommends.prodle":product.prodle},function(err,userdata){
+		if(err){
+			logger.emit("log","failed to connect to database "+err);
+			self.emit("failedProductRecommend",{"error":{"code":"ED001","message":"Error in db to find user data"}});
+		}else if(!userdata){
+			_recommendProduct(self,product,sessionuserid);				
+		}else{
+			self.emit("failedProductRecommend",{"error":{"code":"AD001","message":"You have already recommended to this product"}});
+		}
+	})
+}
+var _recommendProduct=function(self,product,sessionuserid){
+	userModel.update({userid:sessionuserid},{$push:{products_recommends:{prodle:product.prodle,orgid:product.orgid,recommenddate:new Date()}}},function(err,recommendproductstatus){
+		if(err){
+			logger.emit("log","failed to connect to database "+err);
+			self.emit("failedProductRecommend",{"error":{"code":"ED001","message":"Error in db to recommend product"}});
+		}else if(recommendproductstatus){
+			_updateProductRecommendCount(product.prodle);
+			_successfulProductRecommend(self);
+		}else{
+			logger.emit("log","Failure in recommend the product");
+			self.emit("failedProductRecommend",{"error":{"code":"F001","message":"Failed to recommend the product"}});
+		}
+	});
+}
+var _updateProductRecommendCount = function(prodle){
+	console.log("_updateProductRecommendCount");
+	TrendingModel.update({prodle:prodle},{$inc:{recommendcount:1}},function(err,latestupatestatus){
+		if(err){
+			logger.emit("error","Error in updation latest product recommend count");
+		}else if(latestupatestatus==1){
+			logger.emit("log","Latest product recommend count updated");
+		}else{
+			logger.emit("error","Given product id is wrong to update latest product recommend count");
+		}
+	})
+}
+var _successfulProductRecommend=function(self){
+	logger.emit("log","_successfulProductRecommend");
+	self.emit("successfulProductRecommend",{"success":{"message":"You have successfully recommended to this product"}});
+}
+
 User.prototype.checkUsernameExists=function(username){
 	var self=this;
 	/////////////////////////////////////

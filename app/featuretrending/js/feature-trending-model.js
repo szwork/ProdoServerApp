@@ -20,6 +20,7 @@ var featureTrendingSchema = mongoose.Schema({
   	prodle:{type:String},
   	commentcount:{type:Number,default:0},
   	followedcount:{type:Number,default:0},
+  	recommendcount:{type:Number,default:0},
   	org_category:[{type:String}],
   	status:{type:String,default:"active"}//active,deactive
 });

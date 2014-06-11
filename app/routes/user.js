@@ -36,6 +36,8 @@ exports.init = function (app) {
 
   app.get("/api/user/follow/:prodle",auth, api.userapi.followproduct);
   app.get("/api/user/unfollow/:prodle",auth, api.userapi.unfollowproduct);
+  app.put("/api/productrecommend/:prodle",auth, api.userapi.productRecommends);
+  app.get("/api/recommendcount/:prodle",auth, api.userapi.productRecommendCount);
   
   app.get('/api/subscription/:plantype',api.subscriptionapi.getSubscriptionPlanbyType);
   app.post("/api/userinvites",auth,api.userapi.userInvites);

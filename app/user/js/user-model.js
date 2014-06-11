@@ -54,14 +54,13 @@ var userSchema = mongoose.Schema({
   payment:{paymentid:{type:String,ref:"payment",default:null}},
   payment_history:[{paymentid:{type:String,ref:"payment"}}],
   products_followed: [{prodle:{type:String,ref:"product"},orgid:{type:String,ref:"organizations"},followdate:{type:Date}}], //list of prodle - product ids handles #12934xyz
-  products_recommends:[{prodle:{type:String,ref:"product"} ,orgid:{type:String,ref:"organizations"},rating:{type:String} ,repeat_value:{type:String}}], //list of prodles
+  products_recommends:[{prodle:{type:String,ref:"product"},orgid:{type:String,ref:"organizations"},recommenddate:{type:Date}}], //list of prodles
   campaign_followed: [{campaign_id:{type:String,ref:"productcampaign"},prodle:{type:String,ref:"product"},orgid:{type:String,ref:"organizations"}}],
   blog_likes:[{blogid:{type:String,ref:"blog"},prodle:{type:String,ref:"product"},authorid:{type:String,ref:"author"},likedate:{type:String}}], 
   status:{type:String,default:"active"},
   terms:{type:Boolean},
   adddate:{ type:Date,default:Date.now },
   updatedate:{ type:Date},
-  // featurerating:[{}]
   removedate:{ type:Date},
   profile_pic:{bucket:{type:String},key:String,image:{type:String}},
   author:{authorid:{type:String,default:null},isAuthor:{type:Boolean,default:false}},//blog author
