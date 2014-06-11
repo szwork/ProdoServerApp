@@ -939,7 +939,7 @@ var _isValidOrgForProductEnquiry=function(self,productenquirydata,orgid,prodle,u
 var _sendProductEnquiryRequest=function(self,productenquirydata,orgid,product,user){
 	var body=productenquirydata.body;
 	var subject=productenquirydata.subject;
-	body="<br><br>Enquiry about product <b>"+product.name+"</b><br><br>"+productenquirydata.body;
+	body="<br><br><b>"+productenquirydata.body+"</b>";
 	body+="<br><br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
   body+="<br>Disclaimer: We are not responsible for the content of this email as it is produced by "+user.email;
     var grparray=[new RegExp("admin",'i'),new RegExp("sales",'i'),new RegExp("sales",'i')];
@@ -975,7 +975,7 @@ var _sendProductEnquiryRequest=function(self,productenquirydata,orgid,product,us
 		       };
 		       console.log("message"+JSON.stringify(message))
          ////////////////////////////////////
-		   _addNotificationToGroupMemberInbox(message,validproductenquiryuserids,user)
+		   _addNotificationToGroupMemberInbox(subject,productenquirydata.body,validproductenquiryuserids,user)
 		     ///////////////////////////////////
          /////////////////////////////////////	
          _addToTheProductEnquiry(self,orgid,product.prodle,message,user.userid,body)
@@ -1013,7 +1013,7 @@ var _addToTheProductEnquiry=function(self,orgid,prodle,message,userid,body){
 var _successfullProductEnquiry=function(self){
 	self.emit("successfulProductEnquiryRequest",{success:{message:"Product Enquiry Request Sent successfully to Organization Member"}})
 }
-var _addNotificationToGroupMemberInbox=function(message,userids,user){
+var _addNotificationToGroupMemberInbox=function(subject,body,userids,user){
 	UserModel.find({userid:{$in:userids}},{userid:1,email:1,firstname:1},function(err,users){
 		if(err){
 			logger.emit("error","Database Issue"+err)
@@ -1022,7 +1022,7 @@ var _addNotificationToGroupMemberInbox=function(message,userids,user){
 		}else{
 			var inboxarray=[]
 			for(var i=0;i<users.length;i++){
-				var inbox=inbox={messagetype:"enquiry",userid:users[i].userid,from:{email:user.email,userid:user.userid,username:user.username},subject:message.subject,body:message.html}
+				var inbox=inbox={messagetype:"enquiry",userid:users[i].userid,from:{email:user.email,userid:user.userid,username:user.username},subject:subject,body:body}
 				
 				inboxarray.push(inbox)
 			}
