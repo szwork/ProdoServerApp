@@ -77,7 +77,7 @@ var _sendTestimonialRequestToOrganizationMember=function(self,testimonial,user,p
 	logger.emit("log","host"+host);
 	var body="";
 	var subject="Testimonial Requst";
-	body+="<br>Customer <b><username> <orgname><b> has provided a testimonial for our product <b><productname></b>.<br>";
+	body+="Customer <b><username> <orgname></b> has provided a testimonial for our product <b><productname></b>";
 	// body+="<br><br> '<b><testimonialtext></b>'<br><br>Please press or click <a  style='color:black;border:1;background-color:orange' href='http://"+host+"/api/testimonialaction/<testimonialid>?name=accept'>ACCEPT</a> if you want to make this testimonial public. And press or click <a style='color:black;border:1;background-color:orange' href='http://"+host+"/api/testimonialaction/<testimonialid>?name=reject' >REJECT</a> to remove the testimonial from product page"
 	body=S(body);
 
