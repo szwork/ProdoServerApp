@@ -77,8 +77,8 @@ var _sendTestimonialRequestToOrganizationMember=function(self,testimonial,user,p
 	logger.emit("log","host"+host);
 	var body="";
 	var subject="Testimonial Requst";
-	body+="<br>Customer <username> <orgname> has provided a testimonial for our product <b><productname></b>.<br>";
-	body+="<br><br> '<b><testimonialtext></b>'<br><br>Please press or click <a  style='color:black;border:1;background-color:orange' href='http://"+host+"/api/testimonialaction/<testimonialid>?name=accept'>ACCEPT</a> if you want to make this testimonial public. And press or click <a style='color:black;border:1;background-color:orange' href='http://"+host+"/api/testimonialaction/<testimonialid>?name=reject' >REJECT</a> to remove the testimonial from product page"
+	body+="<br>Customer <b><username> <orgname><b> has provided a testimonial for our product <b><productname></b>.<br>";
+	// body+="<br><br> '<b><testimonialtext></b>'<br><br>Please press or click <a  style='color:black;border:1;background-color:orange' href='http://"+host+"/api/testimonialaction/<testimonialid>?name=accept'>ACCEPT</a> if you want to make this testimonial public. And press or click <a style='color:black;border:1;background-color:orange' href='http://"+host+"/api/testimonialaction/<testimonialid>?name=reject' >REJECT</a> to remove the testimonial from product page"
 	body=S(body);
 
 	body=body.replaceAll("<username>",user.username);
@@ -94,8 +94,8 @@ var _sendTestimonialRequestToOrganizationMember=function(self,testimonial,user,p
 	console.log('body'+body)
  body=body.s;
 	// body="<br><br>User <username> has added Testimonial h<b>"+product.name+"</b><br><br>";
-	body+="<br><br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
-  body+="<br>Disclaimer: We are not responsible for the content of this email as it is produced by "+user.email;
+	// body+="<br><br>This email content is sent on behalf of  "+user.email+" by Prodonus Software Team";
+  // body+="<br>Disclaimer: We are not responsible for the content of this email as it is produced by "+user.email;
     var grparray=[new RegExp("admin",'i'),new RegExp("marketing",'i'),new RegExp("marketing",'i')];
 		orgModel.aggregate({$match:{orgid:testimonial.orgid}},{$unwind:"$usergrp"},{$match:{"usergrp.grpname":{$in:grparray}}},{$project:{grpname:"$usergrp.grpname",grpmembers:"$usergrp.grpmembers",_id:0}},function(err,usergrps){
 			if(err){
