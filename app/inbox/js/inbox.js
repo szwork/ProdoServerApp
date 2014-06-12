@@ -23,7 +23,7 @@ Inbox.prototype.getMyLatestInbox=function(sessionuserid,messagetype){
 	
 }
 var _getMyLatestInbox=function(self,sessionuserid,messagetype){
-	var query=InboxModel.find({userid:sessionuserid,messagetype:messagetype}).sort({createdate:-1}).limit(10).lean()
+	var query=InboxModel.find({userid:sessionuserid,messagetype:messagetype,status:{$ne:"deactive"}}).sort({createdate:-1}).limit(10).lean()
 	query.exec(function(err,inbox){
 		if(err){
 			self.emit("failedGetMyLatestInbox",{error:{code:"ED001",message:"Database Issue"}})
@@ -46,7 +46,7 @@ Inbox.prototype.loadMoreInboxMessages=function(sessionuserid,messageid){
 	///////////////////////////////////////////
 }
 var _loadMoreInboxMessage=function(self,sessionuserid,messageid){
-	InboxModel.findOne({userid:sessionuserid,messageid:messageid},function(err,inbox){
+	InboxModel.findOne({userid:sessionuserid,messageid:messageid,status:{$ne:"deactive"}},function(err,inbox){
 		if(err){
 			self.emit("failedLoadMoreInboxMessages",{error:{code:"ED001",message:"Database Issue"}})
 		}else if(!inbox){
@@ -96,7 +96,7 @@ var _validateInboxAction=function(self,sessionuserid,messageid,action){
 				if(err){
 					self.emit("failedInboxAction",{error:{code:"ED001",message:"Database Issue"}})
 				}else if(!inbox){
-					self.emit("failedInboxAction",{error:{"message":"messageid is wrong or not exiss"}})
+					self.emit("failedInboxAction",{error:{"message":"messageid is wrong or not exists"}})
 				}else{
 					if(action=="read"){
 						if(action==inbox.status){
