@@ -76,7 +76,7 @@ var _successfullAddTestimonial=function(self){
 var _sendTestimonialRequestToOrganizationMember=function(self,testimonial,user,product,host){
 	logger.emit("log","host"+host);
 	var body="";
-	var subject="Testimonial Requst";
+	var subject="Testimonial Request";
 	body+="Customer <b><username> <orgname></b> has provided a testimonial for our product <b><productname></b>";
 	// body+="<br><br> '<b><testimonialtext></b>'<br><br>Please press or click <a  style='color:black;border:1;background-color:orange' href='http://"+host+"/api/testimonialaction/<testimonialid>?name=accept'>ACCEPT</a> if you want to make this testimonial public. And press or click <a style='color:black;border:1;background-color:orange' href='http://"+host+"/api/testimonialaction/<testimonialid>?name=reject' >REJECT</a> to remove the testimonial from product page"
 	body=S(body);
@@ -236,7 +236,7 @@ var _acceptTestimonial=function(self,testimonial,action){
 			self.emit("failedTestimonailAction",{"error":{"message":"testimonialid is wrong"}})			
 		}else{
 			/////////////////////////////////
-			_updateInboxTestimonialStatus(testimonialid,"accept")
+			_updateInboxTestimonialStatus(testimonial.testimonialid,"accept")
 			////////////////////////////////	
 			var message="Successfully accepted the testimonial";
 			////////////////////////////////
