@@ -928,11 +928,28 @@ var _isValidOrgForProductEnquiry=function(self,productenquirydata,orgid,prodle,u
 				}else if(!product){
 					self.emit("failedProductEnquiryRequest",{"error":{"message":"Product not exists"}});		
 				}else{
-					/////////////////////////////////////////////////////////////////
-					_sendProductEnquiryRequest(self,productenquirydata,orgid,product,user)
-					/////////////////////////////////////////////////////////////////
+					/////////////////////////////////////////////////////////////////////////
+					_checkProductEnquiryAlreadySent(self,productenquirydata,orgid,product,user)
+					//////////////////////////////////////////////////////////////////
+					
 				}
 			})
+		}
+	})
+}
+var _checkProductEnquiryAlreadySent=function(self,productenquirydata,orgid,product,user){
+	var currentdate=new Date();
+	currentdate.setDate(currentdate.getDate()-10);
+	ProductEnquiry.findOne({prodle:prodle,enquirydate:{$gt:currentdate}},function(err,productenquiry){
+		if(err){
+			logger.emit("error","Database Issue _checkProductEnquiryAlreadySent "+err)
+			self.emit("failedProductEnquiryRequest",{"error":{"message":"Database Issue"}})		
+		}else if(productenquiry){
+			self.emit("failedProductEnquiryRequest",{error:{message:"Product enquiry request for this product already sent,Your request is under processing"}})
+		}else{
+			/////////////////////////////////////////////////////////////////
+			_sendProductEnquiryRequest(self,productenquirydata,orgid,product,user)
+		    /////////////////////////////////////////////////////////////////
 		}
 	})
 }
@@ -981,13 +998,13 @@ var _sendProductEnquiryRequest=function(self,productenquirydata,orgid,product,us
          _addToTheProductEnquiry(self,orgid,product.prodle,message,user.userid,body)
          //////////////////////////////////////
 
-		    commonapi.sendMail(message,CONFIG.smtp_business, function (result){
-		      if(result=="failure"){
-		        logger.emit("error","Product enquiry request not sent to "+message.to+" by"+user.email);
-		      }else{
-		        logger.emit("log","Product enquiry request Sent Successfully to"+message.to+" by"+user.email);
-		      }
-		    });
+		    // commonapi.sendMail(message,CONFIG.smtp_business, function (result){
+		    //   if(result=="failure"){
+		    //     logger.emit("error","Product enquiry request not sent to "+message.to+" by"+user.email);
+		    //   }else{
+		    //     logger.emit("log","Product enquiry request Sent Successfully to"+message.to+" by"+user.email);
+		    //   }
+		    // });
 
 			}
 		})

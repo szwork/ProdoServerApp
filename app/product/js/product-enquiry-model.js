@@ -26,7 +26,8 @@ var productEnquirySchema = mongoose.Schema({
   orgid:{type:String,ref:"Organization"},//means manufacturer
   userid:{type:String},
   subject:{type:String},
-  body:{type:String}
+  body:{type:String},
+  enquirydate:{type:Date,default:new Date()}
 });
 productEnquirySchema.pre('save', function(next) {
   var productenquiry = this;
