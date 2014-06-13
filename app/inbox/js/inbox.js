@@ -52,7 +52,7 @@ var _loadMoreInboxMessage=function(self,sessionuserid,messageid){
 		}else if(!inbox){
 			self.emit("failedLoadMoreInboxMessages",{error:{"message":"inboxd is wrong or not exiss"}})
 		}else{
-			var query=InboxModel.find({messagetype:inbox.messagetype,userid:sessionuserid,messageid:{$ne:messageid},createdate:{$lte:inbox.createdate}}).sort({createdate:-1}).limit(10).lean()
+			var query=InboxModel.find({messagetype:inbox.messagetype,userid:sessionuserid,status:{$ne:"deactive"},messageid:{$ne:messageid},createdate:{$lte:new Date(inbox.createdate)}}).sort({createdate:-1}).limit(10).lean()
 	        query.exec(function(err,inbox){
 				if(err){
 					self.emit("failedLoadMoreInboxMessages",{error:{code:"ED001",message:"Database Issue"}})
